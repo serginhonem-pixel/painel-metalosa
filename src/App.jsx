@@ -1795,7 +1795,7 @@ export default function App() {
 
                        return (
                          <div className="space-y-4">
-                           <div className="grid grid-cols-7 gap-2 text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                           <div className="grid grid-cols-7 gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-bold">
                              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((label) => (
                                <div key={label} className="text-center">{label}</div>
                              ))}
@@ -1819,40 +1819,40 @@ export default function App() {
                                  : base > 0
                                    ? ((base - faltas) / base) * 100
                                    : 0;
-                               return (
-                                 <button
-                                   key={dataISO}
-                                   onClick={() => setDiaHistorico(dataISO)}
-                                   className={`h-24 rounded-xl border px-3 py-2 text-left transition-all ${
-                                     isAtivo
-                                       ? 'border-blue-500 bg-blue-950/40'
-                                       : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
-                                   }`}
-                                 >
-                                   <div className="flex items-center justify-between">
-                                     <span className="text-sm font-bold text-slate-100">{dia}</span>
-                                     {isWeekend ? (
-                                       <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-200">
-                                         DSR
-                                       </span>
-                                     ) : (
-                                       resumo.total > 0 && (
-                                         <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-200">
-                                           {resumo.total} falta{resumo.total > 1 ? 's' : ''}
-                                         </span>
-                                       )
-                                     )}
-                                   </div>
-                                   <div className="mt-3 rounded-lg border border-slate-800 bg-slate-950/60 px-2 py-1 text-center text-[11px] font-bold text-emerald-200">
-                                     {percentualPresenca.toFixed(0)}% presenca
-                                   </div>
-                                   <div className="mt-2 text-[10px] text-slate-400">
-                                     {isWeekend ? 'Descanso semanal' : (resumo.total === 0 ? 'Sem faltas' : 'Com apontamentos')}
-                                   </div>
-                                 </button>
-                               );
-                             })}
-                           </div>
+                                return (
+                                  <button
+                                    key={dataISO}
+                                    onClick={() => setDiaHistorico(dataISO)}
+                                   className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
+                                      isAtivo
+                                        ? 'border-blue-500 bg-blue-950/40'
+                                        : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs sm:text-sm font-bold text-slate-100">{dia}</span>
+                                      {isWeekend ? (
+                                        <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-indigo-200">
+                                          DSR
+                                        </span>
+                                      ) : (
+                                        resumo.total > 0 && (
+                                          <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-rose-200">
+                                            {resumo.total} falta{resumo.total > 1 ? 's' : ''}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                    <div className="mt-2 sm:mt-3 rounded-lg border border-slate-800 bg-slate-950/60 px-1.5 sm:px-2 py-1 text-center text-[9px] sm:text-[11px] font-bold text-emerald-200">
+                                      {percentualPresenca.toFixed(0)}% presenca
+                                    </div>
+                                    <div className="mt-1.5 text-[9px] sm:text-[10px] text-slate-400 hidden sm:block">
+                                      {isWeekend ? 'Descanso semanal' : (resumo.total === 0 ? 'Sem faltas' : 'Com apontamentos')}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
                          </div>
                        );
                      })()}
