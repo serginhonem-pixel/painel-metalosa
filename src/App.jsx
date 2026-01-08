@@ -41,7 +41,6 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
-  { id: 'operacional', label: 'Visão Operacional', icon: Factory },
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
@@ -1554,35 +1553,6 @@ export default function App() {
             </div>
           )}
 
-          {/* ABA OPERACIONAL */}
-          {abaAtiva === 'operacional' && (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-right duration-500">
-                {listaMaquinas.map((m, idx) => (
-                  <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-300 transition-all">
-                    <h3 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                      <Cpu size={18} className="text-blue-500 group-hover:scale-110 transition-transform"/> {m.nome}
-                    </h3>
-                    <div className="space-y-4">
-                       <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-500 uppercase tracking-tighter">Setor:</span>
-                          <span className="text-blue-600 uppercase tracking-tighter">{m.setor}</span>
-                       </div>
-                       <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-500 uppercase tracking-tighter">Operação:</span>
-                          <span className="text-emerald-600">ATIVO</span>
-                       </div>
-                       <p className="text-slate-400 text-xs italic">Sem dados do ERP.</p>
-                    </div>
-                  </div>
-                ))}
-                {listaMaquinas.length === 0 && (
-                  <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
-                    <p className="text-slate-400 italic">Nenhuma máquina cadastrada. Vá em Configurações.</p>
-                  </div>
-                )}
-             </div>
-          )}
-
           {/* ABA DE GESTÃO DIÁRIA */}
           {abaAtiva === 'gestao' && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
@@ -1793,15 +1763,18 @@ export default function App() {
                          return dia;
                        });
 
+                       const hojeISO = new Date().toLocaleDateString('en-CA');
                        return (
                          <div className="space-y-4">
-                           <div className="grid grid-cols-7 gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((label) => (
-                               <div key={label} className="text-center">{label}</div>
-                             ))}
-                           </div>
-                           <div className="grid grid-cols-7 gap-2">
-                             {cells.map((dia, index) => {
+                           <div className="overflow-x-auto">
+                             <div className="min-w-[560px]">
+                               <div className="grid grid-cols-7 gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                                 {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((label) => (
+                                   <div key={label} className="text-center">{label}</div>
+                                 ))}
+                               </div>
+                               <div className="grid grid-cols-7 gap-2">
+                                 {cells.map((dia, index) => {
                                if (!dia) {
                                  return <div key={`empty-${index}`} className="h-20 rounded-xl border border-dashed border-slate-700/60 bg-slate-900/40" />;
                                }
@@ -1810,6 +1783,7 @@ export default function App() {
                                const dataISO = `${anoBase}-${mes}-${diaStr}`;
                                const resumo = obterResumoDia(dataISO);
                                const isAtivo = diaHistorico === dataISO;
+                               const isHoje = dataISO === hojeISO;
                                const diaSemana = (index % 7);
                                const isWeekend = diaSemana === 0 || diaSemana === 6;
                                const faltas = resumo.total;
@@ -1823,10 +1797,12 @@ export default function App() {
                                   <button
                                     key={dataISO}
                                     onClick={() => setDiaHistorico(dataISO)}
-                                   className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
-                                      isAtivo
-                                        ? 'border-blue-500 bg-blue-950/40'
-                                        : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
+                                    className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
+                                      isHoje
+                                        ? 'border-emerald-400/70 bg-emerald-950/40 ring-2 ring-emerald-400/40'
+                                        : isAtivo
+                                          ? 'border-blue-500 bg-blue-950/40'
+                                          : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between">
@@ -1851,8 +1827,10 @@ export default function App() {
                                     </div>
                                   </button>
                                 );
-                              })}
-                            </div>
+                                 })}
+                               </div>
+                             </div>
+                           </div>
                          </div>
                        );
                      })()}
