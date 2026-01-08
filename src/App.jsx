@@ -627,7 +627,7 @@ export default function App() {
     <div className="app-dark flex min-h-screen bg-slate-950 text-slate-100 font-sans">
       
       {/* Sidebar Clássica */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col fixed h-full z-20 shadow-2xl">
+      <aside className="hidden md:flex w-64 bg-slate-900 text-white flex-col fixed h-full z-20 shadow-2xl">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-10">
             <div className="bg-blue-600 p-2 rounded-lg shadow-lg">
@@ -663,7 +663,7 @@ export default function App() {
       </aside>
 
       {/* Conteúdo Principal */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 md:ml-64 p-6 md:p-8 pb-24 md:pb-8">
         <header className="max-w-7xl mx-auto mb-8 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -2030,6 +2030,25 @@ export default function App() {
         </div>
       </main>
 
+      {/* Menu Mobile Inferior */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
+        <div className="grid grid-cols-5">
+          {ITENS_MENU.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setAbaAtiva(item.id)}
+              className={`flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold uppercase tracking-wide transition-all ${
+                abaAtiva === item.id
+                  ? 'text-blue-400'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <item.icon size={18} />
+              {item.label.split(' ')[0]}
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
