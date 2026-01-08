@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import presencaDez from './data/Prensençadez.json';
+import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { db } from './firebase';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -45,7 +47,7 @@ const ITENS_MENU = [
 ];
 
 const SETORES_INICIAIS = [];
-const GESTORES_INICIAIS = [];
+const GESTORES_INICIAIS = ['Thalles'];
 const MAQUINAS_INICIAIS = [];
 
 // --- Componentes de UI ---
@@ -114,6 +116,15 @@ const formatarValorCurto = (valor) => {
   return `R$ ${Math.round(valor)}`;
 };
 
+const normalizarIdFirestore = (texto) =>
+  String(texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .trim();
+
 // --- Aplicação Principal ---
 
 export default function App() {
@@ -176,9 +187,42 @@ export default function App() {
       );
       setListaSetores(setoresUnicos);
     }
-    if (!listaGestores.length) {
-      setListaGestores(['Thalles']);
-    }
+  }, []);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarSupervisores = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'supervisores'));
+        if (!ativo) return;
+
+        if (!snap.empty) {
+          const nomes = snap.docs
+            .map((docRef) => docRef.data().nome)
+            .filter(Boolean);
+          if (nomes.length) {
+            setListaGestores(nomes);
+            return;
+          }
+        }
+
+        const base = GESTORES_INICIAIS.length ? GESTORES_INICIAIS : ['Thalles'];
+        await Promise.all(
+          base.map((nome) =>
+            setDoc(doc(db, 'supervisores', normalizarIdFirestore(nome)), { nome })
+          )
+        );
+        if (!ativo) return;
+        setListaGestores(base);
+      } catch (err) {
+        console.error('Erro ao carregar supervisores:', err);
+      }
+    };
+
+    carregarSupervisores();
+    return () => {
+      ativo = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -452,6 +496,14 @@ export default function App() {
     setFiltroSupervisor((prev) =>
       prev === supervisorEditando ? novoNome : prev
     );
+    if (supervisorEditando) {
+      deleteDoc(doc(db, 'supervisores', normalizarIdFirestore(supervisorEditando)))
+        .catch((err) => console.error('Erro ao remover supervisor antigo:', err))
+        .finally(() => {
+          setDoc(doc(db, 'supervisores', normalizarIdFirestore(novoNome)), { nome: novoNome })
+            .catch((err) => console.error('Erro ao salvar supervisor:', err));
+        });
+    }
     setSupervisorEditando(null);
     setSupervisorNome('');
   };
@@ -1911,7 +1963,11 @@ export default function App() {
                       <form className="flex gap-4 mb-8" onSubmit={(e) => {
                         e.preventDefault();
                         const v = e.target.elements.novoSupervisor.value;
-                        if (v && !listaGestores.includes(v)) setListaGestores([...listaGestores, v]);
+                        if (v && !listaGestores.includes(v)) {
+                          setListaGestores([...listaGestores, v]);
+                          setDoc(doc(db, 'supervisores', normalizarIdFirestore(v)), { nome: v })
+                            .catch((err) => console.error('Erro ao salvar supervisor:', err));
+                        }
                         e.target.reset();
                       }}>
                         <input name="novoSupervisor" type="text" className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Ex: Thalles" />
@@ -1956,7 +2012,11 @@ export default function App() {
                                   <Trash2
                                     size={16}
                                     className="text-slate-300 hover:text-rose-500 cursor-pointer"
-                                    onClick={() => setListaGestores(listaGestores.filter(x => x !== g))}
+                                    onClick={() => {
+                                      setListaGestores(listaGestores.filter(x => x !== g));
+                                      deleteDoc(doc(db, 'supervisores', normalizarIdFirestore(g)))
+                                        .catch((err) => console.error('Erro ao remover supervisor:', err));
+                                    }}
                                   />
                                 </div>
                               </>
@@ -2032,19 +2092,19 @@ export default function App() {
 
       {/* Menu Mobile Inferior */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {ITENS_MENU.map((item) => (
             <button
               key={item.id}
               onClick={() => setAbaAtiva(item.id)}
-              className={`flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold uppercase tracking-wide transition-all ${
+              className={`flex flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
                 abaAtiva === item.id
                   ? 'text-blue-400'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <item.icon size={18} />
-              {item.label.split(' ')[0]}
+              <span className="whitespace-nowrap">{item.label.split(' ')[0]}</span>
             </button>
           ))}
         </div>
