@@ -1,0 +1,350 @@
+{
+  "mes": "2025-12",
+  "supervisor": "Thalles",
+  "diasDoMes": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  "defaultStatus": "Presença",
+  "mapaCodigos": {
+    "FJ": "Falta Justificada",
+    "FI": "Falta Injustificada",
+    "FE": "Férias",
+    "SC": "SC",
+    "DSR": "DSR"
+  },
+  "colaboradores": [
+    {
+      "nome": "Josmar",
+      "setor": "Setores auxiliares",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "8": "Falta Injustificada",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "José Pereira",
+      "setor": "Setores auxiliares",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR",
+        "31": "Falta Injustificada"
+      }
+    },
+    {
+      "nome": "João Custodio",
+      "setor": "Setores auxiliares",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "Diego",
+      "setor": "Setores auxiliares",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+
+    {
+      "nome": "Alvaro",
+      "setor": "Pé",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "Eber",
+      "setor": "Pé",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "23": "Falta Justificada",
+        "24": "Falta Justificada",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+
+    {
+      "nome": "Alexsandro",
+      "setor": "Caçamba",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "22": "SC",
+        "27": "DSR",
+        "28": "DSR",
+        "30": "Falta Injustificada"
+      }
+    },
+    {
+      "nome": "Juarez",
+      "setor": "Caçamba",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "11": "Falta Justificada",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "25": "Falta Justificada",
+        "27": "DSR",
+        "28": "DSR",
+        "31": "Falta Injustificada"
+      }
+    },
+
+    {
+      "nome": "Bastos",
+      "setor": "Varal",
+      "excecoes": {
+        "5": "SC",
+        "6": "DSR",
+        "7": "DSR",
+        "13": "SC",
+        "14": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "Odair",
+      "setor": "Varal",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "Falta Injustificada",
+        "27": "DSR",
+        "28": "DSR",
+        "30": "Falta Justificada",
+        "31": "SC"
+      }
+    },
+
+    {
+      "nome": "Ayane",
+      "setor": "Aro",
+      "excecoes": {
+        "3": "Falta Justificada",
+        "4": "Falta Justificada",
+        "5": "Falta Justificada",
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "Francieli Souza",
+      "setor": "Aro",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "16": "SC",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR",
+        "31": "Falta Injustificada"
+      }
+    },
+    {
+      "nome": "Marcelo Souza",
+      "setor": "Aro",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "10": "Falta Justificada",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR",
+        "30": "Falta Injustificada"
+      }
+    },
+    {
+      "nome": "Valeria",
+      "setor": "Aro",
+      "excecoes": {
+        "3": "Férias",
+        "4": "Férias",
+        "5": "Férias",
+        "6": "DSR",
+        "7": "DSR",
+        "8": "Férias",
+        "9": "Férias",
+        "10": "Férias",
+        "11": "Férias",
+        "12": "Férias",
+        "13": "Férias",
+        "14": "Férias",
+        "15": "Férias",
+        "16": "Férias",
+        "17": "Férias",
+        "18": "Férias",
+        "19": "Férias",
+        "20": "Férias",
+        "21": "Férias",
+        "22": "Férias",
+        "23": "Férias",
+        "24": "Férias",
+        "25": "Férias",
+        "26": "Férias",
+        "27": "Férias",
+        "28": "Férias",
+        "29": "Férias",
+        "30": "Férias",
+        "31": "Férias"
+      }
+    },
+    {
+      "nome": "Alan",
+      "setor": "Aro",
+      "excecoes": {
+        "3": "Falta Justificada",
+        "6": "DSR",
+        "7": "DSR",
+        "13": "DSR",
+        "14": "Falta Injustificada",
+        "20": "DSR",
+        "21": "DSR",
+        "25": "SC",
+        "27": "DSR",
+        "28": "DSR",
+        "30": "Falta Justificada",
+        "31": "Falta Injustificada"
+      }
+    },
+    {
+      "nome": "Natália",
+      "setor": "Aro",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "13": "SC",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR",
+        "30": "SC"
+      }
+    },
+
+    {
+      "nome": "Cristiane",
+      "setor": "Kit",
+      "excecoes": {
+        "6": "DSR",
+        "7": "DSR",
+        "10": "SC",
+        "11": "Falta Justificada",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+    {
+      "nome": "Luciano Pesca",
+      "setor": "Kit",
+      "excecoes": {
+        "3": "Férias",
+        "4": "Férias",
+        "5": "Férias",
+        "6": "DSR",
+        "7": "DSR",
+        "8": "Férias",
+        "9": "Férias",
+        "10": "Férias",
+        "11": "Férias",
+        "12": "Férias",
+        "13": "Férias",
+        "14": "Férias",
+        "15": "Férias",
+        "16": "Férias",
+        "17": "Férias",
+        "18": "Férias",
+        "19": "Férias",
+        "20": "Férias",
+        "21": "Férias"
+      }
+    },
+    {
+      "nome": "Valquiria",
+      "setor": "Kit",
+      "excecoes": {
+        "1": "Falta Justificada",
+        "5": "SC",
+        "6": "DSR",
+        "7": "DSR",
+        "10": "SC",
+        "13": "DSR",
+        "20": "DSR",
+        "21": "DSR",
+        "27": "DSR",
+        "28": "DSR"
+      }
+    },
+
+    {
+      "nome": "Daniel Almeida",
+      "setor": "Montagem de Pneu",
+      "excecoes": {
+        "4": "SC",
+        "6": "DSR",
+        "7": "DSR",
+        "12": "SC",
+        "13": "SC",
+        "20": "SC",
+        "27": "DSR",
+        "28": "DSR",
+        "29": "SC",
+        "30": "Falta Injustificada",
+        "31": "Falta Injustificada"
+      }
+    }
+  ]
+}

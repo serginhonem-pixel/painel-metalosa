@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
+import presencaDez from './data/Prensençadez.json';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -124,6 +125,7 @@ export default function App() {
 
   // --- Estados de Dados ---
   const [listaSetores, setListaSetores] = useState(SETORES_INICIAIS);
+  const [listaGestores, setListaGestores] = useState(GESTORES_INICIAIS);
   const [listaMaquinas, setListaMaquinas] = useState(MAQUINAS_INICIAIS);
   const [colaboradores, setColaboradores] = useState([]);
   const [faturamentoDados, setFaturamentoDados] = useState({
@@ -144,8 +146,11 @@ export default function App() {
   const [registrosPorData, setRegistrosPorData] = useState({});
   const [mesHistorico, setMesHistorico] = useState(() => new Date().getMonth());
   const [diaHistorico, setDiaHistorico] = useState(null);
+  const [anoHistorico, setAnoHistorico] = useState(2026);
   const [filtroSupervisor, setFiltroSupervisor] = useState('Todos');
   const [filtroSetor, setFiltroSetor] = useState('Todos');
+  const [supervisorEditando, setSupervisorEditando] = useState(null);
+  const [supervisorNome, setSupervisorNome] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
@@ -171,7 +176,67 @@ export default function App() {
       );
       setListaSetores(setoresUnicos);
     }
+    if (!listaGestores.length) {
+      setListaGestores(['Thalles']);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!colaboradores.length) return;
+    if (!presencaDez || !presencaDez.colaboradores) return;
+
+    setRegistrosPorData((prev) => {
+      const jaImportado = Object.keys(prev).some((key) => key.startsWith('2025-12-'));
+      if (jaImportado) return prev;
+
+      const normalizar = (texto) =>
+        String(texto || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9 ]/g, '')
+          .toLowerCase()
+          .replace(/\s+/g, ' ')
+          .trim();
+
+      const mapaIds = new Map(
+        colaboradores.map((colab) => [
+          `${normalizar(colab.nome)}||${normalizar(colab.setor)}`,
+          colab.id,
+        ])
+      );
+
+      const mapaCodigos = presencaDez.mapaCodigos || {};
+      const registros = { ...prev };
+      const mesBase = presencaDez.mes || '2025-12';
+
+      presencaDez.colaboradores.forEach((colab) => {
+        const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+        const id = mapaIds.get(chave);
+        if (!id || !colab.excecoes) return;
+
+        Object.entries(colab.excecoes).forEach(([dia, codigo]) => {
+          const bruto = mapaCodigos[codigo] || codigo;
+          const normal = normalizar(bruto);
+          let tipo = 'Presente';
+          if (normal.includes('presen')) tipo = 'Presente';
+          else if (normal.includes('justificada')) tipo = 'Falta Justificada';
+          else if (normal.includes('injustificada')) tipo = 'Falta Injustificada';
+          else if (normal.includes('feria') || normal.includes('fria')) tipo = 'Ferias';
+          else if (normal === 'sc') tipo = 'Falta Justificada';
+          else if (normal === 'dsr') tipo = 'DSR';
+
+          if (tipo === 'Presente' || tipo === 'DSR') return;
+
+          const diaStr = String(dia).padStart(2, '0');
+          const dataISO = `${mesBase}-${diaStr}`;
+          if (!registros[dataISO]) registros[dataISO] = {};
+          registros[dataISO][id] = { tipoFalta: tipo };
+        });
+      });
+
+      return registros;
+    });
+  }, [colaboradores]);
 
   useEffect(() => {
     const carregarFaturamento = async () => {
@@ -359,6 +424,36 @@ export default function App() {
       total += 1;
     });
     return { total, tipos };
+  };
+
+  const iniciarEdicaoSupervisor = (nome) => {
+    setSupervisorEditando(nome);
+    setSupervisorNome(nome);
+  };
+
+  const cancelarEdicaoSupervisor = () => {
+    setSupervisorEditando(null);
+    setSupervisorNome('');
+  };
+
+  const salvarEdicaoSupervisor = () => {
+    const novoNome = supervisorNome.trim();
+    if (!novoNome) return;
+    if (novoNome !== supervisorEditando && listaGestores.includes(novoNome)) return;
+
+    setListaGestores((prev) =>
+      prev.map((g) => (g === supervisorEditando ? novoNome : g))
+    );
+    setColaboradores((prev) =>
+      prev.map((c) =>
+        c.gestor === supervisorEditando ? { ...c, gestor: novoNome } : c
+      )
+    );
+    setFiltroSupervisor((prev) =>
+      prev === supervisorEditando ? novoNome : prev
+    );
+    setSupervisorEditando(null);
+    setSupervisorNome('');
   };
 
   const paretoDados = useMemo(() => {
@@ -1583,7 +1678,7 @@ export default function App() {
                  <div className="space-y-6">
                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
                      <div>
-                       <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Historico Mensal (2026)</h3>
+                       <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Historico Mensal ({anoHistorico})</h3>
                        <p className="text-xs text-slate-400 mt-1">Selecione o mes para ver o calendario e as faltas registradas.</p>
                      </div>
                      <div className="flex items-center gap-2">
@@ -1614,15 +1709,28 @@ export default function App() {
                            </option>
                          ))}
                        </select>
-                       <span className="text-xs font-bold text-slate-500">2026</span>
+                       <select
+                         value={anoHistorico}
+                         onChange={(e) => {
+                           setAnoHistorico(Number(e.target.value));
+                           setDiaHistorico(null);
+                         }}
+                         className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                       >
+                         {[2025, 2026].map((ano) => (
+                           <option key={ano} value={ano}>
+                             {ano}
+                           </option>
+                         ))}
+                       </select>
                      </div>
                    </div>
 
                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                      {(() => {
-                       const anoHistorico = 2026;
-                       const diasNoMes = new Date(anoHistorico, mesHistorico + 1, 0).getDate();
-                       const primeiroDia = new Date(anoHistorico, mesHistorico, 1).getDay();
+                       const anoBase = anoHistorico;
+                       const diasNoMes = new Date(anoBase, mesHistorico + 1, 0).getDate();
+                       const primeiroDia = new Date(anoBase, mesHistorico, 1).getDay();
                        const offset = primeiroDia;
                        const dias = Array.from({ length: diasNoMes }, (_, i) => i + 1);
                        const totalCells = offset + diasNoMes;
@@ -1647,7 +1755,7 @@ export default function App() {
                                }
                                const mes = String(mesHistorico + 1).padStart(2, '0');
                                const diaStr = String(dia).padStart(2, '0');
-                               const dataISO = `${anoHistorico}-${mes}-${diaStr}`;
+                               const dataISO = `${anoBase}-${mes}-${diaStr}`;
                                const resumo = obterResumoDia(dataISO);
                                const isAtivo = diaHistorico === dataISO;
                                const diaSemana = (index % 7);
@@ -1777,7 +1885,8 @@ export default function App() {
                 </div>
 
                 {subAbaConfig === 'processos' && (
-                  <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
+                  <div className="space-y-6">
+                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                     <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Layers size={22} className="text-blue-600" /> Setores Estruturais</h3>
                     <form className="flex gap-4 mb-8" onSubmit={(e) => {
                       e.preventDefault();
@@ -1795,6 +1904,66 @@ export default function App() {
                             <Trash2 size={16} className="text-slate-300 hover:text-rose-500 cursor-pointer" onClick={() => setListaSetores(listaSetores.filter(x => x !== s))} />
                          </div>
                        ))}
+                    </div>
+                    </div>
+                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
+                      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><UserCog size={22} className="text-blue-600" /> Supervisores</h3>
+                      <form className="flex gap-4 mb-8" onSubmit={(e) => {
+                        e.preventDefault();
+                        const v = e.target.elements.novoSupervisor.value;
+                        if (v && !listaGestores.includes(v)) setListaGestores([...listaGestores, v]);
+                        e.target.reset();
+                      }}>
+                        <input name="novoSupervisor" type="text" className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Ex: Thalles" />
+                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Criar</button>
+                      </form>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {listaGestores.map((g) => (
+                          <div key={g} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between gap-3">
+                            {supervisorEditando === g ? (
+                              <div className="flex-1 flex items-center gap-2">
+                                <input
+                                  value={supervisorNome}
+                                  onChange={(e) => setSupervisorNome(e.target.value)}
+                                  className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={salvarEdicaoSupervisor}
+                                  className="px-3 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold"
+                                >
+                                  Salvar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelarEdicaoSupervisor}
+                                  className="px-3 py-2 rounded-lg bg-slate-200 text-slate-600 text-xs font-bold"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <span className="font-bold text-slate-700 text-sm">{g}</span>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => iniciarEdicaoSupervisor(g)}
+                                    className="text-xs font-bold text-blue-600 hover:text-blue-500"
+                                  >
+                                    Editar
+                                  </button>
+                                  <Trash2
+                                    size={16}
+                                    className="text-slate-300 hover:text-rose-500 cursor-pointer"
+                                    onClick={() => setListaGestores(listaGestores.filter(x => x !== g))}
+                                  />
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1841,7 +2010,9 @@ export default function App() {
                        <input name="nome" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none" placeholder="Nome" />
                        <input name="cargo" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none" placeholder="Cargo" />
                        <select name="setor" className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none">{listaSetores.map(s => <option key={s}>{s}</option>)}</select>
-                       <select name="gestor" className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none">{GESTORES_INICIAIS.map(m => <option key={m}>{m}</option>)}</select>
+                       <select name="gestor" className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none">
+                         {listaGestores.map((m) => <option key={m}>{m}</option>)}
+                       </select>
                        <button type="submit" className="bg-blue-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 text-xs"><Plus size={14}/> Cadastrar</button>
                     </form>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
