@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import presencaDez from './data/Prensençadez.json';
+import presencaDezLeandro from './data/presenca-dez-2025-leandro.json';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -41,7 +42,6 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
-  { id: 'operacional', label: 'Visão Operacional', icon: Factory },
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
@@ -162,6 +162,7 @@ export default function App() {
   const [filtroSetor, setFiltroSetor] = useState('Todos');
   const [supervisorEditando, setSupervisorEditando] = useState(null);
   const [supervisorNome, setSupervisorNome] = useState('');
+  const [faltasCarregadas, setFaltasCarregadas] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
@@ -170,24 +171,104 @@ export default function App() {
 
   useEffect(() => {
     if (!colaboradores.length) {
+      const normalizar = (texto) =>
+        String(texto || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9 ]/g, '')
+          .toLowerCase()
+          .replace(/\s+/g, ' ')
+          .trim();
+
       const colaboradoresIniciais = (funcionariosBase || []).map((item, index) => ({
         id: index + 1,
         nome: item.nome,
         cargo: 'Operador',
         setor: item.setor,
-        gestor: 'Thalles',
+        gestor: item.gestor || 'Thalles',
         estaAusente: false,
         tipoFalta: 'Presente',
       }));
+
+      const chaves = new Set(
+        colaboradoresIniciais.map((c) => `${normalizar(c.nome)}||${normalizar(c.setor)}`)
+      );
+
+      if (presencaDezLeandro?.colaboradores?.length) {
+        const gestorPadrao = presencaDezLeandro.supervisor || 'Leandro Souza';
+        presencaDezLeandro.colaboradores.forEach((colab) => {
+          if (!colab || typeof colab.setor !== 'string') return;
+          const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+          if (chaves.has(chave)) return;
+          colaboradoresIniciais.push({
+            id: colaboradoresIniciais.length + 1,
+            nome: colab.nome,
+            cargo: 'Operador',
+            setor: colab.setor,
+            gestor: gestorPadrao,
+            estaAusente: false,
+            tipoFalta: 'Presente',
+          });
+          chaves.add(chave);
+        });
+      }
+
       setColaboradores(colaboradoresIniciais);
     }
     if (!listaSetores.length) {
-      const setoresUnicos = Array.from(
-        new Set((funcionariosBase || []).map((item) => item.setor).filter(Boolean))
-      );
-      setListaSetores(setoresUnicos);
+      const setores = new Set((funcionariosBase || []).map((item) => item.setor).filter(Boolean));
+      if (presencaDezLeandro?.colaboradores?.length) {
+        presencaDezLeandro.colaboradores.forEach((colab) => {
+          if (typeof colab?.setor === 'string' && colab.setor.trim()) {
+            setores.add(colab.setor.trim());
+          }
+        });
+      }
+      setListaSetores(Array.from(setores));
     }
   }, []);
+
+  useEffect(() => {
+    if (!presencaDezLeandro?.colaboradores?.length) return;
+
+    const normalizar = (texto) =>
+      String(texto || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    setColaboradores((prev) => {
+      const existentes = new Set(
+        prev.map((c) => `${normalizar(c.nome)}||${normalizar(c.setor)}`)
+      );
+      let next = [...prev];
+      const gestorPadrao = presencaDezLeandro.supervisor || 'Leandro Souza';
+
+      presencaDezLeandro.colaboradores.forEach((colab) => {
+        if (!colab || typeof colab.setor !== 'string') return;
+        const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+        if (existentes.has(chave)) return;
+        next = [
+          ...next,
+          {
+            id: next.length + 1,
+            nome: colab.nome,
+            cargo: 'Operador',
+            setor: colab.setor,
+            gestor: gestorPadrao,
+            estaAusente: false,
+            tipoFalta: 'Presente',
+          },
+        ];
+        existentes.add(chave);
+      });
+
+      return next;
+    });
+  }, [presencaDezLeandro]);
 
   useEffect(() => {
     let ativo = true;
@@ -227,12 +308,8 @@ export default function App() {
 
   useEffect(() => {
     if (!colaboradores.length) return;
-    if (!presencaDez || !presencaDez.colaboradores) return;
 
     setRegistrosPorData((prev) => {
-      const jaImportado = Object.keys(prev).some((key) => key.startsWith('2025-12-'));
-      if (jaImportado) return prev;
-
       const normalizar = (texto) =>
         String(texto || '')
           .normalize('NFD')
@@ -248,39 +325,109 @@ export default function App() {
           colab.id,
         ])
       );
+      const mapaIdsNome = new Map(
+        colaboradores.map((colab) => [normalizar(colab.nome), colab.id])
+      );
 
-      const mapaCodigos = presencaDez.mapaCodigos || {};
+      const mapearTipo = (valor) => {
+        const normal = normalizar(valor);
+        const compacto = normal.replace(/\s+/g, '');
+        if (!normal) return 'Presente';
+        if (normal.includes('presen') || compacto.includes('presen')) return 'Presente';
+        if (normal.includes('justificada') || compacto.includes('justificada')) return 'Falta Justificada';
+        if (normal.includes('injustificada') || compacto.includes('injustificada')) return 'Falta Injustificada';
+        if (
+          normal.includes('feria') ||
+          normal.includes('fria') ||
+          compacto.includes('feria') ||
+          compacto.includes('ferias') ||
+          compacto.includes('fria') ||
+          compacto.includes('frias')
+        ) {
+          return 'Ferias';
+        }
+        if (compacto === 'fj') return 'Falta Justificada';
+        if (compacto === 'fi') return 'Falta Injustificada';
+        if (compacto === 'fe') return 'Ferias';
+        if (['sc', 'et', 'co', 'frd', 'j'].includes(compacto)) return 'Falta Justificada';
+        if (compacto === 'dsr') return 'DSR';
+        return 'Presente';
+      };
+
       const registros = { ...prev };
-      const mesBase = presencaDez.mes || '2025-12';
 
-      presencaDez.colaboradores.forEach((colab) => {
-        const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
-        const id = mapaIds.get(chave);
-        if (!id || !colab.excecoes) return;
+      const aplicarExcecoes = (dados) => {
+        if (!dados || !dados.colaboradores) return;
+        const mapaCodigos = dados.mapaCodigos || {};
+        const mesBase = dados.mes || '2025-12';
+        dados.colaboradores.forEach((colab) => {
+          const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+          const id = mapaIds.get(chave) || mapaIdsNome.get(normalizar(colab.nome));
+          if (!id || !colab.excecoes) return;
 
-        Object.entries(colab.excecoes).forEach(([dia, codigo]) => {
-          const bruto = mapaCodigos[codigo] || codigo;
-          const normal = normalizar(bruto);
-          let tipo = 'Presente';
-          if (normal.includes('presen')) tipo = 'Presente';
-          else if (normal.includes('justificada')) tipo = 'Falta Justificada';
-          else if (normal.includes('injustificada')) tipo = 'Falta Injustificada';
-          else if (normal.includes('feria') || normal.includes('fria')) tipo = 'Ferias';
-          else if (normal === 'sc') tipo = 'Falta Justificada';
-          else if (normal === 'dsr') tipo = 'DSR';
+          Object.entries(colab.excecoes).forEach(([dia, codigo]) => {
+            const bruto = mapaCodigos[codigo] || codigo;
+            const tipo = mapearTipo(bruto);
+            if (tipo === 'Presente' || tipo === 'DSR') return;
 
-          if (tipo === 'Presente' || tipo === 'DSR') return;
-
-          const diaStr = String(dia).padStart(2, '0');
-          const dataISO = `${mesBase}-${diaStr}`;
-          if (!registros[dataISO]) registros[dataISO] = {};
-          registros[dataISO][id] = { tipoFalta: tipo };
+            const diaStr = String(dia).padStart(2, '0');
+            const dataISO = `${mesBase}-${diaStr}`;
+            if (!registros[dataISO]) registros[dataISO] = {};
+            if (registros[dataISO][id]) return;
+            registros[dataISO][id] = { tipoFalta: tipo };
+          });
         });
-      });
+      };
+
+      aplicarExcecoes(presencaDez);
+      aplicarExcecoes(presencaDezLeandro);
 
       return registros;
     });
   }, [colaboradores]);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarFaltas = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'faltas'));
+        if (!ativo) return;
+        const registros = {};
+        snap.forEach((docRef) => {
+          const data = docRef.data();
+          if (data && data.registros) {
+            registros[docRef.id] = data.registros;
+          }
+        });
+        if (Object.keys(registros).length) {
+          setRegistrosPorData((prev) => ({ ...prev, ...registros }));
+        }
+        setFaltasCarregadas(true);
+      } catch (err) {
+        console.error('Erro ao carregar faltas:', err);
+        setFaltasCarregadas(true);
+      }
+    };
+
+    carregarFaltas();
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!faltasCarregadas) return;
+    const salvar = async () => {
+      const dias = Object.keys(registrosPorData);
+      await Promise.all(
+        dias.map((dia) =>
+          setDoc(doc(db, 'faltas', dia), { registros: registrosPorData[dia] }, { merge: true })
+        )
+      );
+    };
+
+    salvar().catch((err) => console.error('Erro ao salvar faltas:', err));
+  }, [registrosPorData, faltasCarregadas]);
 
   useEffect(() => {
     const carregarFaturamento = async () => {
@@ -424,6 +571,56 @@ export default function App() {
     const percentualPresenca = total > 0 ? (presentes / total) * 100 : 0;
     return { total, presentes, ausentes: ausentes.length, porTipo, percentualPresenca };
   }, [colaboradoresDiaFiltrados]);
+
+  const resumoHistorico = useMemo(() => {
+    const idsFiltrados = new Set(
+      colaboradores
+        .filter((colab) => {
+          const supervisorOk = filtroSupervisor === 'Todos' || colab.gestor === filtroSupervisor;
+          const setorOk = filtroSetor === 'Todos' || colab.setor === filtroSetor;
+          return supervisorOk && setorOk;
+        })
+        .map((colab) => String(colab.id))
+    );
+
+    const totalColab = idsFiltrados.size;
+    const diasNoMes = new Date(anoHistorico, mesHistorico + 1, 0).getDate();
+    const mesStr = `${anoHistorico}-${String(mesHistorico + 1).padStart(2, '0')}`;
+
+    let faltasTotal = 0;
+    let faltasJust = 0;
+    let faltasInjust = 0;
+    let ferias = 0;
+    const diasComFalta = new Set();
+
+    Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
+      if (!dataISO.startsWith(mesStr)) return;
+      Object.entries(registros || {}).forEach(([id, registro]) => {
+        if (!idsFiltrados.has(String(id))) return;
+        faltasTotal += 1;
+        diasComFalta.add(dataISO);
+        const tipo = registro?.tipoFalta || 'Falta Injustificada';
+        if (tipo === 'Falta Justificada') faltasJust += 1;
+        else if (tipo === 'Falta Injustificada') faltasInjust += 1;
+        else if (tipo === 'Ferias') ferias += 1;
+      });
+    });
+
+    const totalPossivel = totalColab * diasNoMes;
+    const presencaEstimada = totalPossivel > 0 ? Math.max(totalPossivel - faltasTotal, 0) : 0;
+    const percentualPresenca = totalPossivel > 0 ? (presencaEstimada / totalPossivel) * 100 : 0;
+
+    return {
+      totalColab,
+      diasNoMes,
+      faltasTotal,
+      faltasJust,
+      faltasInjust,
+      ferias,
+      diasComFalta: diasComFalta.size,
+      percentualPresenca,
+    };
+  }, [colaboradores, filtroSupervisor, filtroSetor, registrosPorData, mesHistorico, anoHistorico]);
 
   const alternarPresenca = (id) => {
     setRegistrosPorData((prev) => {
@@ -1554,35 +1751,6 @@ export default function App() {
             </div>
           )}
 
-          {/* ABA OPERACIONAL */}
-          {abaAtiva === 'operacional' && (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-right duration-500">
-                {listaMaquinas.map((m, idx) => (
-                  <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-300 transition-all">
-                    <h3 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                      <Cpu size={18} className="text-blue-500 group-hover:scale-110 transition-transform"/> {m.nome}
-                    </h3>
-                    <div className="space-y-4">
-                       <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-500 uppercase tracking-tighter">Setor:</span>
-                          <span className="text-blue-600 uppercase tracking-tighter">{m.setor}</span>
-                       </div>
-                       <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-500 uppercase tracking-tighter">Operação:</span>
-                          <span className="text-emerald-600">ATIVO</span>
-                       </div>
-                       <p className="text-slate-400 text-xs italic">Sem dados do ERP.</p>
-                    </div>
-                  </div>
-                ))}
-                {listaMaquinas.length === 0 && (
-                  <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
-                    <p className="text-slate-400 italic">Nenhuma máquina cadastrada. Vá em Configurações.</p>
-                  </div>
-                )}
-             </div>
-          )}
-
           {/* ABA DE GESTÃO DIÁRIA */}
           {abaAtiva === 'gestao' && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
@@ -1733,7 +1901,18 @@ export default function App() {
                        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Historico Mensal ({anoHistorico})</h3>
                        <p className="text-xs text-slate-400 mt-1">Selecione o mes para ver o calendario e as faltas registradas.</p>
                      </div>
-                     <div className="flex items-center gap-2">
+                     <div className="flex flex-wrap items-center gap-2">
+                       <select
+                         value={filtroSupervisor}
+                         onChange={(e) => setFiltroSupervisor(e.target.value)}
+                         className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                       >
+                         {supervisoresDisponiveis.map((supervisor) => (
+                           <option key={supervisor} value={supervisor}>
+                             {supervisor}
+                           </option>
+                         ))}
+                       </select>
                        <select
                          value={mesHistorico}
                          onChange={(e) => {
@@ -1778,6 +1957,53 @@ export default function App() {
                      </div>
                    </div>
 
+                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-sm">
+                       <div className="flex items-center justify-between">
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Presenca media</p>
+                         <CheckCircle2 size={16} className="text-emerald-300" />
+                       </div>
+                       <p className="mt-2 text-2xl font-bold text-slate-100">
+                         {resumoHistorico.percentualPresenca.toFixed(0)}%
+                       </p>
+                       <p className="text-xs text-slate-400">
+                         Base: {resumoHistorico.totalColab} colabs
+                       </p>
+                     </div>
+                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-sm">
+                       <div className="flex items-center justify-between">
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Faltas no mes</p>
+                         <AlertTriangle size={16} className="text-rose-300" />
+                       </div>
+                       <p className="mt-2 text-2xl font-bold text-slate-100">
+                         {resumoHistorico.faltasTotal}
+                       </p>
+                       <p className="text-xs text-slate-400">
+                         {resumoHistorico.diasComFalta} dias com apontamentos
+                       </p>
+                     </div>
+                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-sm">
+                       <div className="flex items-center justify-between">
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Just. x Injust.</p>
+                         <UserX size={16} className="text-amber-300" />
+                       </div>
+                       <p className="mt-2 text-2xl font-bold text-slate-100">
+                         {resumoHistorico.faltasJust} / {resumoHistorico.faltasInjust}
+                       </p>
+                       <p className="text-xs text-slate-400">Justificadas vs Injustificadas</p>
+                     </div>
+                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-sm">
+                       <div className="flex items-center justify-between">
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Ferias</p>
+                         <CalendarIcon size={16} className="text-blue-300" />
+                       </div>
+                       <p className="mt-2 text-2xl font-bold text-slate-100">
+                         {resumoHistorico.ferias}
+                       </p>
+                       <p className="text-xs text-slate-400">Dias no mes: {resumoHistorico.diasNoMes}</p>
+                     </div>
+                   </div>
+
                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                      {(() => {
                        const anoBase = anoHistorico;
@@ -1793,15 +2019,18 @@ export default function App() {
                          return dia;
                        });
 
+                       const hojeISO = new Date().toLocaleDateString('en-CA');
                        return (
                          <div className="space-y-4">
-                           <div className="grid grid-cols-7 gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((label) => (
-                               <div key={label} className="text-center">{label}</div>
-                             ))}
-                           </div>
-                           <div className="grid grid-cols-7 gap-2">
-                             {cells.map((dia, index) => {
+                           <div className="overflow-x-auto">
+                             <div className="min-w-[560px]">
+                               <div className="grid grid-cols-7 gap-2 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                                 {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((label) => (
+                                   <div key={label} className="text-center">{label}</div>
+                                 ))}
+                               </div>
+                               <div className="grid grid-cols-7 gap-2">
+                                 {cells.map((dia, index) => {
                                if (!dia) {
                                  return <div key={`empty-${index}`} className="h-20 rounded-xl border border-dashed border-slate-700/60 bg-slate-900/40" />;
                                }
@@ -1810,6 +2039,7 @@ export default function App() {
                                const dataISO = `${anoBase}-${mes}-${diaStr}`;
                                const resumo = obterResumoDia(dataISO);
                                const isAtivo = diaHistorico === dataISO;
+                               const isHoje = dataISO === hojeISO;
                                const diaSemana = (index % 7);
                                const isWeekend = diaSemana === 0 || diaSemana === 6;
                                const faltas = resumo.total;
@@ -1823,10 +2053,12 @@ export default function App() {
                                   <button
                                     key={dataISO}
                                     onClick={() => setDiaHistorico(dataISO)}
-                                   className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
-                                      isAtivo
-                                        ? 'border-blue-500 bg-blue-950/40'
-                                        : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
+                                    className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
+                                      isHoje
+                                        ? 'border-emerald-400/70 bg-emerald-950/40 ring-2 ring-emerald-400/40'
+                                        : isAtivo
+                                          ? 'border-blue-500 bg-blue-950/40'
+                                          : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/60 hover:bg-blue-950/30'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between">
@@ -1844,15 +2076,19 @@ export default function App() {
                                       )}
                                     </div>
                                     <div className="mt-2 sm:mt-3 rounded-lg border border-slate-800 bg-slate-950/60 px-1.5 sm:px-2 py-1 text-center text-[9px] sm:text-[11px] font-bold text-emerald-200">
-                                      {percentualPresenca.toFixed(0)}% presenca
+                                      {dataISO > new Date().toISOString().slice(0, 10)
+                                        ? '-'
+                                        : `${percentualPresenca.toFixed(0)}% presenca`}
                                     </div>
                                     <div className="mt-1.5 text-[9px] sm:text-[10px] text-slate-400 hidden sm:block">
                                       {isWeekend ? 'Descanso semanal' : (resumo.total === 0 ? 'Sem faltas' : 'Com apontamentos')}
                                     </div>
                                   </button>
                                 );
-                              })}
-                            </div>
+                                 })}
+                               </div>
+                             </div>
+                           </div>
                          </div>
                        );
                      })()}
@@ -1896,6 +2132,7 @@ export default function App() {
                                      <tr>
                                        <th className="px-5 py-3">Colaborador</th>
                                        <th className="px-5 py-3">Setor</th>
+                                       <th className="px-5 py-3">Supervisor</th>
                                        <th className="px-5 py-3">Tipo</th>
                                      </tr>
                                    </thead>
@@ -1904,6 +2141,7 @@ export default function App() {
                                        <tr key={item.id} className="text-slate-700">
                                          <td className="px-5 py-3 font-semibold">{item.nome}</td>
                                          <td className="px-5 py-3 text-slate-500">{item.setor}</td>
+                                         <td className="px-5 py-3 text-slate-500">{item.gestor}</td>
                                          <td className="px-5 py-3">
                                            <span className="rounded-full bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-600">
                                              {item.tipo}

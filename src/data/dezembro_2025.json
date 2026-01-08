@@ -1,0 +1,1251 @@
+{
+  "mes": "2025-12",
+  "supervisor": "Leandro Souza",
+  "diasDoMes": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "defaultStatus": "Presenca",
+  "mapaCodigos": {
+    "FJ": "Falta Justificada",
+    "FI": "Falta Injustificada",
+    "FE": "Ferias",
+    "SC": "SC",
+    "ET": "ET",
+    "CO": "CO",
+    "FRD": "FRD",
+    "J": "J",
+    "DSR": "DSR"
+  },
+  "colaboradores": [
+    {
+      "nome": "Adenílson de Souza Ferraz",
+      "setor": "Solda",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE"
+      }
+    },
+    {
+      "nome": "Adriana Barbosa da Silva",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alceu Carlos Gomes",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Aldino Santiago",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alex Ribeiro de Souza",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alexandre Mendonça dos Santos",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alice Vitória Pim Gomes",
+      "setor": "Célula robótica",
+      "excecoes": {}
+    },
+    {
+      "nome": "Antônio Alves Bearis",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Antônio Hidrolândio Santos",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Breno Feitosa Ferreira",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Carlos Alexandre Cassiano Ramo",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Davy de Jesus de Oliveira",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Douglas Santos Silva",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Edinaldo Furtado",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Eli Lauers",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Fabrício Costa Cordeiro",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Fernando Gonçalves",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Giovani Silva Vieira",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Halisson Frois Santana",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Henry Valery Huerta Sanchez",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Hudson Telis dos Santos Manea",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Ismael Pereira de Oliveira",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jackson Pereira dos Santos",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jadson Steven Barboza de Lazari",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "João Manoel de Souza",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jocarly Alvarenga Fraga",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jorge Sales da Silva Filho",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "José Adelson de Almeida",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Josemir Dalmásio",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Juraci Barbosa Ferreira",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Kelly dos Santos",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Leandro Silva Souza",
+      "setor": "Supervisão",
+      "excecoes": {}
+    },
+    {
+      "nome": "Lillian Gabrielli Silva Soares",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Luciano de Souza Raimundo",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Luiz Ângelo da Silva",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Marcondes Santos de Souza",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Marcos Vinícius de O Silva Sel",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Maria Clara Negri Alves",
+      "setor": "Célula robótica",
+      "excecoes": {}
+    },
+    {
+      "nome": "Robert Souza Santos",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Romildo Onofre Gonçalves",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Sandro Souza dos Santos",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Sebastião Felipe de Oliveira",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Sérgio Lafaiete Neves",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Talita Patrícia Diogo dos Santos",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Tiago Rodrigues",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Valdir Santo Chever",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Vinícius Frazão de Lira",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Wallace da Silva Rodrigues",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Wandra Kely Alves de Souza",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Warlem Pereira Gomes",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Wilson Fagner Silva da Conceição",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Adenílson de Souza Ferraz",
+      "setor": "Solda",
+      "excecoes": {
+        "5": "FE",
+        "6": "FE",
+        "7": "FE",
+        "8": "FE",
+        "9": "FE",
+        "10": "FE",
+        "11": "FE",
+        "12": "FE",
+        "13": "FE",
+        "14": "FE",
+        "15": "FE",
+        "16": "FE",
+        "17": "FE",
+        "18": "FE",
+        "19": "FE",
+        "20": "FE",
+        "21": "FE",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE",
+        "28": "FE",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Adriana Barbosa da Silva",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alceu Carlos Gomes",
+      "setor": "Pintura",
+      "excecoes": {
+        "6": "FJ",
+        "7": "FJ"
+      }
+    },
+    {
+      "nome": "Alex Ribeiro de Souza",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Alexandre Mendonça dos Santos",
+      "setor": "Pintura",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE",
+        "5": "FE",
+        "6": "FE"
+      }
+    },
+    {
+      "nome": "Alice Vitória Pim Gomes",
+      "setor": "Célula robótica",
+      "excecoes": {}
+    },
+    {
+      "nome": "Antônio Alves Bearis",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Antônio Hidrolândio Santos",
+      "setor": "Betoneira",
+      "excecoes": {
+        "8": "FI"
+      }
+    },
+    {
+      "nome": "Breno Feitosa Ferreira",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Carlos Alexandre Cassiano Ramo",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Davy de Jesus de Oliveira",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Douglas Santos Silva",
+      "setor": "Solda",
+      "excecoes": {
+        "5": "FI"
+      }
+    },
+    {
+      "nome": "Edinaldo Furtado",
+      "setor": "Betoneira",
+      "excecoes": {
+        "7": "FJ"
+      }
+    },
+    {
+      "nome": "Eli Lauers",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Fabrício Costa Cordeiro",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Fernando Gonçalves",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Giovani Silva Vieira",
+      "setor": "Solda",
+      "excecoes": {
+        "5": "FI"
+      }
+    },
+    {
+      "nome": "Halisson Frois Santana",
+      "setor": "Betoneira",
+      "excecoes": {
+        "5": "FJ",
+        "6": "FJ",
+        "7": "FJ",
+        "8": "FJ",
+        "9": "FJ"
+      }
+    },
+    {
+      "nome": "Henry Valery Huerta Sanchez",
+      "setor": "Betoneira",
+      "excecoes": {
+        "5": "ET"
+      }
+    },
+    {
+      "nome": "Hudson Telis dos Santos Manea",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Ismael Pereira de Oliveira",
+      "setor": "Solda",
+      "excecoes": {
+        "5": "FI"
+      }
+    },
+    {
+      "nome": "Jackson Pereira dos Santos",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jadson Steven Barboza de Lazari",
+      "setor": "Solda",
+      "excecoes": {
+        "7": "SC"
+      }
+    },
+    {
+      "nome": "João Manoel de Souza",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jocarly Alvarenga Fraga",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Jorge Sales da Silva Filho",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "José Adelson de Almeida",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Josemir Dalmásio",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Juraci Barbosa Ferreira",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Kelly dos Santos",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Leandro Silva Souza",
+      "setor": "Supervisão",
+      "excecoes": {}
+    },
+    {
+      "nome": "Lillian Gabrielli Silva Soares",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Luciano de Souza Raimundo",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Luiz Ângelo da Silva",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Marcondes Santos de Souza",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Marcos Vinícius de O Silva Sel",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Robert Souza Santos",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Romildo Onofre Gonçalves",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Sandro Souza dos Santos",
+      "setor": "Solda",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE"
+      }
+    },
+    {
+      "nome": "Sebastião Felipe de Oliveira",
+      "setor": "Solda",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE",
+        "6": "ET"
+      }
+    },
+    {
+      "nome": "Sérgio Lafaiete Neves",
+      "setor": "Carro solda",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE",
+        "5": "FE",
+        "6": "FE",
+        "7": "FE",
+        "8": "FE",
+        "9": "FE",
+        "10": "FE",
+        "11": "FE",
+        "12": "FE",
+        "13": "FE",
+        "14": "FE",
+        "15": "FE",
+        "16": "FE",
+        "17": "FE",
+        "18": "FE",
+        "19": "FE",
+        "20": "FE",
+        "21": "FE",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE"
+      }
+    },
+    {
+      "nome": "Talita Patrícia Diogo dos Santos",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Tiago Rodrigues",
+      "setor": "Carro solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Valdir Santo Chever",
+      "setor": "Pintura",
+      "excecoes": {}
+    },
+    {
+      "nome": "Vinícius Frazão de Lira",
+      "setor": "Betoneira",
+      "excecoes": {}
+    },
+    {
+      "nome": "Wallace da Silva Rodrigues",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Wandra Kely Alves de Souza",
+      "setor": "Carro solda",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE",
+        "5": "FE",
+        "6": "SC"
+      }
+    },
+    {
+      "nome": "Warlem Pereira Gomes",
+      "setor": "Betoneira",
+      "excecoes": {
+        "8": "FI"
+      }
+    },
+    {
+      "nome": "Wilson Fagner Silva da Conceição",
+      "setor": "Solda",
+      "excecoes": {}
+    },
+    {
+      "nome": "Adenílson de Souza Ferraz",
+      "setor": "Solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Adriana Barbosa da Silva",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Alceu Carlos Gomes",
+      "setor": "Pintura",
+      "excecoes": {
+        "11": "FJ",
+        "19": "SC",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Aldino Santiago",
+      "setor": "Carro solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Alex Ribeiro de Souza",
+      "setor": "Pintura",
+      "excecoes": {
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Alexandre Mendonça dos Santos",
+      "setor": "Pintura",
+      "excecoes": {
+        "18": "FE",
+        "19": "FE",
+        "20": "FE",
+        "21": "FE",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE",
+        "28": "FE",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Alice Vitória Pim Gomes",
+      "setor": "Célula robótica",
+      "excecoes": {
+        "1": "FJ",
+        "5": "FJ",
+        "8": "FJ",
+        "16": "FJ",
+        "17": "FJ",
+        "18": "SC",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Antônio Alves Bearis",
+      "setor": "Pintura",
+      "excecoes": {
+        "1": "FJ",
+        "4": "FJ",
+        "13": "FJ",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Antônio Hidrolândio Santos",
+      "setor": "Betoneira",
+      "excecoes": {
+        "1": "ET",
+        "3": "FJ",
+        "11": "ET",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Breno Feitosa Ferreira",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Carlos Alexandre Cassiano Ramo",
+      "setor": "Betoneira",
+      "excecoes": {
+        "1": "FE",
+        "2": "FE",
+        "3": "FE",
+        "4": "FE",
+        "5": "FE",
+        "6": "FE",
+        "7": "FE",
+        "8": "FE",
+        "9": "FE",
+        "10": "FE",
+        "11": "FE",
+        "12": "FE",
+        "13": "FE",
+        "14": "FE",
+        "15": "FE",
+        "16": "FE",
+        "22": "FJ",
+        "23": "FJ",
+        "24": "FJ",
+        "25": "FJ",
+        "26": "FJ",
+        "27": "FJ",
+        "28": "FJ",
+        "29": "FJ",
+        "30": "FJ",
+        "31": "FJ"
+      }
+    },
+    {
+      "nome": "Davy de Jesus de Oliveira",
+      "setor": "Carro solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Douglas Santos Silva",
+      "setor": "Solda",
+      "excecoes": {
+        "13": "FJ",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Edinaldo Furtado",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Eli Lauers",
+      "setor": "Carro solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO",
+        "29": "ET"
+      }
+    },
+    {
+      "nome": "Fabrício Costa Cordeiro",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Fernando Gonçalves",
+      "setor": "Solda",
+      "excecoes": {
+        "13": "FI",
+        "23": "SC",
+        "25": "FRD",
+        "26": "CO",
+        "30": "SC"
+      }
+    },
+    {
+      "nome": "Giovani Silva Vieira",
+      "setor": "Solda",
+      "excecoes": {
+        "1": "FJ",
+        "2": "FJ",
+        "3": "FJ",
+        "4": "FJ",
+        "5": "FJ",
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Halisson Frois Santana",
+      "setor": "Betoneira",
+      "excecoes": {
+        "8": "FJ",
+        "9": "FJ",
+        "13": "FI",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Henry Valery Huerta Sanchez",
+      "setor": "Betoneira",
+      "excecoes": {
+        "24": "ET",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Hudson Telis dos Santos Manea",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Ismael Pereira de Oliveira",
+      "setor": "Solda",
+      "excecoes": {
+        "8": "FJ",
+        "10": "FJ",
+        "13": "FI",
+        "23": "SC",
+        "25": "FRD",
+        "26": "CO",
+        "30": "SC"
+      }
+    },
+    {
+      "nome": "Jackson Pereira dos Santos",
+      "setor": "Betoneira",
+      "excecoes": {
+        "5": "FJ",
+        "8": "FI",
+        "15": "FJ",
+        "17": "SC",
+        "18": "FJ",
+        "19": "FJ",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Jadson Steven Barboza de Lazari",
+      "setor": "Solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Jaqueline Correa Iansen",
+      "setor": "Pintura",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO",
+        "29": "FI",
+        "30": "FI",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "João Manoel de Souza",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Jocarly Alvarenga Fraga",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Jorge Sales da Silva Filho",
+      "setor": "Carro solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "José Adelson de Almeida",
+      "setor": "Solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Josemir Dalmásio",
+      "setor": "Betoneira",
+      "excecoes": {
+        "13": "FI",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Juraci Barbosa Ferreira",
+      "setor": "Solda",
+      "excecoes": {
+        "13": "FI",
+        "22": "FI",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Kelly dos Santos",
+      "setor": "Pintura",
+      "excecoes": {
+        "19": "SC",
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Leandro Silva Souza",
+      "setor": "Supervisão",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Lillian Gabrielli Silva Soares",
+      "setor": "Carro solda",
+      "excecoes": {
+        "23": "FI",
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO",
+        "29": "FI",
+        "30": "FI",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Luciano de Souza Raimundo",
+      "setor": "Solda",
+      "excecoes": {
+        "19": "SC",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Luiz Ângelo da Silva",
+      "setor": "Pintura",
+      "excecoes": {
+        "19": "SC",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Marcondes Santos de Souza",
+      "setor": "Betoneira",
+      "excecoes": {
+        "13": "FI",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Marcos Vinícius de O Silva Sel",
+      "setor": "Betoneira",
+      "excecoes": {
+        "13": "FI",
+        "24": "FI",
+        "25": "FRD",
+        "26": "FRD",
+        "29": "FI",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Maria Aparecida da Silva Peres",
+      "setor": "Carro solda",
+      "excecoes": {
+        "3": "FJ",
+        "4": "FJ",
+        "8": "FJ",
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO",
+        "31": "FI"
+      }
+    },
+    {
+      "nome": "Robert Souza Santos",
+      "setor": "Solda",
+      "excecoes": {
+        "10": "SC",
+        "13": "SC",
+        "17": "SC",
+        "22": "FI",
+        "23": "FI",
+        "24": "FI",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Romildo Onofre Gonçalves",
+      "setor": "Carro solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Sandro Souza dos Santos",
+      "setor": "Solda",
+      "excecoes": {
+        "15": "FE",
+        "16": "FE",
+        "17": "FE",
+        "18": "FE",
+        "19": "FE",
+        "20": "FE",
+        "21": "FE",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE",
+        "28": "FE",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Sebastião Felipe de Oliveira",
+      "setor": "Solda",
+      "excecoes": {
+        "10": "SC",
+        "12": "FI",
+        "17": "SC",
+        "18": "FE",
+        "19": "FE",
+        "20": "FE",
+        "21": "FE",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE",
+        "28": "FE",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Sérgio Lafaiete Neves",
+      "setor": "Carro solda",
+      "excecoes": {
+        "19": "SC",
+        "25": "FRD",
+        "26": "CO",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Talita Patrícia Diogo dos Santos",
+      "setor": "Solda",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Tiago Rodrigues",
+      "setor": "Carro solda",
+      "excecoes": {
+        "1": "FJ",
+        "2": "FJ",
+        "3": "FJ",
+        "4": "FI",
+        "5": "ET",
+        "10": "SC",
+        "12": "SC",
+        "13": "FI",
+        "17": "FJ",
+        "18": "FJ",
+        "19": "FJ",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Valdir Santo Chever",
+      "setor": "Pintura",
+      "excecoes": {
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Vinícius Frazão de Lira",
+      "setor": "Betoneira",
+      "excecoes": {
+        "1": "FJ",
+        "13": "FI",
+        "17": "SC",
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Wallace da Silva Rodrigues",
+      "setor": "Solda",
+      "excecoes": {
+        "24": "J",
+        "25": "FRD",
+        "26": "CO"
+      }
+    },
+    {
+      "nome": "Wandra Kely Alves de Souza",
+      "setor": "Carro solda",
+      "excecoes": {
+        "5": "FJ",
+        "10": "SC",
+        "17": "FJ",
+        "18": "FJ",
+        "19": "FJ",
+        "22": "FE",
+        "23": "FE",
+        "24": "FE",
+        "25": "FE",
+        "26": "FE",
+        "27": "FE",
+        "28": "FE",
+        "29": "FE",
+        "30": "FE",
+        "31": "FE"
+      }
+    },
+    {
+      "nome": "Warlem Pereira Gomes",
+      "setor": "Betoneira",
+      "excecoes": {
+        "25": "FRD",
+        "26": "FRD"
+      }
+    },
+    {
+      "nome": "Wilson Fagner Silva da Conceição",
+      "setor": "Solda",
+      "excecoes": {
+        "24": "J",
+        "25": "FRD",
+        "26": "CO"
+      }
+    }
+  ]
+}

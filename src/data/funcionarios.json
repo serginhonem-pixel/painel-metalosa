@@ -1,76 +1,598 @@
 [
-  { "nome": "Josmar", "setor": "Setores auxiliares" },
-  { "nome": "José Pereira", "setor": "Setores auxiliares" },
-  { "nome": "João Custodio", "setor": "Setores auxiliares" },
-  { "nome": "Diego", "setor": "Setores auxiliares" },
-
-  { "nome": "Alvaro", "setor": "Pé" },
-  { "nome": "Eber", "setor": "Pé" },
-
-  { "nome": "Antonio Barreto", "setor": "Caçamba" },
-  { "nome": "Jocimar Sandré", "setor": "Caçamba" },
-  { "nome": "Maicon", "setor": "Caçamba" },
-  { "nome": "Alexsandro", "setor": "Caçamba" },
-  { "nome": "José Claudio", "setor": "Caçamba" },
-  { "nome": "Juarez", "setor": "Caçamba" },
-  { "nome": "Leonardo Antonio Rodrigues", "setor": "Caçamba" },
-  { "nome": "Marcone", "setor": "Caçamba" },
-  { "nome": "Gilmara", "setor": "Caçamba" },
-  { "nome": "Kissylla", "setor": "Caçamba" },
-  { "nome": "Geander", "setor": "Caçamba" },
-  { "nome": "Wender", "setor": "Caçamba" },
-  { "nome": "Agostinho", "setor": "Caçamba" },
-  { "nome": "Antonio José", "setor": "Caçamba" },
-  { "nome": "Kevin", "setor": "Caçamba" },
-  { "nome": "Zanato Pinheiro", "setor": "Caçamba" },
-
-  { "nome": "Bastos", "setor": "Varal" },
-  { "nome": "Eleomar", "setor": "Varal" },
-  { "nome": "Luiz Carlos", "setor": "Varal" },
-  { "nome": "Odair", "setor": "Varal" },
-  { "nome": "Leonardo", "setor": "Varal" },
-  { "nome": "Igor Lena", "setor": "Varal" },
-  { "nome": "Valdir Varal", "setor": "Varal" },
-  { "nome": "Elizeu", "setor": "Varal" },
-
-  { "nome": "Ayane", "setor": "Aro" },
-  { "nome": "Francieli Souza", "setor": "Aro" },
-  { "nome": "Marcelo Souza", "setor": "Aro" },
-  { "nome": "Valdecir", "setor": "Aro" },
-  { "nome": "Neyde", "setor": "Aro" },
-  { "nome": "Valeria", "setor": "Aro" },
-  { "nome": "Esmeralda", "setor": "Aro" },
-  { "nome": "Renato", "setor": "Aro" },
-  { "nome": "Alan", "setor": "Aro" },
-  { "nome": "Natália", "setor": "Aro" },
-  { "nome": "Noenne José", "setor": "Aro" },
-  { "nome": "Vitoria Carolina Lopes", "setor": "Aro" },
-
-  { "nome": "Aparecida Maria", "setor": "Kit" },
-  { "nome": "Cristiane", "setor": "Kit" },
-  { "nome": "Eliana", "setor": "Kit" },
-  { "nome": "Lurdelma Alves", "setor": "Kit" },
-  { "nome": "Valdir", "setor": "Kit" },
-  { "nome": "Vanderleia", "setor": "Kit" },
-  { "nome": "Eliene da Conceição", "setor": "Kit" },
-  { "nome": "Luciano Pesca", "setor": "Kit" },
-  { "nome": "Maria Aparecida", "setor": "Kit" },
-  { "nome": "Paulo", "setor": "Kit" },
-  { "nome": "Valquiria", "setor": "Kit" },
-
-  { "nome": "Bertran", "setor": "Montagem de Pneu" },
-  { "nome": "Daniel Almeida", "setor": "Montagem de Pneu" },
-  { "nome": "Higor", "setor": "Montagem de Pneu" },
-  { "nome": "Lucas Ferreira", "setor": "Montagem de Pneu" },
-  { "nome": "Luiz", "setor": "Montagem de Pneu" },
-  { "nome": "Diego - veio do carregamento", "setor": "Montagem de Pneu" },
-  { "nome": "Édipo", "setor": "Montagem de Pneu" },
-  { "nome": "Lucas Odalio", "setor": "Montagem de Pneu" },
-  { "nome": "Lucas Rodrigues", "setor": "Montagem de Pneu" },
-  { "nome": "Matheus", "setor": "Montagem de Pneu" },
-  { "nome": "Ravan Nunes", "setor": "Montagem de Pneu" },
-  { "nome": "Silvio", "setor": "Montagem de Pneu" },
-  { "nome": "Thiago Ribeiro", "setor": "Montagem de Pneu" },
-  { "nome": "Valmir", "setor": "Montagem de Pneu" },
-  { "nome": "Lucas Pereira", "setor": "Montagem de Pneu" }
+  {
+    "nome": "Josmar",
+    "setor": "Setores auxiliares",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "José Pereira",
+    "setor": "Setores auxiliares",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "João Custodio",
+    "setor": "Setores auxiliares",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Diego",
+    "setor": "Setores auxiliares",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Alvaro",
+    "setor": "Pé",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Eber",
+    "setor": "Pé",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Antonio Barreto",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Jocimar Sandré",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Maicon",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Alexsandro",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "José Claudio",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Juarez",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Leonardo Antonio Rodrigues",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Marcone",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Gilmara",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Kissylla",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Geander",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Wender",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Agostinho",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Antonio José",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Kevin",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Zanato Pinheiro",
+    "setor": "Caçamba",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Bastos",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Eleomar",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Luiz Carlos",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Odair",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Leonardo",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Igor Lena",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valdir Varal",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Elizeu",
+    "setor": "Varal",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Ayane",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Francieli Souza",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Marcelo Souza",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valdecir",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Neyde",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valeria",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Esmeralda",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Renato",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Alan",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Natália",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Noenne José",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Vitoria Carolina Lopes",
+    "setor": "Aro",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Aparecida Maria",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Cristiane",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Eliana",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Lurdelma Alves",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valdir",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Vanderleia",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Eliene da Conceição",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Luciano Pesca",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Maria Aparecida",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Paulo",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valquiria",
+    "setor": "Kit",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Bertran",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Daniel Almeida",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Higor",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Lucas Ferreira",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Luiz",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Diego - veio do carregamento",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Édipo",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Lucas Odalio",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Lucas Rodrigues",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Matheus",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Ravan Nunes",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Silvio",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Thiago Ribeiro",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Valmir",
+    "setor": "Montagem de Pneu",
+    "gestor": "Thalles"
+  },
+  {
+    "nome": "Adenílson de Souza Ferraz",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Adriana Barbosa da Silva",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Alceu Carlos Gomes",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Aldino Santiago",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Alex Ribeiro de Souza",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Alexandre Mendonça dos Santos",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Alice Vitória Pim Gomes",
+    "setor": "Célula robótica",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Antônio Alves Bearis",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Antônio Hidrolândio Santos",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Breno Feitosa Ferreira",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Carlos Alexandre Cassiano Ramo",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Davy de Jesus de Oliveira",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Douglas Santos Silva",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Edinaldo Furtado",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Eli Lauers",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Fabrício Costa Cordeiro",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Fernando Gonçalves",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Giovani Silva Vieira",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Halisson Frois Santana",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Henry Valery Huerta Sanchez",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Hudson Telis dos Santos Manea",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Ismael Pereira de Oliveira",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Jackson Pereira dos Santos",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Jadson Steven Barboza de Lazari",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Jaqueline Correa Iansen",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "João Manoel de Souza",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Jocarly Alvarenga Fraga",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Jorge Sales da Silva Filho",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "José Adelson de Almeida",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Josemir Dalmásio",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Juraci Barbosa Ferreira",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Kelly dos Santos",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Leandro Silva Souza",
+    "setor": "Supervisão",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Lillian Gabrielli Silva Soares",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Luciano de Souza Raimundo",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Luiz Ângelo da Silva",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Marcondes Santos de Souza",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Marcos Vinícius de O Silva Sel",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Maria Aparecida da Silva Peres",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Robert Souza Santos",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Romildo Onofre Gonçalves",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Sandro Souza dos Santos",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Sebastião Felipe de Oliveira",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Sérgio Lafaiete Neves",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Talita Patrícia Diogo dos Santos",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Tiago Rodrigues",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Valdir Santo Chever",
+    "setor": "Pintura",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Vinícius Frazão de Lira",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Wallace da Silva Rodrigues",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Wandra Kely Alves de Souza",
+    "setor": "Carro solda",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Warlem Pereira Gomes",
+    "setor": "Betoneira",
+    "gestor": "Leandro Souza"
+  },
+  {
+    "nome": "Wilson Fagner Silva da Conceição",
+    "setor": "Solda",
+    "gestor": "Leandro Souza"
+  }
 ]
+  
