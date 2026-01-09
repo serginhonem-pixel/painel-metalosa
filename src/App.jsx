@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import presencaDez from './data/Prensençadez.json';
-import * as XLSX from 'xlsx';
 import faturamentoData from './data/faturamento.json';
 import clientesData from './Faturamento/clientes.json';
 import produtosData from './data/produtos.json';
+import municipiosLatLong from './data/municipios_brasil_latlong.json';
+import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -170,6 +172,37 @@ const normalizarCodigoProduto = (valor) =>
     .replace(/\s+/g, '')
     .toUpperCase();
 
+const UF_CENTROID = {
+  AC: [-9.0238, -70.812],
+  AL: [-9.5713, -36.7819],
+  AM: [-3.1019, -60.025],
+  AP: [1.4117, -51.773],
+  BA: [-12.96, -38.51],
+  CE: [-3.7172, -38.5434],
+  DF: [-15.7939, -47.8828],
+  ES: [-20.3155, -40.3128],
+  GO: [-16.6869, -49.2648],
+  MA: [-2.5307, -44.3068],
+  MG: [-19.9167, -43.9345],
+  MS: [-20.4697, -54.6201],
+  MT: [-15.6009, -56.0974],
+  PA: [-1.4558, -48.4902],
+  PB: [-7.115, -34.8641],
+  PE: [-8.0476, -34.877],
+  PI: [-5.0892, -42.8016],
+  PR: [-25.4284, -49.2733],
+  RJ: [-22.9068, -43.1729],
+  RN: [-5.7945, -35.211],
+  RO: [-8.7612, -63.9004],
+  RR: [2.8235, -60.6753],
+  RS: [-30.0346, -51.2177],
+  SC: [-27.5954, -48.548],
+  SE: [-10.9472, -37.0731],
+  SP: [-23.5505, -46.6333],
+  TO: [-10.2491, -48.3243],
+};
+
+
 const normalizarIdFirestore = (texto) =>
   String(texto || '')
     .normalize('NFD')
@@ -211,7 +244,7 @@ export default function App() {
   const [abaAtiva, setAbaAtiva] = useState('executivo');
   const [subAbaGestao, setSubAbaGestao] = useState('lista');
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
-  const [subAbaFaturamento, setSubAbaFaturamento] = useState('2025');
+  const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
@@ -242,6 +275,24 @@ export default function App() {
   const [filtroSupervisor, setFiltroSupervisor] = useState('Todos');
   const [filtroSetor, setFiltroSetor] = useState('Todos');
   const [filtroTipoDia, setFiltroTipoDia] = useState('Todos');
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [mapModalInstance, setMapModalInstance] = useState(null);
+  const [modalLancamento, setModalLancamento] = useState(null);
+  const [modalTipo, setModalTipo] = useState('Presente');
+  const [modalTempo, setModalTempo] = useState('02:00');
+  const [modalErro, setModalErro] = useState('');
+  const [modalFeriasOpen, setModalFeriasOpen] = useState(false);
+  const [feriasColaboradorId, setFeriasColaboradorId] = useState('');
+  const [feriasInicio, setFeriasInicio] = useState('');
+  const [feriasFim, setFeriasFim] = useState('');
+  const [feriasErro, setFeriasErro] = useState('');
+  const [modalRapidoFiltroOpen, setModalRapidoFiltroOpen] = useState(false);
+  const [rapidoSupervisor, setRapidoSupervisor] = useState('');
+  const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
+  const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
+  const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
+  const [modoRapidoTempo, setModoRapidoTempo] = useState('02:00');
+  const [modoRapidoErro, setModoRapidoErro] = useState('');
   const [supervisorEditando, setSupervisorEditando] = useState(null);
   const [supervisorNome, setSupervisorNome] = useState('');
   const [faltasCarregadas, setFaltasCarregadas] = useState(false);
@@ -255,156 +306,95 @@ export default function App() {
 
   useEffect(() => {
     let ativo = true;
-    const carregarPlanilhaLeandro = async () => {
+    const carregarLeandroJson = () => {
       try {
-        const arquivo = new URL('./data/Absenteísmo - LEANDRO.xlsx', import.meta.url);
-        const resp = await fetch(arquivo);
-        if (!resp.ok) throw new Error('Falha ao carregar planilha do Leandro.');
-        const buffer = await resp.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
-        if (!rows.length) return;
-
-        const meses = {
-          janeiro: '01',
-          fevereiro: '02',
-          marco: '03',
-          abril: '04',
-          maio: '05',
-          junho: '06',
-          julho: '07',
-          agosto: '08',
-          setembro: '09',
-          outubro: '10',
-          novembro: '11',
-          dezembro: '12',
-        };
-
-        const mesPorLinha = rows.map((row) => {
-          let mesBase = null;
-          (row || []).some((cell) => {
-            if (typeof cell !== 'string') return false;
-            const texto = cell.toLowerCase();
-            const match = texto.match(
-              /(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(\\d{4})/
-            );
-            if (!match) return false;
-            const mes = meses[match[1]];
-            mesBase = `${match[2]}-${mes}`;
-            return true;
-          });
-          return mesBase;
-        });
-
-        const localizarMesBase = (linha) => {
-          for (let i = linha; i >= 0; i -= 1) {
-            if (mesPorLinha[i]) return mesPorLinha[i];
-          }
-          return '2025-12';
+        if (!absenteismoLeandro?.meses) return;
+        const supervisorNome = 'Leandro Souza';
+        const mapaCodigos = {
+          FJ: 'Falta Justificada',
+          FI: 'Falta Injustificada',
+          FE: 'Ferias',
+          F: 'Ferias',
+          ET: 'Falta Justificada',
+          SC: 'Falta Justificada',
+          CO: 'Falta Justificada',
+          FRD: 'Falta Justificada',
+          J: 'Falta Justificada',
+          DSR: 'DSR',
+          P: 'Presente',
         };
 
         const blocos = [];
         const resumoMeses = {};
         const colaboradoresTodos = [];
 
-        for (let i = 0; i < rows.length; i += 1) {
-          const row = rows[i];
-          if (!Array.isArray(row) || !row.includes('Colaborador')) continue;
-
-          const header = row;
-          const colNome = header.indexOf('Colaborador');
-          const colSetor = header.indexOf('Setor');
-          if (colNome < 0 || colSetor < 0) continue;
-
-          const dias = header
-            .map((value, index) => (
-              Number.isInteger(value) && value >= 1 && value <= 31
-                ? { dia: value, index }
-                : null
-            ))
-            .filter(Boolean);
-
-          const mesBase = localizarMesBase(i);
+        Object.entries(absenteismoLeandro.meses).forEach(([mesBase, pessoas]) => {
+          if (!mesBase.startsWith('2026-')) return;
+          if (!pessoas || typeof pessoas !== 'object') return;
           const colaboradores = [];
-          let idxP = -1;
-          let idxFI = -1;
-          let idxFE = -1;
-          let idxFJ = -1;
+          const resumoPorDia = {};
 
-          for (let r = i + 1; r < rows.length; r += 1) {
-            const linha = rows[r];
-            if (!Array.isArray(linha)) continue;
-            if (linha.includes('Colaborador')) break;
-            if (mesPorLinha[r]) break;
-
-            const cellNome = linha[colNome];
-            if (typeof cellNome !== 'string' || !cellNome.trim()) continue;
-            if (cellNome.includes(' - ')) {
-              const texto = normalizarTexto(cellNome);
-              if (texto.includes('p - presente')) idxP = r;
-              if (texto.includes('fi - falta injustificada')) idxFI = r;
-              if (texto.includes('fe - ferias')) idxFE = r;
-              if (texto.includes('fj - falta justificada')) idxFJ = r;
-              continue;
-            }
-
+          Object.entries(pessoas).forEach(([nome, dados]) => {
+            if (!dados || typeof dados !== 'object') return;
+            const setor = typeof dados.setor === 'string' ? dados.setor.trim() : '';
+            const dias = dados.dias || {};
             const excecoes = {};
-            dias.forEach(({ dia, index }) => {
-              const valor = linha?.[index];
-              if (typeof valor !== 'string') return;
-              const codigo = valor.trim().toUpperCase();
+
+            Object.entries(dias).forEach(([dia, codigoRaw]) => {
+              const codigo = String(codigoRaw ?? '').trim().toUpperCase();
               if (!codigo) return;
-              if (codigo === 'P') return;
+              const diaStr = String(dia).padStart(2, '0');
+              const dataISO = `${mesBase}-${diaStr}`;
+              if (!resumoPorDia[dataISO]) {
+                resumoPorDia[dataISO] = { P: 0, FI: 0, FJ: 0, FE: 0 };
+              }
+
+              if (codigo === 'P') {
+                resumoPorDia[dataISO].P += 1;
+                return;
+              }
               if (codigo === 'F' || codigo === 'FE') {
+                resumoPorDia[dataISO].FE += 1;
                 excecoes[String(dia)] = 'FE';
                 return;
               }
+              if (codigo === 'FI') {
+                resumoPorDia[dataISO].FI += 1;
+                excecoes[String(dia)] = 'FI';
+                return;
+              }
+              if (codigo === 'FJ') {
+                resumoPorDia[dataISO].FJ += 1;
+                excecoes[String(dia)] = 'FJ';
+                return;
+              }
+              if (codigo === 'DSR') {
+                excecoes[String(dia)] = 'DSR';
+                return;
+              }
+
+              resumoPorDia[dataISO].FJ += 1;
               excecoes[String(dia)] = 'FJ';
             });
 
             colaboradores.push({
-              nome: cellNome.trim(),
-              setor: typeof linha[colSetor] === 'string' ? linha[colSetor].trim() : '',
+              nome: typeof nome === 'string' ? nome.trim() : String(nome ?? '').trim(),
+              setor,
+              dias,
               excecoes,
             });
-          }
-
-          const resumoPorDia = {};
-          const lerNumero = (rowIndex, colIndex) => {
-            if (rowIndex < 0) return 0;
-            const valor = rows[rowIndex]?.[colIndex];
-            if (typeof valor === 'number' && Number.isFinite(valor)) return valor;
-            if (typeof valor === 'string') {
-              const parsed = Number(valor.replace(',', '.'));
-              return Number.isFinite(parsed) ? parsed : 0;
-            }
-            return 0;
-          };
-          dias.forEach(({ dia, index }) => {
-            const diaStr = String(dia).padStart(2, '0');
-            const dataISO = `${mesBase}-${diaStr}`;
-            resumoPorDia[dataISO] = {
-              P: lerNumero(idxP, index),
-              FI: lerNumero(idxFI, index),
-              FE: lerNumero(idxFE, index),
-              FJ: lerNumero(idxFJ, index),
-            };
           });
 
           blocos.push({
             mes: mesBase,
-            supervisor: 'Leandro Souza',
-            mapaCodigos: {
-              FJ: 'Falta Justificada',
-              FI: 'Falta Injustificada',
-              FE: 'Ferias',
-            },
+            supervisor: supervisorNome,
+            mapaCodigos,
             colaboradores,
+            usarDiasCompletos: true,
           });
           resumoMeses[mesBase] = resumoPorDia;
           colaboradoresTodos.push(...colaboradores);
-        }
+        });
 
         if (!ativo) return;
         if (blocos.length) {
@@ -415,11 +405,11 @@ export default function App() {
           setResumoLeandroExcel({ meses: resumoMeses });
         }
       } catch (err) {
-        console.error('Erro ao carregar planilha do Leandro:', err);
+        console.error('Erro ao carregar JSON do Leandro:', err);
       }
     };
 
-    carregarPlanilhaLeandro();
+    carregarLeandroJson();
     return () => {
       ativo = false;
     };
@@ -565,6 +555,7 @@ export default function App() {
         if (normal.includes('presen') || compacto.includes('presen')) return 'Presente';
         if (normal.includes('justificada') || compacto.includes('justificada')) return 'Falta Justificada';
         if (normal.includes('injustificada') || compacto.includes('injustificada')) return 'Falta Injustificada';
+        if (normal.includes('parcial') || compacto.includes('parcial')) return 'Falta Parcial';
         if (
           normal.includes('feria') ||
           normal.includes('fria') ||
@@ -589,33 +580,56 @@ export default function App() {
         if (!dados || !dados.colaboradores) return;
         const mapaCodigos = dados.mapaCodigos || {};
         const mesBase = dados.mes || '2025-12';
+        const usarDiasCompletos = Boolean(dados.usarDiasCompletos);
+
+        const aplicarCodigo = (id, dia, codigo) => {
+          const bruto = mapaCodigos[codigo] || codigo;
+          const tipo = mapearTipo(bruto);
+          const diaStr = String(dia).padStart(2, '0');
+          const dataISO = `${mesBase}-${diaStr}`;
+
+          if (tipo === 'Presente' || tipo === 'DSR') {
+            if (registros[dataISO]?.[id]) {
+              delete registros[dataISO][id];
+              if (Object.keys(registros[dataISO]).length === 0) {
+                delete registros[dataISO];
+              }
+            }
+            return;
+          }
+
+          if (!registros[dataISO]) registros[dataISO] = {};
+          registros[dataISO][id] = { tipoFalta: tipo };
+        };
+
         dados.colaboradores.forEach((colab) => {
           const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
           const id = mapaIds.get(chave) || mapaIdsNome.get(normalizarTexto(colab.nome));
-          if (!id || !colab.excecoes) return;
+          if (!id) return;
 
+          if (usarDiasCompletos && colab.dias) {
+            Object.entries(colab.dias).forEach(([dia, codigo]) => {
+              const codigoStr = String(codigo ?? '').trim().toUpperCase();
+              if (!codigoStr) return;
+              aplicarCodigo(id, dia, codigoStr);
+            });
+            return;
+          }
+
+          if (!colab.excecoes) return;
           Object.entries(colab.excecoes).forEach(([dia, codigo]) => {
-            const bruto = mapaCodigos[codigo] || codigo;
-            const tipo = mapearTipo(bruto);
-            if (tipo === 'Presente' || tipo === 'DSR') return;
-
-            const diaStr = String(dia).padStart(2, '0');
-            const dataISO = `${mesBase}-${diaStr}`;
-            if (!registros[dataISO]) registros[dataISO] = {};
-            if (registros[dataISO][id]) return;
-            registros[dataISO][id] = { tipoFalta: tipo };
+            aplicarCodigo(id, dia, codigo);
           });
         });
       };
 
-      aplicarExcecoes(presencaDez);
       if (presencaLeandroExcel?.blocos?.length) {
         presencaLeandroExcel.blocos.forEach((bloco) => aplicarExcecoes(bloco));
       }
 
       return registros;
     });
-  }, [colaboradores, presencaLeandroExcel]);
+  }, [colaboradores, presencaLeandroExcel, faltasCarregadas]);
 
   useEffect(() => {
     let ativo = true;
@@ -625,6 +639,7 @@ export default function App() {
         if (!ativo) return;
         const registros = {};
         snap.forEach((docRef) => {
+          if (!docRef.id.startsWith('2026-')) return;
           const data = docRef.data();
           if (data && data.registros) {
             registros[docRef.id] = data.registros;
@@ -649,7 +664,7 @@ export default function App() {
   useEffect(() => {
     if (!faltasCarregadas) return;
     const salvar = async () => {
-      const dias = Object.keys(registrosPorData);
+      const dias = Object.keys(registrosPorData).filter((dia) => dia.startsWith('2026-'));
       await Promise.all(
         dias.map((dia) =>
           setDoc(doc(db, 'faltas', dia), { registros: registrosPorData[dia] }, { merge: true })
@@ -767,9 +782,11 @@ export default function App() {
     const registrosDia = registrosPorData[dataLancamento] || {};
     return colaboradores.map((colab) => {
       const tipoFalta = registrosDia[colab.id]?.tipoFalta || 'Presente';
+      const tempoParcial = registrosDia[colab.id]?.tempoParcial || '';
       return {
         ...colab,
         tipoFalta,
+        tempoParcial,
         estaAusente: tipoFalta !== 'Presente',
       };
     });
@@ -786,11 +803,13 @@ export default function App() {
   }, [colaboradores]);
 
   const colaboradoresDiaFiltrados = useMemo(() => {
-    return colaboradoresDia.filter((colab) => {
-      const supervisorOk = filtroSupervisor === 'Todos' || colab.gestor === filtroSupervisor;
-      const setorOk = filtroSetor === 'Todos' || colab.setor === filtroSetor;
-      return supervisorOk && setorOk;
-    });
+    return colaboradoresDia
+      .filter((colab) => {
+        const supervisorOk = filtroSupervisor === 'Todos' || colab.gestor === filtroSupervisor;
+        const setorOk = filtroSetor === 'Todos' || colab.setor === filtroSetor;
+        return supervisorOk && setorOk;
+      })
+      .sort((a, b) => a.nome.localeCompare(b.nome));
   }, [colaboradoresDia, filtroSupervisor, filtroSetor]);
 
   const totalColaboradoresFiltrados = useMemo(() => {
@@ -872,6 +891,156 @@ export default function App() {
       percentualPresenca,
     };
   }, [colaboradores, filtroSupervisor, filtroSetor, registrosPorData, mesHistorico, anoHistorico]);
+
+  const abrirModalLancamento = (colab) => {
+    const registro = registrosPorData[dataLancamento]?.[colab.id];
+    const tipoAtual = registro?.tipoFalta || 'Presente';
+    const tempoAtual = registro?.tempoParcial || '02:00';
+    setModalLancamento(colab);
+    setModalTipo(tipoAtual);
+    setModalTempo(tempoAtual);
+    setModalErro('');
+  };
+
+  const fecharModalLancamento = () => {
+    setModalLancamento(null);
+    setModalErro('');
+  };
+
+  const salvarModalLancamento = () => {
+    if (!modalLancamento) return;
+    if (modalTipo === 'Falta Parcial') {
+      const match = String(modalTempo || '').match(/^(\d{1,2}):([0-5]\d)$/);
+      if (!match) {
+        setModalErro('Informe o tempo no formato HH:MM (ex: 02:00).');
+        return;
+      }
+    }
+    setRegistrosPorData((prev) => {
+      const dia = prev[dataLancamento] ? { ...prev[dataLancamento] } : {};
+      if (modalTipo === 'Presente') {
+        delete dia[modalLancamento.id];
+      } else {
+        dia[modalLancamento.id] = {
+          tipoFalta: modalTipo,
+          ...(modalTipo === 'Falta Parcial' ? { tempoParcial: modalTempo } : {}),
+        };
+      }
+      return { ...prev, [dataLancamento]: dia };
+    });
+    fecharModalLancamento();
+  };
+
+  const abrirModalFerias = () => {
+    setModalFeriasOpen(true);
+    setFeriasColaboradorId('');
+    setFeriasInicio('');
+    setFeriasFim('');
+    setFeriasErro('');
+  };
+
+  const fecharModalFerias = () => {
+    setModalFeriasOpen(false);
+    setFeriasErro('');
+  };
+
+  const salvarFerias = () => {
+    if (!feriasColaboradorId || !feriasInicio || !feriasFim) {
+      setFeriasErro('Preencha colaborador, data inicio e data fim.');
+      return;
+    }
+    if (feriasInicio > feriasFim) {
+      setFeriasErro('A data inicio nao pode ser maior que a data fim.');
+      return;
+    }
+    const id = Number(feriasColaboradorId);
+    const datas = [];
+    let cursor = new Date(`${feriasInicio}T00:00:00`);
+    const fim = new Date(`${feriasFim}T00:00:00`);
+    while (cursor <= fim) {
+      const iso = cursor.toISOString().slice(0, 10);
+      if (!isDiaDesconsiderado(iso) && !isDataSemApontamento(iso)) {
+        datas.push(iso);
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    if (!datas.length) {
+      setFeriasErro('Nenhuma data valida no intervalo selecionado.');
+      return;
+    }
+    setRegistrosPorData((prev) => {
+      const next = { ...prev };
+      datas.forEach((dia) => {
+        const registrosDia = next[dia] ? { ...next[dia] } : {};
+        registrosDia[id] = { tipoFalta: 'Ferias' };
+        next[dia] = registrosDia;
+      });
+      return next;
+    });
+    fecharModalFerias();
+  };
+
+  const abrirModoRapido = () => {
+    setModalRapidoFiltroOpen(true);
+    setRapidoSupervisor(filtroSupervisor === 'Todos' ? '' : filtroSupervisor);
+    setRapidoSupervisorErro('');
+  };
+
+  const iniciarModoRapido = () => {
+    if (!rapidoSupervisor) {
+      setRapidoSupervisorErro('Selecione um supervisor.');
+      return;
+    }
+    setFiltroSupervisor(rapidoSupervisor);
+    setModalRapidoFiltroOpen(false);
+    setModoRapidoOpen(true);
+    setModoRapidoIndex(0);
+    setModoRapidoTempo('02:00');
+    setModoRapidoErro('');
+  };
+
+  const fecharModoRapido = () => {
+    setModoRapidoOpen(false);
+    setModoRapidoErro('');
+  };
+
+  const avancarModoRapido = () => {
+    setModoRapidoIndex((prev) => {
+      const total = colaboradoresDiaFiltrados.length;
+      if (total === 0) return 0;
+      return Math.min(prev + 1, total - 1);
+    });
+  };
+
+  const voltarModoRapido = () => {
+    setModoRapidoIndex((prev) => Math.max(prev - 1, 0));
+  };
+
+  const salvarModoRapido = (tipo) => {
+    const colab = colaboradoresDiaFiltrados[modoRapidoIndex];
+    if (!colab) return;
+    if (tipo === 'Falta Parcial') {
+      const match = String(modoRapidoTempo || '').match(/^(\d{1,2}):([0-5]\d)$/);
+      if (!match) {
+        setModoRapidoErro('Informe o tempo no formato HH:MM (ex: 02:00).');
+        return;
+      }
+    }
+    setRegistrosPorData((prev) => {
+      const dia = prev[dataLancamento] ? { ...prev[dataLancamento] } : {};
+      if (tipo === 'Presente') {
+        delete dia[colab.id];
+      } else {
+        dia[colab.id] = {
+          tipoFalta: tipo,
+          ...(tipo === 'Falta Parcial' ? { tempoParcial: modoRapidoTempo } : {}),
+        };
+      }
+      return { ...prev, [dataLancamento]: dia };
+    });
+    setModoRapidoErro('');
+    avancarModoRapido();
+  };
 
   const alternarPresenca = (id) => {
     setRegistrosPorData((prev) => {
@@ -1139,6 +1308,20 @@ export default function App() {
         produto.descricao || '',
       ])
     );
+    const municipiosPorChave = new Map(
+      (municipiosLatLong || []).map((item) => {
+        const chave = `${normalizarTexto(item.nome)}||${String(item.uf || '').toUpperCase()}`;
+        return [
+          chave,
+          {
+            nome: item.nome,
+            uf: String(item.uf || '').toUpperCase(),
+            lat: item.latitude,
+            lng: item.longitude,
+          },
+        ];
+      })
+    );
     const clientesPorCodigo = new Map(
       (clientesData?.clientes || []).map((cliente) => [
         normalizarCodigoCliente(cliente.Codigo),
@@ -1169,6 +1352,8 @@ export default function App() {
         mixUnidade: [],
         topEstados: [],
         topMunicipios: [],
+        estadosTodos: [],
+        municipiosMapa: [],
       };
     }
 
@@ -1215,6 +1400,7 @@ export default function App() {
     const municipioMap = new Map();
     const estadoPedidosMap = new Map();
     const municipioPedidosMap = new Map();
+    const municipioClientesMap = new Map();
 
     linhasMes.forEach((row) => {
       const codigoCliente = normalizarCodigoCliente(row.cliente);
@@ -1226,8 +1412,21 @@ export default function App() {
         estadoPedidosMap.set(infoCliente.estado, (estadoPedidosMap.get(infoCliente.estado) || 0) + 1);
       }
       if (infoCliente?.municipio) {
-        municipioMap.set(infoCliente.municipio, (municipioMap.get(infoCliente.municipio) || 0) + row.valorTotal);
-        municipioPedidosMap.set(infoCliente.municipio, (municipioPedidosMap.get(infoCliente.municipio) || 0) + 1);
+        const municipioKey = `${normalizarTexto(infoCliente.municipio)}||${String(infoCliente.estado || '').toUpperCase()}`;
+        if (!municipioMap.has(municipioKey)) {
+          municipioMap.set(municipioKey, {
+            municipio: infoCliente.municipio,
+            uf: String(infoCliente.estado || '').toUpperCase(),
+            valor: 0,
+          });
+        }
+        municipioMap.get(municipioKey).valor += row.valorTotal;
+        municipioPedidosMap.set(municipioKey, (municipioPedidosMap.get(municipioKey) || 0) + 1);
+        if (!municipioClientesMap.has(municipioKey)) {
+          municipioClientesMap.set(municipioKey, new Map());
+        }
+        const clientesLocal = municipioClientesMap.get(municipioKey);
+        clientesLocal.set(chaveCliente, (clientesLocal.get(chaveCliente) || 0) + row.valorTotal);
       }
 
       const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
@@ -1289,6 +1488,7 @@ export default function App() {
           descricao: descricaoFinal,
           valor: dados.valor,
           quantidade: dados.quantidade,
+          precoMedio: dados.quantidade > 0 ? dados.valor / dados.quantidade : 0,
           unidade: unidadePrincipal,
         };
       })
@@ -1308,8 +1508,7 @@ export default function App() {
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 6);
 
-    const topMunicipios = Array.from(municipioMap.entries())
-      .map(([municipio, valor]) => ({ municipio, valor }))
+    const topMunicipios = Array.from(municipioMap.values())
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 6);
 
@@ -1319,9 +1518,38 @@ export default function App() {
       .slice(0, 6);
 
     const pedidosPorMunicipio = Array.from(municipioPedidosMap.entries())
-      .map(([municipio, pedidos]) => ({ municipio, pedidos }))
+      .map(([chave, pedidos]) => ({ chave, pedidos }))
       .sort((a, b) => b.pedidos - a.pedidos)
       .slice(0, 6);
+
+    const estadosTodos = Array.from(estadoMap.entries())
+      .map(([estado, valor]) => ({ estado, valor }))
+      .sort((a, b) => b.valor - a.valor);
+
+    const municipiosMapa = Array.from(municipioMap.entries())
+      .map(([chave, item]) => {
+        const info = municipiosPorChave.get(chave);
+        if (!info) return null;
+        const clientesLocais = Array.from((municipioClientesMap.get(chave) || new Map()).entries())
+          .map(([cliente, valor]) => ({
+            cliente,
+            nome: clientesPorCodigo.get(cliente)?.nome || cliente,
+            valor,
+          }))
+          .sort((a, b) => b.valor - a.valor)
+          .slice(0, 10);
+        return {
+          municipio: info.nome,
+          uf: info.uf,
+          valor: item.valor,
+          lat: info.lat,
+          lng: info.lng,
+          topClientes: clientesLocais,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 25);
 
     const filiais = porFilial.map((item) => item.filial);
     const porDiaFilial = Array.from(diaFilialMap.entries())
@@ -1362,8 +1590,101 @@ export default function App() {
       topMunicipios,
       pedidosPorEstado,
       pedidosPorMunicipio,
+      estadosTodos,
+      municipiosMapa,
     };
   }, [faturamentoLinhas]);
+
+  const municipiosBounds = useMemo(() => {
+    if (faturamentoAtual.municipiosMapa.length === 0) return null;
+    let minLat = 90;
+    let maxLat = -90;
+    let minLng = 180;
+    let maxLng = -180;
+    faturamentoAtual.municipiosMapa.forEach((item) => {
+      minLat = Math.min(minLat, item.lat);
+      maxLat = Math.max(maxLat, item.lat);
+      minLng = Math.min(minLng, item.lng);
+      maxLng = Math.max(maxLng, item.lng);
+    });
+    if (minLat === 90) return null;
+    return [
+      [minLat, minLng],
+      [maxLat, maxLng],
+    ];
+  }, [faturamentoAtual.municipiosMapa]);
+
+  useEffect(() => {
+    if (!mapModalOpen || !mapModalInstance) return;
+    setTimeout(() => {
+      mapModalInstance.invalidateSize();
+      if (municipiosBounds) {
+        mapModalInstance.fitBounds(municipiosBounds, { padding: [24, 24], maxZoom: 9 });
+      }
+    }, 0);
+  }, [mapModalOpen, mapModalInstance, municipiosBounds]);
+
+  const renderMapaMunicipio = (containerClass, options = {}) => {
+    const { zoomControl = false, onMapReady = null } = options;
+    if (faturamentoAtual.municipiosMapa.length === 0) {
+      return <p className="text-xs text-slate-400 italic">Sem dados por municipio.</p>;
+    }
+    const maxValor = Math.max(...faturamentoAtual.municipiosMapa.map((item) => item.valor), 1);
+
+    return (
+      <div className={containerClass}>
+        <MapContainer
+          className="map-base"
+          key={municipiosBounds ? municipiosBounds.flat().join(',') : 'brasil'}
+          center={[-14.235, -51.9253]}
+          zoom={5}
+          bounds={municipiosBounds || undefined}
+          boundsOptions={{ padding: [24, 24], maxZoom: 9 }}
+          zoomControl={zoomControl}
+          scrollWheelZoom={false}
+          whenCreated={onMapReady || undefined}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          />
+          {faturamentoAtual.municipiosMapa.map((item) => {
+            const escala = Math.sqrt(item.valor / maxValor);
+            const radius = 6 + Math.min(12, escala * 12);
+            const clientesBase = item.topClientes || [];
+            const clientesTooltip = clientesBase.slice(0, 10);
+            return (
+              <CircleMarker
+                key={`${item.municipio}-${item.estado}`}
+                center={[item.lat, item.lng]}
+                radius={radius}
+                pathOptions={{ color: '#22c55e', weight: 1, fillColor: '#22c55e', fillOpacity: 0.6 }}
+              >
+                <Tooltip direction="top" opacity={1} className="map-tooltip">
+                  <div className="text-[11px] font-semibold text-slate-100">
+                    {item.municipio} / {item.estado}
+                  </div>
+                  <div className="text-[10px] text-slate-200">
+                    Total: R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                  {clientesTooltip.length > 0 && (
+                    <div className="mt-2 text-[10px] leading-4 text-slate-300 max-w-[260px] cliente-list">
+                      {clientesTooltip.map((cliente, index) => (
+                        <div key={`${cliente.nome}-${index}`} className="cliente-item">
+                          {cliente.nome}: R$ {cliente.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Tooltip>
+              </CircleMarker>
+            );
+          })}
+        </MapContainer>
+      </div>
+    );
+  };
 
   if (carregando) {
     return (
@@ -1378,6 +1699,368 @@ export default function App() {
 
   return (
     <div className="app-dark flex min-h-screen bg-slate-950 text-slate-100 font-sans">
+      {mapModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-6xl rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">Mapa por municipio</h3>
+              <button
+                type="button"
+                onClick={() => setMapModalOpen(false)}
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-200"
+              >
+                Fechar
+              </button>
+            </div>
+            {renderMapaMunicipio('h-[70vh] overflow-hidden rounded-xl border border-slate-100', {
+              zoomControl: true,
+              onMapReady: setMapModalInstance,
+            })}
+          </div>
+        </div>
+      )}
+
+      {modalLancamento && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Lancamento de faltas</p>
+                <p className="text-lg font-bold text-slate-800">{modalLancamento.nome}</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {modalLancamento.setor} • {modalLancamento.gestor} • {dataLancamento}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={fecharModalLancamento}
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 text-xs font-bold">
+              {['Presente', 'Falta Justificada', 'Falta Injustificada', 'Falta Parcial'].map((tipo) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => {
+                    setModalTipo(tipo);
+                    if (tipo === 'Falta Parcial' && !modalTempo) {
+                      setModalTempo('02:00');
+                    }
+                    setModalErro('');
+                  }}
+                  className={`rounded-xl border px-4 py-3 text-left transition-all ${
+                    modalTipo === tipo
+                      ? 'border-slate-900 bg-slate-900 text-white'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  {tipo}
+                </button>
+              ))}
+            </div>
+
+            {modalTipo === 'Falta Parcial' && (
+              <div className="mt-4">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Tempo de falta
+                </label>
+                <input
+                  value={modalTempo}
+                  onChange={(e) => setModalTempo(e.target.value)}
+                  placeholder="02:00"
+                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none"
+                />
+              </div>
+            )}
+
+            {modalErro && (
+              <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                {modalErro}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={fecharModalLancamento}
+                className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={salvarModalLancamento}
+                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-500"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalFeriasOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Lancar ferias</p>
+                <p className="text-lg font-bold text-slate-800">Periodo de ferias</p>
+              </div>
+              <button
+                type="button"
+                onClick={fecharModalFerias}
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Colaborador
+                </label>
+                <select
+                  value={feriasColaboradorId}
+                  onChange={(e) => setFeriasColaboradorId(e.target.value)}
+                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                >
+                  <option value="">Selecione...</option>
+                  {colaboradores
+                    .slice()
+                    .sort((a, b) => a.nome.localeCompare(b.nome))
+                    .map((colab) => (
+                      <option key={colab.id} value={colab.id}>
+                        {colab.nome} ({colab.setor})
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Data inicio
+                  </label>
+                  <input
+                    type="date"
+                    value={feriasInicio}
+                    onChange={(e) => setFeriasInicio(e.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Data fim
+                  </label>
+                  <input
+                    type="date"
+                    value={feriasFim}
+                    onChange={(e) => setFeriasFim(e.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {feriasErro && (
+              <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                {feriasErro}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={fecharModalFerias}
+                className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={salvarFerias}
+                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-500"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalRapidoFiltroOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Modo rapido</p>
+                <p className="text-lg font-bold text-slate-800">Selecione o supervisor</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalRapidoFiltroOpen(false)}
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="mt-4">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Supervisor
+              </label>
+              <select
+                value={rapidoSupervisor}
+                onChange={(e) => setRapidoSupervisor(e.target.value)}
+                className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+              >
+                <option value="">Selecione...</option>
+                {supervisoresDisponiveis
+                  .filter((nome) => nome !== 'Todos')
+                  .map((nome) => (
+                    <option key={nome} value={nome}>
+                      {nome}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {rapidoSupervisorErro && (
+              <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                {rapidoSupervisorErro}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setModalRapidoFiltroOpen(false)}
+                className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={iniciarModoRapido}
+                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-500"
+              >
+                Iniciar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modoRapidoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Modo rapido</p>
+                <p className="text-lg font-bold text-slate-800">Lancamento em sequencia</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {dataLancamento} • {colaboradoresDiaFiltrados.length} colaboradores filtrados
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={fecharModoRapido}
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600"
+              >
+                Fechar
+              </button>
+            </div>
+
+            {colaboradoresDiaFiltrados.length === 0 ? (
+              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                Nenhum colaborador para os filtros selecionados.
+              </div>
+            ) : (
+              (() => {
+                const colab = colaboradoresDiaFiltrados[modoRapidoIndex];
+                return (
+                  <div className="mt-6">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-lg font-bold text-slate-800">{colab.nome}</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {colab.setor} • {colab.gestor}
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold text-slate-400">
+                          {modoRapidoIndex + 1} / {colaboradoresDiaFiltrados.length}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-bold">
+                        {[
+                          { tipo: 'Presente', classe: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' },
+                          { tipo: 'Falta Justificada', classe: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
+                          { tipo: 'Falta Injustificada', classe: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' },
+                          { tipo: 'Falta Parcial', classe: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' },
+                        ].map(({ tipo, classe }) => (
+                          <button
+                            key={tipo}
+                            type="button"
+                            onClick={() => salvarModoRapido(tipo)}
+                            className={`rounded-xl border px-4 py-3 text-left text-xs font-bold transition-all ${classe}`}
+                          >
+                            {tipo}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="mt-3">
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                          Tempo falta parcial (HH:MM)
+                        </label>
+                        <input
+                          value={modoRapidoTempo}
+                          onChange={(e) => setModoRapidoTempo(e.target.value)}
+                          className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                          placeholder="02:00"
+                        />
+                      </div>
+                    </div>
+
+                    {modoRapidoErro && (
+                      <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                        {modoRapidoErro}
+                      </div>
+                    )}
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={voltarModoRapido}
+                        className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                        disabled={modoRapidoIndex === 0}
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        type="button"
+                        onClick={avancarModoRapido}
+                        className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                        disabled={modoRapidoIndex >= colaboradoresDiaFiltrados.length - 1}
+                      >
+                        Proximo
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()
+            )}
+          </div>
+        </div>
+      )}
       
       {/* Sidebar Clássica */}
       <aside className="hidden md:flex w-64 bg-slate-900 text-white flex-col fixed h-full z-20 shadow-2xl">
@@ -2008,7 +2691,7 @@ export default function App() {
                       </div>
 
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-2">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-3">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Faturamento por dia</h4>
                             <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
@@ -2035,7 +2718,7 @@ export default function App() {
                             const areaPath = `${margin.left},${margin.top + chartH} ${linePath} ${margin.left + (linePoints.length - 1) * barW + (barW - 14) / 2 + 7},${margin.top + chartH}`;
 
                             return (
-                              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-72">
+                              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
@@ -2126,7 +2809,10 @@ export default function App() {
                           })()}
                         </div>
 
-                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                      </div>
+
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-1">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top clientes</h4>
                             <span className="text-xs text-slate-400">Top 6</span>
@@ -2153,15 +2839,13 @@ export default function App() {
                             })}
                           </div>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-2">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top produtos</h4>
                             <span className="text-xs text-slate-400">Top 8</span>
                           </div>
-                          <div className="max-h-72 overflow-auto rounded-xl border border-slate-100">
+                          <div className="max-h-80 overflow-auto rounded-xl border border-slate-100">
                             <table className="w-full text-left text-xs">
                               <thead className="sticky top-0 bg-white text-slate-400 uppercase tracking-wider">
                                 <tr>
@@ -2169,6 +2853,7 @@ export default function App() {
                                   <th className="px-4 py-3">Descricao</th>
                                   <th className="px-4 py-3 text-right">Qtd</th>
                                   <th className="px-4 py-3">Unid</th>
+                                  <th className="px-4 py-3 text-right">Preco medio</th>
                                   <th className="px-4 py-3 text-right">Valor</th>
                                 </tr>
                               </thead>
@@ -2182,6 +2867,9 @@ export default function App() {
                                     </td>
                                     <td className="px-4 py-3">{item.unidade || '-'}</td>
                                     <td className="px-4 py-3 text-right font-semibold">
+                                      R$ {item.precoMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </td>
+                                    <td className="px-4 py-3 text-right font-semibold">
                                       R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                     </td>
                                   </tr>
@@ -2193,115 +2881,94 @@ export default function App() {
                       </div>
 
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm xl:col-span-2">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top estados</h4>
-                            <span className="text-xs text-slate-400">Top 6</span>
-                          </div>
-                          <div className="space-y-2">
-                            {faturamentoAtual.topEstados.length === 0 ? (
-                              <p className="text-xs text-slate-400 italic">Sem dados de estado.</p>
-                            ) : (
-                              faturamentoAtual.topEstados.map((item) => {
-                                const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
-                                const pedidos = faturamentoAtual.pedidosPorEstado.find((p) => p.estado === item.estado)?.pedidos || 0;
-                                return (
-                                  <div key={item.estado} className="space-y-1">
-                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                      <span>{item.estado}</span>
-                                      <span>{perc.toFixed(1)}%</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                      <span>{pedidos} pedidos</span>
-                                      <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                      <div className="h-full bg-indigo-500" style={{ width: `${perc}%` }} />
-                                    </div>
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                          <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top municipios</h4>
-                            <span className="text-xs text-slate-400">Top 6</span>
-                          </div>
-                          <div className="space-y-2">
-                            {faturamentoAtual.topMunicipios.length === 0 ? (
-                              <p className="text-xs text-slate-400 italic">Sem dados de municipio.</p>
-                            ) : (
-                              faturamentoAtual.topMunicipios.map((item) => {
-                                const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
-                                const pedidos = faturamentoAtual.pedidosPorMunicipio.find((p) => p.municipio === item.municipio)?.pedidos || 0;
-                                return (
-                                  <div key={item.municipio} className="space-y-1">
-                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                      <span>{item.municipio}</span>
-                                      <span>{perc.toFixed(1)}%</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                      <span>{pedidos} pedidos</span>
-                                      <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                      <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
-                                    </div>
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                          <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top clientes</h4>
-                            <span className="text-xs text-slate-400">Top 6</span>
-                          </div>
-                          <div className="space-y-2">
-                            {faturamentoAtual.topClientes.map((item) => {
-                              const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
-                              const nome = item.info?.nome || item.cliente;
-                              const local = [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ');
-                              return (
-                                <div key={item.cliente} className="space-y-1">
-                                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                    <div>
-                                      <div className="font-bold text-slate-700">{nome}</div>
-                                      <div className="text-[10px] text-slate-400">{local || `Codigo: ${item.cliente}`}</div>
-                                    </div>
-                                    <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                                  </div>
-                                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                    <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Mix por unidade</h4>
-                          <span className="text-xs text-slate-400">{faturamentoAtual.mixUnidade.length} unidades</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {faturamentoAtual.mixUnidade.map((item) => (
-                            <div key={item.unidade} className="flex items-center justify-between rounded-xl border border-slate-100 p-3">
-                              <div className="text-xs font-bold text-slate-600 uppercase">{item.unidade}</div>
-                              <div className="text-sm font-semibold text-slate-900">
-                                {item.quantidade.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
-                              </div>
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Mapa por municipio</h4>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-slate-400">Faturamento</span>
+                              <button
+                                type="button"
+                                onClick={() => setMapModalOpen(true)}
+                                className="text-xs font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300"
+                              >
+                                Expandir
+                              </button>
                             </div>
-                          ))}
+                          </div>
+                          {!mapModalOpen &&
+                            renderMapaMunicipio('aspect-square overflow-hidden rounded-xl border border-slate-100', {
+                              zoomControl: true,
+                            })}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top estados</h4>
+                              <span className="text-xs text-slate-400">Top 6</span>
+                            </div>
+                            <div className="space-y-2">
+                              {faturamentoAtual.topEstados.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">Sem dados de estado.</p>
+                              ) : (
+                                faturamentoAtual.topEstados.map((item) => {
+                                  const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                                  const pedidos = faturamentoAtual.pedidosPorEstado.find((p) => p.estado === item.estado)?.pedidos || 0;
+                                  return (
+                                    <div key={item.estado} className="space-y-1">
+                                      <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                        <span>{item.estado}</span>
+                                        <span>{perc.toFixed(1)}%</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                        <span>{pedidos} pedidos</span>
+                                        <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                      </div>
+                                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                        <div className="h-full bg-indigo-500" style={{ width: `${perc}%` }} />
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top municipios</h4>
+                              <span className="text-xs text-slate-400">Top 6</span>
+                            </div>
+                            <div className="space-y-2">
+                              {faturamentoAtual.topMunicipios.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">Sem dados de municipio.</p>
+                              ) : (
+                                faturamentoAtual.topMunicipios.map((item) => {
+                                  const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                                  const chaveMunicipio = `${normalizarTexto(item.municipio)}||${String(item.uf || '').toUpperCase()}`;
+                                  const pedidos = faturamentoAtual.pedidosPorMunicipio.find((p) => p.chave === chaveMunicipio)?.pedidos || 0;
+                                  return (
+                                    <div key={`${item.municipio}-${item.uf}`} className="space-y-1">
+                                      <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                        <span>{item.municipio} / {item.uf}</span>
+                                        <span>{perc.toFixed(1)}%</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                        <span>{pedidos} pedidos</span>
+                                        <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                      </div>
+                                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                        <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
+
                     </>
                   )}
                 </div>
@@ -2675,7 +3342,7 @@ export default function App() {
                    </div>
 
                    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                     <div className="p-6 border-b border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-4 text-sm font-bold text-slate-500 uppercase">
+                     <div className="p-6 border-b border-slate-200 bg-slate-900/80 flex flex-wrap justify-between items-center gap-4 text-sm font-bold text-slate-200 uppercase">
                        <div className="flex flex-wrap items-center gap-4">
                          <span>Lancamento Diario de Presenca</span>
                          <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-600">
@@ -2687,20 +3354,35 @@ export default function App() {
                                setDataLancamento(e.target.value);
                                setDiaHistorico(null);
                              }}
-                             className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-600"
-                           />
-                         </div>
-                       </div>
-                       <div className="flex flex-wrap gap-3 text-xs">
-                         <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 size={14}/> Presente</span>
-                         <span className="text-amber-600 flex items-center gap-1"><AlertTriangle size={14}/> Falta Justificada</span>
-                         <span className="text-rose-600 flex items-center gap-1"><XCircle size={14}/> Falta Injustificada</span>
-                         <span className="text-blue-600 flex items-center gap-1"><CalendarIcon size={14}/> Ferias</span>
-                       </div>
-                     </div>
+                            className="rounded-lg border border-slate-700 bg-slate-950/60 px-2 py-1 text-[11px] font-semibold text-slate-200"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 text-xs">
+                        <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={14}/> Presente</span>
+                        <span className="text-amber-400 flex items-center gap-1"><AlertTriangle size={14}/> Falta Justificada</span>
+                        <span className="text-rose-400 flex items-center gap-1"><XCircle size={14}/> Falta Injustificada</span>
+                        <span className="text-amber-300 flex items-center gap-1"><AlertTriangle size={14}/> Falta Parcial</span>
+                        <span className="text-blue-400 flex items-center gap-1"><CalendarIcon size={14}/> Ferias</span>
+                        <button
+                          type="button"
+                          onClick={abrirModalFerias}
+                          className="ml-2 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/40 px-3 py-2 text-[10px] font-bold text-slate-200 hover:bg-slate-900"
+                        >
+                          Lançar férias
+                        </button>
+                        <button
+                          type="button"
+                          onClick={abrirModoRapido}
+                          className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-blue-600/80 px-3 py-2 text-[10px] font-bold text-white hover:bg-blue-500"
+                        >
+                          Modo rápido
+                        </button>
+                      </div>
+                    </div>
                      <table className="w-full text-left">
                        <thead>
-                         <tr className="bg-slate-100/50 text-slate-500 text-xs uppercase font-bold tracking-wider border-b border-slate-200">
+                         <tr className="bg-slate-900/70 text-slate-200 text-xs uppercase font-bold tracking-wider border-b border-slate-700">
                            <th className="px-6 py-4">Colaborador</th>
                            <th className="px-6 py-4">Setor / Supervisor</th>
                            <th className="px-6 py-4 text-center">Lancamento</th>
@@ -2709,7 +3391,7 @@ export default function App() {
                        <tbody className="divide-y divide-slate-100 font-medium">
                         {colaboradoresDiaFiltrados.length > 0 ? (
                         colaboradoresDiaFiltrados.map((colab) => (
-                           <tr key={colab.id} className="hover:bg-slate-50 transition-colors">
+                           <tr key={colab.id} className="hover:bg-slate-800/70 transition-colors">
                              <td className="px-6 py-4">
                                <div className="font-bold text-slate-800 text-base">{colab.nome}</div>
                                <div className="text-xs text-slate-400 font-bold uppercase">{colab.cargo}</div>
@@ -2720,19 +3402,27 @@ export default function App() {
                              </td>
                              <td className="px-6 py-4">
                                <div className="flex flex-wrap items-center justify-end gap-3">
-                                 <button onClick={() => alternarPresenca(colab.id)} className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold border transition-all active:scale-95 ${colab.estaAusente ? 'bg-rose-50 text-rose-600 border-rose-200 shadow-sm shadow-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm shadow-emerald-100'}`}>
-                                   {colab.estaAusente ? <XCircle size={14}/> : <CheckCircle2 size={14}/>} {colab.estaAusente ? 'AUSENTE' : 'PRESENTE'}
-                                 </button>
-                                 <select
-                                   value={colab.tipoFalta || 'Presente'}
-                                   onChange={(e) => atualizarTipoFalta(colab.id, e.target.value)}
-                                   className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600"
+                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border ${
+                                   colab.tipoFalta === 'Presente'
+                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                                     : colab.tipoFalta === 'Falta Parcial'
+                                       ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                       : colab.tipoFalta === 'Ferias'
+                                         ? 'bg-blue-50 text-blue-600 border-blue-200'
+                                         : 'bg-rose-50 text-rose-600 border-rose-200'
+                                 }`}>
+                                   {colab.tipoFalta === 'Presente' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+                                   {colab.tipoFalta === 'Falta Parcial' && colab.tempoParcial
+                                     ? `Falta Parcial (${colab.tempoParcial})`
+                                     : colab.tipoFalta}
+                                 </span>
+                                 <button
+                                   type="button"
+                                   onClick={() => abrirModalLancamento(colab)}
+                                   className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-slate-800"
                                  >
-                                   <option value="Presente">Presente</option>
-                                   <option value="Falta Justificada">Falta Justificada</option>
-                                   <option value="Falta Injustificada">Falta Injustificada</option>
-                                   <option value="Ferias">Ferias</option>
-                                 </select>
+                                   Lancar
+                                 </button>
                                </div>
                              </td>
                            </tr>
@@ -2998,6 +3688,7 @@ export default function App() {
                                    setor: colaborador?.setor || '-',
                                    gestor: colaborador?.gestor || '-',
                                    tipo: registro.tipoFalta || 'Falta Injustificada',
+                                   tempoParcial: registro.tempoParcial || '',
                                  };
                                })
                                .filter((item) => {
@@ -3075,9 +3766,13 @@ export default function App() {
                                            <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
                                              item.tipo === 'Ferias'
                                                ? 'bg-amber-500/20 text-amber-700'
-                                               : 'bg-rose-100 text-rose-600'
+                                               : item.tipo === 'Falta Parcial'
+                                                 ? 'bg-amber-100 text-amber-700'
+                                                 : 'bg-rose-100 text-rose-600'
                                            }`}>
-                                             {item.tipo}
+                                             {item.tipo === 'Falta Parcial' && item.tempoParcial
+                                               ? `Falta Parcial (${item.tempoParcial})`
+                                               : item.tipo}
                                            </span>
                                          </td>
                                        </tr>
