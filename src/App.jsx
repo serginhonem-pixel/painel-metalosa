@@ -5,6 +5,7 @@ import faturamentoData from './data/faturamento.json';
 import clientesData from './Faturamento/clientes.json';
 import produtosData from './data/produtos.json';
 import municipiosLatLong from './data/municipios_brasil_latlong.json';
+import logoMetalosa from './data/logo.png';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
@@ -2142,50 +2143,180 @@ export default function App() {
           {/* ABA EXECUTIVA */}
           {abaAtiva === 'executivo' && (
             <div className="space-y-8 animate-in fade-in duration-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <CardInformativo titulo="Faturamento Bruto" valor="R$ —" subtitulo="Sem dados do ERP" icon={DollarSign} corFundo="bg-blue-600" />
-                <CardInformativo titulo="Faltas Hoje" valor="—" subtitulo="Sem dados do ERP" icon={UserX} corFundo="bg-rose-600" />
-                <CardInformativo titulo="Eficiência (OEE)" valor="—" subtitulo="Sem dados do ERP" icon={BarChart3} corFundo="bg-amber-500" />
-                <CardInformativo titulo="Impacto em Faltas" valor="R$ —" subtitulo="Sem dados do ERP" icon={AlertTriangle} corFundo="bg-orange-600" />
+              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent" />
+                <div className="relative flex flex-wrap items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+                      <img src={logoMetalosa} alt="Metalosa" className="h-10 w-10 object-contain" />
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.4em] text-slate-300">Metalosa</p>
+                      <h2 className="text-2xl font-bold text-white">Painel Executivo</h2>
+                      <p className="text-xs text-slate-300 mt-1">Status da operacao em {new Date().toLocaleDateString('pt-BR')}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
+                    <div className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-emerald-200">
+                      Presenca hoje: {resumoFaltas.percentualPresenca.toFixed(1)}%
+                    </div>
+                    <div className="rounded-full border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-amber-200">
+                      Dias ativos: {faturamentoAtual.diasAtivos}
+                    </div>
+                    <div className="rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-blue-200">
+                      Faturamento mes: R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h3 className="font-bold text-slate-800 text-lg mb-8 flex items-center gap-2">
-                    <TrendingUp className="text-blue-600" size={20} />
-                    Absenteísmo por Processo (Alertas)
-                  </h3>
-                  {listaSetores.length > 0 ? (
-                    <div className="space-y-2">
-                      {listaSetores.map((setor) => (
-                        <BarraProgresso 
-                          key={setor} 
-                          rotulo={setor} 
-                          atual={metricas.faltasPorSetor[setor] || 0} 
-                          total={10} 
-                          unidade=" faltas" 
-                          cor={(metricas.faltasPorSetor[setor] || 0) > 3 ? "bg-rose-500" : "bg-blue-600"} 
-                        />
-                      ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento mes</p>
+                  <p className="text-xl font-bold text-slate-900 mt-2">
+                    R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">Total consolidado.</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
+                  <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">
+                    R$ {(faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">Media dos dias ativos.</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
+                  <p className="text-xl font-bold text-slate-900 mt-2">
+                    R$ {faturamentoAtual.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-2">{faturamentoAtual.clientesAtivos}</p>
+                  <p className="text-xs text-slate-400 mt-1">No mes corrente.</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faltas hoje</p>
+                  <p className="text-2xl font-bold text-rose-600 mt-2">{resumoFaltas.ausentes}</p>
+                  <p className="text-xs text-slate-400 mt-1">Ausencias registradas.</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ferias hoje</p>
+                  <p className="text-2xl font-bold text-amber-600 mt-2">{resumoFaltas.porTipo['Ferias'] || 0}</p>
+                  <p className="text-xs text-slate-400 mt-1">Lancadas no dia.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2 space-y-6">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Faturamento por dia</h3>
+                      <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
                     </div>
-                  ) : (
-                    <p className="text-slate-400 italic">Sem dados do ERP.</p>
-                  )}
+                    {faturamentoAtual.porDia.length === 0 ? (
+                      <p className="text-slate-400 italic">Sem dados para o periodo.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {faturamentoAtual.porDia.slice(-7).map((item) => {
+                          const maxDia = Math.max(...faturamentoAtual.porDia.map((d) => d.valor), 1);
+                          const perc = (item.valor / maxDia) * 100;
+                          return (
+                            <div key={item.dia} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs text-slate-500">
+                                <span>{item.dia}</span>
+                                <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                <div className="h-full bg-blue-600" style={{ width: `${perc}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                      <TrendingUp className="text-blue-600" size={18} />
+                      Absenteismo por processo (alertas)
+                    </h3>
+                    {listaSetores.length > 0 ? (
+                      <div className="space-y-2">
+                        {listaSetores.map((setor) => (
+                          <BarraProgresso
+                            key={setor}
+                            rotulo={setor}
+                            atual={metricas.faltasPorSetor[setor] || 0}
+                            total={10}
+                            unidade=" faltas"
+                            cor={(metricas.faltasPorSetor[setor] || 0) > 3 ? "bg-rose-500" : "bg-blue-600"}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-slate-400 italic">Sem dados do ERP.</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                   <h3 className="font-bold text-slate-800 text-lg mb-6">Mão de Obra</h3>
-                   <div className="space-y-6">
-                      <p className="text-slate-400 text-[11px] text-center italic mt-4">
-                        Sem dados do ERP.
-                      </p>
-                   </div>
+                <div className="space-y-6">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Top clientes</h3>
+                      <span className="text-xs text-slate-400">Top 5</span>
+                    </div>
+                    {faturamentoAtual.topClientes.length === 0 ? (
+                      <p className="text-slate-400 italic">Sem dados de clientes.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {faturamentoAtual.topClientes.slice(0, 5).map((item) => (
+                          <div key={item.cliente} className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs font-bold text-slate-700">
+                                {item.info?.nome || item.cliente}
+                              </p>
+                              <p className="text-[10px] text-slate-400">
+                                {item.info?.municipio ? `${item.info.municipio} / ${item.info.estado}` : 'Sem municipio'}
+                              </p>
+                            </div>
+                            <span className="text-xs font-semibold text-emerald-600">
+                              R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider mb-3">Mao de obra</h3>
+                    <div className="grid grid-cols-3 gap-3 text-center text-xs">
+                      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                        <p className="text-emerald-700 font-bold">{resumoFaltas.presentes}</p>
+                        <p className="text-[10px] text-emerald-600">Presentes</p>
+                      </div>
+                      <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+                        <p className="text-rose-700 font-bold">{resumoFaltas.ausentes}</p>
+                        <p className="text-[10px] text-rose-600">Ausentes</p>
+                      </div>
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                        <p className="text-amber-700 font-bold">{resumoFaltas.porTipo['Ferias'] || 0}</p>
+                        <p className="text-[10px] text-amber-600">Ferias</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
+                      Total filtrado: <span className="font-semibold text-slate-700">{resumoFaltas.total}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
-
-          {/* ABA DE FATURAMENTO */}
+{/* ABA DE FATURAMENTO */}
           {abaAtiva === 'faturamento' && (
             <div className="space-y-8 animate-in slide-in-from-right duration-700">
               <div className="flex flex-wrap gap-2">
