@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "faturamento:build": "node scripts/buildFaturamento.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "firebase:upload": "node scripts/uploadFirebase.mjs"

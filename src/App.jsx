@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import presencaDez from './data/Prensençadez.json';
-import presencaDezLeandro from './data/presenca-dez-2025-leandro.json';
+import * as XLSX from 'xlsx';
+import faturamentoData from './data/faturamento.json';
+import clientesData from './Faturamento/clientes.json';
+import produtosData from './data/produtos.json';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -116,6 +119,57 @@ const formatarValorCurto = (valor) => {
   return `R$ ${Math.round(valor)}`;
 };
 
+const parseEmissaoData = (valor) => {
+  if (!valor && valor !== 0) return null;
+  if (valor instanceof Date) return valor;
+  if (typeof valor === 'number') {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+    const date = new Date(excelEpoch.getTime() + valor * 24 * 60 * 60 * 1000);
+    return Number.isNaN(date.valueOf()) ? null : date;
+  }
+  if (typeof valor === 'string') {
+    const texto = valor.trim();
+    const match = texto.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (match) {
+      const [, dd, mm, yyyy] = match;
+      return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
+    }
+    const parsed = new Date(texto);
+    return Number.isNaN(parsed.valueOf()) ? null : parsed;
+  }
+  return null;
+};
+
+const obterMesKey = (row) => {
+  const mesEmissao = row?.MesEmissao || row?.mesEmissao;
+  if (typeof mesEmissao === 'string') {
+    const match = mesEmissao.match(/(\d{1,2})\/(\d{4})/);
+    if (match) {
+      const [, mm, yyyy] = match;
+      return {
+        key: `${yyyy}-${String(mm).padStart(2, '0')}`,
+        display: `${String(mm).padStart(2, '0')}/${yyyy}`,
+      };
+    }
+  }
+  const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
+  if (!emissao) return null;
+  const yyyy = emissao.getUTCFullYear();
+  const mm = String(emissao.getUTCMonth() + 1).padStart(2, '0');
+  return { key: `${yyyy}-${mm}`, display: `${mm}/${yyyy}` };
+};
+
+const normalizarCodigoCliente = (valor) => {
+  const digits = String(valor ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.padStart(6, '0');
+};
+
+const normalizarCodigoProduto = (valor) =>
+  String(valor ?? '')
+    .replace(/\s+/g, '')
+    .toUpperCase();
+
 const normalizarIdFirestore = (texto) =>
   String(texto || '')
     .normalize('NFD')
@@ -124,6 +178,32 @@ const normalizarIdFirestore = (texto) =>
     .toLowerCase()
     .replace(/\s+/g, '-')
     .trim();
+
+const normalizarTexto = (texto) =>
+  String(texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const isFolgaColetiva = (dataISO) =>
+  dataISO >= '2025-12-25' && dataISO <= '2026-01-04';
+
+const DATAS_SEM_APONTAMENTO = new Set();
+
+const isFinalDeSemana = (dataISO) => {
+  const data = new Date(`${dataISO}T00:00:00`);
+  const diaSemana = data.getDay();
+  return diaSemana === 0 || diaSemana === 6;
+};
+
+const isDataSemApontamento = (dataISO) =>
+  DATAS_SEM_APONTAMENTO.has(dataISO);
+
+const isDiaDesconsiderado = (dataISO) =>
+  isFolgaColetiva(dataISO) || isFinalDeSemana(dataISO);
 
 // --- Aplicação Principal ---
 
@@ -146,6 +226,7 @@ export default function App() {
     porGrupo: [],
     porMes: [],
   });
+  const [faturamentoLinhas, setFaturamentoLinhas] = useState([]);
   const [gruposExpandidos, setGruposExpandidos] = useState({});
   const [paretoSelecionado, setParetoSelecionado] = useState(null);
   const [paretoHover, setParetoHover] = useState(null);
@@ -160,9 +241,12 @@ export default function App() {
   const [anoHistorico, setAnoHistorico] = useState(2026);
   const [filtroSupervisor, setFiltroSupervisor] = useState('Todos');
   const [filtroSetor, setFiltroSetor] = useState('Todos');
+  const [filtroTipoDia, setFiltroTipoDia] = useState('Todos');
   const [supervisorEditando, setSupervisorEditando] = useState(null);
   const [supervisorNome, setSupervisorNome] = useState('');
   const [faltasCarregadas, setFaltasCarregadas] = useState(false);
+  const [presencaLeandroExcel, setPresencaLeandroExcel] = useState(null);
+  const [resumoLeandroExcel, setResumoLeandroExcel] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
@@ -170,16 +254,179 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!colaboradores.length) {
-      const normalizar = (texto) =>
-        String(texto || '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9 ]/g, '')
-          .toLowerCase()
-          .replace(/\s+/g, ' ')
-          .trim();
+    let ativo = true;
+    const carregarPlanilhaLeandro = async () => {
+      try {
+        const arquivo = new URL('./data/Absenteísmo - LEANDRO.xlsx', import.meta.url);
+        const resp = await fetch(arquivo);
+        if (!resp.ok) throw new Error('Falha ao carregar planilha do Leandro.');
+        const buffer = await resp.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
+        if (!rows.length) return;
 
+        const meses = {
+          janeiro: '01',
+          fevereiro: '02',
+          marco: '03',
+          abril: '04',
+          maio: '05',
+          junho: '06',
+          julho: '07',
+          agosto: '08',
+          setembro: '09',
+          outubro: '10',
+          novembro: '11',
+          dezembro: '12',
+        };
+
+        const mesPorLinha = rows.map((row) => {
+          let mesBase = null;
+          (row || []).some((cell) => {
+            if (typeof cell !== 'string') return false;
+            const texto = cell.toLowerCase();
+            const match = texto.match(
+              /(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(\\d{4})/
+            );
+            if (!match) return false;
+            const mes = meses[match[1]];
+            mesBase = `${match[2]}-${mes}`;
+            return true;
+          });
+          return mesBase;
+        });
+
+        const localizarMesBase = (linha) => {
+          for (let i = linha; i >= 0; i -= 1) {
+            if (mesPorLinha[i]) return mesPorLinha[i];
+          }
+          return '2025-12';
+        };
+
+        const blocos = [];
+        const resumoMeses = {};
+        const colaboradoresTodos = [];
+
+        for (let i = 0; i < rows.length; i += 1) {
+          const row = rows[i];
+          if (!Array.isArray(row) || !row.includes('Colaborador')) continue;
+
+          const header = row;
+          const colNome = header.indexOf('Colaborador');
+          const colSetor = header.indexOf('Setor');
+          if (colNome < 0 || colSetor < 0) continue;
+
+          const dias = header
+            .map((value, index) => (
+              Number.isInteger(value) && value >= 1 && value <= 31
+                ? { dia: value, index }
+                : null
+            ))
+            .filter(Boolean);
+
+          const mesBase = localizarMesBase(i);
+          const colaboradores = [];
+          let idxP = -1;
+          let idxFI = -1;
+          let idxFE = -1;
+          let idxFJ = -1;
+
+          for (let r = i + 1; r < rows.length; r += 1) {
+            const linha = rows[r];
+            if (!Array.isArray(linha)) continue;
+            if (linha.includes('Colaborador')) break;
+            if (mesPorLinha[r]) break;
+
+            const cellNome = linha[colNome];
+            if (typeof cellNome !== 'string' || !cellNome.trim()) continue;
+            if (cellNome.includes(' - ')) {
+              const texto = normalizarTexto(cellNome);
+              if (texto.includes('p - presente')) idxP = r;
+              if (texto.includes('fi - falta injustificada')) idxFI = r;
+              if (texto.includes('fe - ferias')) idxFE = r;
+              if (texto.includes('fj - falta justificada')) idxFJ = r;
+              continue;
+            }
+
+            const excecoes = {};
+            dias.forEach(({ dia, index }) => {
+              const valor = linha?.[index];
+              if (typeof valor !== 'string') return;
+              const codigo = valor.trim().toUpperCase();
+              if (!codigo) return;
+              if (codigo === 'P') return;
+              if (codigo === 'F' || codigo === 'FE') {
+                excecoes[String(dia)] = 'FE';
+                return;
+              }
+              excecoes[String(dia)] = 'FJ';
+            });
+
+            colaboradores.push({
+              nome: cellNome.trim(),
+              setor: typeof linha[colSetor] === 'string' ? linha[colSetor].trim() : '',
+              excecoes,
+            });
+          }
+
+          const resumoPorDia = {};
+          const lerNumero = (rowIndex, colIndex) => {
+            if (rowIndex < 0) return 0;
+            const valor = rows[rowIndex]?.[colIndex];
+            if (typeof valor === 'number' && Number.isFinite(valor)) return valor;
+            if (typeof valor === 'string') {
+              const parsed = Number(valor.replace(',', '.'));
+              return Number.isFinite(parsed) ? parsed : 0;
+            }
+            return 0;
+          };
+          dias.forEach(({ dia, index }) => {
+            const diaStr = String(dia).padStart(2, '0');
+            const dataISO = `${mesBase}-${diaStr}`;
+            resumoPorDia[dataISO] = {
+              P: lerNumero(idxP, index),
+              FI: lerNumero(idxFI, index),
+              FE: lerNumero(idxFE, index),
+              FJ: lerNumero(idxFJ, index),
+            };
+          });
+
+          blocos.push({
+            mes: mesBase,
+            supervisor: 'Leandro Souza',
+            mapaCodigos: {
+              FJ: 'Falta Justificada',
+              FI: 'Falta Injustificada',
+              FE: 'Ferias',
+            },
+            colaboradores,
+          });
+          resumoMeses[mesBase] = resumoPorDia;
+          colaboradoresTodos.push(...colaboradores);
+        }
+
+        if (!ativo) return;
+        if (blocos.length) {
+          setPresencaLeandroExcel({
+            blocos,
+            colaboradores: colaboradoresTodos,
+          });
+          setResumoLeandroExcel({ meses: resumoMeses });
+        }
+      } catch (err) {
+        console.error('Erro ao carregar planilha do Leandro:', err);
+      }
+    };
+
+    carregarPlanilhaLeandro();
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!colaboradores.length) {
       const colaboradoresIniciais = (funcionariosBase || []).map((item, index) => ({
         id: index + 1,
         nome: item.nome,
@@ -191,14 +438,14 @@ export default function App() {
       }));
 
       const chaves = new Set(
-        colaboradoresIniciais.map((c) => `${normalizar(c.nome)}||${normalizar(c.setor)}`)
+        colaboradoresIniciais.map((c) => `${normalizarTexto(c.nome)}||${normalizarTexto(c.setor)}`)
       );
 
-      if (presencaDezLeandro?.colaboradores?.length) {
-        const gestorPadrao = presencaDezLeandro.supervisor || 'Leandro Souza';
-        presencaDezLeandro.colaboradores.forEach((colab) => {
+      if (presencaLeandroExcel?.colaboradores?.length) {
+        const gestorPadrao = 'Leandro Souza';
+        presencaLeandroExcel.colaboradores.forEach((colab) => {
           if (!colab || typeof colab.setor !== 'string') return;
-          const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+          const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
           if (chaves.has(chave)) return;
           colaboradoresIniciais.push({
             id: colaboradoresIniciais.length + 1,
@@ -217,8 +464,8 @@ export default function App() {
     }
     if (!listaSetores.length) {
       const setores = new Set((funcionariosBase || []).map((item) => item.setor).filter(Boolean));
-      if (presencaDezLeandro?.colaboradores?.length) {
-        presencaDezLeandro.colaboradores.forEach((colab) => {
+      if (presencaLeandroExcel?.colaboradores?.length) {
+        presencaLeandroExcel.colaboradores.forEach((colab) => {
           if (typeof colab?.setor === 'string' && colab.setor.trim()) {
             setores.add(colab.setor.trim());
           }
@@ -226,30 +473,21 @@ export default function App() {
       }
       setListaSetores(Array.from(setores));
     }
-  }, []);
+  }, [presencaLeandroExcel]);
 
   useEffect(() => {
-    if (!presencaDezLeandro?.colaboradores?.length) return;
-
-    const normalizar = (texto) =>
-      String(texto || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9 ]/g, '')
-        .toLowerCase()
-        .replace(/\s+/g, ' ')
-        .trim();
+    if (!presencaLeandroExcel?.colaboradores?.length) return;
 
     setColaboradores((prev) => {
       const existentes = new Set(
-        prev.map((c) => `${normalizar(c.nome)}||${normalizar(c.setor)}`)
+        prev.map((c) => `${normalizarTexto(c.nome)}||${normalizarTexto(c.setor)}`)
       );
       let next = [...prev];
-      const gestorPadrao = presencaDezLeandro.supervisor || 'Leandro Souza';
+      const gestorPadrao = 'Leandro Souza';
 
-      presencaDezLeandro.colaboradores.forEach((colab) => {
+      presencaLeandroExcel.colaboradores.forEach((colab) => {
         if (!colab || typeof colab.setor !== 'string') return;
-        const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
+        const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
         if (existentes.has(chave)) return;
         next = [
           ...next,
@@ -268,7 +506,7 @@ export default function App() {
 
       return next;
     });
-  }, [presencaDezLeandro]);
+  }, [presencaLeandroExcel]);
 
   useEffect(() => {
     let ativo = true;
@@ -310,27 +548,18 @@ export default function App() {
     if (!colaboradores.length) return;
 
     setRegistrosPorData((prev) => {
-      const normalizar = (texto) =>
-        String(texto || '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9 ]/g, '')
-          .toLowerCase()
-          .replace(/\s+/g, ' ')
-          .trim();
-
       const mapaIds = new Map(
         colaboradores.map((colab) => [
-          `${normalizar(colab.nome)}||${normalizar(colab.setor)}`,
+          `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`,
           colab.id,
         ])
       );
       const mapaIdsNome = new Map(
-        colaboradores.map((colab) => [normalizar(colab.nome), colab.id])
+        colaboradores.map((colab) => [normalizarTexto(colab.nome), colab.id])
       );
 
       const mapearTipo = (valor) => {
-        const normal = normalizar(valor);
+        const normal = normalizarTexto(valor);
         const compacto = normal.replace(/\s+/g, '');
         if (!normal) return 'Presente';
         if (normal.includes('presen') || compacto.includes('presen')) return 'Presente';
@@ -361,8 +590,8 @@ export default function App() {
         const mapaCodigos = dados.mapaCodigos || {};
         const mesBase = dados.mes || '2025-12';
         dados.colaboradores.forEach((colab) => {
-          const chave = `${normalizar(colab.nome)}||${normalizar(colab.setor)}`;
-          const id = mapaIds.get(chave) || mapaIdsNome.get(normalizar(colab.nome));
+          const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
+          const id = mapaIds.get(chave) || mapaIdsNome.get(normalizarTexto(colab.nome));
           if (!id || !colab.excecoes) return;
 
           Object.entries(colab.excecoes).forEach(([dia, codigo]) => {
@@ -380,11 +609,13 @@ export default function App() {
       };
 
       aplicarExcecoes(presencaDez);
-      aplicarExcecoes(presencaDezLeandro);
+      if (presencaLeandroExcel?.blocos?.length) {
+        presencaLeandroExcel.blocos.forEach((bloco) => aplicarExcecoes(bloco));
+      }
 
       return registros;
     });
-  }, [colaboradores]);
+  }, [colaboradores, presencaLeandroExcel]);
 
   useEffect(() => {
     let ativo = true;
@@ -432,10 +663,20 @@ export default function App() {
   useEffect(() => {
     const carregarFaturamento = async () => {
       try {
-        const resp = await fetch('/data/faturamento-2025.json');
-        if (!resp.ok) throw new Error('Falha ao carregar planilha.');
-        const linhas = await resp.json();
+        let linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
+        try {
+          const resp = await fetch('/data/faturamento-2025.json');
+          if (resp.ok) {
+            const antigas = await resp.json();
+            if (Array.isArray(antigas)) {
+              linhas = [...antigas, ...linhas];
+            }
+          }
+        } catch (err) {
+          console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
+        }
 
+        setFaturamentoLinhas(linhas);
         const total = linhas.reduce((acc, row) => acc + parseValor(row['ValorTotal']), 0);
 
         const porGrupoMap = linhas.reduce((acc, row) => {
@@ -496,6 +737,7 @@ export default function App() {
           porMes,
         });
       } catch (err) {
+        setFaturamentoLinhas([]);
         setFaturamentoDados({
           carregando: false,
           erro: err instanceof Error ? err.message : 'Erro ao processar planilha.',
@@ -585,6 +827,12 @@ export default function App() {
 
     const totalColab = idsFiltrados.size;
     const diasNoMes = new Date(anoHistorico, mesHistorico + 1, 0).getDate();
+    const diasDesconsideradosNoMes = Array.from({ length: diasNoMes }, (_, i) => {
+      const dia = String(i + 1).padStart(2, '0');
+      const mes = String(mesHistorico + 1).padStart(2, '0');
+      const dataISO = `${anoHistorico}-${mes}-${dia}`;
+      return isDiaDesconsiderado(dataISO) ? 1 : 0;
+    }).reduce((acc, value) => acc + value, 0);
     const mesStr = `${anoHistorico}-${String(mesHistorico + 1).padStart(2, '0')}`;
 
     let faltasTotal = 0;
@@ -595,6 +843,8 @@ export default function App() {
 
     Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
       if (!dataISO.startsWith(mesStr)) return;
+      if (isDiaDesconsiderado(dataISO)) return;
+      if (isDataSemApontamento(dataISO)) return;
       Object.entries(registros || {}).forEach(([id, registro]) => {
         if (!idsFiltrados.has(String(id))) return;
         faltasTotal += 1;
@@ -606,7 +856,8 @@ export default function App() {
       });
     });
 
-    const totalPossivel = totalColab * diasNoMes;
+    const diasUteis = Math.max(diasNoMes - diasDesconsideradosNoMes, 0);
+    const totalPossivel = totalColab * diasUteis;
     const presencaEstimada = totalPossivel > 0 ? Math.max(totalPossivel - faltasTotal, 0) : 0;
     const percentualPresenca = totalPossivel > 0 ? (presencaEstimada / totalPossivel) * 100 : 0;
 
@@ -648,6 +899,26 @@ export default function App() {
   };
 
   const obterResumoDia = (dataISO) => {
+    if (isDiaDesconsiderado(dataISO)) return { total: 0, tipos: {} };
+    if (isDataSemApontamento(dataISO)) return { total: 0, tipos: {} };
+    if (
+      resumoLeandroExcel?.meses &&
+      filtroSupervisor === 'Leandro Souza' &&
+      filtroSetor === 'Todos'
+    ) {
+      const mesBase = dataISO.slice(0, 7);
+      const resumoExcel = resumoLeandroExcel.meses?.[mesBase]?.[dataISO];
+      if (resumoExcel) {
+        const tipos = {};
+        const fe = resumoExcel.FE || 0;
+        const fi = resumoExcel.FI || 0;
+        const fj = resumoExcel.FJ || 0;
+        if (fe) tipos['Ferias'] = fe;
+        if (fi) tipos['Falta Injustificada'] = fi;
+        if (fj) tipos['Falta Justificada'] = fj;
+        return { total: fe + fi + fj, tipos, fonte: 'excel' };
+      }
+    }
     const registros = registrosPorData[dataISO] || {};
     const tipos = {};
     let total = 0;
@@ -861,6 +1132,239 @@ export default function App() {
     };
   }, [faturamentoDados.porGrupo]);
 
+  const faturamentoAtual = useMemo(() => {
+    const produtosPorCodigo = new Map(
+      (produtosData || []).map((produto) => [
+        normalizarCodigoProduto(produto.codigo),
+        produto.descricao || '',
+      ])
+    );
+    const clientesPorCodigo = new Map(
+      (clientesData?.clientes || []).map((cliente) => [
+        normalizarCodigoCliente(cliente.Codigo),
+        {
+          nome: cliente.Nome || '',
+          estado: cliente.Estado || '',
+          municipio: cliente.Municipio || '',
+        },
+      ])
+    );
+
+    if (!faturamentoLinhas.length) {
+      return {
+        mes: '',
+        total: 0,
+        linhas: [],
+        topClientes: [],
+        topProdutos: [],
+        porDia: [],
+        porDiaFilial: [],
+        filiais: [],
+        porFilial: [],
+        clientesAtivos: 0,
+        movimentos: 0,
+        ticketMedio: 0,
+        diasAtivos: 0,
+        quantidadeTotal: 0,
+        mixUnidade: [],
+        topEstados: [],
+        topMunicipios: [],
+      };
+    }
+
+    const normalizadas = faturamentoLinhas.map((row) => {
+      const mesInfo = obterMesKey(row);
+      return {
+        cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
+        grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
+        codigo: row?.Codigo ?? row?.codigo ?? '',
+        descricao: row?.Descricao ?? row?.descricao ?? '',
+        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        unidade: row?.Unidade ?? row?.unidade ?? '',
+        quantidade: parseValor(row?.Quantidade ?? row?.quantidade),
+        valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
+        valorTotal: parseValor(row?.ValorTotal ?? row?.valorTotal),
+        emissao: parseEmissaoData(row?.Emissao ?? row?.emissao),
+        mesKey: mesInfo?.key,
+        mesDisplay: mesInfo?.display,
+      };
+    });
+
+    const mesKeys = normalizadas
+      .map((row) => row.mesKey)
+      .filter(Boolean)
+      .sort();
+    const mesAtual = mesKeys.length ? mesKeys[mesKeys.length - 1] : null;
+    const mesAtualDisplay =
+      normalizadas.find((row) => row.mesKey === mesAtual)?.mesDisplay || '';
+
+    const linhasMes = mesAtual
+      ? normalizadas.filter((row) => row.mesKey === mesAtual)
+      : normalizadas;
+
+    const total = linhasMes.reduce((acc, row) => acc + row.valorTotal, 0);
+    const quantidadeTotal = linhasMes.reduce((acc, row) => acc + row.quantidade, 0);
+
+    const clientesMap = new Map();
+    const produtosMap = new Map();
+    const filialMap = new Map();
+    const unidadeMap = new Map();
+    const diaMap = new Map();
+    const diaFilialMap = new Map();
+    const estadoMap = new Map();
+    const municipioMap = new Map();
+    const estadoPedidosMap = new Map();
+    const municipioPedidosMap = new Map();
+
+    linhasMes.forEach((row) => {
+      const codigoCliente = normalizarCodigoCliente(row.cliente);
+      const chaveCliente = codigoCliente || String(row.cliente || 'Sem cliente');
+      clientesMap.set(chaveCliente, (clientesMap.get(chaveCliente) || 0) + row.valorTotal);
+      const infoCliente = clientesPorCodigo.get(chaveCliente);
+      if (infoCliente?.estado) {
+        estadoMap.set(infoCliente.estado, (estadoMap.get(infoCliente.estado) || 0) + row.valorTotal);
+        estadoPedidosMap.set(infoCliente.estado, (estadoPedidosMap.get(infoCliente.estado) || 0) + 1);
+      }
+      if (infoCliente?.municipio) {
+        municipioMap.set(infoCliente.municipio, (municipioMap.get(infoCliente.municipio) || 0) + row.valorTotal);
+        municipioPedidosMap.set(infoCliente.municipio, (municipioPedidosMap.get(infoCliente.municipio) || 0) + 1);
+      }
+
+      const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
+      if (!produtosMap.has(chaveProd)) {
+        produtosMap.set(chaveProd, { valor: 0, quantidade: 0, unidades: new Map() });
+      }
+      const prod = produtosMap.get(chaveProd);
+      prod.valor += row.valorTotal;
+      const qtd = Number.isFinite(row.quantidade) ? row.quantidade : 0;
+      prod.quantidade += qtd;
+      const unidadeKey = String(row.unidade || 'N/A');
+      prod.unidades.set(unidadeKey, (prod.unidades.get(unidadeKey) || 0) + (qtd || 1));
+
+      const filial = String(row.filial || 'Sem filial');
+      filialMap.set(filial, (filialMap.get(filial) || 0) + row.valorTotal);
+
+      const unidade = String(row.unidade || 'N/A');
+      unidadeMap.set(unidade, (unidadeMap.get(unidade) || 0) + row.quantidade);
+
+      if (row.emissao) {
+        const diaISO = row.emissao.toISOString().slice(0, 10);
+        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + row.valorTotal);
+        if (!diaFilialMap.has(diaISO)) {
+          diaFilialMap.set(diaISO, new Map());
+        }
+        const mapaFilial = diaFilialMap.get(diaISO);
+        mapaFilial.set(filial, (mapaFilial.get(filial) || 0) + row.valorTotal);
+      }
+    });
+
+    const porDia = Array.from(diaMap.entries())
+      .map(([dia, valor]) => ({ dia, valor }))
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+
+    const topClientes = Array.from(clientesMap.entries())
+      .map(([cliente, valor]) => ({
+        cliente,
+        valor,
+        info: clientesPorCodigo.get(cliente) || null,
+      }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const topProdutos = Array.from(produtosMap.entries())
+      .map(([chave, dados]) => {
+        const [codigo, descricao] = chave.split('||');
+        const codigoNorm = normalizarCodigoProduto(codigo);
+        const descricaoFinal = descricao || produtosPorCodigo.get(codigoNorm) || '';
+        let unidadePrincipal = '';
+        let unidadeQtd = 0;
+        dados.unidades.forEach((valor, unidade) => {
+          if (valor > unidadeQtd) {
+            unidadeQtd = valor;
+            unidadePrincipal = unidade;
+          }
+        });
+        return {
+          codigo,
+          descricao: descricaoFinal,
+          valor: dados.valor,
+          quantidade: dados.quantidade,
+          unidade: unidadePrincipal,
+        };
+      })
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 8);
+
+    const porFilial = Array.from(filialMap.entries())
+      .map(([filial, valor]) => ({ filial, valor }))
+      .sort((a, b) => b.valor - a.valor);
+
+    const mixUnidade = Array.from(unidadeMap.entries())
+      .map(([unidade, quantidade]) => ({ unidade, quantidade }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+
+    const topEstados = Array.from(estadoMap.entries())
+      .map(([estado, valor]) => ({ estado, valor }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const topMunicipios = Array.from(municipioMap.entries())
+      .map(([municipio, valor]) => ({ municipio, valor }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const pedidosPorEstado = Array.from(estadoPedidosMap.entries())
+      .map(([estado, pedidos]) => ({ estado, pedidos }))
+      .sort((a, b) => b.pedidos - a.pedidos)
+      .slice(0, 6);
+
+    const pedidosPorMunicipio = Array.from(municipioPedidosMap.entries())
+      .map(([municipio, pedidos]) => ({ municipio, pedidos }))
+      .sort((a, b) => b.pedidos - a.pedidos)
+      .slice(0, 6);
+
+    const filiais = porFilial.map((item) => item.filial);
+    const porDiaFilial = Array.from(diaFilialMap.entries())
+      .map(([dia, mapa]) => {
+        const porFilialDia = {};
+        let totalDia = 0;
+        filiais.forEach((filial) => {
+          const valor = mapa.get(filial) || 0;
+          porFilialDia[filial] = valor;
+          totalDia += valor;
+        });
+        return { dia, total: totalDia, porFilial: porFilialDia };
+      })
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+
+    const clientesAtivos = clientesMap.size;
+    const movimentos = linhasMes.length;
+    const ticketMedio = movimentos > 0 ? total / movimentos : 0;
+    const diasAtivos = diaMap.size;
+
+    return {
+      mes: mesAtualDisplay,
+      total,
+      linhas: linhasMes,
+      topClientes,
+      topProdutos,
+      porDia,
+      porDiaFilial,
+      porFilial,
+      filiais,
+      clientesAtivos,
+      movimentos,
+      ticketMedio,
+      diasAtivos,
+      quantidadeTotal,
+      mixUnidade,
+      topEstados,
+      topMunicipios,
+      pedidosPorEstado,
+      pedidosPorMunicipio,
+    };
+  }, [faturamentoLinhas]);
+
   if (carregando) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -978,19 +1482,6 @@ export default function App() {
           {/* ABA DE FATURAMENTO */}
           {abaAtiva === 'faturamento' && (
             <div className="space-y-8 animate-in slide-in-from-right duration-700">
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-slate-800 mb-2">Resumo da Planilha 2025</h2>
-                {faturamentoDados.carregando ? (
-                  <p className="text-slate-400 italic">Carregando planilha...</p>
-                ) : faturamentoDados.erro ? (
-                  <p className="text-rose-600 text-sm font-medium">{faturamentoDados.erro}</p>
-                ) : (
-                  <div className="text-2xl font-bold text-slate-900">
-                    R$ {faturamentoDados.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </div>
-                )}
-              </div>
-
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSubAbaFaturamento('atual')}
@@ -1005,6 +1496,21 @@ export default function App() {
                   Faturamento 2025
                 </button>
               </div>
+
+              {subAbaFaturamento === '2025' && (
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-lg font-bold text-slate-800 mb-2">Resumo da Planilha 2025</h2>
+                  {faturamentoDados.carregando ? (
+                    <p className="text-slate-400 italic">Carregando planilha...</p>
+                  ) : faturamentoDados.erro ? (
+                    <p className="text-rose-600 text-sm font-medium">{faturamentoDados.erro}</p>
+                  ) : (
+                    <div className="text-2xl font-bold text-slate-900">
+                      R$ {faturamentoDados.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {subAbaFaturamento === '2025' && (
                 <div className="grid grid-cols-1 gap-8">
@@ -1449,9 +1955,355 @@ export default function App() {
               )}
 
               {subAbaFaturamento === 'atual' && (
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">Faturamento Atual</h3>
-                  <p className="text-slate-400 italic mt-3">Vamos montar esses indicadores depois.</p>
+                <div className="space-y-6">
+                  {faturamentoAtual.linhas.length === 0 ? (
+                    <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+                      <p className="text-slate-400 italic">Sem dados de faturamento para o periodo atual.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total no mes</p>
+                          <p className="text-xl font-bold text-slate-900 mt-2">
+                            R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Soma do periodo.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
+                          <p className="text-xl font-bold text-slate-900 mt-2">
+                            R$ {faturamentoAtual.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
+                          <p className="text-2xl font-bold text-slate-900 mt-2">
+                            {faturamentoAtual.clientesAtivos}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Movimentos</p>
+                          <p className="text-2xl font-bold text-slate-900 mt-2">
+                            {faturamentoAtual.movimentos}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Linhas registradas.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>
+                          <p className="text-2xl font-bold text-slate-900 mt-2">
+                            {faturamentoAtual.diasAtivos}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Quantidade total</p>
+                          <p className="text-2xl font-bold text-slate-900 mt-2">
+                            {faturamentoAtual.quantidadeTotal.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Somatorio de volumes.</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-2">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Faturamento por dia</h4>
+                            <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
+                          </div>
+                          {(() => {
+                            const width = 1000;
+                            const height = 310;
+                            const margin = { top: 54, right: 20, bottom: 50, left: 58 };
+                            const chartW = width - margin.left - margin.right;
+                            const chartH = height - margin.top - margin.bottom;
+                            const dados = faturamentoAtual.porDia;
+                            const maxValor = Math.max(...dados.map((item) => item.valor), 1);
+                            const barW = chartW / Math.max(dados.length, 1);
+                            let acumulado = 0;
+                            const totalPeriodo = dados.reduce((acc, item) => acc + item.valor, 0);
+                            const linePoints = dados.map((item, i) => {
+                              acumulado += item.valor;
+                              const perc = totalPeriodo > 0 ? acumulado / totalPeriodo : 0;
+                              const x = margin.left + i * barW + (barW - 14) / 2 + 7;
+                              const y = margin.top + chartH * (1 - perc);
+                              return { x, y, item, perc };
+                            });
+                            const linePath = linePoints.map((p) => `${p.x},${p.y}`).join(' ');
+                            const areaPath = `${margin.left},${margin.top + chartH} ${linePath} ${margin.left + (linePoints.length - 1) * barW + (barW - 14) / 2 + 7},${margin.top + chartH}`;
+
+                            return (
+                              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-72">
+                                <defs>
+                                  <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
+                                    <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.9" />
+                                  </linearGradient>
+                                  <linearGradient id="linhaAcum" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
+                                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.1" />
+                                  </linearGradient>
+                                  <filter id="linhaGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="2.2" result="blur" />
+                                    <feMerge>
+                                      <feMergeNode in="blur" />
+                                      <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                  </filter>
+                                </defs>
+                                {[0.25, 0.5, 0.75, 1].map((p) => (
+                                  <line
+                                    key={p}
+                                    x1={margin.left}
+                                    x2={width - margin.right}
+                                    y1={margin.top + chartH * (1 - p)}
+                                    y2={margin.top + chartH * (1 - p)}
+                                    stroke="#1f2937"
+                                    strokeDasharray="4 6"
+                                  />
+                                ))}
+                                <text x={margin.left} y={margin.top - 18} fontSize="12" fill="#94a3b8">
+                                  Acumulado (%)
+                                </text>
+                                {dados.map((item, i) => {
+                                  const xBase = margin.left + i * barW + 7;
+                                  const barH = (item.valor / maxValor) * chartH;
+                                  const y = margin.top + chartH - barH;
+                                  return (
+                                    <g key={item.dia}>
+                                      <rect
+                                        x={xBase}
+                                        y={y}
+                                        width={barW - 14}
+                                        height={barH}
+                                        rx="6"
+                                        fill="url(#diaBar)"
+                                      />
+                                      <text
+                                        x={xBase + (barW - 14) / 2}
+                                        y={Math.max(y - 10, 18)}
+                                        textAnchor="middle"
+                                        fontSize="14"
+                                        fill="#e2e8f0"
+                                        fontWeight="700"
+                                      >
+                                        {formatarValorCurto(item.valor)}
+                                      </text>
+                                      <text
+                                        x={xBase + (barW - 14) / 2}
+                                        y={margin.top + chartH + 20}
+                                        textAnchor="middle"
+                                        fontSize="12"
+                                        fill="#94a3b8"
+                                      >
+                                        {item.dia.slice(8)}
+                                      </text>
+                                    </g>
+                                  );
+                                })}
+                                <polygon points={areaPath} fill="url(#linhaAcum)" opacity="0.35" />
+                                <polyline
+                                  points={linePoints.map((p) => `${p.x},${p.y}`).join(' ')}
+                                  fill="none"
+                                  stroke="#fbbf24"
+                                  strokeWidth="3.5"
+                                  filter="url(#linhaGlow)"
+                                />
+                                {linePoints.map((p) => (
+                                  <circle
+                                    key={`line-${p.item.dia}`}
+                                    cx={p.x}
+                                    cy={p.y}
+                                    r="4.5"
+                                    fill="#fbbf24"
+                                    filter="url(#linhaGlow)"
+                                  />
+                                ))}
+                              </svg>
+                            );
+                          })()}
+                        </div>
+
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top clientes</h4>
+                            <span className="text-xs text-slate-400">Top 6</span>
+                          </div>
+                          <div className="space-y-3">
+                            {faturamentoAtual.topClientes.map((item) => {
+                              const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                              const nome = item.info?.nome || item.cliente;
+                              const local = [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ');
+                              return (
+                                <div key={item.cliente} className="space-y-1">
+                                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                    <div>
+                                      <div className="font-bold text-slate-700">{nome}</div>
+                                      <div className="text-[10px] text-slate-400">{local || `Codigo: ${item.cliente}`}</div>
+                                    </div>
+                                    <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  </div>
+                                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                    <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-2">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top produtos</h4>
+                            <span className="text-xs text-slate-400">Top 8</span>
+                          </div>
+                          <div className="max-h-72 overflow-auto rounded-xl border border-slate-100">
+                            <table className="w-full text-left text-xs">
+                              <thead className="sticky top-0 bg-white text-slate-400 uppercase tracking-wider">
+                                <tr>
+                                  <th className="px-4 py-3">Codigo</th>
+                                  <th className="px-4 py-3">Descricao</th>
+                                  <th className="px-4 py-3 text-right">Qtd</th>
+                                  <th className="px-4 py-3">Unid</th>
+                                  <th className="px-4 py-3 text-right">Valor</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {faturamentoAtual.topProdutos.map((item, index) => (
+                                  <tr key={`${item.codigo}-${index}`} className="text-slate-600">
+                                    <td className="px-4 py-3 font-semibold">{item.codigo || '-'}</td>
+                                    <td className="px-4 py-3">{item.descricao || '-'}</td>
+                                    <td className="px-4 py-3 text-right font-semibold">
+                                      {item.quantidade.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
+                                    </td>
+                                    <td className="px-4 py-3">{item.unidade || '-'}</td>
+                                    <td className="px-4 py-3 text-right font-semibold">
+                                      R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top estados</h4>
+                            <span className="text-xs text-slate-400">Top 6</span>
+                          </div>
+                          <div className="space-y-2">
+                            {faturamentoAtual.topEstados.length === 0 ? (
+                              <p className="text-xs text-slate-400 italic">Sem dados de estado.</p>
+                            ) : (
+                              faturamentoAtual.topEstados.map((item) => {
+                                const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                                const pedidos = faturamentoAtual.pedidosPorEstado.find((p) => p.estado === item.estado)?.pedidos || 0;
+                                return (
+                                  <div key={item.estado} className="space-y-1">
+                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                      <span>{item.estado}</span>
+                                      <span>{perc.toFixed(1)}%</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                      <span>{pedidos} pedidos</span>
+                                      <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                      <div className="h-full bg-indigo-500" style={{ width: `${perc}%` }} />
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top municipios</h4>
+                            <span className="text-xs text-slate-400">Top 6</span>
+                          </div>
+                          <div className="space-y-2">
+                            {faturamentoAtual.topMunicipios.length === 0 ? (
+                              <p className="text-xs text-slate-400 italic">Sem dados de municipio.</p>
+                            ) : (
+                              faturamentoAtual.topMunicipios.map((item) => {
+                                const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                                const pedidos = faturamentoAtual.pedidosPorMunicipio.find((p) => p.municipio === item.municipio)?.pedidos || 0;
+                                return (
+                                  <div key={item.municipio} className="space-y-1">
+                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                      <span>{item.municipio}</span>
+                                      <span>{perc.toFixed(1)}%</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                      <span>{pedidos} pedidos</span>
+                                      <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                      <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Top clientes</h4>
+                            <span className="text-xs text-slate-400">Top 6</span>
+                          </div>
+                          <div className="space-y-2">
+                            {faturamentoAtual.topClientes.map((item) => {
+                              const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                              const nome = item.info?.nome || item.cliente;
+                              const local = [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ');
+                              return (
+                                <div key={item.cliente} className="space-y-1">
+                                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                    <div>
+                                      <div className="font-bold text-slate-700">{nome}</div>
+                                      <div className="text-[10px] text-slate-400">{local || `Codigo: ${item.cliente}`}</div>
+                                    </div>
+                                    <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  </div>
+                                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                    <div className="h-full bg-emerald-500" style={{ width: `${perc}%` }} />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Mix por unidade</h4>
+                          <span className="text-xs text-slate-400">{faturamentoAtual.mixUnidade.length} unidades</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {faturamentoAtual.mixUnidade.map((item) => (
+                            <div key={item.unidade} className="flex items-center justify-between rounded-xl border border-slate-100 p-3">
+                              <div className="text-xs font-bold text-slate-600 uppercase">{item.unidade}</div>
+                              <div className="text-sm font-semibold text-slate-900">
+                                {item.quantidade.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -2044,15 +2896,19 @@ export default function App() {
                                const isWeekend = diaSemana === 0 || diaSemana === 6;
                                const faltas = resumo.total;
                                const base = totalColaboradoresFiltrados || 0;
-                               const percentualPresenca = isWeekend
-                                 ? 100
-                                 : base > 0
-                                   ? ((base - faltas) / base) * 100
-                                   : 0;
+                               const isFolga = isFolgaColetiva(dataISO);
+                               const ferias = resumo.tipos?.Ferias || 0;
+                               const faltasSemFerias = Math.max(faltas - ferias, 0);
+                               const semLancamento = (isWeekend || isFolga) && resumo.total === 0;
+                               const mostraPercentual = !isWeekend && !isFolga;
+                               const percentualPresenca = base > 0 ? ((base - faltas) / base) * 100 : 0;
                                 return (
                                   <button
                                     key={dataISO}
-                                    onClick={() => setDiaHistorico(dataISO)}
+                                    onClick={() => {
+                                      setDiaHistorico(dataISO);
+                                      setFiltroTipoDia('Todos');
+                                    }}
                                     className={`h-20 sm:h-24 rounded-xl border px-2 sm:px-3 py-2 text-left transition-all ${
                                       isHoje
                                         ? 'border-emerald-400/70 bg-emerald-950/40 ring-2 ring-emerald-400/40'
@@ -2063,25 +2919,56 @@ export default function App() {
                                   >
                                     <div className="flex items-center justify-between">
                                       <span className="text-xs sm:text-sm font-bold text-slate-100">{dia}</span>
-                                      {isWeekend ? (
-                                        <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-indigo-200">
+                                      {isFolga ? (
+                                        <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-200">
+                                          Folga
+                                        </span>
+                                      ) : isWeekend ? (
+                                        <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-bold ${
+                                          semLancamento
+                                            ? 'bg-slate-500/20 text-slate-200'
+                                            : 'bg-indigo-500/20 text-indigo-200'
+                                        }`}>
                                           DSR
                                         </span>
                                       ) : (
-                                        resumo.total > 0 && (
-                                          <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-rose-200">
-                                            {resumo.total} falta{resumo.total > 1 ? 's' : ''}
-                                          </span>
-                                        )
+                                        <>
+                                          {ferias > 0 && (
+                                            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-200">
+                                              {ferias} ferias
+                                            </span>
+                                          )}
+                                          {faltasSemFerias > 0 && (
+                                            <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-rose-200">
+                                              {faltasSemFerias} falta{faltasSemFerias > 1 ? 's' : ''}
+                                            </span>
+                                          )}
+                                        </>
                                       )}
                                     </div>
-                                    <div className="mt-2 sm:mt-3 rounded-lg border border-slate-800 bg-slate-950/60 px-1.5 sm:px-2 py-1 text-center text-[9px] sm:text-[11px] font-bold text-emerald-200">
+                                    <div className={`mt-2 sm:mt-3 rounded-lg border px-1.5 sm:px-2 py-1 text-center text-[9px] sm:text-[11px] font-bold ${
+                                      semLancamento || !mostraPercentual
+                                        ? 'border-slate-700 bg-slate-900/50 text-slate-300'
+                                        : 'border-slate-800 bg-slate-950/60 text-emerald-200'
+                                    }`}>
                                       {dataISO > new Date().toISOString().slice(0, 10)
                                         ? '-'
-                                        : `${percentualPresenca.toFixed(0)}% presenca`}
+                                        : isFolga
+                                          ? 'Folga coletiva'
+                                          : isWeekend
+                                            ? 'Descanso semanal'
+                                            : semLancamento
+                                              ? 'Sem lancamento'
+                                              : `${percentualPresenca.toFixed(0)}% presenca`}
                                     </div>
                                     <div className="mt-1.5 text-[9px] sm:text-[10px] text-slate-400 hidden sm:block">
-                                      {isWeekend ? 'Descanso semanal' : (resumo.total === 0 ? 'Sem faltas' : 'Com apontamentos')}
+                                      {isFolga
+                                        ? 'Folga coletiva'
+                                        : isWeekend
+                                          ? semLancamento
+                                            ? 'Sem lancamento'
+                                            : 'Descanso semanal'
+                                          : (resumo.total === 0 ? 'Sem faltas' : 'Com apontamentos')}
                                     </div>
                                   </button>
                                 );
@@ -2097,23 +2984,32 @@ export default function App() {
                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                      {diaHistorico ? (
                        (() => {
-                         const registros = registrosPorData[diaHistorico] || {};
-                         const faltas = Object.entries(registros)
-                           .map(([id, registro]) => {
-                             const colaborador = colaboradores.find((c) => String(c.id) === String(id));
-                             return {
-                               id,
-                               nome: colaborador?.nome || 'Nao encontrado',
-                               setor: colaborador?.setor || '-',
-                               gestor: colaborador?.gestor || '-',
-                               tipo: registro.tipoFalta || 'Falta Injustificada',
-                             };
-                           })
-                           .filter((item) => {
-                             const supervisorOk = filtroSupervisor === 'Todos' || item.gestor === filtroSupervisor;
-                             const setorOk = filtroSetor === 'Todos' || item.setor === filtroSetor;
-                             return supervisorOk && setorOk;
-                           });
+                         const resumoDia = obterResumoDia(diaHistorico);
+                         const resumoDoExcel = resumoDia?.fonte === 'excel';
+                         const registros = (isDataSemApontamento(diaHistorico) || isDiaDesconsiderado(diaHistorico))
+                           ? {}
+                           : (registrosPorData[diaHistorico] || {});
+                             const faltas = Object.entries(registros)
+                               .map(([id, registro]) => {
+                                 const colaborador = colaboradores.find((c) => String(c.id) === String(id));
+                                 return {
+                                   id,
+                                   nome: colaborador?.nome || 'Nao encontrado',
+                                   setor: colaborador?.setor || '-',
+                                   gestor: colaborador?.gestor || '-',
+                                   tipo: registro.tipoFalta || 'Falta Injustificada',
+                                 };
+                               })
+                               .filter((item) => {
+                                 const supervisorOk = filtroSupervisor === 'Todos' || item.gestor === filtroSupervisor;
+                                 const setorOk = filtroSetor === 'Todos' || item.setor === filtroSetor;
+                                 const tipoOk = filtroTipoDia === 'Todos'
+                                   ? true
+                                   : filtroTipoDia === 'Ferias'
+                                     ? item.tipo === 'Ferias'
+                                     : item.tipo !== 'Ferias';
+                                 return supervisorOk && setorOk && tipoOk;
+                               });
                          return (
                            <div className="space-y-4">
                              <div className="flex items-center justify-between">
@@ -2121,9 +3017,42 @@ export default function App() {
                                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faltas do dia</p>
                                  <p className="text-sm font-semibold text-slate-800">{diaHistorico}</p>
                                </div>
-                               <span className="text-xs text-slate-400">{faltas.length} registros</span>
+                               <div className="flex items-center gap-3">
+                                 <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 text-[11px] font-bold text-slate-500">
+                                   {['Todos', 'Faltas', 'Ferias'].map((tipo) => (
+                                     <button
+                                       key={tipo}
+                                       type="button"
+                                       onClick={() => setFiltroTipoDia(tipo)}
+                                       className={`px-3 py-1 rounded-full transition-colors ${
+                                         filtroTipoDia === tipo
+                                           ? 'bg-slate-900 text-white'
+                                           : 'text-slate-500 hover:text-slate-700'
+                                       }`}
+                                     >
+                                       {tipo}
+                                     </button>
+                                   ))}
+                                 </div>
+                                 <span className="text-xs text-slate-400">
+                                   {resumoDoExcel ? resumoDia.total : faltas.length} registros
+                                 </span>
+                               </div>
                              </div>
-                             {faltas.length === 0 ? (
+                             {resumoDoExcel ? (
+                               <div className="rounded-xl border border-slate-100 p-4 text-sm text-slate-600">
+                                 <div className="font-bold text-slate-700 mb-2">Resumo do dia (planilha)</div>
+                                 {(filtroTipoDia === 'Todos' || filtroTipoDia === 'Ferias') && (
+                                   <div>Ferias: {resumoDia.tipos?.Ferias || 0}</div>
+                                 )}
+                                 {(filtroTipoDia === 'Todos' || filtroTipoDia === 'Faltas') && (
+                                   <div>Falta Justificada: {resumoDia.tipos?.['Falta Justificada'] || 0}</div>
+                                 )}
+                                 {(filtroTipoDia === 'Todos' || filtroTipoDia === 'Faltas') && (
+                                   <div>Falta Injustificada: {resumoDia.tipos?.['Falta Injustificada'] || 0}</div>
+                                 )}
+                               </div>
+                             ) : faltas.length === 0 ? (
                                <p className="text-slate-400 italic">Nenhuma falta registrada neste dia.</p>
                              ) : (
                                <div className="max-h-72 overflow-auto rounded-xl border border-slate-100">
@@ -2143,7 +3072,11 @@ export default function App() {
                                          <td className="px-5 py-3 text-slate-500">{item.setor}</td>
                                          <td className="px-5 py-3 text-slate-500">{item.gestor}</td>
                                          <td className="px-5 py-3">
-                                           <span className="rounded-full bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-600">
+                                           <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
+                                             item.tipo === 'Ferias'
+                                               ? 'bg-amber-500/20 text-amber-700'
+                                               : 'bg-rose-100 text-rose-600'
+                                           }`}>
                                              {item.tipo}
                                            </span>
                                          </td>
