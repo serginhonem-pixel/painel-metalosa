@@ -63,7 +63,7 @@ const subirFuncionarios = async () => {
       data: {
         nome: item.nome || '',
         setor: item.setor || '',
-        gestor: 'Thalles',
+        gestor: item.gestor || 'Thalles',
       },
     };
   });
@@ -72,6 +72,10 @@ const subirFuncionarios = async () => {
 };
 
 const subirPresencaDez = async () => {
+  if (!presencaDez) {
+    console.log('Arquivo de presenca dezembro nao encontrado, ignorando.');
+    return;
+  }
   const colRef = collection(db, 'presenca_2025_12');
   const docs = presencaDez.colaboradores.map((item, index) => {
     const id = `${normalizarId(item.nome)}-${index + 1}`;

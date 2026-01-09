@@ -254,6 +254,7 @@ export default function App() {
   const [listaGestores, setListaGestores] = useState(GESTORES_INICIAIS);
   const [listaMaquinas, setListaMaquinas] = useState(MAQUINAS_INICIAIS);
   const [colaboradores, setColaboradores] = useState([]);
+  const [funcionariosFirestore, setFuncionariosFirestore] = useState([]);
   const [faturamentoDados, setFaturamentoDados] = useState({
     carregando: true,
     erro: null,
@@ -300,6 +301,10 @@ export default function App() {
   const [faltasCarregadas, setFaltasCarregadas] = useState(false);
   const [presencaLeandroExcel, setPresencaLeandroExcel] = useState(null);
   const [resumoLeandroExcel, setResumoLeandroExcel] = useState(null);
+  const funcionariosFonte = useMemo(
+    () => (funcionariosFirestore.length ? funcionariosFirestore : funcionariosBase),
+    [funcionariosFirestore]
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
@@ -418,8 +423,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!colaboradores.length) {
-      const colaboradoresIniciais = (funcionariosBase || []).map((item, index) => ({
+    const deveRecarregar = funcionariosFirestore.length > 0 || !colaboradores.length;
+    if (deveRecarregar) {
+      const colaboradoresIniciais = (funcionariosFonte || []).map((item, index) => ({
         id: index + 1,
         nome: item.nome,
         cargo: 'Operador',
@@ -454,8 +460,8 @@ export default function App() {
 
       setColaboradores(colaboradoresIniciais);
     }
-    if (!listaSetores.length) {
-      const setores = new Set((funcionariosBase || []).map((item) => item.setor).filter(Boolean));
+    if (!listaSetores.length || funcionariosFirestore.length > 0) {
+      const setores = new Set((funcionariosFonte || []).map((item) => item.setor).filter(Boolean));
       if (presencaLeandroExcel?.colaboradores?.length) {
         presencaLeandroExcel.colaboradores.forEach((colab) => {
           if (typeof colab?.setor === 'string' && colab.setor.trim()) {
@@ -465,7 +471,7 @@ export default function App() {
       }
       setListaSetores(Array.from(setores));
     }
-  }, [presencaLeandroExcel]);
+  }, [presencaLeandroExcel, funcionariosFonte, funcionariosFirestore.length, colaboradores.length, listaSetores.length]);
 
   useEffect(() => {
     if (!presencaLeandroExcel?.colaboradores?.length) return;
@@ -531,6 +537,35 @@ export default function App() {
     };
 
     carregarSupervisores();
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarFuncionarios = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'funcionarios'));
+        if (!ativo) return;
+        const itens = snap.docs
+          .map((docRef) => docRef.data())
+          .filter((item) => item?.nome);
+        if (itens.length) {
+          setFuncionariosFirestore(
+            itens.map((item) => ({
+              nome: item.nome || '',
+              setor: item.setor || '',
+              gestor: item.gestor || 'Thalles',
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Erro ao carregar funcionarios:', err);
+      }
+    };
+
+    carregarFuncionarios();
     return () => {
       ativo = false;
     };
@@ -835,6 +870,47 @@ export default function App() {
     return { total, presentes, ausentes: ausentes.length, porTipo, percentualPresenca };
   }, [colaboradoresDiaFiltrados]);
 
+  const resumoMesAtualSetores = useMemo(() => {
+    const mesesLabel = [
+      'Janeiro',
+      'Fevereiro',
+      'Marco',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
+    ];
+    const hoje = new Date();
+    const mesAtualKey = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+    const mesLabel = `${mesesLabel[hoje.getMonth()]} ${hoje.getFullYear()}`;
+
+    const porSetor = {};
+    let totalFaltas = 0;
+    Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
+      if (!dataISO.startsWith(mesAtualKey)) return;
+      if (isDiaDesconsiderado(dataISO)) return;
+      if (isDataSemApontamento(dataISO)) return;
+      Object.entries(registros || {}).forEach(([id, registro]) => {
+        const colaborador = colaboradores.find((c) => String(c.id) === String(id));
+        if (!colaborador) return;
+        const tipo = registro?.tipoFalta || 'Falta Injustificada';
+        if (tipo === 'Presente' || tipo === 'DSR' || tipo === 'Ferias') return;
+        const setor = colaborador.setor || 'Sem setor';
+        porSetor[setor] = (porSetor[setor] || 0) + 1;
+        totalFaltas += 1;
+      });
+    });
+
+    const valores = Object.values(porSetor);
+    const maxSetor = valores.length ? Math.max(...valores) : 1;
+    return { mesLabel, porSetor, totalFaltas, maxSetor };
+  }, [registrosPorData, colaboradores]);
+
   const resumoHistorico = useMemo(() => {
     const idsFiltrados = new Set(
       colaboradores
@@ -859,7 +935,8 @@ export default function App() {
     let faltasTotal = 0;
     let faltasJust = 0;
     let faltasInjust = 0;
-    let ferias = 0;
+    let feriasOcorrencias = 0;
+    const feriasColaboradores = new Set();
     const diasComFalta = new Set();
 
     Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
@@ -873,7 +950,10 @@ export default function App() {
         const tipo = registro?.tipoFalta || 'Falta Injustificada';
         if (tipo === 'Falta Justificada') faltasJust += 1;
         else if (tipo === 'Falta Injustificada') faltasInjust += 1;
-        else if (tipo === 'Ferias') ferias += 1;
+        else if (tipo === 'Ferias') {
+          feriasOcorrencias += 1;
+          feriasColaboradores.add(String(id));
+        }
       });
     });
 
@@ -888,7 +968,8 @@ export default function App() {
       faltasTotal,
       faltasJust,
       faltasInjust,
-      ferias,
+      feriasOcorrencias,
+      feriasColaboradores: feriasColaboradores.size,
       diasComFalta: diasComFalta.size,
       percentualPresenca,
     };
@@ -2091,7 +2172,7 @@ export default function App() {
         <div className="p-6">
           <div className="flex items-center gap-3 mb-10">
             <div className="bg-blue-600 p-2 rounded-lg shadow-lg">
-              <Activity size={24} />
+              <img src={logoMetalosa} alt="Metalosa" className="h-6 w-6 object-contain" />
             </div>
             <span className="font-bold text-xl tracking-tight leading-tight">Painel<br/>Industrial</span>
           </div>
@@ -2240,22 +2321,28 @@ export default function App() {
                   </div>
 
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <TrendingUp className="text-blue-600" size={18} />
-                      Absenteismo por processo (alertas)
-                    </h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                        <TrendingUp className="text-blue-600" size={18} />
+                        Absenteismo por processo
+                      </h3>
+                      <span className="text-xs text-slate-400">{resumoMesAtualSetores.mesLabel}</span>
+                    </div>
                     {listaSetores.length > 0 ? (
                       <div className="space-y-2">
-                        {listaSetores.map((setor) => (
-                          <BarraProgresso
-                            key={setor}
-                            rotulo={setor}
-                            atual={metricas.faltasPorSetor[setor] || 0}
-                            total={10}
-                            unidade=" faltas"
-                            cor={(metricas.faltasPorSetor[setor] || 0) > 3 ? "bg-rose-500" : "bg-blue-600"}
-                          />
-                        ))}
+                        {listaSetores.map((setor) => {
+                          const valor = resumoMesAtualSetores.porSetor[setor] || 0;
+                          return (
+                            <BarraProgresso
+                              key={setor}
+                              rotulo={setor}
+                              atual={valor}
+                              total={resumoMesAtualSetores.maxSetor || 1}
+                              unidade=" faltas"
+                              cor={valor > 3 ? "bg-rose-500" : "bg-blue-600"}
+                            />
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="text-slate-400 italic">Sem dados do ERP.</p>
@@ -3690,9 +3777,9 @@ export default function App() {
                          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Faltas no mes</p>
                          <AlertTriangle size={16} className="text-rose-300" />
                        </div>
-                      <p className="mt-2 text-2xl font-bold text-slate-100">
-                        {Math.max(resumoHistorico.faltasTotal - resumoHistorico.ferias, 0)}
-                      </p>
+                       <p className="mt-2 text-2xl font-bold text-slate-100">
+                         {Math.max(resumoHistorico.faltasTotal - resumoHistorico.feriasOcorrencias, 0)}
+                       </p>
                        <p className="text-xs text-slate-400">
                          {resumoHistorico.diasComFalta} dias com apontamentos
                        </p>
@@ -3713,7 +3800,7 @@ export default function App() {
                          <CalendarIcon size={16} className="text-blue-300" />
                        </div>
                        <p className="mt-2 text-2xl font-bold text-slate-100">
-                         {resumoHistorico.ferias}
+                         {resumoHistorico.feriasColaboradores}
                        </p>
                        <p className="text-xs text-slate-400">Dias no mes: {resumoHistorico.diasNoMes}</p>
                      </div>
