@@ -104,6 +104,16 @@ const main = () => {
   const idxValorUnitario = localizarIndice(header, ['vlrunitario', 'valorunitario']);
   const idxValorTotal = localizarIndice(header, ['vlrtotal', 'valortotal']);
   const idxEmissao = localizarIndice(header, ['emissao']);
+  const idxNF = localizarIndice(header, [
+    'nf',
+    'nfe',
+    'notafiscal',
+    'nota',
+    'numeronf',
+    'numeronota',
+    'numdoc',
+    'documento',
+  ]);
 
   const dados = rows.slice(headerIndex + 1).reduce((acc, row) => {
     const cliente = row?.[idxCliente];
@@ -115,6 +125,7 @@ const main = () => {
     const valorUnitario = row?.[idxValorUnitario];
     const valorTotal = row?.[idxValorTotal];
     const emissao = row?.[idxEmissao];
+    const nf = idxNF >= 0 ? row?.[idxNF] : '';
 
     const vazio =
       (cliente === undefined || cliente === null || cliente === '') &&
@@ -135,6 +146,7 @@ const main = () => {
       ValorUnitario: valorUnitario ?? '',
       ValorTotal: valorTotal ?? '',
       Emissao: emissao ?? '',
+      NF: nf ?? '',
       MesEmissao: formatMesEmissao(emissao),
     });
 

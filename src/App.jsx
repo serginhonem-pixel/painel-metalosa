@@ -1367,6 +1367,7 @@ export default function App() {
         descricao: row?.Descricao ?? row?.descricao ?? '',
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
+        nf: row?.NF ?? row?.Nf ?? row?.NotaFiscal ?? row?.notaFiscal ?? '',
         quantidade: parseValor(row?.Quantidade ?? row?.quantidade),
         valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
         valorTotal: parseValor(row?.ValorTotal ?? row?.valorTotal),
@@ -1419,7 +1420,13 @@ export default function App() {
       const infoCliente = clientesPorCodigo.get(chaveCliente);
       if (infoCliente?.estado) {
         estadoMap.set(infoCliente.estado, (estadoMap.get(infoCliente.estado) || 0) + row.valorTotal);
-        estadoPedidosMap.set(infoCliente.estado, (estadoPedidosMap.get(infoCliente.estado) || 0) + 1);
+        const pedidoKey = row.nf
+          ? String(row.nf).trim()
+          : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${chaveCliente}||${row.valorTotal}`;
+        if (!estadoPedidosMap.has(infoCliente.estado)) {
+          estadoPedidosMap.set(infoCliente.estado, new Set());
+        }
+        estadoPedidosMap.get(infoCliente.estado).add(pedidoKey);
       }
       if (infoCliente?.municipio) {
         const municipioKey = `${normalizarTexto(infoCliente.municipio)}||${String(infoCliente.estado || '').toUpperCase()}`;
@@ -1431,7 +1438,13 @@ export default function App() {
           });
         }
         municipioMap.get(municipioKey).valor += row.valorTotal;
-        municipioPedidosMap.set(municipioKey, (municipioPedidosMap.get(municipioKey) || 0) + 1);
+        const pedidoKey = row.nf
+          ? String(row.nf).trim()
+          : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${chaveCliente}||${row.valorTotal}`;
+        if (!municipioPedidosMap.has(municipioKey)) {
+          municipioPedidosMap.set(municipioKey, new Set());
+        }
+        municipioPedidosMap.get(municipioKey).add(pedidoKey);
         if (!municipioClientesMap.has(municipioKey)) {
           municipioClientesMap.set(municipioKey, new Map());
         }
@@ -1523,12 +1536,12 @@ export default function App() {
       .slice(0, 6);
 
     const pedidosPorEstado = Array.from(estadoPedidosMap.entries())
-      .map(([estado, pedidos]) => ({ estado, pedidos }))
+      .map(([estado, pedidos]) => ({ estado, pedidos: pedidos.size }))
       .sort((a, b) => b.pedidos - a.pedidos)
       .slice(0, 6);
 
     const pedidosPorMunicipio = Array.from(municipioPedidosMap.entries())
-      .map(([chave, pedidos]) => ({ chave, pedidos }))
+      .map(([chave, pedidos]) => ({ chave, pedidos: pedidos.size }))
       .sort((a, b) => b.pedidos - a.pedidos)
       .slice(0, 6);
 
@@ -2683,6 +2696,13 @@ export default function App() {
                           <p className="text-xs text-slate-400 mt-1">Soma do periodo.</p>
                         </div>
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
+                          <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">
+                            R$ {(faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Media nos dias com faturamento.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
                           <p className="text-xl font-bold text-slate-900 mt-2">
                             R$ {faturamentoAtual.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -2709,13 +2729,6 @@ export default function App() {
                             {faturamentoAtual.diasAtivos}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
-                        </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Quantidade total</p>
-                          <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {faturamentoAtual.quantidadeTotal.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Somatorio de volumes.</p>
                         </div>
                       </div>
 
@@ -2950,7 +2963,7 @@ export default function App() {
                                         <span>{perc.toFixed(1)}%</span>
                                       </div>
                                       <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                        <span>{pedidos} pedidos</span>
+                                        <span>{pedidos > 0 ? `${pedidos} pedidos` : '-'}</span>
                                         <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                       </div>
                                       <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
@@ -2983,7 +2996,7 @@ export default function App() {
                                         <span>{perc.toFixed(1)}%</span>
                                       </div>
                                       <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                        <span>{pedidos} pedidos</span>
+                                        <span>{pedidos > 0 ? `${pedidos} pedidos` : '-'}</span>
                                         <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                       </div>
                                       <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
@@ -3374,7 +3387,7 @@ export default function App() {
                      <div className="p-6 border-b border-slate-200 bg-slate-900/80 flex flex-wrap justify-between items-center gap-4 text-sm font-bold text-slate-200 uppercase">
                        <div className="flex flex-wrap items-center gap-4">
                          <span>Lancamento Diario de Presenca</span>
-                         <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-600">
+                         <div className="flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-1 text-[11px] font-semibold text-amber-200 shadow-[0_0_12px_rgba(251,191,36,0.25)]">
                            <CalendarIcon size={14} />
                            <input
                              type="date"
@@ -3383,7 +3396,7 @@ export default function App() {
                                setDataLancamento(e.target.value);
                                setDiaHistorico(null);
                              }}
-                            className="rounded-lg border border-slate-700 bg-slate-950/60 px-2 py-1 text-[11px] font-semibold text-slate-200"
+                            className="rounded-full border border-amber-400/60 bg-slate-950/70 px-3 py-1 text-[11px] font-semibold text-amber-100 outline-none focus:ring-2 focus:ring-amber-400/60"
                           />
                         </div>
                       </div>
@@ -3546,9 +3559,9 @@ export default function App() {
                          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Faltas no mes</p>
                          <AlertTriangle size={16} className="text-rose-300" />
                        </div>
-                       <p className="mt-2 text-2xl font-bold text-slate-100">
-                         {resumoHistorico.faltasTotal}
-                       </p>
+                      <p className="mt-2 text-2xl font-bold text-slate-100">
+                        {Math.max(resumoHistorico.faltasTotal - resumoHistorico.ferias, 0)}
+                      </p>
                        <p className="text-xs text-slate-400">
                          {resumoHistorico.diasComFalta} dias com apontamentos
                        </p>
