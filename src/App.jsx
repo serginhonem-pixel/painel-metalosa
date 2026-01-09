@@ -245,6 +245,7 @@ export default function App() {
   const [subAbaGestao, setSubAbaGestao] = useState('lista');
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
+  const [filtroFilial, setFiltroFilial] = useState('Todas');
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
@@ -1387,8 +1388,17 @@ export default function App() {
       ? normalizadas.filter((row) => row.mesKey === mesAtual)
       : normalizadas;
 
-    const total = linhasMes.reduce((acc, row) => acc + row.valorTotal, 0);
-    const quantidadeTotal = linhasMes.reduce((acc, row) => acc + row.quantidade, 0);
+    const filiaisBase = Array.from(
+      new Set(linhasMes.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
+    ).sort((a, b) => String(a).localeCompare(String(b)));
+
+    const linhasFiltradas =
+      filtroFilial === 'Todas'
+        ? linhasMes
+        : linhasMes.filter((row) => row.filial === filtroFilial);
+
+    const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
+    const quantidadeTotal = linhasFiltradas.reduce((acc, row) => acc + row.quantidade, 0);
 
     const clientesMap = new Map();
     const produtosMap = new Map();
@@ -1402,7 +1412,7 @@ export default function App() {
     const municipioPedidosMap = new Map();
     const municipioClientesMap = new Map();
 
-    linhasMes.forEach((row) => {
+    linhasFiltradas.forEach((row) => {
       const codigoCliente = normalizarCodigoCliente(row.cliente);
       const chaveCliente = codigoCliente || String(row.cliente || 'Sem cliente');
       clientesMap.set(chaveCliente, (clientesMap.get(chaveCliente) || 0) + row.valorTotal);
@@ -1551,7 +1561,7 @@ export default function App() {
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 25);
 
-    const filiais = porFilial.map((item) => item.filial);
+    const filiais = filiaisBase.length ? filiaisBase : porFilial.map((item) => item.filial);
     const porDiaFilial = Array.from(diaFilialMap.entries())
       .map(([dia, mapa]) => {
         const porFilialDia = {};
@@ -1566,14 +1576,14 @@ export default function App() {
       .sort((a, b) => a.dia.localeCompare(b.dia));
 
     const clientesAtivos = clientesMap.size;
-    const movimentos = linhasMes.length;
+    const movimentos = linhasFiltradas.length;
     const ticketMedio = movimentos > 0 ? total / movimentos : 0;
     const diasAtivos = diaMap.size;
 
     return {
       mes: mesAtualDisplay,
       total,
-      linhas: linhasMes,
+      linhas: linhasFiltradas,
       topClientes,
       topProdutos,
       porDia,
@@ -1593,7 +1603,7 @@ export default function App() {
       estadosTodos,
       municipiosMapa,
     };
-  }, [faturamentoLinhas]);
+  }, [faturamentoLinhas, filtroFilial]);
 
   const municipiosBounds = useMemo(() => {
     if (faturamentoAtual.municipiosMapa.length === 0) return null;
@@ -2645,6 +2655,25 @@ export default function App() {
                     </div>
                   ) : (
                     <>
+                      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                          <span className="mr-2">Filiais</span>
+                          {['Todas', ...faturamentoAtual.filiais].map((filial) => (
+                            <button
+                              key={filial}
+                              type="button"
+                              onClick={() => setFiltroFilial(filial)}
+                              className={`rounded-full px-3 py-2 transition-all ${
+                                filtroFilial === filial
+                                  ? 'bg-blue-600 text-white shadow'
+                                  : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                              }`}
+                            >
+                              {filial}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total no mes</p>
