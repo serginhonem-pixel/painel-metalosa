@@ -1,0 +1,629 @@
+[
+  {
+    "Codigo": "CONTA - 3222110001",
+    "Descricao": "SALARIOS E ORDENADOS",
+    "Valores": {
+      "Janeiro": 73009.18,
+      "Fevereiro": 88747.07,
+      "Março": 112033.6,
+      "Abril": 101125.83,
+      "Maio": 112085.65,
+      "Junho": 110314.3,
+      "Julho": 103984.54,
+      "Agosto": 124931.26,
+      "Setembro": 123324.02,
+      "Outubro": 119993.55,
+      "Novembro": 140472.27,
+      "Dezembro": 0,
+      "Total": 1210021.27
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222110002",
+    "Descricao": "PREMIOS DE PRODUCAO",
+    "Valores": {
+      "Janeiro": 867.4,
+      "Fevereiro": 0,
+      "Março": 1848,
+      "Abril": 3796.5,
+      "Maio": 1510,
+      "Junho": 1300,
+      "Julho": 500,
+      "Agosto": 3744.4,
+      "Setembro": 500,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 14066.3
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222110003",
+    "Descricao": "PROVISAO FERIAS E 13o SALARIO",
+    "Valores": {
+      "Janeiro": 28884.87,
+      "Fevereiro": 24911.71,
+      "Março": 19645.04,
+      "Abril": 1782.13,
+      "Maio": 23136.24,
+      "Junho": 31112.13,
+      "Julho": 27116.81,
+      "Agosto": 27251.57,
+      "Setembro": 31632.87,
+      "Outubro": 13296.4,
+      "Novembro": 48153.17,
+      "Dezembro": 0,
+      "Total": 276922.94
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222110007",
+    "Descricao": "ADICIONAL NOTURNO",
+    "Valores": {
+      "Janeiro": 441.81,
+      "Fevereiro": 441.81,
+      "Março": 305.38,
+      "Abril": 617.023,
+      "Maio": 473.04,
+      "Junho": 575.87,
+      "Julho": 637.58,
+      "Agosto": 597.03,
+      "Setembro": 637.58,
+      "Outubro": 617,
+      "Novembro": 675.82,
+      "Dezembro": 0,
+      "Total": 6019.943
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222110008",
+    "Descricao": "ADICIONAL DE PERICULOSIDADE",
+    "Valores": {
+      "Janeiro": 3226.36,
+      "Fevereiro": 3543.48,
+      "Março": 3247.23,
+      "Abril": 3247.23,
+      "Maio": 4108.95,
+      "Junho": 3219.62,
+      "Julho": 4201.64,
+      "Agosto": 4324.39,
+      "Setembro": 3642.19,
+      "Outubro": 2359.81,
+      "Novembro": 3907.05,
+      "Dezembro": 0,
+      "Total": 39027.95
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222110009",
+    "Descricao": "HORAS EXTRAS",
+    "Valores": {
+      "Janeiro": 13359.08,
+      "Fevereiro": 7275.07,
+      "Março": 6916.75,
+      "Abril": 6931.55,
+      "Maio": 8018.46,
+      "Junho": 5735.35,
+      "Julho": 5264.95,
+      "Agosto": 8139.2,
+      "Setembro": 5491.7,
+      "Outubro": 9994.66,
+      "Novembro": 16180.32,
+      "Dezembro": 0,
+      "Total": 93307.09
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222120001",
+    "Descricao": "INSS",
+    "Valores": {
+      "Janeiro": 25891.31,
+      "Fevereiro": 24794.14,
+      "Março": 24418.6,
+      "Abril": 19936.54,
+      "Maio": 27383.6,
+      "Junho": 31895.49,
+      "Julho": 28928.14,
+      "Agosto": 35466.01,
+      "Setembro": 35262.37,
+      "Outubro": 25355.64,
+      "Novembro": 45034.03,
+      "Dezembro": 0,
+      "Total": 324365.87
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222120002",
+    "Descricao": "FGTS",
+    "Valores": {
+      "Janeiro": 10427.21,
+      "Fevereiro": 9598.13,
+      "Março": 25012.47,
+      "Abril": 8825.42,
+      "Maio": 13351.82,
+      "Junho": 11455.82,
+      "Julho": 10728.08,
+      "Agosto": 12642.72,
+      "Setembro": 12018.06,
+      "Outubro": 10275.23,
+      "Novembro": 20772.1,
+      "Dezembro": 0,
+      "Total": 145107.06
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222120003",
+    "Descricao": "AVISO PREVIO E INDENIZACOES",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 2590.75,
+      "Março": 10110.99,
+      "Abril": 0,
+      "Maio": 6560.52,
+      "Junho": 1250.13,
+      "Julho": 1520.75,
+      "Agosto": 230.01,
+      "Setembro": 151.88,
+      "Outubro": 3522.76,
+      "Novembro": 2598.17,
+      "Dezembro": 0,
+      "Total": 28535.96
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222120005",
+    "Descricao": "CONTRIBUICAO DE TERCEIROS",
+    "Valores": {
+      "Janeiro": 6452.07,
+      "Fevereiro": 6432.53,
+      "Março": 7710.16,
+      "Abril": 6923.64,
+      "Maio": 7823.58,
+      "Junho": 7788.17,
+      "Julho": 8008.1,
+      "Agosto": 8172.47,
+      "Setembro": 8203.68,
+      "Outubro": 8985.83,
+      "Novembro": 9685.44,
+      "Dezembro": 0,
+      "Total": 86185.67
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222120006",
+    "Descricao": "SEGUROS DE ACIDENTES DO TRABAL",
+    "Valores": {
+      "Janeiro": 3337.3,
+      "Fevereiro": 3327.17,
+      "Março": 3988.05,
+      "Abril": 3581.17,
+      "Maio": 4046.73,
+      "Junho": 4028.39,
+      "Julho": 4142.13,
+      "Agosto": 4227.16,
+      "Setembro": 4243.29,
+      "Outubro": 4650.62,
+      "Novembro": 5012.76,
+      "Dezembro": 0,
+      "Total": 44584.77
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130001",
+    "Descricao": "ALIMENTACAO (PAT)",
+    "Valores": {
+      "Janeiro": 142293.01,
+      "Fevereiro": 214755.01,
+      "Março": 72737.43,
+      "Abril": 107403.04,
+      "Maio": 72289.37,
+      "Junho": 271343.44,
+      "Julho": 107791.39,
+      "Agosto": 163810.63,
+      "Setembro": 158959.25,
+      "Outubro": 176976.72,
+      "Novembro": 163373.93,
+      "Dezembro": 0,
+      "Total": 1651733.22
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130002",
+    "Descricao": "DESPESAS MEDICAS E MEDICAMENTO",
+    "Valores": {
+      "Janeiro": 4037.18,
+      "Fevereiro": 4334.65,
+      "Março": 9898.01,
+      "Abril": 1948.43,
+      "Maio": 3457.91,
+      "Junho": 3785.68,
+      "Julho": 2678.86,
+      "Agosto": 2781.48,
+      "Setembro": 3763.4,
+      "Outubro": 2000,
+      "Novembro": 5271.55,
+      "Dezembro": 0,
+      "Total": 43957.15
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130003",
+    "Descricao": "DESPESAS C/TRANSPORTE DE PESSO",
+    "Valores": {
+      "Janeiro": 24525,
+      "Fevereiro": 27216.01,
+      "Março": 29485.8,
+      "Abril": 26708,
+      "Maio": 29405.521,
+      "Junho": 22591.69,
+      "Julho": 22639.86,
+      "Agosto": 27040.4,
+      "Setembro": 15428.55,
+      "Outubro": 40779.85,
+      "Novembro": 30152.83,
+      "Dezembro": 0,
+      "Total": 295973.511
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130004",
+    "Descricao": "CURSOS E TREINAMENTOS",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 713.79,
+      "Junho": 544.6,
+      "Julho": 0,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 1258.39
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130005",
+    "Descricao": "UNIFORMES E MATL PROTECAO SEGU",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 9212,
+      "Abril": 1240.99,
+      "Maio": 0,
+      "Junho": 0,
+      "Julho": 0,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 10452.99
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130007",
+    "Descricao": "SEGUROS DE VIDA",
+    "Valores": {
+      "Janeiro": 4224.2,
+      "Fevereiro": 4224.2,
+      "Março": 2339.05,
+      "Abril": 4654.75,
+      "Maio": 5916.86,
+      "Junho": 5963.01,
+      "Julho": 5963.01,
+      "Agosto": 5870.69,
+      "Setembro": 5993.7,
+      "Outubro": 6212.99,
+      "Novembro": 6212.99,
+      "Dezembro": 0,
+      "Total": 57575.45
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222130008",
+    "Descricao": "SORTEIOS",
+    "Valores": {
+      "Janeiro": 1168,
+      "Fevereiro": 3845.99,
+      "Março": 1715.42,
+      "Abril": 408.13,
+      "Maio": 3906.96,
+      "Junho": 1586.19,
+      "Julho": 2168.62,
+      "Agosto": 1112.43,
+      "Setembro": 3607.8,
+      "Outubro": 2807.19,
+      "Novembro": 2332.75,
+      "Dezembro": 0,
+      "Total": 24659.48
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410001",
+    "Descricao": "DEPRECIACOES E AMORTIZACOES",
+    "Valores": {
+      "Janeiro": 18028.02,
+      "Fevereiro": 18177.77,
+      "Março": 18177.24,
+      "Abril": 18119.97,
+      "Maio": 18119.42,
+      "Junho": 17784.38,
+      "Julho": 17779.48,
+      "Agosto": 17903.26,
+      "Setembro": 17988.23,
+      "Outubro": 17908.8,
+      "Novembro": 17722.66,
+      "Dezembro": 0,
+      "Total": 197709.23
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410002",
+    "Descricao": "LUZ E FORCA",
+    "Valores": {
+      "Janeiro": 56354.73,
+      "Fevereiro": 64410.2,
+      "Março": 58183.73,
+      "Abril": 59736.35,
+      "Maio": 63064.07,
+      "Junho": 62248.24,
+      "Julho": 55707.9,
+      "Agosto": 64763.52,
+      "Setembro": 60864.32,
+      "Outubro": 70313.73,
+      "Novembro": 98079.19,
+      "Dezembro": 0,
+      "Total": 713725.98
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410008",
+    "Descricao": "IMOBILIZADO DE PEQUENO VALOR",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 0,
+      "Junho": 0,
+      "Julho": 325.16,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 325.16
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410004",
+    "Descricao": "ARRENDAMENTOS E ALUGUEIS",
+    "Valores": {
+      "Janeiro": 1998.91,
+      "Fevereiro": 1918.91,
+      "Março": 1418.91,
+      "Abril": 1418.91,
+      "Maio": 0,
+      "Junho": 0,
+      "Julho": 0,
+      "Agosto": 6501.31,
+      "Setembro": 5160,
+      "Outubro": 1998.91,
+      "Novembro": 1418.91,
+      "Dezembro": 0,
+      "Total": 21834.77
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410005",
+    "Descricao": "MATERIAL DE LIMPEZA",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 0,
+      "Junho": 0,
+      "Julho": 0,
+      "Agosto": 70,
+      "Setembro": 0,
+      "Outubro": 145.8,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 215.8
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410009",
+    "Descricao": "IMPOSTO PREDIAL E TERRIT URBAN",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 0,
+      "Junho": 1620,
+      "Julho": 0,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 1620
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410010",
+    "Descricao": "MATERIAL MANUTENCAO",
+    "Valores": {
+      "Janeiro": 11947.99,
+      "Fevereiro": 14897.6,
+      "Março": 22407.99,
+      "Abril": 14899.59,
+      "Maio": 10698.2,
+      "Junho": 23876.55,
+      "Julho": 22882.44,
+      "Agosto": 28253.06,
+      "Setembro": 24410.76,
+      "Outubro": 39361.37,
+      "Novembro": 16400.17,
+      "Dezembro": 0,
+      "Total": 230035.72
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410011",
+    "Descricao": "MATERIAL EXPEDIENTE",
+    "Valores": {
+      "Janeiro": 7335.93,
+      "Fevereiro": 8706.7,
+      "Março": 3040.92,
+      "Abril": 3458.08,
+      "Maio": 13232.6,
+      "Junho": 3531.8,
+      "Julho": 867.67,
+      "Agosto": 735.3,
+      "Setembro": 1718.34,
+      "Outubro": 8601.44,
+      "Novembro": 2055.21,
+      "Dezembro": 0,
+      "Total": 53283.99
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410012",
+    "Descricao": "COMBUSTIVEL E LUBRIFICANTES",
+    "Valores": {
+      "Janeiro": 5270,
+      "Fevereiro": 6460,
+      "Março": 4930,
+      "Abril": 8116.14,
+      "Maio": 7276.4,
+      "Junho": 6460,
+      "Julho": 5400.88,
+      "Agosto": 6710.8,
+      "Setembro": 6866,
+      "Outubro": 10702.36,
+      "Novembro": 6970,
+      "Dezembro": 0,
+      "Total": 75162.58
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410013",
+    "Descricao": "DESPESAS COPA COZINHA  E LANCH",
+    "Valores": {
+      "Janeiro": 3820.98,
+      "Fevereiro": 5747.47,
+      "Março": 2347.31,
+      "Abril": 4393.31,
+      "Maio": 6558.39,
+      "Junho": 1638.12,
+      "Julho": 3365.14,
+      "Agosto": 3850.7,
+      "Setembro": 3679.64,
+      "Outubro": 2962.06,
+      "Novembro": 6452.74,
+      "Dezembro": 0,
+      "Total": 44815.86
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410015",
+    "Descricao": "OUTROS",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 559.6,
+      "Junho": 300,
+      "Julho": 0,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 99.55,
+      "Novembro": 25.8,
+      "Dezembro": 0,
+      "Total": 984.95
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410016",
+    "Descricao": "SERVICOS TERCEIROS - PJ",
+    "Valores": {
+      "Janeiro": 52460.76,
+      "Fevereiro": 50076.6,
+      "Março": 53149.41,
+      "Abril": 69082.46,
+      "Maio": 54917.54,
+      "Junho": 68721.52,
+      "Julho": 55746.93,
+      "Agosto": 55274.6,
+      "Setembro": 52416.76,
+      "Outubro": 78830.33,
+      "Novembro": 37702.12,
+      "Dezembro": 0,
+      "Total": 628379.03
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410018",
+    "Descricao": "MATERIAL EMBALAGEM",
+    "Valores": {
+      "Janeiro": 0,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 89,
+      "Maio": 0,
+      "Junho": 0,
+      "Julho": 0,
+      "Agosto": 0,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 89
+    }
+  },
+  {
+    "Codigo": "CONTA - 3222410019",
+    "Descricao": "PROTECAO SEGURANCA",
+    "Valores": {
+      "Janeiro": 40,
+      "Fevereiro": 0,
+      "Março": 0,
+      "Abril": 0,
+      "Maio": 15.9,
+      "Junho": 0,
+      "Julho": 0,
+      "Agosto": 6579.82,
+      "Setembro": 0,
+      "Outubro": 0,
+      "Novembro": 0,
+      "Dezembro": 0,
+      "Total": 6635.72
+    }
+  },
+  {
+    "Codigo": "TOTAL DOS CUSTOS INDIRETOS",
+    "Descricao": "",
+    "Valores": {
+      "Janeiro": 499401.3,
+      "Fevereiro": 596432.97,
+      "Março": 504279.49,
+      "Abril": 478444.183,
+      "Maio": 498631.121,
+      "Junho": 700670.49,
+      "Julho": 498350.06,
+      "Agosto": 620984.22,
+      "Setembro": 585964.39,
+      "Outubro": 658752.6,
+      "Novembro": 686661.98,
+      "Dezembro": 0,
+      "Total": 6328572.804
+    }
+  }
+]

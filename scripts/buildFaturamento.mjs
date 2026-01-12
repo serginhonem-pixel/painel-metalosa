@@ -9,6 +9,11 @@ const DEVOLUCAO_INPUT = path.resolve('src', 'Faturamento', 'devolução.xlsx');
 const DEVOLUCAO_OUTPUT = path.resolve('src', 'data', 'devolucao.json');
 const DEVOLUCAO_SHEET = 'SCAFNYW0';
 const CFOP_DEVOLUCAO = new Set(['1201', '2201', '1202', '2202']);
+const CUSTOS_INPUT = path.resolve('src', 'Faturamento', 'custos.xlsx');
+const CUSTOS_OUTPUT = path.resolve('src', 'data', 'custos.json');
+const CUSTOS_SHEET = 'Sheet1';
+const CUSTOS_INDIRETOS_OUTPUT = path.resolve('src', 'data', 'custos_indiretos.json');
+const CUSTOS_INDIRETOS_SHEET = 'Indiretos';
 
 const normalizar = (valor) =>
   String(valor || '')
@@ -223,6 +228,77 @@ const extrairDevolucoes = (sheet) => {
   }, []);
 };
 
+const extrairCustos = (sheet) => {
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
+  if (!rows.length) return [];
+  const header = rows[0] || [];
+  const idxCodigo = localizarIndice(header, ['codigo', 'cod']);
+  const idxDescricao = localizarIndice(header, ['descricao', 'desc']);
+  const mensalidades = header
+    .map((cell, idx) => ({ idx, label: String(cell ?? '').trim() }))
+    .filter(({ idx, label }) => {
+      if (!label) return false;
+      if (idx === idxCodigo || idx === idxDescricao) return false;
+      return true;
+    });
+
+  return rows.slice(1).reduce((acc, row) => {
+    const codigo = idxCodigo >= 0 ? row?.[idxCodigo] ?? '' : '';
+    const descricao = idxDescricao >= 0 ? row?.[idxDescricao] ?? '' : '';
+    if (!codigo && !descricao) return acc;
+    const valores = {};
+    mensalidades.forEach(({ idx, label }) => {
+      const raw = row?.[idx];
+      let numero = 0;
+      if (typeof raw === 'number') {
+        numero = raw;
+      } else if (typeof raw === 'string') {
+        const normalizado = Number(String(raw).replace(',', '.').replace(/[^0-9.-]/g, ''));
+        numero = Number.isNaN(normalizado) ? 0 : normalizado;
+      }
+      valores[label] = numero;
+    });
+    acc.push({
+      Codigo: codigo,
+      Descricao: descricao,
+      Valores: valores,
+    });
+    return acc;
+  }, []);
+};
+
+const extrairCustosIndiretos = (sheet) => {
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
+  if (!rows.length) return [];
+  const header = rows[0] || [];
+  const mensalidades = header
+    .map((cell, idx) => ({ idx, label: String(cell ?? '').trim() }))
+    .filter(({ idx, label }) => idx >= 2 && label);
+  return rows.slice(1).reduce((acc, row) => {
+    const codigo = String(row?.[0] ?? '').trim();
+    const descricao = String(row?.[1] ?? '').trim();
+    if (!codigo && !descricao) return acc;
+    const valores = {};
+    mensalidades.forEach(({ idx, label }) => {
+      const raw = row?.[idx];
+      let numero = 0;
+      if (typeof raw === 'number') {
+        numero = raw;
+      } else if (typeof raw === 'string') {
+        const normalizado = Number(String(raw).replace(',', '.').replace(/[^0-9.-]/g, ''));
+        numero = Number.isNaN(normalizado) ? 0 : normalizado;
+      }
+      valores[label] = numero;
+    });
+    acc.push({
+      Codigo: codigo,
+      Descricao: descricao,
+      Valores: valores,
+    });
+    return acc;
+  }, []);
+};
+
 const main = () => {
   if (!fs.existsSync(INPUT)) {
     throw new Error(`Arquivo nao encontrado: ${INPUT}`);
@@ -252,6 +328,30 @@ const main = () => {
     console.log(`Gerado ${DEVOLUCAO_OUTPUT} com ${devolucoes.length} linhas.`);
   } else {
     console.warn(`Arquivo de devolucao nao encontrado: ${DEVOLUCAO_INPUT}`);
+  }
+
+  if (fs.existsSync(CUSTOS_INPUT)) {
+    const custosWorkbook = XLSX.readFile(CUSTOS_INPUT, { cellDates: true });
+    const custosSheet = custosWorkbook.Sheets[CUSTOS_SHEET];
+    if (!custosSheet) {
+      throw new Error(`Aba nao encontrada: ${CUSTOS_SHEET}`);
+    }
+
+    const custos = extrairCustos(custosSheet);
+    fs.mkdirSync(path.dirname(CUSTOS_OUTPUT), { recursive: true });
+    fs.writeFileSync(CUSTOS_OUTPUT, JSON.stringify(custos, null, 2));
+    console.log(`Gerado ${CUSTOS_OUTPUT} com ${custos.length} linhas.`);
+    const indiretosSheet = custosWorkbook.Sheets[CUSTOS_INDIRETOS_SHEET];
+    if (indiretosSheet) {
+      const indiretos = extrairCustosIndiretos(indiretosSheet);
+      fs.mkdirSync(path.dirname(CUSTOS_INDIRETOS_OUTPUT), { recursive: true });
+      fs.writeFileSync(CUSTOS_INDIRETOS_OUTPUT, JSON.stringify(indiretos, null, 2));
+      console.log(`Gerado ${CUSTOS_INDIRETOS_OUTPUT} com ${indiretos.length} linhas.`);
+    } else {
+      console.warn(`Aba nao encontrada: ${CUSTOS_INDIRETOS_SHEET}`);
+    }
+  } else {
+    console.warn(`Arquivo de custos nao encontrado: ${CUSTOS_INPUT}`);
   }
 };
 

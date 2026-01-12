@@ -5,8 +5,12 @@ import faturamentoData from './data/faturamento.json';
 import devolucaoData from './data/devolucao.json';
 import clientesData from './Faturamento/clientes.json';
 import produtosData from './data/produtos.json';
+import custosData from './data/custos.json';
+import custosPrevanoData from './data/custos_prevano.json';
+import custosIndiretosData from './data/custos_indiretos.json';
 import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
+import { computeCostBreakdown } from './services/costing';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
@@ -75,8 +79,23 @@ const CardInformativo = ({ titulo, valor, subtitulo, icon: Icon, corFundo, tende
           )}
         </div>
         <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">{titulo}</h3>
-        <p className="text-2xl font-bold text-slate-900 mt-1">{valor}</p>
-        <p className="text-slate-400 text-[11px] mt-1 font-medium">{subtitulo}</p>
+        {(() => {
+          if (typeof valor === 'string' && valor.trim().startsWith('R$')) {
+            const trimmed = valor.trim();
+            return (
+              <div className="flex items-end gap-1 mt-1">
+                <span className="text-xs font-semibold text-slate-500">R$</span>
+                <span className="text-xl font-bold text-slate-900 leading-none">
+                  {trimmed.slice(2).trim()}
+                </span>
+              </div>
+            );
+          }
+          return (
+            <p className="text-xl font-bold text-slate-900 mt-1">{valor}</p>
+          );
+        })()}
+        <p className="text-slate-400 text-[10px] mt-1 font-medium">{subtitulo}</p>
       </div>
     </div>
   </div>
@@ -313,6 +332,7 @@ export default function App() {
   const [filtroTipoDia, setFiltroTipoDia] = useState('Todos');
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [mapModalInstance, setMapModalInstance] = useState(null);
+  const [modalTabelaCustosOpen, setModalTabelaCustosOpen] = useState(false);
   const [modalLancamento, setModalLancamento] = useState(null);
   const [modalTipo, setModalTipo] = useState('Presente');
   const [modalTempo, setModalTempo] = useState('02:00');
@@ -1042,6 +1062,17 @@ export default function App() {
       percentualPresenca,
     };
   }, [colaboradores, filtroSupervisor, filtroSetor, registrosPorData, mesHistorico, anoHistorico]);
+
+  const produtoDescricaoMap = useMemo(() => {
+    const map = new Map();
+    (produtosData || []).forEach((produto) => {
+      const codigo = normalizarCodigoProduto(produto.codigo);
+      if (codigo) {
+        map.set(codigo, produto.descricao || '');
+      }
+    });
+    return map;
+  }, [produtosData]);
 
   const abrirModalLancamento = (colab) => {
     const registro = registrosPorData[dataLancamento]?.[colab.id];
@@ -1789,6 +1820,90 @@ export default function App() {
     };
   }, [faturamentoLinhas, filtroFilial]);
 
+const mesesCustos = useMemo(() => {
+  if (!custosData?.length) return [];
+  const primeiro = custosData.find((item) => item.Valores && Object.keys(item.Valores).length);
+  if (!primeiro) return [];
+  return Object.keys(primeiro.Valores);
+}, [custosData]);
+
+const mesCustoAtual = mesesCustos.length ? mesesCustos[mesesCustos.length - 1] : '';
+
+const faturamentoComCustos = useMemo(
+  () =>
+    computeCostBreakdown({
+      linhas: faturamentoAtual.linhas,
+      produtoDescricaoMap,
+      custosDiretos: custosData,
+      custosDiretosAnoAnterior: custosPrevanoData,
+      custosIndiretos: custosIndiretosData,
+      mesCustoAtual,
+    }),
+  [
+    faturamentoAtual.linhas,
+    produtoDescricaoMap,
+    custosData,
+    custosPrevanoData,
+    custosIndiretosData,
+    mesCustoAtual,
+  ]
+);
+
+const totalCustosMes = faturamentoComCustos.total;
+
+const margemPercentual = useMemo(() => {
+  const total = faturamentoAtual.total;
+  const custo = faturamentoComCustos.total;
+  if (total <= 0) return 0;
+  return ((total - custo) / total) * 100;
+}, [faturamentoAtual.total, faturamentoComCustos.total]);
+
+const markupPercentual = useMemo(() => {
+  const custo = faturamentoComCustos.total;
+  if (custo <= 0) return 0;
+  return ((faturamentoAtual.total - custo) / custo) * 100;
+}, [faturamentoAtual.total, faturamentoComCustos.total]);
+
+const percentualCustoSobreFaturamento = useMemo(() => {
+  const total = faturamentoAtual.total;
+  if (total <= 0) return 0;
+  return (totalCustosMes / total) * 100;
+}, [faturamentoAtual.total, totalCustosMes]);
+
+const custoMedioMovimento = useMemo(() => {
+  const movimentos = faturamentoAtual.movimentos || 0;
+  return movimentos > 0 ? totalCustosMes / movimentos : 0;
+}, [faturamentoAtual.movimentos, totalCustosMes]);
+
+const custoMedioDia = useMemo(() => {
+  const dias = faturamentoAtual.diasAtivos || 0;
+  return dias > 0 ? totalCustosMes / dias : 0;
+}, [faturamentoAtual.diasAtivos, totalCustosMes]);
+
+const itensCustosOrdenados = useMemo(() => {
+  return (faturamentoComCustos.itens || [])
+    .map((item) => ({
+      ...item,
+      margem: item.receita > 0 ? ((item.receita - item.custo) / item.receita) * 100 : 0,
+      markup: item.custo > 0 ? ((item.receita - item.custo) / item.custo) * 100 : 0,
+    }))
+    .sort((a, b) => (b.receita - b.custo) - (a.receita - a.custo));
+}, [faturamentoComCustos.itens]);
+
+const resumoCustosIndiretos = useMemo(() => {
+  if (!custosIndiretosData?.length) {
+    return { total: 0, itens: [], top: [] };
+  }
+  const itens = custosIndiretosData.map((item) => {
+    const total = Object.values(item.Valores || {}).reduce((acc, raw) => acc + parseValor(raw), 0);
+    return { ...item, total };
+  });
+  const ordenados = itens.sort((a, b) => b.total - a.total);
+  const top = ordenados.filter((item) => item.total > 0).slice(0, 3);
+  const total = ordenados.reduce((acc, item) => acc + item.total, 0);
+  return { total, itens: ordenados, top };
+}, [custosIndiretosData]);
+
   const municipiosBounds = useMemo(() => {
     if (faturamentoAtual.municipiosMapa.length === 0) return null;
     let minLat = 90;
@@ -2088,6 +2203,61 @@ export default function App() {
         </div>
       )}
 
+      {modalTabelaCustosOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
+          <div className="w-full max-w-4xl rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+            <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
+                <p className="text-lg font-bold text-white">Custos por SKU</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalTabelaCustosOpen(false)}
+                className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="p-6">
+              {itensCustosOrdenados.length ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-[120px_1fr_60px_80px_80px_70px_70px] items-center text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                    <span>SKU</span>
+                    <span>Descrição</span>
+                    <span className="text-right">Qtd</span>
+                    <span className="text-right">Receita</span>
+                    <span className="text-right">Custo</span>
+                    <span className="text-right">Margem</span>
+                    <span className="text-right">Markup</span>
+                  </div>
+                  <div className="mt-3 max-h-[60vh] overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60 p-3">
+                    <div className="space-y-3">
+                      {itensCustosOrdenados.slice(0, 40).map((item) => (
+                        <div
+                          key={`${item.codigo}-${item.descricao}`}
+                          className="grid grid-cols-[120px_1fr_60px_80px_80px_70px_70px] items-center text-[11px] text-slate-200"
+                        >
+                          <span className="text-slate-100">{item.codigo || '-'}</span>
+                          <span className="text-slate-400">{item.descricao || 'Sem descrição'}</span>
+                          <span className="text-right">{item.quantidade ? Math.round(item.quantidade) : 0}</span>
+                          <span className="text-right text-emerald-300">{formatarMoeda(item.receita)}</span>
+                          <span className="text-right text-emerald-400">{formatarMoeda(item.custo)}</span>
+                          <span className="text-right">{item.margem.toFixed(1)}%</span>
+                          <span className="text-right">{item.markup.toFixed(1)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400">Ainda não há dados de custos para mostrar.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {modalRapidoFiltroOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -2313,180 +2483,322 @@ export default function App() {
           {/* ABA EXECUTIVA */}
           {abaAtiva === 'executivo' && (
             <div className="space-y-8 animate-in fade-in duration-700">
-              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent" />
-                <div className="relative flex flex-wrap items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
-                      <img src={logoMetalosa} alt="Metalosa" className="h-10 w-10 object-contain" />
+              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-emerald-600/5 blur-3xl" />
+                <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-inner">
+                      <img src={logoMetalosa} alt="Metalosa" className="h-14 w-14 object-contain opacity-90" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.4em] text-slate-300">Metalosa</p>
-                      <h2 className="text-2xl font-bold text-white">Painel Executivo</h2>
-                      <p className="text-xs text-slate-300 mt-1">Status da operacao em {new Date().toLocaleDateString('pt-BR')}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
-                    <div className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-emerald-200">
-                      Presenca hoje: {resumoFaltas.percentualPresenca.toFixed(1)}%
-                    </div>
-                    <div className="rounded-full border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-amber-200">
-                      Dias ativos: {faturamentoAtual.diasAtivos}
-                    </div>
-                    <div className="rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-blue-200">
-                      Faturamento mes: R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento mes</p>
-                  <p className="text-xl font-bold text-slate-900 mt-2">
-                    R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">Total consolidado.</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
-                  <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">
-                    R$ {(faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">Media dos dias ativos.</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
-                  <p className="text-xl font-bold text-slate-900 mt-2">
-                    R$ {faturamentoAtual.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-2">{faturamentoAtual.clientesAtivos}</p>
-                  <p className="text-xs text-slate-400 mt-1">No mes corrente.</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faltas hoje</p>
-                  <p className="text-2xl font-bold text-rose-600 mt-2">{resumoFaltas.ausentes}</p>
-                  <p className="text-xs text-slate-400 mt-1">Ausencias registradas.</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ferias hoje</p>
-                  <p className="text-2xl font-bold text-amber-600 mt-2">{resumoFaltas.porTipo['Ferias'] || 0}</p>
-                  <p className="text-xs text-slate-400 mt-1">Lancadas no dia.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2 space-y-6">
-                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Faturamento por dia</h3>
-                      <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
-                    </div>
-                    {faturamentoAtual.porDia.length === 0 ? (
-                      <p className="text-slate-400 italic">Sem dados para o periodo.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {faturamentoAtual.porDia.slice(-7).map((item) => {
-                          const maxDia = Math.max(...faturamentoAtual.porDia.map((d) => d.valor), 1);
-                          const perc = (item.valor / maxDia) * 100;
-                          return (
-                            <div key={item.dia} className="space-y-1">
-                              <div className="flex items-center justify-between text-xs text-slate-500">
-                                <span>{item.dia}</span>
-                                <span>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                              </div>
-                              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                <div className="h-full bg-blue-600" style={{ width: `${perc}%` }} />
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">
+                          Operação em tempo real
+                        </p>
                       </div>
-                    )}
+                      <h2 className="text-3xl font-black text-white tracking-tight">Painel Executivo</h2>
+                      <p className="text-sm text-slate-400 mt-1 font-medium">
+                        Consolidado industrial · {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[320px]">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Presença hoje</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-2xl font-black text-emerald-400">{resumoFaltas.percentualPresenca.toFixed(1)}%</span>
+                        <span className="text-[10px] text-slate-500 mb-1">da meta</span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-2xl font-black text-amber-300">{faturamentoAtual.diasAtivos}</span>
+                        <span className="text-[10px] text-slate-500 mb-1">dias úteis</span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mês</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-xl font-black text-blue-300">{formatarMoeda(faturamentoAtual.total)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                {[
+                  {
+                    titulo: 'Faturamento Total',
+                    valor: formatarMoeda(faturamentoAtual.total),
+                    subtitulo: 'Consolidado mensal',
+                    icon: DollarSign,
+                    corFundo: 'bg-blue-500',
+                  },
+                  {
+                    titulo: 'Média por dia',
+                    valor: formatarMoeda(
+                      faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0
+                    ),
+                    subtitulo: 'Performance diária',
+                    icon: TrendingUp,
+                    corFundo: 'bg-emerald-500',
+                  },
+                  {
+                    titulo: 'Ticket médio',
+                    valor: formatarMoeda(faturamentoAtual.ticketMedio),
+                    subtitulo: 'Valor por pedido',
+                    icon: ShoppingCart,
+                    corFundo: 'bg-purple-500',
+                  },
+                  {
+                    titulo: 'Clientes ativos',
+                    valor: faturamentoAtual.clientesAtivos,
+                    subtitulo: 'Carteira no mês',
+                    icon: Users,
+                    corFundo: 'bg-amber-500',
+                  },
+                  {
+                    titulo: 'Faltas hoje',
+                    valor: resumoFaltas.ausentes,
+                    subtitulo: 'Atenção operacional',
+                    icon: UserX,
+                    corFundo: 'bg-rose-500',
+                  },
+                  {
+                    titulo: 'Férias hoje',
+                    valor: resumoFaltas.porTipo['Ferias'] || 0,
+                    subtitulo: 'Planejamento RH',
+                    icon: CalendarIcon,
+                    corFundo: 'bg-slate-400',
+                  },
+                ].map((kpi) => (
+                  <CardInformativo
+                    key={kpi.titulo}
+                    titulo={kpi.titulo}
+                    valor={kpi.valor}
+                    subtitulo={kpi.subtitulo}
+                    icon={kpi.icon}
+                    corFundo={kpi.corFundo}
+                  />
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div className="xl:col-span-6 space-y-4">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
+                          <Activity className="text-blue-600" size={18} />
+                          Faturamento por Dia
+                        </h3>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Histórico dos últimos dias ativos</p>
+                      </div>
+                      <span className="px-3 py-1.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">
+                        {faturamentoAtual.porDia.length} dias
+                      </span>
+                    </div>
+                    {(() => {
+                      const diasExibidos = faturamentoAtual.porDia.slice(-8);
+                      if (!diasExibidos.length) {
+                        return (
+                          <div className="h-40 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
+                            <p className="text-slate-400 text-xs italic">Aguardando dados do ERP...</p>
+                          </div>
+                        );
+                      }
+                      const maxValor = diasExibidos.reduce((acc, item) => Math.max(acc, item.valor), 1);
+                      const mediaDia =
+                        faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0;
+                      return (
+                        <div className="space-y-4">
+                          {diasExibidos.map((item) => {
+                            const perc = (item.valor / maxValor) * 100;
+                            const isHigh = item.valor >= mediaDia;
+                            return (
+                              <div key={item.dia} className="group">
+                                <div className="flex items-center justify-between text-[11px] mb-1.5">
+                                  <span className="font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
+                                    {item.dia}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {isHigh && <ArrowUpRight size={12} className="text-emerald-500" />}
+                                    <span className="font-black text-slate-900">{formatarMoeda(item.valor)}</span>
+                                  </div>
+                                </div>
+                                <div className="h-3 rounded-full bg-slate-100 overflow-hidden border border-slate-100 p-[1px]">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-1000 ${
+                                      isHigh ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-blue-400'
+                                    }`}
+                                    style={{ width: `${Math.min(perc, 100)}%` }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
-                        <TrendingUp className="text-blue-600" size={18} />
-                        Absenteismo por processo
-                      </h3>
-                      <span className="text-xs text-slate-400">{resumoMesAtualSetores.mesLabel}</span>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-5">
+                      <div>
+                        <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
+                          <AlertTriangle className="text-rose-500" size={18} />
+                          Alertas de Absenteísmo
+                        </h3>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Impacto por processo produtivo</p>
+                      </div>
+                      <span className="text-[10px] text-slate-400 uppercase">{resumoMesAtualSetores.mesLabel}</span>
                     </div>
                     {listaSetores.length > 0 ? (
-                      <div className="space-y-2">
+                      <div className="grid grid-cols-1 gap-3">
                         {listaSetores.map((setor) => {
                           const valor = resumoMesAtualSetores.porSetor[setor] || 0;
+                          const maxSetor = resumoMesAtualSetores.maxSetor || 1;
+                          const perc = (valor / maxSetor) * 100;
+                          const isCritical = valor > 3;
                           return (
-                            <BarraProgresso
-                              key={setor}
-                              rotulo={setor}
-                              atual={valor}
-                              total={resumoMesAtualSetores.maxSetor || 1}
-                              unidade=" faltas"
-                              cor={valor > 3 ? "bg-rose-500" : "bg-blue-600"}
-                            />
+                            <div key={setor} className="space-y-2 border-b border-slate-100 pb-2 last:border-0 last:pb-0">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-black text-slate-600">{setor}</span>
+                                <span
+                                  className={`text-[11px] font-bold ${
+                                    isCritical ? 'text-rose-600' : 'text-slate-900'
+                                  }`}
+                                >
+                                  {valor} faltas
+                                </span>
+                              </div>
+                              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-1000 ${
+                                    isCritical ? 'bg-rose-500' : 'bg-blue-500'
+                                  }`}
+                                  style={{ width: `${Math.min(perc, 100)}%` }}
+                                />
+                              </div>
+                            </div>
                           );
                         })}
                       </div>
                     ) : (
-                      <p className="text-slate-400 italic">Sem dados do ERP.</p>
+                      <p className="text-slate-400 text-xs italic text-center py-8">
+                        Sem dados operacionais registrados.
+                      </p>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Top clientes</h3>
-                      <span className="text-xs text-slate-400">Top 5</span>
+                <div className="xl:col-span-6 space-y-6">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm space-y-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black">Custos consolidados</p>
+                        <p className="text-4xl font-black text-slate-900">{formatarMoeda(totalCustosMes)}</p>
+                        <p className="text-xs text-slate-400 mt-1">{mesCustoAtual || 'Planilha de custos'}</p>
+                      </div>
+                      <div className="flex flex-col text-right text-[11px] text-slate-500">
+                        <span>Capturado dos insumos</span>
+                        <span className="text-[10px] text-slate-400 mt-2">{faturamentoAtual.movimentos || 0} movimentos</span>
+                      </div>
                     </div>
-                    {faturamentoAtual.topClientes.length === 0 ? (
-                      <p className="text-slate-400 italic">Sem dados de clientes.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {faturamentoAtual.topClientes.slice(0, 5).map((item) => (
-                          <div key={item.cliente} className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-xs font-bold text-slate-700">
-                                {item.info?.nome || item.cliente}
-                              </p>
-                              <p className="text-[10px] text-slate-400">
-                                {item.info?.municipio ? `${item.info.municipio} / ${item.info.estado}` : 'Sem municipio'}
+                    <div className="grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-500">
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-[10px]">Margem sobre faturamento</p>
+                        <p className="text-2xl font-bold text-emerald-500 mt-1">
+                          {Number.isFinite(margemPercentual) ? `${margemPercentual.toFixed(1)}%` : '-'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-[10px]">Markup sobre custo</p>
+                        <p className="text-2xl font-bold text-blue-500 mt-1">
+                          {Number.isFinite(markupPercentual) ? `${markupPercentual.toFixed(1)}%` : '-'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-[10px]">Custo médio / movimento</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioMovimento)}</p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-[10px]">Custo médio / dia</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioDia)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {faturamentoComCustos.topItens.length ? (
+                        faturamentoComCustos.topItens.map((item) => {
+                          const margemItem = item.receita > 0 ? ((item.receita - item.custo) / item.receita) * 100 : 0;
+                          const markupItem = item.custo > 0 ? ((item.receita - item.custo) / item.custo) * 100 : 0;
+                          return (
+                            <div
+                              key={`${item.codigo}-${item.descricao}`}
+                              className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-slate-900">{item.codigo || '-'}</span>
+                                <span className="text-emerald-500 font-black">{formatarMoeda(item.receita)}</span>
+                              </div>
+                              <p className="text-[12px] text-slate-500">{item.descricao || 'Sem descrição'}</p>
+                              <p className="text-[11px] text-slate-400 mt-1">
+                                Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} · Markup{' '}
+                                {Number.isFinite(markupItem) ? `${markupItem.toFixed(1)}%` : '0%'}
                               </p>
                             </div>
-                            <span className="text-xs font-semibold text-emerald-600">
-                              R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          );
+                        })
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">Sem itens com custos definidos.</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setModalTabelaCustosOpen(true)}
+                      className="w-full rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-600/90 to-emerald-500/80 px-4 py-3 text-xs font-black uppercase tracking-[0.3em] text-white"
+                    >
+                      Abrir detalhamento por SKU
+                    </button>
+                    <p className="text-[11px] text-slate-400">
+                      Valide os valores por SKU no modal e confirme que os custos acompanham o faturamento.
+                    </p>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider mb-3">Mao de obra</h3>
-                    <div className="grid grid-cols-3 gap-3 text-center text-xs">
-                      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                        <p className="text-emerald-700 font-bold">{resumoFaltas.presentes}</p>
-                        <p className="text-[10px] text-emerald-600">Presentes</p>
-                      </div>
-                      <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
-                        <p className="text-rose-700 font-bold">{resumoFaltas.ausentes}</p>
-                        <p className="text-[10px] text-rose-600">Ausentes</p>
-                      </div>
-                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
-                        <p className="text-amber-700 font-bold">{resumoFaltas.porTipo['Ferias'] || 0}</p>
-                        <p className="text-[10px] text-amber-600">Ferias</p>
-                      </div>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest">Top clientes</h3>
+                      <span className="text-[10px] text-slate-400">Top 5</span>
                     </div>
-                    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
-                      Total filtrado: <span className="font-semibold text-slate-700">{resumoFaltas.total}</span>
-                    </div>
+                    {faturamentoAtual.topClientes.length === 0 ? (
+                      <p className="text-xs text-slate-400 italic">Sem dados de faturamento.</p>
+                    ) : (
+                      <div className="space-y-5">
+                        {faturamentoAtual.topClientes.slice(0, 5).map((item, index) => {
+                          const share = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                          return (
+                            <div key={`${item.cliente}-${index}`} className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-semibold text-slate-900">{item.info?.nome || item.cliente}</p>
+                                <p className="text-[11px] text-slate-500">
+                                  {item.info?.municipio ? `${item.info.municipio} / ${item.info.estado}` : 'Cliente sem cadastro'}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-black text-emerald-500">{formatarMoeda(item.valor)}</p>
+                                <p className="text-[10px] text-slate-400">
+                                  {Number.isFinite(share) ? `${share.toFixed(1)}% share` : '-'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

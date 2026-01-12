@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 src/Faturamento/faturamento.xlsx
+src/Faturamento/custos.xlsx
 dist
 dist-ssr
 *.local
