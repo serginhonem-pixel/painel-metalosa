@@ -252,6 +252,9 @@ const normalizarTexto = (texto) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const gerarIdColaborador = (nome, setor) =>
+  `${normalizarTexto(nome)}||${normalizarTexto(setor)}`;
+
 const isFolgaColetiva = (dataISO) =>
   dataISO >= '2025-12-25' && dataISO <= '2026-01-04';
 
@@ -335,6 +338,15 @@ export default function App() {
     () => (funcionariosFirestore.length ? funcionariosFirestore : funcionariosBase),
     [funcionariosFirestore]
   );
+  const legacyIdMap = useMemo(() => {
+    const map = new Map();
+    colaboradores.forEach((colab) => {
+      if (colab.legacyId !== undefined && colab.legacyId !== null) {
+        map.set(String(colab.legacyId), String(colab.id));
+      }
+    });
+    return map;
+  }, [colaboradores]);
 
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
@@ -456,7 +468,8 @@ export default function App() {
     const deveRecarregar = funcionariosFirestore.length > 0 || !colaboradores.length;
     if (deveRecarregar) {
       const colaboradoresIniciais = (funcionariosFonte || []).map((item, index) => ({
-        id: index + 1,
+        id: gerarIdColaborador(item.nome, item.setor),
+        legacyId: index + 1,
         nome: item.nome,
         cargo: 'Operador',
         setor: item.setor,
@@ -466,17 +479,18 @@ export default function App() {
       }));
 
       const chaves = new Set(
-        colaboradoresIniciais.map((c) => `${normalizarTexto(c.nome)}||${normalizarTexto(c.setor)}`)
+        colaboradoresIniciais.map((c) => gerarIdColaborador(c.nome, c.setor))
       );
 
       if (presencaLeandroExcel?.colaboradores?.length) {
         const gestorPadrao = 'Leandro Souza';
         presencaLeandroExcel.colaboradores.forEach((colab) => {
           if (!colab || typeof colab.setor !== 'string') return;
-          const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
+          const chave = gerarIdColaborador(colab.nome, colab.setor);
           if (chaves.has(chave)) return;
           colaboradoresIniciais.push({
-            id: colaboradoresIniciais.length + 1,
+            id: chave,
+            legacyId: colaboradoresIniciais.length + 1,
             nome: colab.nome,
             cargo: 'Operador',
             setor: colab.setor,
@@ -508,19 +522,22 @@ export default function App() {
 
     setColaboradores((prev) => {
       const existentes = new Set(
-        prev.map((c) => `${normalizarTexto(c.nome)}||${normalizarTexto(c.setor)}`)
+        prev.map((c) => gerarIdColaborador(c.nome, c.setor))
       );
       let next = [...prev];
       const gestorPadrao = 'Leandro Souza';
+      let nextLegacyId = next.reduce((acc, item) => Math.max(acc, item.legacyId || 0), 0);
 
       presencaLeandroExcel.colaboradores.forEach((colab) => {
         if (!colab || typeof colab.setor !== 'string') return;
-        const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
+        const chave = gerarIdColaborador(colab.nome, colab.setor);
         if (existentes.has(chave)) return;
+        nextLegacyId += 1;
         next = [
           ...next,
           {
-            id: next.length + 1,
+            id: chave,
+            legacyId: nextLegacyId,
             nome: colab.nome,
             cargo: 'Operador',
             setor: colab.setor,
@@ -606,10 +623,7 @@ export default function App() {
 
     setRegistrosPorData((prev) => {
       const mapaIds = new Map(
-        colaboradores.map((colab) => [
-          `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`,
-          colab.id,
-        ])
+        colaboradores.map((colab) => [gerarIdColaborador(colab.nome, colab.setor), colab.id])
       );
       const mapaIdsNome = new Map(
         colaboradores.map((colab) => [normalizarTexto(colab.nome), colab.id])
@@ -670,7 +684,7 @@ export default function App() {
         };
 
         dados.colaboradores.forEach((colab) => {
-          const chave = `${normalizarTexto(colab.nome)}||${normalizarTexto(colab.setor)}`;
+          const chave = gerarIdColaborador(colab.nome, colab.setor);
           const id = mapaIds.get(chave) || mapaIdsNome.get(normalizarTexto(colab.nome));
           if (!id) return;
 
@@ -697,6 +711,25 @@ export default function App() {
       return registros;
     });
   }, [colaboradores, presencaLeandroExcel, faltasCarregadas]);
+
+  useEffect(() => {
+    if (!legacyIdMap.size) return;
+    setRegistrosPorData((prev) => {
+      let mudou = false;
+      const next = {};
+      Object.entries(prev || {}).forEach(([dataISO, registros]) => {
+        const registrosDia = {};
+        Object.entries(registros || {}).forEach(([id, registro]) => {
+          const idStr = String(id);
+          const novoId = legacyIdMap.get(idStr) || idStr;
+          if (novoId !== idStr) mudou = true;
+          registrosDia[novoId] = registro;
+        });
+        next[dataISO] = registrosDia;
+      });
+      return mudou ? next : prev;
+    });
+  }, [legacyIdMap]);
 
   useEffect(() => {
     let ativo = true;
@@ -1211,12 +1244,11 @@ export default function App() {
     let total = 0;
     Object.entries(registros).forEach(([id, registro]) => {
       const colaborador = colaboradores.find((c) => String(c.id) === String(id));
-      if (colaborador) {
-        const supervisorOk = filtroSupervisor === 'Todos' || colaborador.gestor === filtroSupervisor;
-        const setorOk = filtroSetor === 'Todos' || colaborador.setor === filtroSetor;
-        if (!supervisorOk || !setorOk) {
-          return;
-        }
+      if (!colaborador) return;
+      const supervisorOk = filtroSupervisor === 'Todos' || colaborador.gestor === filtroSupervisor;
+      const setorOk = filtroSetor === 'Todos' || colaborador.setor === filtroSetor;
+      if (!supervisorOk || !setorOk) {
+        return;
       }
       const tipo = registro.tipoFalta || 'Falta Injustificada';
       tipos[tipo] = (tipos[tipo] || 0) + 1;
@@ -4010,18 +4042,20 @@ export default function App() {
                          const registros = (isDataSemApontamento(diaHistorico) || isDiaDesconsiderado(diaHistorico))
                            ? {}
                            : (registrosPorData[diaHistorico] || {});
-                             const faltas = Object.entries(registros)
+                            const faltas = Object.entries(registros)
                                .map(([id, registro]) => {
                                  const colaborador = colaboradores.find((c) => String(c.id) === String(id));
+                                 if (!colaborador) return null;
                                  return {
                                    id,
-                                   nome: colaborador?.nome || 'Nao encontrado',
-                                   setor: colaborador?.setor || '-',
-                                   gestor: colaborador?.gestor || '-',
+                                   nome: colaborador.nome || 'Nao encontrado',
+                                   setor: colaborador.setor || '-',
+                                   gestor: colaborador.gestor || '-',
                                    tipo: registro.tipoFalta || 'Falta Injustificada',
                                    tempoParcial: registro.tempoParcial || '',
                                  };
                                })
+                               .filter(Boolean)
                                .filter((item) => {
                                  const supervisorOk = filtroSupervisor === 'Todos' || item.gestor === filtroSupervisor;
                                  const setorOk = filtroSetor === 'Todos' || item.setor === filtroSetor;
