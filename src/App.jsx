@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import presencaDez from './data/Prensençadez.json';
 import faturamentoData from './data/faturamento.json';
+import devolucaoData from './data/devolucao.json';
 import clientesData from './Faturamento/clientes.json';
 import produtosData from './data/produtos.json';
 import municipiosLatLong from './data/municipios_brasil_latlong.json';
@@ -115,12 +116,41 @@ const parseValor = (value) => {
   return 0;
 };
 
+const normalizarTipoMovimento = (valor) => {
+  const tipo = String(valor ?? '').trim().toLowerCase();
+  return tipo === 'devolucao' ? 'devolucao' : 'venda';
+};
+
+const obterValorLiquido = (row) => {
+  const valor = parseValor(row?.ValorTotal ?? row?.valorTotal);
+  return normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao'
+    ? -Math.abs(valor)
+    : valor;
+};
+
+const obterQuantidadeLiquida = (row) => {
+  const quantidade = parseValor(row?.Quantidade ?? row?.quantidade);
+  return normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao'
+    ? -Math.abs(quantidade)
+    : quantidade;
+};
+
+const CFOP_DEVOLUCAO_LABELS = {
+  '1201': 'Devolucao venda producao - dentro do estado',
+  '2201': 'Devolucao venda producao - fora do estado',
+  '1202': 'Devolucao venda revenda - dentro do estado',
+  '2202': 'Devolucao venda revenda - fora do estado',
+};
+
 const formatarValorCurto = (valor) => {
   if (!Number.isFinite(valor)) return '-';
   if (valor >= 1_000_000) return `R$ ${(valor / 1_000_000).toFixed(1)}M`;
   if (valor >= 1_000) return `R$ ${(valor / 1_000).toFixed(1)}k`;
   return `R$ ${Math.round(valor)}`;
 };
+
+const formatarMoeda = (valor) =>
+  `R$ ${Number(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
 const parseEmissaoData = (valor) => {
   if (!valor && valor !== 0) return null;
@@ -716,6 +746,7 @@ export default function App() {
     const carregarFaturamento = async () => {
       try {
         let linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
+        const devolucoes = Array.isArray(devolucaoData) ? [...devolucaoData] : [];
         try {
           const resp = await fetch('/data/faturamento-2025.json');
           if (resp.ok) {
@@ -728,13 +759,17 @@ export default function App() {
           console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
         }
 
+        if (devolucoes.length) {
+          linhas = [...linhas, ...devolucoes];
+        }
+
         setFaturamentoLinhas(linhas);
-        const total = linhas.reduce((acc, row) => acc + parseValor(row['ValorTotal']), 0);
+        const total = linhas.reduce((acc, row) => acc + obterValorLiquido(row), 0);
 
         const porGrupoMap = linhas.reduce((acc, row) => {
           const grupoRaw = row['Grupo'];
           const grupo = grupoRaw && String(grupoRaw).trim() ? String(grupoRaw).trim() : 'Sem grupo';
-          const valor = parseValor(row['ValorTotal']);
+          const valor = obterValorLiquido(row);
           const codigo = row['Codigo'];
           const descricao = row['Descricao'];
           const chaveItem = `${codigo ?? ''}||${descricao ?? ''}`;
@@ -760,7 +795,7 @@ export default function App() {
         const porMesMap = linhas.reduce((acc, row) => {
           const mes = row['MesEmissao'];
           if (!mes) return acc;
-          const valor = parseValor(row['ValorTotal']);
+          const valor = obterValorLiquido(row);
           acc.set(mes, (acc.get(mes) || 0) + valor);
           return acc;
         }, new Map());
@@ -1420,6 +1455,8 @@ export default function App() {
       return {
         mes: '',
         total: 0,
+        totalBruto: 0,
+        totalDevolucao: 0,
         linhas: [],
         topClientes: [],
         topProdutos: [],
@@ -1442,6 +1479,7 @@ export default function App() {
 
     const normalizadas = faturamentoLinhas.map((row) => {
       const mesInfo = obterMesKey(row);
+      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
       return {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
@@ -1450,12 +1488,14 @@ export default function App() {
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: row?.NF ?? row?.Nf ?? row?.NotaFiscal ?? row?.notaFiscal ?? '',
-        quantidade: parseValor(row?.Quantidade ?? row?.quantidade),
+        quantidade: obterQuantidadeLiquida(row),
         valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
-        valorTotal: parseValor(row?.ValorTotal ?? row?.valorTotal),
+        valorTotal: obterValorLiquido(row),
         emissao: parseEmissaoData(row?.Emissao ?? row?.emissao),
         mesKey: mesInfo?.key,
         mesDisplay: mesInfo?.display,
+        tipoMovimento,
+        cfop: row?.CFOP ?? row?.cfop ?? '',
       };
     });
 
@@ -1481,6 +1521,20 @@ export default function App() {
         : linhasMes.filter((row) => row.filial === filtroFilial);
 
     const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
+    const totalBruto = linhasFiltradas
+      .filter((row) => row.tipoMovimento !== 'devolucao')
+      .reduce((acc, row) => acc + row.valorTotal, 0);
+    const totalDevolucao = linhasFiltradas
+      .filter((row) => row.tipoMovimento === 'devolucao')
+      .reduce((acc, row) => acc + Math.abs(row.valorTotal), 0);
+    const devolucoesPorCfop = linhasFiltradas
+      .filter((row) => row.tipoMovimento === 'devolucao')
+      .reduce((acc, row) => {
+        const cfop = String(row.cfop || '').trim();
+        if (!cfop) return acc;
+        acc[cfop] = (acc[cfop] || 0) + Math.abs(row.valorTotal);
+        return acc;
+      }, {});
     const quantidadeTotal = linhasFiltradas.reduce((acc, row) => acc + row.quantidade, 0);
 
     const clientesMap = new Map();
@@ -1678,6 +1732,9 @@ export default function App() {
     return {
       mes: mesAtualDisplay,
       total,
+      totalBruto,
+      totalDevolucao,
+      devolucoesPorCfop,
       linhas: linhasFiltradas,
       topClientes,
       topProdutos,
@@ -2907,11 +2964,32 @@ export default function App() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total no mes</p>
+                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento do periodo</p>
                           <p className="text-xl font-bold text-slate-900 mt-2">
                             R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
-                          <p className="text-xs text-slate-400 mt-1">Soma do periodo.</p>
+                          <p className="text-xs text-slate-400 mt-1">Liquido no periodo.</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Devolucoes (CFOP)</p>
+                            <span
+                              title={[
+                                'Situacao CFOP',
+                                ...Object.entries(CFOP_DEVOLUCAO_LABELS).map(([cfop, label]) => {
+                                  const valor = faturamentoAtual.devolucoesPorCfop?.[cfop] || 0;
+                                  return `${label} (${cfop}): ${formatarMoeda(valor)}`;
+                                }),
+                              ].join('\n')}
+                              className="text-slate-400"
+                            >
+                              <Info size={14} />
+                            </span>
+                          </div>
+                          <p className="text-xl font-bold text-slate-900 mt-2">
+                            R$ {faturamentoAtual.totalDevolucao.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">Valores de devolucao no periodo.</p>
                         </div>
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                           <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
@@ -2933,13 +3011,6 @@ export default function App() {
                             {faturamentoAtual.clientesAtivos}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
-                        </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Movimentos</p>
-                          <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {faturamentoAtual.movimentos}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Linhas registradas.</p>
                         </div>
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>

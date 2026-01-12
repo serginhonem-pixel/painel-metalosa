@@ -5,6 +5,10 @@ import XLSX from 'xlsx';
 const INPUT = path.resolve('src', 'Faturamento', 'faturamento.xlsx');
 const OUTPUT = path.resolve('src', 'data', 'faturamento.json');
 const SHEET = 'SCAF2020';
+const DEVOLUCAO_INPUT = path.resolve('src', 'Faturamento', 'devolução.xlsx');
+const DEVOLUCAO_OUTPUT = path.resolve('src', 'data', 'devolucao.json');
+const DEVOLUCAO_SHEET = 'SCAFNYW0';
+const CFOP_DEVOLUCAO = new Set(['1201', '2201', '1202', '2202']);
 
 const normalizar = (valor) =>
   String(valor || '')
@@ -13,11 +17,11 @@ const normalizar = (valor) =>
     .replace(/[^a-zA-Z0-9]/g, '')
     .toLowerCase();
 
-const localizarCabecalho = (rows) => {
+const localizarCabecalho = (rows, required) => {
   for (let i = 0; i < Math.min(rows.length, 50); i += 1) {
     const row = rows[i] || [];
     const normalizados = row.map((cell) => normalizar(cell));
-    if (normalizados.includes('cliente') && normalizados.includes('vlrtotal')) {
+    if (required.every((col) => normalizados.includes(col))) {
       return i;
     }
   }
@@ -76,21 +80,11 @@ const formatMesEmissao = (valor) => {
   return `${mm}/${yyyy}`;
 };
 
-const main = () => {
-  if (!fs.existsSync(INPUT)) {
-    throw new Error(`Arquivo nao encontrado: ${INPUT}`);
-  }
-
-  const workbook = XLSX.readFile(INPUT, { cellDates: true });
-  const sheet = workbook.Sheets[SHEET];
-  if (!sheet) {
-    throw new Error(`Aba nao encontrada: ${SHEET}`);
-  }
-
+const extrairFaturamento = (sheet) => {
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
-  const headerIndex = localizarCabecalho(rows);
+  const headerIndex = localizarCabecalho(rows, ['cliente', 'vlrtotal']);
   if (headerIndex < 0) {
-    throw new Error('Nao foi possivel localizar o cabecalho.');
+    throw new Error('Nao foi possivel localizar o cabecalho do faturamento.');
   }
 
   const header = rows[headerIndex] || [];
@@ -115,7 +109,7 @@ const main = () => {
     'documento',
   ]);
 
-  const dados = rows.slice(headerIndex + 1).reduce((acc, row) => {
+  return rows.slice(headerIndex + 1).reduce((acc, row) => {
     const cliente = row?.[idxCliente];
     const grupo = row?.[idxGrupo];
     const codigo = row?.[idxCodigo];
@@ -148,14 +142,117 @@ const main = () => {
       Emissao: emissao ?? '',
       NF: nf ?? '',
       MesEmissao: formatMesEmissao(emissao),
+      TipoMovimento: 'venda',
     });
 
     return acc;
   }, []);
+};
 
+const normalizarCfop = (valor) => String(valor ?? '').replace(/\D/g, '');
+
+const extrairDevolucoes = (sheet) => {
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
+  const headerIndex = localizarCabecalho(rows, ['codfiscal', 'vlrtotal']);
+  if (headerIndex < 0) {
+    throw new Error('Nao foi possivel localizar o cabecalho da devolucao.');
+  }
+
+  const header = rows[headerIndex] || [];
+  const idxCliente = localizarIndice(header, ['forncliente', 'cliente']);
+  const idxFilial = localizarIndice(header, ['filial']);
+  const idxGrupo = localizarIndice(header, ['grupo']);
+  const idxCodigo = localizarIndice(header, ['produto', 'codigo']);
+  const idxDescricao = localizarIndice(header, ['descitem', 'descricao']);
+  const idxQuantidade = localizarIndice(header, ['quantidade']);
+  const idxUnidade = localizarIndice(header, ['unidade']);
+  const idxValorUnitario = localizarIndice(header, ['vlrunitario', 'valorunitario']);
+  const idxValorTotal = localizarIndice(header, ['vlrtotal', 'valortotal', 'valordevol']);
+  const idxEmissao = localizarIndice(header, ['dtemissao', 'emissao']);
+  const idxCFOP = localizarIndice(header, ['codfiscal', 'cfop']);
+  const idxNF = localizarIndice(header, [
+    'documento',
+    'numdoc',
+    'numeronf',
+    'nota',
+    'notafiscal',
+  ]);
+
+  return rows.slice(headerIndex + 1).reduce((acc, row) => {
+    const valorTotal = row?.[idxValorTotal];
+    const cfopRaw = idxCFOP >= 0 ? row?.[idxCFOP] : '';
+    const cfop = normalizarCfop(cfopRaw);
+    if (!CFOP_DEVOLUCAO.has(cfop)) return acc;
+
+    const cliente = row?.[idxCliente];
+    const grupo = row?.[idxGrupo];
+    const codigo = row?.[idxCodigo];
+    const descricao = row?.[idxDescricao];
+    const quantidade = row?.[idxQuantidade];
+    const unidade = row?.[idxUnidade];
+    const valorUnitario = row?.[idxValorUnitario];
+    const emissao = row?.[idxEmissao];
+    const nf = idxNF >= 0 ? row?.[idxNF] : '';
+
+    const vazio =
+      (cliente === undefined || cliente === null || cliente === '') &&
+      (grupo === undefined || grupo === null || grupo === '') &&
+      (codigo === undefined || codigo === null || codigo === '') &&
+      (valorTotal === undefined || valorTotal === null || valorTotal === '');
+
+    if (vazio) return acc;
+
+    acc.push({
+      Cliente: cliente ?? '',
+      Filial: idxFilial >= 0 ? (row?.[idxFilial] ?? '') : '',
+      Grupo: grupo ?? '',
+      Codigo: codigo ?? '',
+      Descricao: descricao ?? '',
+      Quantidade: quantidade ?? '',
+      Unidade: unidade ?? '',
+      ValorUnitario: valorUnitario ?? '',
+      ValorTotal: valorTotal ?? '',
+      Emissao: emissao ?? '',
+      NF: nf ?? '',
+      MesEmissao: formatMesEmissao(emissao),
+      CFOP: cfop,
+      TipoMovimento: 'devolucao',
+    });
+
+    return acc;
+  }, []);
+};
+
+const main = () => {
+  if (!fs.existsSync(INPUT)) {
+    throw new Error(`Arquivo nao encontrado: ${INPUT}`);
+  }
+
+  const workbook = XLSX.readFile(INPUT, { cellDates: true });
+  const sheet = workbook.Sheets[SHEET];
+  if (!sheet) {
+    throw new Error(`Aba nao encontrada: ${SHEET}`);
+  }
+
+  const dados = extrairFaturamento(sheet);
   fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
   fs.writeFileSync(OUTPUT, JSON.stringify(dados, null, 2));
   console.log(`Gerado ${OUTPUT} com ${dados.length} linhas.`);
+
+  if (fs.existsSync(DEVOLUCAO_INPUT)) {
+    const devolucaoWorkbook = XLSX.readFile(DEVOLUCAO_INPUT, { cellDates: true });
+    const devolucaoSheet = devolucaoWorkbook.Sheets[DEVOLUCAO_SHEET];
+    if (!devolucaoSheet) {
+      throw new Error(`Aba nao encontrada: ${DEVOLUCAO_SHEET}`);
+    }
+
+    const devolucoes = extrairDevolucoes(devolucaoSheet);
+    fs.mkdirSync(path.dirname(DEVOLUCAO_OUTPUT), { recursive: true });
+    fs.writeFileSync(DEVOLUCAO_OUTPUT, JSON.stringify(devolucoes, null, 2));
+    console.log(`Gerado ${DEVOLUCAO_OUTPUT} com ${devolucoes.length} linhas.`);
+  } else {
+    console.warn(`Arquivo de devolucao nao encontrado: ${DEVOLUCAO_INPUT}`);
+  }
 };
 
 main();
