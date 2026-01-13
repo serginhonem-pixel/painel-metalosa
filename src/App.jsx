@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import funcionariosBase from './data/funcionarios.json';
-import presencaDez from './data/Prensençadez.json';
 import faturamentoData from './data/faturamento.json';
 import devolucaoData from './data/devolucao.json';
 import clientesData from './Faturamento/clientes.json';
@@ -271,6 +270,161 @@ const normalizarTexto = (texto) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const CFOP_SAIDA_TABLE = [
+  {
+    cfop: '5101',
+    descricaoFiscal: 'Venda de produção do estabelecimento',
+    pratica: 'Venda de produto fabricado pela própria empresa, dentro do estado',
+    faturamento: '✅ Sim',
+  },
+  {
+    cfop: '5102',
+    descricaoFiscal: 'Venda de mercadoria adquirida de terceiros',
+    pratica: 'Revenda de mercadoria comprada, dentro do estado',
+    faturamento: '✅ Sim',
+  },
+  {
+    cfop: '6101',
+    descricaoFiscal: 'Venda de produção do estabelecimento (interestadual)',
+    pratica: 'Venda de produto fabricado, para outro estado',
+    faturamento: '✅ Sim',
+  },
+  {
+    cfop: '6102',
+    descricaoFiscal: 'Venda de mercadoria adquirida de terceiros (interestadual)',
+    pratica: 'Revenda para outro estado',
+    faturamento: '✅ Sim',
+  },
+  {
+    cfop: '6107',
+    descricaoFiscal: 'Venda de produção fora do estado sem destaque de ICMS',
+    pratica: 'Venda interestadual com tratamento fiscal específico',
+    faturamento: '⚠️ Depende (normalmente não)',
+  },
+  {
+    cfop: '5401',
+    descricaoFiscal: 'Venda de produção do estabelecimento com ST',
+    pratica: 'Venda de produto fabricado com ICMS-ST',
+    faturamento: '✅ Sim (bruto)',
+  },
+  {
+    cfop: '5403',
+    descricaoFiscal: 'Venda de mercadoria adquirida de terceiros com ST',
+    pratica: 'Revenda com ICMS-ST',
+    faturamento: '✅ Sim (bruto)',
+  },
+  {
+    cfop: '6401',
+    descricaoFiscal: 'Venda de produção do estabelecimento com ST (interestadual)',
+    pratica: 'Venda interestadual com ST',
+    faturamento: '✅ Sim (bruto)',
+  },
+  {
+    cfop: '5152',
+    descricaoFiscal: 'Transferência de mercadoria entre estabelecimentos',
+    pratica: 'Envio entre filiais da mesma empresa',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '5405',
+    descricaoFiscal: 'Transferência de produção do estabelecimento com ST',
+    pratica: 'Transferência interna com ST',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '5409',
+    descricaoFiscal: 'Transferência de mercadoria adquirida de terceiros com ST',
+    pratica: 'Transferência interna de mercadoria com ST',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '6108',
+    descricaoFiscal: 'Venda de mercadoria adquirida de terceiros com ST (interestadual)',
+    pratica: 'Venda interestadual com ST e regra específica',
+    faturamento: '⚠️ Depende',
+  },
+  {
+    cfop: '6109',
+    descricaoFiscal: 'Outras vendas de mercadorias (interestadual)',
+    pratica: 'Venda com tratamento fiscal especial',
+    faturamento: '⚠️ Depende',
+  },
+  {
+    cfop: '5201',
+    descricaoFiscal: 'Devolução de compra para industrialização',
+    pratica: 'Retorno de mercadoria ao fornecedor',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '6910',
+    descricaoFiscal: 'Bonificação / doação / brinde',
+    pratica: 'Saída sem cobrança',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '6915',
+    descricaoFiscal: 'Remessa simbólica / retorno de industrialização',
+    pratica: 'Ajuste fiscal/logístico',
+    faturamento: '❌ Não',
+  },
+  {
+    cfop: '6901',
+    descricaoFiscal: 'Remessa para industrialização fora do estabelecimento',
+    pratica: 'Envio para industrialização em terceiro',
+    faturamento: '❌ Não',
+  },
+];
+
+const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
+const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401']);
+const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
+
+const CfopFilterSelector = ({ selected = [], onSelect, label = 'CFOP', className = '' }) => {
+  const normalizedSelected = selected
+    .map((item) => String(item ?? '').trim())
+    .filter((item) => item);
+  const selectedSet = new Set(normalizedSelected);
+
+  const handleSelect = (option) => {
+    if (typeof onSelect === 'function') {
+      onSelect(option);
+    }
+  };
+
+  return (
+    <div
+      className={`flex flex-wrap items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.3em] text-slate-500 ${className}`}
+    >
+      <span className="text-slate-400 whitespace-nowrap">{label}</span>
+      <button
+        type="button"
+        onClick={() => handleSelect('Todos')}
+        className={`px-2.5 py-1 rounded-full transition-all ${
+          selectedSet.size === 0
+            ? 'bg-blue-600 text-white shadow'
+            : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+        }`}
+      >
+        Todos{selectedSet.size ? ` (${selectedSet.size})` : ''}
+      </button>
+      {CFOP_FILTER_OPTIONS.map((option) => (
+        <button
+          type="button"
+          key={option}
+          onClick={() => handleSelect(option)}
+          className={`px-2.5 py-1 rounded-full transition-all ${
+            selectedSet.has(option)
+              ? 'bg-blue-600 text-white shadow'
+              : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+          } ${CFOP_FATURAMENTO_SET.has(option) ? 'ring-1 ring-emerald-400/60' : ''}`}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const gerarIdColaborador = (nome, setor) =>
   `${normalizarTexto(nome)}||${normalizarTexto(setor)}`;
 
@@ -299,6 +453,8 @@ export default function App() {
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
   const [filtroFilial, setFiltroFilial] = useState('Todas');
+  const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
+  const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
@@ -347,6 +503,32 @@ export default function App() {
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
+
+  const toggleCfopFilter = (option) => {
+    if (!option) return;
+    if (option === 'Todos') {
+      setFiltroCfops([]);
+      return;
+    }
+    const normalized = String(option).trim();
+    if (!normalized) return;
+    setFiltroCfops((prev) => {
+      if (prev.includes(normalized)) {
+        return prev.filter((item) => item !== normalized);
+      }
+      return [...prev, normalized];
+    });
+  };
+  const cfopSelectionSet = useMemo(() => {
+    const set = new Set();
+    filtroCfops.forEach((item) => {
+      const normalized = String(item ?? '').trim();
+      if (normalized) {
+        set.add(normalized);
+      }
+    });
+    return set;
+  }, [filtroCfops]);
   const [modoRapidoTempo, setModoRapidoTempo] = useState('02:00');
   const [modoRapidoErro, setModoRapidoErro] = useState('');
   const [supervisorEditando, setSupervisorEditando] = useState(null);
@@ -1558,7 +1740,7 @@ export default function App() {
         mesKey: mesInfo?.key,
         mesDisplay: mesInfo?.display,
         tipoMovimento,
-        cfop: row?.CFOP ?? row?.cfop ?? '',
+        cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
       };
     });
 
@@ -1578,10 +1760,14 @@ export default function App() {
       new Set(linhasMes.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
     ).sort((a, b) => String(a).localeCompare(String(b)));
 
-    const linhasFiltradas =
+    const filtradasPorFilial =
       filtroFilial === 'Todas'
         ? linhasMes
         : linhasMes.filter((row) => row.filial === filtroFilial);
+    const linhasFiltradas =
+      filtroCfops.length === 0
+        ? filtradasPorFilial
+        : filtradasPorFilial.filter((row) => filtroCfops.includes(String(row.cfop || '').trim()));
 
     const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
     const totalBruto = linhasFiltradas
@@ -1818,7 +2004,7 @@ export default function App() {
       estadosTodos,
       municipiosMapa,
     };
-  }, [faturamentoLinhas, filtroFilial]);
+  }, [faturamentoLinhas, filtroFilial, filtroCfops]);
 
 const mesesCustos = useMemo(() => {
   if (!custosData?.length) return [];
@@ -2483,6 +2669,75 @@ const resumoCustosIndiretos = useMemo(() => {
           {/* ABA EXECUTIVA */}
           {abaAtiva === 'executivo' && (
             <div className="space-y-8 animate-in fade-in duration-700">
+              <div className="space-y-2.5 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMostrarFiltroCfop((prev) => !prev)}
+                    className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-600"
+                  >
+                    <ChevronRight
+                      size={12}
+                      className={`transition-transform ${mostrarFiltroCfop ? 'rotate-90' : ''}`}
+                    />
+                    CFOPs de saida (Protheus)
+                  </button>
+                  <span className="text-[9px] text-slate-400">
+                    {filtroCfops.length} selecionados
+                  </span>
+                </div>
+                {mostrarFiltroCfop && (
+                  <>
+                    <CfopFilterSelector
+                      selected={filtroCfops}
+                      onSelect={toggleCfopFilter}
+                      label="Cod Fiscal"
+                    />
+                    <div
+                      className="text-[9px] text-slate-500"
+                      title={filtroCfops.length ? filtroCfops.join(", ") : "Todos"}
+                    >
+                      {filtroCfops.length === 0
+                        ? "Selecionados (0): Todos"
+                        : `Selecionados (${filtroCfops.length}): ${filtroCfops.slice(0, 3).join(", ")}${
+                            filtroCfops.length > 3 ? "..." : ""
+                          }`}
+                    </div>
+                    <details className="group">
+                      <summary className="cursor-pointer text-[9px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600">
+                        Ver tabela CFOPs
+                      </summary>
+                      <div className="mt-1.5 max-h-40 overflow-auto rounded-2xl border border-slate-100">
+                        <table className="min-w-full text-left text-[9px]">
+                          <thead>
+                            <tr className="text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                              <th className="px-3 py-2 font-semibold">CFOP</th>
+                              <th className="px-3 py-2 font-semibold">Descri��ǜo fiscal</th>
+                              <th className="px-3 py-2 font-semibold">O que Ǹ na prǭtica</th>
+                              <th className="px-3 py-2 font-semibold text-right">�% faturamento?</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {CFOP_SAIDA_TABLE.map((item) => (
+                              <tr
+                                key={item.cfop}
+                                className={`border-b border-slate-100 text-[12px] text-slate-700 transition-colors hover:bg-slate-50 ${
+                                  cfopSelectionSet.has(item.cfop) ? "bg-blue-50" : ""
+                                } ${CFOP_FATURAMENTO_SET.has(item.cfop) ? "border-l-2 border-emerald-400/70" : ""}`}
+                              >
+                                <td className="px-3 py-2 font-black tracking-[0.2em]">{item.cfop}</td>
+                                <td className="px-3 py-2">{item.descricaoFiscal}</td>
+                                <td className="px-3 py-2">{item.pratica}</td>
+                                <td className="px-3 py-2 text-right">{item.faturamento}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </details>
+                  </>
+                )}
+              </div>
               <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
                 <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
                 <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-emerald-600/5 blur-3xl" />
@@ -3287,7 +3542,7 @@ const resumoCustosIndiretos = useMemo(() => {
                     </div>
                   ) : (
                     <>
-                      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                         <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                           <span className="mr-2">Filiais</span>
                           {['Todas', ...faturamentoAtual.filiais].map((filial) => (
@@ -3304,6 +3559,14 @@ const resumoCustosIndiretos = useMemo(() => {
                               {filial}
                             </button>
                           ))}
+                        </div>
+                        <div>
+                          <CfopFilterSelector
+                            selected={filtroCfops}
+                            onSelect={toggleCfopFilter}
+                            label="CFOPs"
+                            className="justify-start"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">

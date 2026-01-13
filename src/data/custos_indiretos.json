@@ -606,24 +606,5 @@
       "Dezembro": 0,
       "Total": 6635.72
     }
-  },
-  {
-    "Codigo": "TOTAL DOS CUSTOS INDIRETOS",
-    "Descricao": "",
-    "Valores": {
-      "Janeiro": 499401.3,
-      "Fevereiro": 596432.97,
-      "Março": 504279.49,
-      "Abril": 478444.183,
-      "Maio": 498631.121,
-      "Junho": 700670.49,
-      "Julho": 498350.06,
-      "Agosto": 620984.22,
-      "Setembro": 585964.39,
-      "Outubro": 658752.6,
-      "Novembro": 686661.98,
-      "Dezembro": 0,
-      "Total": 6328572.804
-    }
   }
 ]

@@ -85,6 +85,8 @@ const formatMesEmissao = (valor) => {
   return `${mm}/${yyyy}`;
 };
 
+const normalizarCfop = (valor) => String(valor ?? '').replace(/\D/g, '');
+
 const extrairFaturamento = (sheet) => {
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
   const headerIndex = localizarCabecalho(rows, ['cliente', 'vlrtotal']);
@@ -113,6 +115,7 @@ const extrairFaturamento = (sheet) => {
     'numdoc',
     'documento',
   ]);
+  const idxCodFiscal = localizarIndice(header, ['codfiscal', 'codfisc', 'cfop']);
 
   return rows.slice(headerIndex + 1).reduce((acc, row) => {
     const cliente = row?.[idxCliente];
@@ -125,6 +128,8 @@ const extrairFaturamento = (sheet) => {
     const valorTotal = row?.[idxValorTotal];
     const emissao = row?.[idxEmissao];
     const nf = idxNF >= 0 ? row?.[idxNF] : '';
+    const codFiscalRaw = idxCodFiscal >= 0 ? row?.[idxCodFiscal] : '';
+    const codFiscal = codFiscalRaw ? normalizarCfop(codFiscalRaw) : '';
 
     const vazio =
       (cliente === undefined || cliente === null || cliente === '') &&
@@ -146,6 +151,7 @@ const extrairFaturamento = (sheet) => {
       ValorTotal: valorTotal ?? '',
       Emissao: emissao ?? '',
       NF: nf ?? '',
+      CodFiscal: codFiscal,
       MesEmissao: formatMesEmissao(emissao),
       TipoMovimento: 'venda',
     });
@@ -153,8 +159,6 @@ const extrairFaturamento = (sheet) => {
     return acc;
   }, []);
 };
-
-const normalizarCfop = (valor) => String(valor ?? '').replace(/\D/g, '');
 
 const extrairDevolucoes = (sheet) => {
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
