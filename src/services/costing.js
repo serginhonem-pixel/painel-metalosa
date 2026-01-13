@@ -398,34 +398,70 @@ export const computeCostBreakdown = ({
     counts[item.fonteDireto] = (counts[item.fonteDireto] || 0) + 1;
   });
 
-  const ratioSample = itemsFinal.slice(0, 10).map((item) => ({
-    sku: item.skuRaw || item.codigo || item.skuNormalized,
-    receita: item.receita,
-    custo: item.custo,
-    relacao: item.receita > 0 ? item.custo / item.receita : null,
-  }));
+  const directSum = itemsComTeorico.reduce(
+    (acc, item) => acc + (item.custoDireto > 0 ? item.custoDireto : 0),
+    0
+  );
+  const somaCustoTotal = itemsFinal.reduce((acc, item) => acc + item.custo, 0);
+  const diffTotal = somaCustoTotal - (directSum + cifTotal);
+
+  const randomSkuSample = itemsFinal
+    .filter((item) => item.receita > 0)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 10)
+    .map((item) => ({
+      sku_raw: item.skuRaw || item.codigo,
+      sku_norm: item.skuNormalized || item.codigo,
+      qtd: item.quantidade,
+      receita_total: item.receita,
+      custo_total: item.custo,
+      custo_direto_final: item.custoDireto,
+      cif_rateado: item.cifRateado,
+      custo_unitario: item.quantidade > 0 ? item.custo / item.quantidade : 0,
+    }));
 
   const zeroCostSkus = itemsFinal
     .filter((item) => item.receita > 0 && item.custo === 0)
     .slice(0, 20)
     .map((item) => ({
-    sku_raw: item.skuRaw || item.codigo,
-    sku_norm: item.skuNormalized || item.codigo,
+      sku_raw: item.skuRaw || item.codigo,
+      sku_norm: item.skuNormalized || item.codigo,
       qtd: item.quantidade,
       receita: item.receita,
-      achou_atual_valor: item.custoDiretoAtualValor || 0,
-      achou_passado_valor: item.custoDiretoPrevValor || 0,
-      teorico_valor: item.custoDiretoTeorico || 0,
+      direto_atual_valor: item.custoDiretoAtualValor || 0,
+      direto_passado_valor: item.custoDiretoPrevValor || 0,
       direto_final: item.custoDireto,
       fonte: item.fonteDireto,
-      peso: item.peso,
+      sumDirectMes: directSum,
       cif_total_mes: cifTotal,
-      cif_origem: cifFonte,
       cif_rateado: item.cifRateado,
       custo_total: item.custo,
     }));
   if (zeroCostSkus.length) {
     console.table(zeroCostSkus);
+  }
+
+  const worstCases = itemsFinal
+    .filter((item) => item.receita > 0 && item.custo > 0 && item.custo < item.receita * 0.01)
+    .sort((a, b) => b.receita - a.receita)
+    .slice(0, 20)
+    .map((item) => ({
+      sku_raw: item.skuRaw || item.codigo,
+      sku_norm: item.skuNormalized || item.codigo,
+      periodo: currentPeriodKey || 'sem periodo',
+      qtd: item.quantidade,
+      receita: item.receita,
+      direto_atual_valor: item.custoDiretoAtualValor || 0,
+      direto_passado_valor: item.custoDiretoPrevValor || 0,
+      direto_final: item.custoDireto,
+      fonte: item.fonteDireto,
+      sumDirectMes: directSum,
+      cif_total_mes: cifTotal,
+      cif_rateado: item.cifRateado,
+      custo_total: item.custo,
+    }));
+  if (worstCases.length) {
+    console.table(worstCases);
   }
 
   const totalCustoEstimado = itemsFinal.reduce((acc, item) => acc + item.custo, 0);
@@ -452,17 +488,17 @@ export const computeCostBreakdown = ({
     periodoNormalized: currentPeriodKey,
     cifTotal: formatarMoedaLog(cifTotal),
     periodoCifUtilizado: periodForCif || 'sem periodo',
-    fonteCif: cifFonte,
-    sumDirect: totalDirect,
+    cifFonte,
     baseRateioMes: baseRateio,
+    somaCustoTotal,
+    sumDirectMes: directSum,
+    cifRateadoTotal: resumoAlocacao,
+    diffTotal,
     counts,
-    alocado: resumoAlocacao,
-    diferenca: cifTotal - resumoAlocacao,
     semCustoTop,
-    zeroCostSkus,
   });
 
-  console.info('Custos SKU ratios:', ratioSample);
+  console.info('Custos SKU random sample:', randomSkuSample);
 
   return {
     total: totalCustoEstimado,
