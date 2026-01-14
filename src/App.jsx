@@ -982,35 +982,43 @@ export default function App() {
 
   useEffect(() => {
     const carregarFaturamento = async () => {
-      try {
-        let linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
-        const devolucoes = Array.isArray(devolucaoData) ? [...devolucaoData] : [];
         try {
-          const resp = await fetch('/data/faturamento-2025.json');
-          if (resp.ok) {
-            const antigas = await resp.json();
-            if (Array.isArray(antigas)) {
-              linhas = [...antigas, ...linhas];
+          let linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
+          const devolucoes = Array.isArray(devolucaoData) ? [...devolucaoData] : [];
+          try {
+            const resp = await fetch('/data/faturamento-2025.json');
+            if (resp.ok) {
+              const antigas = await resp.json();
+              if (Array.isArray(antigas)) {
+                linhas = [...antigas, ...linhas];
+              }
             }
+            const respDevolucao = await fetch('/data/devolucao-2025.json');
+            if (respDevolucao.ok) {
+              const devolucao2025 = await respDevolucao.json();
+              if (Array.isArray(devolucao2025)) {
+                linhas = [...linhas, ...devolucao2025];
+              }
+            }
+          } catch (err) {
+            console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
           }
-        } catch (err) {
-          console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
-        }
 
-        if (devolucoes.length) {
-          linhas = [...linhas, ...devolucoes];
-        }
+          if (devolucoes.length) {
+            linhas = [...linhas, ...devolucoes];
+          }
 
-        setFaturamentoLinhas(linhas);
-        const total = linhas.reduce((acc, row) => acc + obterValorLiquido(row), 0);
+          setFaturamentoLinhas(linhas);
+          const linhas2025 = linhas.filter((row) => obterMesKey(row)?.key?.startsWith('2025-'));
+          const total = linhas2025.reduce((acc, row) => acc + obterValorLiquido(row), 0);
 
-        const porGrupoMap = linhas.reduce((acc, row) => {
-          const grupoRaw = row['Grupo'];
-          const grupo = grupoRaw && String(grupoRaw).trim() ? String(grupoRaw).trim() : 'Sem grupo';
-          const valor = obterValorLiquido(row);
-          const codigo = row['Codigo'];
-          const descricao = row['Descricao'];
-          const chaveItem = `${codigo ?? ''}||${descricao ?? ''}`;
+          const porGrupoMap = linhas2025.reduce((acc, row) => {
+            const grupoRaw = row['Grupo'];
+            const grupo = grupoRaw && String(grupoRaw).trim() ? String(grupoRaw).trim() : 'Sem grupo';
+            const valor = obterValorLiquido(row);
+            const codigo = row['Codigo'];
+            const descricao = row['Descricao'];
+            const chaveItem = `${codigo ?? ''}||${descricao ?? ''}`;
 
           if (!acc.has(grupo)) {
             acc.set(grupo, { total: 0, itens: new Map() });
@@ -1030,12 +1038,12 @@ export default function App() {
           return acc;
         }, new Map());
 
-        const porMesMap = linhas.reduce((acc, row) => {
-          const mes = row['MesEmissao'];
-          if (!mes) return acc;
-          const valor = obterValorLiquido(row);
-          acc.set(mes, (acc.get(mes) || 0) + valor);
-          return acc;
+          const porMesMap = linhas2025.reduce((acc, row) => {
+            const mes = row['MesEmissao'];
+            if (!mes) return acc;
+            const valor = obterValorLiquido(row);
+            acc.set(mes, (acc.get(mes) || 0) + valor);
+            return acc;
         }, new Map());
 
         const porGrupo = Array.from(porGrupoMap.entries())
@@ -2009,7 +2017,218 @@ export default function App() {
     };
   }, [faturamentoLinhas, filtroFilial, filtroCfops]);
 
-const mesesCustos = useMemo(() => {
+  const faturamento2025 = useMemo(() => {
+    const clientesPorCodigo = new Map(
+      (clientesData?.clientes || []).map((cliente) => [
+        normalizarCodigoCliente(cliente.Codigo),
+        {
+          nome: cliente.Nome || '',
+          estado: cliente.Estado || '',
+          municipio: cliente.Municipio || '',
+        },
+      ])
+    );
+    const produtosPorCodigo = new Map(
+      (produtosData || []).map((produto) => [
+        normalizarCodigoProduto(produto.codigo),
+        produto.descricao || '',
+      ])
+    );
+
+    const vazio = {
+      total: 0,
+      totalBruto: 0,
+      totalDevolucao: 0,
+      devolucaoPercent: 0,
+      ticketMedio: 0,
+      clientesAtivos: 0,
+      movimentos: 0,
+      pedidos: 0,
+      diasAtivos: 0,
+      quantidadeTotal: 0,
+      mediaMensal: 0,
+      porMes: [],
+      melhorMes: null,
+      piorMes: null,
+      variacaoUltimoMes: null,
+      topClientes: [],
+      topProdutos: [],
+      topGrupos: [],
+      topFiliais: [],
+      mixUnidade: [],
+      devolucoesPorCfop: [],
+      shareTop5Grupos: 0,
+    };
+
+    if (!faturamentoLinhas.length) {
+      return vazio;
+    }
+
+    const normalizadas = faturamentoLinhas.map((row) => {
+      const mesInfo = obterMesKey(row);
+      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      const codigo = row?.Codigo ?? row?.codigo ?? '';
+      const descricao =
+        row?.Descricao ?? row?.descricao ?? produtosPorCodigo.get(normalizarCodigoProduto(codigo)) ?? '';
+      return {
+        cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
+        grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
+        codigo,
+        descricao,
+        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        unidade: row?.Unidade ?? row?.unidade ?? '',
+        nf: row?.NF ?? row?.Nf ?? row?.NotaFiscal ?? row?.notaFiscal ?? '',
+        quantidade: obterQuantidadeLiquida(row),
+        valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
+        valorTotal: obterValorLiquido(row),
+        emissao: parseEmissaoData(row?.Emissao ?? row?.emissao),
+        mesKey: mesInfo?.key,
+        mesDisplay: mesInfo?.display,
+        tipoMovimento,
+        cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
+      };
+    });
+
+    const linhas2025 = normalizadas.filter((row) => row.mesKey && row.mesKey.startsWith('2025-'));
+    if (!linhas2025.length) {
+      return vazio;
+    }
+
+    let total = 0;
+    let totalBruto = 0;
+    let totalDevolucao = 0;
+    let quantidadeTotal = 0;
+    const porMesMap = new Map();
+    const gruposMap = new Map();
+    const clientesMap = new Map();
+    const produtosMap = new Map();
+    const filiaisMap = new Map();
+    const unidadeMap = new Map();
+    const devolucoesCfopMap = new Map();
+    const diasSet = new Set();
+    const pedidosSet = new Set();
+
+    linhas2025.forEach((row) => {
+      total += row.valorTotal;
+      if (row.tipoMovimento === 'devolucao') {
+        totalDevolucao += Math.abs(row.valorTotal);
+      } else {
+        totalBruto += row.valorTotal;
+      }
+
+      const qtd = Number.isFinite(row.quantidade) ? row.quantidade : 0;
+      quantidadeTotal += qtd;
+
+      if (row.emissao instanceof Date) {
+        diasSet.add(row.emissao.toISOString().slice(0, 10));
+      }
+
+      const pedidoKey = row.nf
+        ? String(row.nf).trim()
+        : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${row.cliente}||${row.valorTotal}`;
+      pedidosSet.add(pedidoKey);
+
+      if (row.mesKey) {
+        const mesLabel =
+          row.mesDisplay || `${row.mesKey.slice(5, 7)}/${row.mesKey.slice(0, 4)}`;
+        const atual = porMesMap.get(row.mesKey) || { mes: mesLabel, ordem: row.mesKey, valor: 0 };
+        atual.valor += row.valorTotal;
+        porMesMap.set(row.mesKey, atual);
+      }
+
+      const grupo = row.grupo || 'Sem grupo';
+      gruposMap.set(grupo, (gruposMap.get(grupo) || 0) + row.valorTotal);
+
+      const clienteKey = normalizarCodigoCliente(row.cliente) || String(row.cliente || 'Sem cliente');
+      if (!clientesMap.has(clienteKey)) {
+        clientesMap.set(clienteKey, { cliente: clienteKey, valor: 0, info: clientesPorCodigo.get(clienteKey) });
+      }
+      clientesMap.get(clienteKey).valor += row.valorTotal;
+
+      const prodKey = `${row.codigo || ''}||${row.descricao || ''}`;
+      if (!produtosMap.has(prodKey)) {
+        produtosMap.set(prodKey, {
+          codigo: row.codigo || '',
+          descricao: row.descricao || '',
+          valor: 0,
+          quantidade: 0,
+        });
+      }
+      const prod = produtosMap.get(prodKey);
+      prod.valor += row.valorTotal;
+      prod.quantidade += qtd;
+
+      const filial = row.filial || 'Sem filial';
+      filiaisMap.set(filial, (filiaisMap.get(filial) || 0) + row.valorTotal);
+
+      const unidade = row.unidade || 'Sem unidade';
+      unidadeMap.set(unidade, (unidadeMap.get(unidade) || 0) + qtd);
+
+      if (row.tipoMovimento === 'devolucao') {
+        const cfop = String(row.cfop || '').trim();
+        if (cfop) {
+          devolucoesCfopMap.set(cfop, (devolucoesCfopMap.get(cfop) || 0) + Math.abs(row.valorTotal));
+        }
+      }
+    });
+
+    const porMes = Array.from(porMesMap.values()).sort((a, b) => a.ordem.localeCompare(b.ordem));
+    const melhorMes = porMes.reduce((acc, item) => (!acc || item.valor > acc.valor ? item : acc), null);
+    const piorMes = porMes.reduce((acc, item) => (!acc || item.valor < acc.valor ? item : acc), null);
+    const ultimoMes = porMes[porMes.length - 1] || null;
+    const mesAnterior = porMes.length > 1 ? porMes[porMes.length - 2] : null;
+    const variacaoUltimoMes =
+      ultimoMes && mesAnterior && mesAnterior.valor !== 0
+        ? (ultimoMes.valor - mesAnterior.valor) / Math.abs(mesAnterior.valor)
+        : null;
+
+    const topGrupos = Array.from(gruposMap.entries())
+      .map(([grupo, valor]) => ({ grupo, valor }))
+      .sort((a, b) => b.valor - a.valor);
+    const topClientes = Array.from(clientesMap.values()).sort((a, b) => b.valor - a.valor);
+    const topProdutos = Array.from(produtosMap.values()).sort((a, b) => b.valor - a.valor);
+    const topFiliais = Array.from(filiaisMap.entries())
+      .map(([filial, valor]) => ({ filial, valor }))
+      .sort((a, b) => b.valor - a.valor);
+    const mixUnidade = Array.from(unidadeMap.entries())
+      .map(([unidade, quantidade]) => ({ unidade, quantidade }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+    const devolucoesPorCfop = Array.from(devolucoesCfopMap.entries())
+      .map(([cfop, valor]) => ({ cfop, valor }))
+      .sort((a, b) => b.valor - a.valor);
+
+    const shareTop5Grupos =
+      total !== 0
+        ? (topGrupos.slice(0, 5).reduce((acc, item) => acc + item.valor, 0) / total) * 100
+        : 0;
+
+    return {
+      total,
+      totalBruto,
+      totalDevolucao,
+      devolucaoPercent: totalBruto > 0 ? (totalDevolucao / totalBruto) * 100 : 0,
+      ticketMedio: pedidosSet.size > 0 ? total / pedidosSet.size : 0,
+      clientesAtivos: clientesMap.size,
+      movimentos: linhas2025.length,
+      pedidos: pedidosSet.size,
+      diasAtivos: diasSet.size,
+      quantidadeTotal,
+      mediaMensal: porMes.length > 0 ? total / porMes.length : 0,
+      porMes,
+      melhorMes,
+      piorMes,
+      variacaoUltimoMes,
+      topClientes,
+      topProdutos,
+      topGrupos,
+      topFiliais,
+      mixUnidade,
+      devolucoesPorCfop,
+      shareTop5Grupos,
+    };
+  }, [faturamentoLinhas, clientesData, produtosData]);
+
+  const mesesCustos = useMemo(() => {
   if (!custosData?.length) return [];
   const primeiro = custosData.find((item) => item.Valores && Object.keys(item.Valores).length);
   if (!primeiro) return [];
@@ -3111,17 +3330,161 @@ const resumoCustosIndiretos = useMemo(() => {
               </div>
 
               {subAbaFaturamento === '2025' && (
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                  <h2 className="text-lg font-bold text-slate-800 mb-2">Resumo da Planilha 2025</h2>
-                  {faturamentoDados.carregando ? (
-                    <p className="text-slate-400 italic">Carregando planilha...</p>
-                  ) : faturamentoDados.erro ? (
-                    <p className="text-rose-600 text-sm font-medium">{faturamentoDados.erro}</p>
-                  ) : (
-                    <div className="text-2xl font-bold text-slate-900">
-                      R$ {faturamentoDados.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                <div className="space-y-6">
+                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-black">Consolidado 2025</p>
+                        <h2 className="text-2xl font-black text-slate-900 mt-1">Painel Faturamento 2025</h2>
+                        <p className="text-xs text-slate-400 mt-1">Inclui devolucoes registradas na planilha</p>
+                      </div>
+                      {faturamentoDados.carregando ? (
+                        <span className="text-xs text-slate-400 italic">Carregando planilha...</span>
+                      ) : faturamentoDados.erro ? (
+                        <span className="text-xs text-rose-600 font-semibold">{faturamentoDados.erro}</span>
+                      ) : (
+                        <span className="text-xs text-emerald-600 font-semibold">
+                          Atualizado com {faturamento2025.movimentos} movimentos
+                        </span>
+                      )}
                     </div>
-                  )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Total liquido</p>
+                      <p className="text-2xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.total)}</p>
+                      <p className="text-xs text-slate-400 mt-1">Receita apos devolucoes</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Total bruto</p>
+                      <p className="text-2xl font-black text-blue-600 mt-2">{formatarMoeda(faturamento2025.totalBruto)}</p>
+                      <p className="text-xs text-slate-400 mt-1">Somente vendas</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Devolucoes</p>
+                      <p className="text-2xl font-black text-rose-500 mt-2">{formatarMoeda(faturamento2025.totalDevolucao)}</p>
+                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.devolucaoPercent.toFixed(2)}% do bruto</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Ticket medio</p>
+                      <p className="text-2xl font-black text-emerald-600 mt-2">{formatarMoeda(faturamento2025.ticketMedio)}</p>
+                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.pedidos} pedidos</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Clientes ativos</p>
+                      <p className="text-2xl font-black text-slate-900 mt-2">{faturamento2025.clientesAtivos}</p>
+                      <p className="text-xs text-slate-400 mt-1">No ano</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Movimentos</p>
+                      <p className="text-2xl font-black text-slate-900 mt-2">{faturamento2025.movimentos}</p>
+                      <p className="text-xs text-slate-400 mt-1">Linhas processadas</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Dias ativos</p>
+                      <p className="text-2xl font-black text-amber-500 mt-2">{faturamento2025.diasAtivos}</p>
+                      <p className="text-xs text-slate-400 mt-1">Dias com emissao</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Media mensal</p>
+                      <p className="text-2xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.mediaMensal)}</p>
+                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.porMes.length} meses</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Melhor mes</p>
+                      <p className="text-xl font-black text-emerald-600 mt-2">
+                        {faturamento2025.melhorMes ? faturamento2025.melhorMes.mes : '-'}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {faturamento2025.melhorMes ? formatarMoeda(faturamento2025.melhorMes.valor) : '-'}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Pior mes</p>
+                      <p className="text-xl font-black text-rose-500 mt-2">
+                        {faturamento2025.piorMes ? faturamento2025.piorMes.mes : '-'}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {faturamento2025.piorMes ? formatarMoeda(faturamento2025.piorMes.valor) : '-'}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Ultimo mes</p>
+                      <p className="text-xl font-black text-slate-900 mt-2">
+                        {faturamento2025.variacaoUltimoMes === null
+                          ? '-'
+                          : `${faturamento2025.variacaoUltimoMes >= 0 ? '+' : ''}${(faturamento2025.variacaoUltimoMes * 100).toFixed(1)}%`}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">Variacao MoM</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Insights 2025</h3>
+                      <div className="mt-4 space-y-3 text-sm text-slate-600">
+                        <div className="flex items-center justify-between">
+                          <span>Share top 5 grupos</span>
+                          <span className="font-black text-slate-900">{faturamento2025.shareTop5Grupos.toFixed(1)}%</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Percentual devolucoes</span>
+                          <span className="font-black text-rose-500">{faturamento2025.devolucaoPercent.toFixed(2)}%</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Ticket medio por pedido</span>
+                          <span className="font-black text-emerald-600">{formatarMoeda(faturamento2025.ticketMedio)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Clientes ativos</span>
+                          <span className="font-black text-slate-900">{faturamento2025.clientesAtivos}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Dias com emissao</span>
+                          <span className="font-black text-amber-500">{faturamento2025.diasAtivos}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Top grupos</h3>
+                      <div className="mt-4 space-y-3">
+                        {faturamento2025.topGrupos.slice(0, 5).map((item) => {
+                          const share = faturamento2025.total !== 0 ? (item.valor / faturamento2025.total) * 100 : 0;
+                          return (
+                            <div key={item.grupo} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs text-slate-500">
+                                <span className="font-semibold text-slate-700">{item.grupo}</span>
+                                <span>{formatarValorCurto(item.valor)}</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                                <div className="h-full bg-blue-500" style={{ width: `${Math.min(share, 100)}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {faturamento2025.topGrupos.length === 0 && (
+                          <p className="text-xs text-slate-400 italic">Sem dados por grupo.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Devolucao por CFOP</h3>
+                      <div className="mt-4 space-y-3">
+                        {faturamento2025.devolucoesPorCfop.slice(0, 6).map((item) => (
+                          <div key={item.cfop} className="flex items-center justify-between text-xs text-slate-500">
+                            <span className="font-semibold text-slate-700">CFOP {item.cfop}</span>
+                            <span className="font-black text-rose-500">{formatarMoeda(item.valor)}</span>
+                          </div>
+                        ))}
+                        {faturamento2025.devolucoesPorCfop.length === 0 && (
+                          <p className="text-xs text-slate-400 italic">Sem devolucoes com CFOP.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -3562,6 +3925,85 @@ const resumoCustosIndiretos = useMemo(() => {
                         );
                       })()
                     )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Top clientes</h3>
+                    <div className="mt-4 space-y-4">
+                      {faturamento2025.topClientes.slice(0, 6).map((item) => {
+                        const share = faturamento2025.total !== 0 ? (item.valor / faturamento2025.total) * 100 : 0;
+                        return (
+                          <div key={item.cliente} className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900">{item.info?.nome || item.cliente}</p>
+                              <p className="text-[11px] text-slate-500">
+                                {item.info?.municipio ? `${item.info.municipio} / ${item.info.estado}` : 'Cliente sem cadastro'}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-black text-emerald-500">{formatarMoeda(item.valor)}</p>
+                              <p className="text-[10px] text-slate-400">{share.toFixed(1)}% share</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {faturamento2025.topClientes.length === 0 && (
+                        <p className="text-xs text-slate-400 italic">Sem dados de clientes.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Top produtos</h3>
+                    <div className="mt-4 space-y-3">
+                      {faturamento2025.topProdutos.slice(0, 6).map((item, index) => (
+                        <div key={`${item.codigo}-${index}`} className="flex items-center justify-between text-xs text-slate-500">
+                          <div>
+                            <p className="font-semibold text-slate-700">{item.codigo || '-'}</p>
+                            <p className="text-[10px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                          </div>
+                          <span className="font-black text-slate-900">{formatarValorCurto(item.valor)}</span>
+                        </div>
+                      ))}
+                      {faturamento2025.topProdutos.length === 0 && (
+                        <p className="text-xs text-slate-400 italic">Sem dados de produtos.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Filiais e mix</h3>
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">Top filiais</p>
+                        <div className="mt-3 space-y-2">
+                          {faturamento2025.topFiliais.slice(0, 4).map((item) => (
+                            <div key={item.filial} className="flex items-center justify-between text-xs text-slate-500">
+                              <span className="font-semibold text-slate-700">Filial {item.filial}</span>
+                              <span className="font-black text-slate-900">{formatarValorCurto(item.valor)}</span>
+                            </div>
+                          ))}
+                          {faturamento2025.topFiliais.length === 0 && (
+                            <p className="text-xs text-slate-400 italic">Sem dados por filial.</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">Mix por unidade</p>
+                        <div className="mt-3 space-y-2">
+                          {faturamento2025.mixUnidade.slice(0, 4).map((item) => (
+                            <div key={item.unidade} className="flex items-center justify-between text-xs text-slate-500">
+                              <span className="font-semibold text-slate-700">{item.unidade || '-'}</span>
+                              <span className="font-black text-slate-900">{item.quantidade.toFixed(0)}</span>
+                            </div>
+                          ))}
+                          {faturamento2025.mixUnidade.length === 0 && (
+                            <p className="text-xs text-slate-400 italic">Sem mix por unidade.</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
