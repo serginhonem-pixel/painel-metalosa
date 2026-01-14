@@ -379,12 +379,20 @@ const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
 const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401']);
 const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
 
-const CfopFilterSelector = ({ selected = [], onSelect, label = 'CFOP', className = '' }) => {
+const CfopFilterSelector = ({
+  selected = [],
+  onSelect,
+  label = 'CFOP',
+  className = '',
+  options = CFOP_FILTER_OPTIONS,
+  infoMap = null,
+}) => {
   const normalizedSelected = selected
     .map((item) => String(item ?? '').trim())
     .filter((item) => item);
   const selectedSet = new Set(normalizedSelected);
   const cfopInfo = CFOP_SAIDA_TABLE.reduce((acc, item) => { acc[item.cfop] = item; return acc; }, {});
+  const info = infoMap || cfopInfo;
 
   const handleSelect = (option) => {
     if (typeof onSelect === 'function') {
@@ -408,11 +416,11 @@ const CfopFilterSelector = ({ selected = [], onSelect, label = 'CFOP', className
       >
         Todos{selectedSet.size ? ` (${selectedSet.size})` : ''}
       </button>
-      {CFOP_FILTER_OPTIONS.map((option) => (
+      {options.map((option) => (
         <button
           type="button"
           key={option}
-          title={cfopInfo[option] ? `${cfopInfo[option].descricaoFiscal}\n${cfopInfo[option].pratica}\nE considerado faturamento: ${cfopInfo[option].faturamento}` : ""}
+          title={info[option] ? `${info[option].descricaoFiscal}\n${info[option].pratica}\nE considerado faturamento: ${info[option].faturamento}` : ""}
           onClick={() => handleSelect(option)}
           className={`px-2.5 py-1 rounded-full transition-all ${
             selectedSet.has(option)
@@ -454,6 +462,8 @@ export default function App() {
   const [subAbaGestao, setSubAbaGestao] = useState('lista');
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
+  const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
+  const [filtroCfops2025, setFiltroCfops2025] = useState([]);
   const [filtroFilial, setFiltroFilial] = useState('Todas');
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
@@ -516,6 +526,21 @@ export default function App() {
     const normalized = String(option).trim();
     if (!normalized) return;
     setFiltroCfops((prev) => {
+      if (prev.includes(normalized)) {
+        return prev.filter((item) => item !== normalized);
+      }
+      return [...prev, normalized];
+    });
+  };
+  const toggleCfopFilter2025 = (option) => {
+    if (!option) return;
+    if (option === 'Todos') {
+      setFiltroCfops2025([]);
+      return;
+    }
+    const normalized = String(option).trim();
+    if (!normalized) return;
+    setFiltroCfops2025((prev) => {
       if (prev.includes(normalized)) {
         return prev.filter((item) => item !== normalized);
       }
@@ -1778,7 +1803,11 @@ export default function App() {
     const linhasFiltradas =
       filtroCfops.length === 0
         ? filtradasPorFilial
-        : filtradasPorFilial.filter((row) => filtroCfops.includes(String(row.cfop || '').trim()));
+        : filtradasPorFilial.filter((row) => {
+            if (row.tipoMovimento === 'devolucao') return true;
+            const cfop = String(row.cfop || '').trim();
+            return cfop ? filtroCfops.includes(cfop) : false;
+          });
 
     const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
     const totalBruto = linhasFiltradas
@@ -2089,7 +2118,14 @@ export default function App() {
       };
     });
 
-    const linhas2025 = normalizadas.filter((row) => row.mesKey && row.mesKey.startsWith('2025-'));
+    const linhas2025 = normalizadas
+      .filter((row) => row.mesKey && row.mesKey.startsWith('2025-'))
+      .filter((row) => (filtroFilial2025 === 'Todas' ? true : row.filial === filtroFilial2025))
+      .filter((row) => {
+        if (!filtroCfops2025.length) return true;
+        const cfop = String(row.cfop || '').trim();
+        return cfop ? filtroCfops2025.includes(cfop) : false;
+      });
     if (!linhas2025.length) {
       return vazio;
     }
@@ -2226,7 +2262,63 @@ export default function App() {
       devolucoesPorCfop,
       shareTop5Grupos,
     };
-  }, [faturamentoLinhas, clientesData, produtosData]);
+  }, [faturamentoLinhas, clientesData, produtosData, filtroFilial2025, filtroCfops2025]);
+
+  const filiais2025 = useMemo(() => {
+    const filiais = new Set();
+    faturamentoLinhas.forEach((row) => {
+      const mesInfo = obterMesKey(row);
+      if (!mesInfo?.key?.startsWith('2025-')) return;
+      const filial = row?.Filial ?? row?.filial ?? '';
+      if (filial) {
+        filiais.add(String(filial));
+      }
+    });
+    return ['Todas', ...Array.from(filiais).sort((a, b) => a.localeCompare(b))];
+  }, [faturamentoLinhas]);
+
+  const cfops2025Options = useMemo(() => {
+    const cfops = new Set();
+    faturamentoLinhas.forEach((row) => {
+      const mesInfo = obterMesKey(row);
+      if (!mesInfo?.key?.startsWith('2025-')) return;
+      const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
+      if (cfop) {
+        cfops.add(cfop);
+      }
+    });
+    return Array.from(cfops).sort((a, b) => a.localeCompare(b));
+  }, [faturamentoLinhas]);
+
+  const faturamento2025PorMesFilial = useMemo(() => {
+    if (!faturamentoLinhas.length) return [];
+    const porMesMap = new Map();
+
+    faturamentoLinhas.forEach((row) => {
+      const mesInfo = obterMesKey(row);
+      if (!mesInfo?.key?.startsWith('2025-')) return;
+
+      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
+      if (tipoMovimento !== 'devolucao' && cfop && !CFOP_FATURAMENTO_SET.has(cfop)) return;
+
+      const filial = row?.Filial ?? row?.filial ?? 'Sem filial';
+      if (filtroFilial2025 !== 'Todas' && filial !== filtroFilial2025) return;
+
+      if (filtroCfops2025.length) {
+        const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
+        if (!cfop || !filtroCfops2025.includes(cfop)) return;
+      }
+
+      const valor = obterValorLiquido(row);
+      const mesLabel = mesInfo.display || `${mesInfo.key.slice(5, 7)}/${mesInfo.key.slice(0, 4)}`;
+      const atual = porMesMap.get(mesInfo.key) || { mes: mesLabel, ordem: mesInfo.key, valor: 0 };
+      atual.valor += valor;
+      porMesMap.set(mesInfo.key, atual);
+    });
+
+    return Array.from(porMesMap.values()).sort((a, b) => a.ordem.localeCompare(b.ordem));
+  }, [faturamentoLinhas, filtroFilial2025, filtroCfops2025]);
 
   const mesesCustos = useMemo(() => {
   if (!custosData?.length) return [];
@@ -2837,11 +2929,10 @@ const resumoCustosIndiretos = useMemo(() => {
       {/* Sidebar Clássica */}
       <aside className="hidden md:flex w-64 bg-slate-900 text-white flex-col fixed h-full z-20 shadow-2xl">
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="bg-blue-600 p-2 rounded-lg shadow-lg">
-              <img src={logoMetalosa} alt="Metalosa" className="h-6 w-6 object-contain" />
+          <div className="flex flex-col items-center justify-center mb-10">
+            <div className="bg-slate-900 p-4 rounded-3xl shadow-lg transform scale-[1.8] origin-center">
+              <img src={logoMetalosa} alt="Metalosa" className="h-16 w-16 object-contain brightness-0 invert" />
             </div>
-            <span className="font-bold text-xl tracking-tight leading-tight">Painel<br/>Industrial</span>
           </div>
 
           <nav className="space-y-1">
@@ -3350,6 +3441,40 @@ const resumoCustosIndiretos = useMemo(() => {
                     </div>
                   </div>
 
+                  <div className="space-y-2.5 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
+                        Filtros 2025
+                      </span>
+                      <span className="text-[9px] text-slate-400">
+                        {filtroCfops2025.length ? `${filtroCfops2025.length} CFOPs` : 'Todos os CFOPs'}
+                      </span>
+                    </div>
+                    <CfopFilterSelector
+                      selected={filtroCfops2025}
+                      onSelect={toggleCfopFilter2025}
+                      label="CFOP"
+                      options={cfops2025Options}
+                    />
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      <span className="mr-2">Filiais</span>
+                      {filiais2025.map((filial) => (
+                        <button
+                          key={filial}
+                          type="button"
+                          onClick={() => setFiltroFilial2025(filial)}
+                          className={`rounded-full px-3 py-1.5 transition-all ${
+                            filtroFilial2025 === filial
+                              ? 'bg-blue-600 text-white shadow'
+                              : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                          }`}
+                        >
+                          {filial}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                       <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Total liquido</p>
@@ -3491,15 +3616,36 @@ const resumoCustosIndiretos = useMemo(() => {
               {subAbaFaturamento === '2025' && (
                 <div className="grid grid-cols-1 gap-8">
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                  <div className="p-6 bg-slate-50 border-b border-slate-200 font-bold text-slate-700 text-sm uppercase tracking-wider">
-                    Faturamento por Mês (2025)
+                  <div className="p-6 bg-slate-50 border-b border-slate-200">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="font-bold text-slate-700 text-sm uppercase tracking-wider">
+                        Faturamento por Mês (2025)
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="mr-1">Filial</span>
+                        {filiais2025.map((filial) => (
+                          <button
+                            key={filial}
+                            type="button"
+                            onClick={() => setFiltroFilial2025(filial)}
+                            className={`rounded-full px-3 py-1.5 transition-all ${
+                              filtroFilial2025 === filial
+                                ? 'bg-blue-600 text-white shadow'
+                                : 'bg-white text-slate-500 hover:text-slate-700'
+                            }`}
+                          >
+                            {filial}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <div className="p-6 border-b border-slate-200">
                     {faturamentoDados.carregando ? (
                       <p className="text-slate-400 italic">Carregando planilha...</p>
                     ) : faturamentoDados.erro ? (
                       <p className="text-rose-600 text-sm font-medium">{faturamentoDados.erro}</p>
-                    ) : faturamentoDados.porMes.length === 0 ? (
+                    ) : faturamento2025PorMesFilial.length === 0 ? (
                       <p className="text-slate-400 italic">Sem dados na planilha.</p>
                     ) : (
                       (() => {
@@ -3508,10 +3654,10 @@ const resumoCustosIndiretos = useMemo(() => {
                         const margin = { top: 20, right: 20, bottom: 40, left: 50 };
                         const chartW = width - margin.left - margin.right;
                         const chartH = height - margin.top - margin.bottom;
-                        const maxValor = Math.max(...faturamentoDados.porMes.map((item) => item.valor), 1);
-                        const stepX = chartW / Math.max(faturamentoDados.porMes.length - 1, 1);
+                        const maxValor = Math.max(...faturamento2025PorMesFilial.map((item) => item.valor), 1);
+                        const stepX = chartW / Math.max(faturamento2025PorMesFilial.length - 1, 1);
 
-                        const pontos = faturamentoDados.porMes.map((item, i) => {
+                        const pontos = faturamento2025PorMesFilial.map((item, i) => {
                           const x = margin.left + i * stepX;
                           const y = margin.top + chartH - (item.valor / maxValor) * chartH;
                           return { x, y, item };
