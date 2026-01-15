@@ -468,6 +468,7 @@ export default function App() {
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
+  const [diaFaturamentoSelecionado, setDiaFaturamentoSelecionado] = useState(null);
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
@@ -2045,6 +2046,68 @@ export default function App() {
       municipiosMapa,
     };
   }, [faturamentoLinhas, filtroFilial, filtroCfops]);
+
+  const detalhesDiaFaturamento = useMemo(() => {
+    if (!diaFaturamentoSelecionado) return null;
+    const produtosPorCodigo = new Map(
+      (produtosData || []).map((produto) => [
+        normalizarCodigoProduto(produto.codigo),
+        produto.descricao || '',
+      ])
+    );
+    const clientesPorCodigo = new Map(
+      (clientesData?.clientes || []).map((cliente) => [
+        normalizarCodigoCliente(cliente.Codigo),
+        cliente.Nome || '',
+      ])
+    );
+    const linhasDia = faturamentoAtual.linhas.filter((row) => {
+      if (!row.emissao) return false;
+      return row.emissao.toISOString().slice(0, 10) === diaFaturamentoSelecionado;
+    });
+    if (!linhasDia.length) return null;
+    const linhasOrdenadas = [...linhasDia].sort((a, b) => {
+      if (a.tipoMovimento === b.tipoMovimento) {
+        return Math.abs(b.valorTotal) - Math.abs(a.valorTotal);
+      }
+      return a.tipoMovimento.localeCompare(b.tipoMovimento);
+    });
+    const linhasComDescricao = linhasOrdenadas.map((row) => {
+      const descricaoAtual = row.descricao ?? '';
+      if (descricaoAtual && descricaoAtual !== 0) return row;
+      const codigoNorm = normalizarCodigoProduto(row.codigo);
+      const descricao = produtosPorCodigo.get(codigoNorm) || '';
+      return { ...row, descricao };
+    });
+    const linhasComCliente = linhasComDescricao.map((row) => {
+      const nomeAtual = row.clienteNome ?? '';
+      if (nomeAtual) return row;
+      const codigoCliente = normalizarCodigoCliente(row.cliente);
+      const clienteNome = clientesPorCodigo.get(codigoCliente) || '';
+      return { ...row, clienteNome };
+    });
+    const totalDia = linhasDia.reduce((acc, row) => acc + row.valorTotal, 0);
+    const totalBrutoDia = linhasDia
+      .filter((row) => row.tipoMovimento !== 'devolucao')
+      .reduce((acc, row) => acc + row.valorTotal, 0);
+    const totalDevolucaoDia = linhasDia
+      .filter((row) => row.tipoMovimento === 'devolucao')
+      .reduce((acc, row) => acc + Math.abs(row.valorTotal), 0);
+    return {
+      linhas: linhasComCliente,
+      totalDia,
+      totalBrutoDia,
+      totalDevolucaoDia,
+    };
+  }, [diaFaturamentoSelecionado, faturamentoAtual.linhas]);
+
+  useEffect(() => {
+    if (!diaFaturamentoSelecionado) return;
+    const existeDia = faturamentoAtual.porDia.some((item) => item.dia === diaFaturamentoSelecionado);
+    if (!existeDia) {
+      setDiaFaturamentoSelecionado(null);
+    }
+  }, [diaFaturamentoSelecionado, faturamentoAtual.porDia]);
 
   const faturamento2025 = useMemo(() => {
     const clientesPorCodigo = new Map(
@@ -4279,36 +4342,27 @@ const resumoCustosIndiretos = useMemo(() => {
                             const dados = faturamentoAtual.porDia;
                             const maxValor = Math.max(...dados.map((item) => item.valor), 1);
                             const barW = chartW / Math.max(dados.length, 1);
-                            let acumulado = 0;
-                            const totalPeriodo = dados.reduce((acc, item) => acc + item.valor, 0);
-                            const linePoints = dados.map((item, i) => {
-                              acumulado += item.valor;
-                              const perc = totalPeriodo > 0 ? acumulado / totalPeriodo : 0;
-                              const x = margin.left + i * barW + (barW - 14) / 2 + 7;
-                              const y = margin.top + chartH * (1 - perc);
-                              return { x, y, item, perc };
+                            const barGap = 30;
+                            const barWidth = Math.max(barW - barGap, 6);
+                            const variacoes = dados.map((item, i) => {
+                              if (i === 0) return null;
+                              const anterior = dados[i - 1].valor;
+                              if (!Number.isFinite(anterior) || anterior === 0) return null;
+                              return ((item.valor - anterior) / anterior) * 100;
                             });
-                            const linePath = linePoints.map((p) => `${p.x},${p.y}`).join(' ');
-                            const areaPath = `${margin.left},${margin.top + chartH} ${linePath} ${margin.left + (linePoints.length - 1) * barW + (barW - 14) / 2 + 7},${margin.top + chartH}`;
+
+                            const handleDiaClick = (dia) => {
+                              setDiaFaturamentoSelecionado((prev) => (prev === dia ? null : dia));
+                            };
 
                             return (
-                              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
+                              <div className="space-y-4">
+                                <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
                                     <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.9" />
                                   </linearGradient>
-                                  <linearGradient id="linhaAcum" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
-                                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.1" />
-                                  </linearGradient>
-                                  <filter id="linhaGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur stdDeviation="2.2" result="blur" />
-                                    <feMerge>
-                                      <feMergeNode in="blur" />
-                                      <feMergeNode in="SourceGraphic" />
-                                    </feMerge>
-                                  </filter>
                                 </defs>
                                 {[0.25, 0.5, 0.75, 1].map((p) => (
                                   <line
@@ -4321,25 +4375,57 @@ const resumoCustosIndiretos = useMemo(() => {
                                     strokeDasharray="4 6"
                                   />
                                 ))}
-                                <text x={margin.left} y={margin.top - 18} fontSize="12" fill="#94a3b8">
-                                  Acumulado (%)
-                                </text>
                                 {dados.map((item, i) => {
-                                  const xBase = margin.left + i * barW + 7;
+                                  const xBase = margin.left + i * barW + barGap / 2;
                                   const barH = (item.valor / maxValor) * chartH;
                                   const y = margin.top + chartH - barH;
+                                  const isSelecionado = diaFaturamentoSelecionado === item.dia;
+                                  const variacao = variacoes[i];
+                                  const variacaoTexto =
+                                    variacao === null || !Number.isFinite(variacao)
+                                      ? null
+                                      : `${variacao > 0 ? '+' : ''}${variacao.toFixed(0)}%`;
+                                  const isPositiva = variacao !== null && variacao >= 0;
+                                  const corVariacao = isPositiva ? '#22c55e' : '#f87171';
+                                  const xCentro = xBase + barWidth / 2;
+                                  const xVariacao = xBase - 8;
+                                  const yVariacao = Math.min(y + 14, margin.top + chartH - 10);
                                   return (
-                                    <g key={item.dia}>
+                                    <g key={item.dia} className="cursor-pointer" onClick={() => handleDiaClick(item.dia)}>
                                       <rect
                                         x={xBase}
                                         y={y}
-                                        width={barW - 14}
+                                        width={barWidth}
                                         height={barH}
                                         rx="6"
                                         fill="url(#diaBar)"
+                                        stroke={isSelecionado ? '#fbbf24' : 'none'}
+                                        strokeWidth={isSelecionado ? 2 : 0}
                                       />
+                                      {variacaoTexto && (
+                                        <g>
+                                          <text
+                                            x={xVariacao}
+                                            y={yVariacao - 6}
+                                            textAnchor="middle"
+                                            fontSize="12"
+                                            fill={corVariacao}
+                                            fontWeight="700"
+                                          >
+                                            {variacaoTexto}
+                                          </text>
+                                          <path
+                                            d={
+                                              isPositiva
+                                                ? `M ${xVariacao} ${yVariacao + 4} L ${xVariacao - 3} ${yVariacao + 9} L ${xVariacao + 3} ${yVariacao + 9} Z`
+                                                : `M ${xVariacao} ${yVariacao + 9} L ${xVariacao - 3} ${yVariacao + 4} L ${xVariacao + 3} ${yVariacao + 4} Z`
+                                            }
+                                            fill={corVariacao}
+                                          />
+                                        </g>
+                                      )}
                                       <text
-                                        x={xBase + (barW - 14) / 2}
+                                        x={xBase + barWidth / 2}
                                         y={Math.max(y - 10, 18)}
                                         textAnchor="middle"
                                         fontSize="14"
@@ -4349,7 +4435,7 @@ const resumoCustosIndiretos = useMemo(() => {
                                         {formatarValorCurto(item.valor)}
                                       </text>
                                       <text
-                                        x={xBase + (barW - 14) / 2}
+                                        x={xBase + barWidth / 2}
                                         y={margin.top + chartH + 20}
                                         textAnchor="middle"
                                         fontSize="12"
@@ -4360,25 +4446,101 @@ const resumoCustosIndiretos = useMemo(() => {
                                     </g>
                                   );
                                 })}
-                                <polygon points={areaPath} fill="url(#linhaAcum)" opacity="0.35" />
-                                <polyline
-                                  points={linePoints.map((p) => `${p.x},${p.y}`).join(' ')}
-                                  fill="none"
-                                  stroke="#fbbf24"
-                                  strokeWidth="3.5"
-                                  filter="url(#linhaGlow)"
-                                />
-                                {linePoints.map((p) => (
-                                  <circle
-                                    key={`line-${p.item.dia}`}
-                                    cx={p.x}
-                                    cy={p.y}
-                                    r="4.5"
-                                    fill="#fbbf24"
-                                    filter="url(#linhaGlow)"
-                                  />
-                                ))}
                               </svg>
+                              {diaFaturamentoSelecionado ? (
+                                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5">
+                                  <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                      <p className="text-xs uppercase tracking-widest text-slate-400 font-bold">
+                                        Detalhe do dia
+                                      </p>
+                                      <p className="text-lg font-black text-white">
+                                        {new Date(`${diaFaturamentoSelecionado}T00:00:00`).toLocaleDateString('pt-BR')}
+                                      </p>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setDiaFaturamentoSelecionado(null)}
+                                      className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white"
+                                    >
+                                      Limpar
+                                    </button>
+                                  </div>
+                                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
+                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                      <p>Total do dia</p>
+                                      <p className="text-base font-black text-white mt-1">
+                                        {formatarMoeda(detalhesDiaFaturamento?.totalDia || 0)}
+                                      </p>
+                                    </div>
+                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                      <p>Faturamento</p>
+                                      <p className="text-base font-black text-emerald-300 mt-1">
+                                        {formatarMoeda(detalhesDiaFaturamento?.totalBrutoDia || 0)}
+                                      </p>
+                                    </div>
+                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                      <p>Devolucoes</p>
+                                      <p className="text-base font-black text-rose-300 mt-1">
+                                        {formatarMoeda(detalhesDiaFaturamento?.totalDevolucaoDia || 0)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="mt-4 max-h-80 overflow-auto rounded-xl border border-slate-800">
+                                    <table className="w-full text-left text-xs">
+                                      <thead className="sticky top-0 bg-slate-900 text-slate-400 uppercase tracking-wider">
+                                        <tr>
+                                          <th className="px-3 py-3">Tipo</th>
+                                          <th className="px-3 py-3">Cliente</th>
+                                          <th className="px-3 py-3">Nome</th>
+                                          <th className="px-3 py-3">Filial</th>
+                                          <th className="px-3 py-3">Grupo</th>
+                                          <th className="px-3 py-3">Codigo</th>
+                                          <th className="px-3 py-3">Descricao</th>
+                                          <th className="px-3 py-3 text-right">Qtd</th>
+                                          <th className="px-3 py-3">Un</th>
+                                          <th className="px-3 py-3 text-right">Valor</th>
+                                          <th className="px-3 py-3">NF</th>
+                                          <th className="px-3 py-3">CFOP</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-slate-800 text-slate-200">
+                                        {(detalhesDiaFaturamento?.linhas || []).map((row, index) => (
+                                          <tr key={`${row.nf || row.codigo}-${index}`}>
+                                            <td
+                                              className={`px-3 py-2 font-bold ${
+                                                row.tipoMovimento === 'devolucao' ? 'text-rose-300' : 'text-emerald-300'
+                                              }`}
+                                            >
+                                              {row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda'}
+                                            </td>
+                                            <td className="px-3 py-2">{row.cliente || '-'}</td>
+                                            <td className="px-3 py-2">{row.clienteNome || '-'}</td>
+                                            <td className="px-3 py-2">{row.filial || '-'}</td>
+                                            <td className="px-3 py-2">{row.grupo || '-'}</td>
+                                            <td className="px-3 py-2 font-semibold">{row.codigo || '-'}</td>
+                                            <td className="px-3 py-2">{row.descricao || '-'}</td>
+                                            <td className="px-3 py-2 text-right">
+                                              {Number(row.quantidade || 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-3 py-2">{row.unidade || '-'}</td>
+                                            <td className="px-3 py-2 text-right font-semibold">
+                                              {formatarMoeda(row.valorTotal)}
+                                            </td>
+                                            <td className="px-3 py-2">{row.nf || '-'}</td>
+                                            <td className="px-3 py-2">{row.cfop || '-'}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-xs text-slate-400 text-center">
+                                  Clique em um dia no grafico para abrir a tabela com faturamento e devolucoes.
+                                </p>
+                              )}
+                              </div>
                             );
                           })()}
                         </div>
