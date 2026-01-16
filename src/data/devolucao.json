@@ -96,6 +96,38 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": "055596",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01332A",
+    "Descricao": 0,
+    "Quantidade": 20.09,
+    "Unidade": "KG",
+    "ValorUnitario": 8.6,
+    "ValorTotal": 172.77,
+    "Emissao": "2026-01-15T03:00:28.000Z",
+    "NF": 336266,
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "055596",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01332B",
+    "Descricao": 0,
+    "Quantidade": 6.7,
+    "Unidade": "KG",
+    "ValorUnitario": 8.38,
+    "ValorTotal": 56.14,
+    "Emissao": "2026-01-15T03:00:28.000Z",
+    "NF": 336266,
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "C12798",
     "Filial": "04",
     "Grupo": "0007",
