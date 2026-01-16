@@ -38865,7 +38865,7 @@
   },
   {
     "Cliente": "C19438",
-    "Filial": "04",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02041A",
     "Descricao": 0,
@@ -38881,7 +38881,7 @@
   },
   {
     "Cliente": "C16068",
-    "Filial": "04",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02042",
     "Descricao": 0,
@@ -38897,7 +38897,7 @@
   },
   {
     "Cliente": "C00005",
-    "Filial": "04",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02042",
     "Descricao": 0,
@@ -38913,7 +38913,7 @@
   },
   {
     "Cliente": "C21769",
-    "Filial": "04",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02042",
     "Descricao": 0,
@@ -38929,7 +38929,7 @@
   },
   {
     "Cliente": "C11834",
-    "Filial": "04",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02045A",
     "Descricao": 0,
@@ -68257,7 +68257,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68273,7 +68273,7 @@
   },
   {
     "Cliente": "047181",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68289,7 +68289,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68305,7 +68305,7 @@
   },
   {
     "Cliente": "056778",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68321,7 +68321,7 @@
   },
   {
     "Cliente": "050780",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68337,7 +68337,7 @@
   },
   {
     "Cliente": "050780",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00283",
     "Descricao": 0,
@@ -68353,7 +68353,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00284",
     "Descricao": 0,
@@ -68369,7 +68369,7 @@
   },
   {
     "Cliente": "047181",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00284",
     "Descricao": 0,
@@ -68385,7 +68385,7 @@
   },
   {
     "Cliente": "058012",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00284",
     "Descricao": 0,
@@ -68401,7 +68401,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00284",
     "Descricao": 0,
@@ -68417,7 +68417,7 @@
   },
   {
     "Cliente": "056778",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G120",
     "Codigo": "00284",
     "Descricao": 0,
@@ -69265,7 +69265,7 @@
   },
   {
     "Cliente": "053235",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "00641",
     "Descricao": 0,
@@ -69281,7 +69281,7 @@
   },
   {
     "Cliente": "052917",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "00641",
     "Descricao": 0,
@@ -71937,7 +71937,7 @@
   },
   {
     "Cliente": "058780",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00960",
     "Descricao": 0,
@@ -71953,7 +71953,7 @@
   },
   {
     "Cliente": "048505",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00960",
     "Descricao": 0,
@@ -71969,7 +71969,7 @@
   },
   {
     "Cliente": "049989",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00960",
     "Descricao": 0,
@@ -71985,7 +71985,7 @@
   },
   {
     "Cliente": "058154",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72001,7 +72001,7 @@
   },
   {
     "Cliente": "037348",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72017,7 +72017,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72033,7 +72033,7 @@
   },
   {
     "Cliente": "053260",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72049,7 +72049,7 @@
   },
   {
     "Cliente": "041972",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72065,7 +72065,7 @@
   },
   {
     "Cliente": "052811",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72081,7 +72081,7 @@
   },
   {
     "Cliente": "057460",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00961",
     "Descricao": 0,
@@ -72097,7 +72097,7 @@
   },
   {
     "Cliente": "058774",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00963",
     "Descricao": 0,
@@ -72113,7 +72113,7 @@
   },
   {
     "Cliente": "053608",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00963",
     "Descricao": 0,
@@ -72129,7 +72129,7 @@
   },
   {
     "Cliente": "051467",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00963",
     "Descricao": 0,
@@ -72145,7 +72145,7 @@
   },
   {
     "Cliente": "041898",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00963",
     "Descricao": 0,
@@ -72161,7 +72161,7 @@
   },
   {
     "Cliente": "D00420",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72177,7 +72177,7 @@
   },
   {
     "Cliente": "053608",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72193,7 +72193,7 @@
   },
   {
     "Cliente": "044827",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72209,7 +72209,7 @@
   },
   {
     "Cliente": "056869",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72225,7 +72225,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72241,7 +72241,7 @@
   },
   {
     "Cliente": "039174",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72257,7 +72257,7 @@
   },
   {
     "Cliente": "049457",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72273,7 +72273,7 @@
   },
   {
     "Cliente": "051467",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72289,7 +72289,7 @@
   },
   {
     "Cliente": "040851",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72305,7 +72305,7 @@
   },
   {
     "Cliente": "058805",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72321,7 +72321,7 @@
   },
   {
     "Cliente": "058812",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72337,7 +72337,7 @@
   },
   {
     "Cliente": "058805",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00965",
     "Descricao": 0,
@@ -72353,7 +72353,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00966",
     "Descricao": 0,
@@ -72369,7 +72369,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G200",
     "Codigo": "00967",
     "Descricao": 0,
@@ -73073,7 +73073,7 @@
   },
   {
     "Cliente": "053625",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73089,7 +73089,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73105,7 +73105,7 @@
   },
   {
     "Cliente": "053982",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73121,7 +73121,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73137,7 +73137,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73153,7 +73153,7 @@
   },
   {
     "Cliente": "056893",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73169,7 +73169,7 @@
   },
   {
     "Cliente": "037038",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73185,7 +73185,7 @@
   },
   {
     "Cliente": "033918",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73201,7 +73201,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73217,7 +73217,7 @@
   },
   {
     "Cliente": "058789",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73233,7 +73233,7 @@
   },
   {
     "Cliente": "057961",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73249,7 +73249,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73265,7 +73265,7 @@
   },
   {
     "Cliente": "039508",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73281,7 +73281,7 @@
   },
   {
     "Cliente": "057961",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73297,7 +73297,7 @@
   },
   {
     "Cliente": "038635",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73313,7 +73313,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73329,7 +73329,7 @@
   },
   {
     "Cliente": "058794",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73345,7 +73345,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73361,7 +73361,7 @@
   },
   {
     "Cliente": "039508",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73377,7 +73377,7 @@
   },
   {
     "Cliente": "058815",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73393,7 +73393,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73409,7 +73409,7 @@
   },
   {
     "Cliente": "039041",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73425,7 +73425,7 @@
   },
   {
     "Cliente": "051964",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73441,7 +73441,7 @@
   },
   {
     "Cliente": "053720",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73457,7 +73457,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73473,7 +73473,7 @@
   },
   {
     "Cliente": "036831",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73489,7 +73489,7 @@
   },
   {
     "Cliente": "D00875",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73505,7 +73505,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73521,7 +73521,7 @@
   },
   {
     "Cliente": "048560",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01390",
     "Descricao": 0,
@@ -73537,7 +73537,7 @@
   },
   {
     "Cliente": "048851",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73553,7 +73553,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73569,7 +73569,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73585,7 +73585,7 @@
   },
   {
     "Cliente": "043147",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73601,7 +73601,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73617,7 +73617,7 @@
   },
   {
     "Cliente": "058785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73633,7 +73633,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73649,7 +73649,7 @@
   },
   {
     "Cliente": "032257",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73665,7 +73665,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73681,7 +73681,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73697,7 +73697,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73713,7 +73713,7 @@
   },
   {
     "Cliente": "052985",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73729,7 +73729,7 @@
   },
   {
     "Cliente": "058019",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73745,7 +73745,7 @@
   },
   {
     "Cliente": "039508",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73761,7 +73761,7 @@
   },
   {
     "Cliente": "048871",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73777,7 +73777,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73793,7 +73793,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73809,7 +73809,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73825,7 +73825,7 @@
   },
   {
     "Cliente": "051964",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73841,7 +73841,7 @@
   },
   {
     "Cliente": "036831",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73857,7 +73857,7 @@
   },
   {
     "Cliente": "049452",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73873,7 +73873,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73889,7 +73889,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73905,7 +73905,7 @@
   },
   {
     "Cliente": "048560",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01391",
     "Descricao": 0,
@@ -73921,7 +73921,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -73937,7 +73937,7 @@
   },
   {
     "Cliente": "058024",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -73953,7 +73953,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -73969,7 +73969,7 @@
   },
   {
     "Cliente": "048441",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -73985,7 +73985,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -74001,7 +74001,7 @@
   },
   {
     "Cliente": "036254",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -74017,7 +74017,7 @@
   },
   {
     "Cliente": "058486",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -74033,7 +74033,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01392",
     "Descricao": 0,
@@ -74049,7 +74049,7 @@
   },
   {
     "Cliente": "053625",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74065,7 +74065,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74081,7 +74081,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74097,7 +74097,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74113,7 +74113,7 @@
   },
   {
     "Cliente": "037038",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74129,7 +74129,7 @@
   },
   {
     "Cliente": "058020",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74145,7 +74145,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74161,7 +74161,7 @@
   },
   {
     "Cliente": "033918",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74177,7 +74177,7 @@
   },
   {
     "Cliente": "058789",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74193,7 +74193,7 @@
   },
   {
     "Cliente": "057961",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74209,7 +74209,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74225,7 +74225,7 @@
   },
   {
     "Cliente": "039508",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74241,7 +74241,7 @@
   },
   {
     "Cliente": "057961",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74257,7 +74257,7 @@
   },
   {
     "Cliente": "038635",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74273,7 +74273,7 @@
   },
   {
     "Cliente": "038635",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74289,7 +74289,7 @@
   },
   {
     "Cliente": "056893",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74305,7 +74305,7 @@
   },
   {
     "Cliente": "057867",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74321,7 +74321,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74337,7 +74337,7 @@
   },
   {
     "Cliente": "058815",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74353,7 +74353,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74369,7 +74369,7 @@
   },
   {
     "Cliente": "053603",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74385,7 +74385,7 @@
   },
   {
     "Cliente": "039041",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74401,7 +74401,7 @@
   },
   {
     "Cliente": "051964",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74417,7 +74417,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74433,7 +74433,7 @@
   },
   {
     "Cliente": "058607",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74449,7 +74449,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74465,7 +74465,7 @@
   },
   {
     "Cliente": "036831",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74481,7 +74481,7 @@
   },
   {
     "Cliente": "D00875",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74497,7 +74497,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74513,7 +74513,7 @@
   },
   {
     "Cliente": "048560",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01393",
     "Descricao": 0,
@@ -74529,7 +74529,7 @@
   },
   {
     "Cliente": "048851",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74545,7 +74545,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74561,7 +74561,7 @@
   },
   {
     "Cliente": "043147",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74577,7 +74577,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74593,7 +74593,7 @@
   },
   {
     "Cliente": "053042",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74609,7 +74609,7 @@
   },
   {
     "Cliente": "058785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74625,7 +74625,7 @@
   },
   {
     "Cliente": "058637",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74641,7 +74641,7 @@
   },
   {
     "Cliente": "032257",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74657,7 +74657,7 @@
   },
   {
     "Cliente": "057157",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74673,7 +74673,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74689,7 +74689,7 @@
   },
   {
     "Cliente": "058797",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74705,7 +74705,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74721,7 +74721,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74737,7 +74737,7 @@
   },
   {
     "Cliente": "058012",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74753,7 +74753,7 @@
   },
   {
     "Cliente": "038190",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74769,7 +74769,7 @@
   },
   {
     "Cliente": "052985",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74785,7 +74785,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74801,7 +74801,7 @@
   },
   {
     "Cliente": "052317",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74817,7 +74817,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74833,7 +74833,7 @@
   },
   {
     "Cliente": "049452",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74849,7 +74849,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74865,7 +74865,7 @@
   },
   {
     "Cliente": "051964",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74881,7 +74881,7 @@
   },
   {
     "Cliente": "036831",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74897,7 +74897,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74913,7 +74913,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74929,7 +74929,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74945,7 +74945,7 @@
   },
   {
     "Cliente": "048560",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01394",
     "Descricao": 0,
@@ -74961,7 +74961,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -74977,7 +74977,7 @@
   },
   {
     "Cliente": "058024",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -74993,7 +74993,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75009,7 +75009,7 @@
   },
   {
     "Cliente": "048441",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75025,7 +75025,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75041,7 +75041,7 @@
   },
   {
     "Cliente": "036254",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75057,7 +75057,7 @@
   },
   {
     "Cliente": "058486",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75073,7 +75073,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75089,7 +75089,7 @@
   },
   {
     "Cliente": "050780",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01395",
     "Descricao": 0,
@@ -75105,7 +75105,7 @@
   },
   {
     "Cliente": "054759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75121,7 +75121,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75137,7 +75137,7 @@
   },
   {
     "Cliente": "041785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75153,7 +75153,7 @@
   },
   {
     "Cliente": "053982",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75169,7 +75169,7 @@
   },
   {
     "Cliente": "040293",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75185,7 +75185,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75201,7 +75201,7 @@
   },
   {
     "Cliente": "043414",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75217,7 +75217,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75233,7 +75233,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75249,7 +75249,7 @@
   },
   {
     "Cliente": "056893",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75265,7 +75265,7 @@
   },
   {
     "Cliente": "037038",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75281,7 +75281,7 @@
   },
   {
     "Cliente": "052617",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75297,7 +75297,7 @@
   },
   {
     "Cliente": "058684",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75313,7 +75313,7 @@
   },
   {
     "Cliente": "055314",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75329,7 +75329,7 @@
   },
   {
     "Cliente": "048014",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75345,7 +75345,7 @@
   },
   {
     "Cliente": "058793",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75361,7 +75361,7 @@
   },
   {
     "Cliente": "037038",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75377,7 +75377,7 @@
   },
   {
     "Cliente": "058789",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75393,7 +75393,7 @@
   },
   {
     "Cliente": "042610",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75409,7 +75409,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75425,7 +75425,7 @@
   },
   {
     "Cliente": "045733",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75441,7 +75441,7 @@
   },
   {
     "Cliente": "036254",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75457,7 +75457,7 @@
   },
   {
     "Cliente": "042610",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75473,7 +75473,7 @@
   },
   {
     "Cliente": "058012",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75489,7 +75489,7 @@
   },
   {
     "Cliente": "052985",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75505,7 +75505,7 @@
   },
   {
     "Cliente": "046436",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75521,7 +75521,7 @@
   },
   {
     "Cliente": "039508",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75537,7 +75537,7 @@
   },
   {
     "Cliente": "041785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75553,7 +75553,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75569,7 +75569,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75585,7 +75585,7 @@
   },
   {
     "Cliente": "053603",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75601,7 +75601,7 @@
   },
   {
     "Cliente": "049452",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75617,7 +75617,7 @@
   },
   {
     "Cliente": "053720",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75633,7 +75633,7 @@
   },
   {
     "Cliente": "053720",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75649,7 +75649,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75665,7 +75665,7 @@
   },
   {
     "Cliente": "058607",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75681,7 +75681,7 @@
   },
   {
     "Cliente": "038754",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75697,7 +75697,7 @@
   },
   {
     "Cliente": "047916",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75713,7 +75713,7 @@
   },
   {
     "Cliente": "058799",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75729,7 +75729,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75745,7 +75745,7 @@
   },
   {
     "Cliente": "034242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75761,7 +75761,7 @@
   },
   {
     "Cliente": "048114",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01396",
     "Descricao": 0,
@@ -75777,7 +75777,7 @@
   },
   {
     "Cliente": "056037",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75793,7 +75793,7 @@
   },
   {
     "Cliente": "054759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75809,7 +75809,7 @@
   },
   {
     "Cliente": "043141",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75825,7 +75825,7 @@
   },
   {
     "Cliente": "041785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75841,7 +75841,7 @@
   },
   {
     "Cliente": "053982",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75857,7 +75857,7 @@
   },
   {
     "Cliente": "040293",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75873,7 +75873,7 @@
   },
   {
     "Cliente": "051428",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75889,7 +75889,7 @@
   },
   {
     "Cliente": "035806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75905,7 +75905,7 @@
   },
   {
     "Cliente": "048973",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75921,7 +75921,7 @@
   },
   {
     "Cliente": "056893",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75937,7 +75937,7 @@
   },
   {
     "Cliente": "052617",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75953,7 +75953,7 @@
   },
   {
     "Cliente": "058684",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75969,7 +75969,7 @@
   },
   {
     "Cliente": "055314",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -75985,7 +75985,7 @@
   },
   {
     "Cliente": "057961",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76001,7 +76001,7 @@
   },
   {
     "Cliente": "048014",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76017,7 +76017,7 @@
   },
   {
     "Cliente": "058793",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76033,7 +76033,7 @@
   },
   {
     "Cliente": "037038",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76049,7 +76049,7 @@
   },
   {
     "Cliente": "058789",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76065,7 +76065,7 @@
   },
   {
     "Cliente": "042610",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76081,7 +76081,7 @@
   },
   {
     "Cliente": "047766",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76097,7 +76097,7 @@
   },
   {
     "Cliente": "045733",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76113,7 +76113,7 @@
   },
   {
     "Cliente": "042610",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76129,7 +76129,7 @@
   },
   {
     "Cliente": "052985",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76145,7 +76145,7 @@
   },
   {
     "Cliente": "046436",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76161,7 +76161,7 @@
   },
   {
     "Cliente": "041785",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76177,7 +76177,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76193,7 +76193,7 @@
   },
   {
     "Cliente": "053603",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76209,7 +76209,7 @@
   },
   {
     "Cliente": "053720",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76225,7 +76225,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76241,7 +76241,7 @@
   },
   {
     "Cliente": "058607",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76257,7 +76257,7 @@
   },
   {
     "Cliente": "038754",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76273,7 +76273,7 @@
   },
   {
     "Cliente": "047916",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76289,7 +76289,7 @@
   },
   {
     "Cliente": "D00875",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76305,7 +76305,7 @@
   },
   {
     "Cliente": "058799",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76321,7 +76321,7 @@
   },
   {
     "Cliente": "056636",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76337,7 +76337,7 @@
   },
   {
     "Cliente": "048560",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01398",
     "Descricao": 0,
@@ -76353,7 +76353,7 @@
   },
   {
     "Cliente": "055759",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76369,7 +76369,7 @@
   },
   {
     "Cliente": "038190",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76385,7 +76385,7 @@
   },
   {
     "Cliente": "058789",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76401,7 +76401,7 @@
   },
   {
     "Cliente": "045733",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76417,7 +76417,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76433,7 +76433,7 @@
   },
   {
     "Cliente": "052316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76449,7 +76449,7 @@
   },
   {
     "Cliente": "049713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76465,7 +76465,7 @@
   },
   {
     "Cliente": "058799",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G110",
     "Codigo": "01400",
     "Descricao": 0,
@@ -76481,7 +76481,7 @@
   },
   {
     "Cliente": "054615",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "01803",
     "Descricao": 0,
@@ -76497,7 +76497,7 @@
   },
   {
     "Cliente": "058800",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "01803",
     "Descricao": 0,
@@ -76513,7 +76513,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76529,7 +76529,7 @@
   },
   {
     "Cliente": "053808",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76545,7 +76545,7 @@
   },
   {
     "Cliente": "056393",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76561,7 +76561,7 @@
   },
   {
     "Cliente": "053938",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76577,7 +76577,7 @@
   },
   {
     "Cliente": "058781",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76593,7 +76593,7 @@
   },
   {
     "Cliente": "040303",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76609,7 +76609,7 @@
   },
   {
     "Cliente": "040050",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76625,7 +76625,7 @@
   },
   {
     "Cliente": "057956",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76641,7 +76641,7 @@
   },
   {
     "Cliente": "058329",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76657,7 +76657,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76673,7 +76673,7 @@
   },
   {
     "Cliente": "050776",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76689,7 +76689,7 @@
   },
   {
     "Cliente": "048898",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76705,7 +76705,7 @@
   },
   {
     "Cliente": "048898",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76721,7 +76721,7 @@
   },
   {
     "Cliente": "051272",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76737,7 +76737,7 @@
   },
   {
     "Cliente": "054251",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76753,7 +76753,7 @@
   },
   {
     "Cliente": "048137",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76769,7 +76769,7 @@
   },
   {
     "Cliente": "051975",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76785,7 +76785,7 @@
   },
   {
     "Cliente": "054502",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76801,7 +76801,7 @@
   },
   {
     "Cliente": "045165",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76817,7 +76817,7 @@
   },
   {
     "Cliente": "048512",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76833,7 +76833,7 @@
   },
   {
     "Cliente": "056481",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76849,7 +76849,7 @@
   },
   {
     "Cliente": "054652",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76865,7 +76865,7 @@
   },
   {
     "Cliente": "049989",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76881,7 +76881,7 @@
   },
   {
     "Cliente": "057739",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76897,7 +76897,7 @@
   },
   {
     "Cliente": "043386",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76913,7 +76913,7 @@
   },
   {
     "Cliente": "040677",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76929,7 +76929,7 @@
   },
   {
     "Cliente": "044029",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76945,7 +76945,7 @@
   },
   {
     "Cliente": "049755",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76961,7 +76961,7 @@
   },
   {
     "Cliente": "054204",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76977,7 +76977,7 @@
   },
   {
     "Cliente": "041810",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -76993,7 +76993,7 @@
   },
   {
     "Cliente": "058443",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77009,7 +77009,7 @@
   },
   {
     "Cliente": "057420",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77025,7 +77025,7 @@
   },
   {
     "Cliente": "058777",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77041,7 +77041,7 @@
   },
   {
     "Cliente": "055929",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77057,7 +77057,7 @@
   },
   {
     "Cliente": "044208",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77073,7 +77073,7 @@
   },
   {
     "Cliente": "053235",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77089,7 +77089,7 @@
   },
   {
     "Cliente": "058443",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77105,7 +77105,7 @@
   },
   {
     "Cliente": "053604",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77121,7 +77121,7 @@
   },
   {
     "Cliente": "057420",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77137,7 +77137,7 @@
   },
   {
     "Cliente": "058811",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025A",
     "Descricao": 0,
@@ -77153,7 +77153,7 @@
   },
   {
     "Cliente": "058280",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77169,7 +77169,7 @@
   },
   {
     "Cliente": "043674",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77185,7 +77185,7 @@
   },
   {
     "Cliente": "058615",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77201,7 +77201,7 @@
   },
   {
     "Cliente": "047422",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77217,7 +77217,7 @@
   },
   {
     "Cliente": "058726",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77233,7 +77233,7 @@
   },
   {
     "Cliente": "040050",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77249,7 +77249,7 @@
   },
   {
     "Cliente": "055316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77265,7 +77265,7 @@
   },
   {
     "Cliente": "047199",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77281,7 +77281,7 @@
   },
   {
     "Cliente": "052467",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77297,7 +77297,7 @@
   },
   {
     "Cliente": "055929",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77313,7 +77313,7 @@
   },
   {
     "Cliente": "054615",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77329,7 +77329,7 @@
   },
   {
     "Cliente": "044907",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77345,7 +77345,7 @@
   },
   {
     "Cliente": "052451",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025C",
     "Descricao": 0,
@@ -77361,7 +77361,7 @@
   },
   {
     "Cliente": "045248",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025E",
     "Descricao": 0,
@@ -77377,7 +77377,7 @@
   },
   {
     "Cliente": "058806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025E",
     "Descricao": 0,
@@ -77393,7 +77393,7 @@
   },
   {
     "Cliente": "057567",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025E",
     "Descricao": 0,
@@ -77409,7 +77409,7 @@
   },
   {
     "Cliente": "040092",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025E",
     "Descricao": 0,
@@ -77425,7 +77425,7 @@
   },
   {
     "Cliente": "052451",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025E",
     "Descricao": 0,
@@ -77441,7 +77441,7 @@
   },
   {
     "Cliente": "048239",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77457,7 +77457,7 @@
   },
   {
     "Cliente": "054466",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77473,7 +77473,7 @@
   },
   {
     "Cliente": "043674",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77489,7 +77489,7 @@
   },
   {
     "Cliente": "055316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77505,7 +77505,7 @@
   },
   {
     "Cliente": "054251",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77521,7 +77521,7 @@
   },
   {
     "Cliente": "048137",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77537,7 +77537,7 @@
   },
   {
     "Cliente": "042876",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77553,7 +77553,7 @@
   },
   {
     "Cliente": "056411",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77569,7 +77569,7 @@
   },
   {
     "Cliente": "057907",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77585,7 +77585,7 @@
   },
   {
     "Cliente": "058443",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77601,7 +77601,7 @@
   },
   {
     "Cliente": "051738",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77617,7 +77617,7 @@
   },
   {
     "Cliente": "056489",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02025H",
     "Descricao": 0,
@@ -77633,7 +77633,7 @@
   },
   {
     "Cliente": "047422",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77649,7 +77649,7 @@
   },
   {
     "Cliente": "042733",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77665,7 +77665,7 @@
   },
   {
     "Cliente": "057711",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77681,7 +77681,7 @@
   },
   {
     "Cliente": "058783",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77697,7 +77697,7 @@
   },
   {
     "Cliente": "044049",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77713,7 +77713,7 @@
   },
   {
     "Cliente": "039217",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77729,7 +77729,7 @@
   },
   {
     "Cliente": "051056",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77745,7 +77745,7 @@
   },
   {
     "Cliente": "053453",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77761,7 +77761,7 @@
   },
   {
     "Cliente": "057956",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77777,7 +77777,7 @@
   },
   {
     "Cliente": "058804",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77793,7 +77793,7 @@
   },
   {
     "Cliente": "058808",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77809,7 +77809,7 @@
   },
   {
     "Cliente": "053715",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77825,7 +77825,7 @@
   },
   {
     "Cliente": "058782",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77841,7 +77841,7 @@
   },
   {
     "Cliente": "048947",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77857,7 +77857,7 @@
   },
   {
     "Cliente": "040050",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77873,7 +77873,7 @@
   },
   {
     "Cliente": "043836",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77889,7 +77889,7 @@
   },
   {
     "Cliente": "058443",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77905,7 +77905,7 @@
   },
   {
     "Cliente": "057953",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77921,7 +77921,7 @@
   },
   {
     "Cliente": "057573",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77937,7 +77937,7 @@
   },
   {
     "Cliente": "058404",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77953,7 +77953,7 @@
   },
   {
     "Cliente": "058404",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027A",
     "Descricao": 0,
@@ -77969,7 +77969,7 @@
   },
   {
     "Cliente": "047475",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -77985,7 +77985,7 @@
   },
   {
     "Cliente": "039713",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78001,7 +78001,7 @@
   },
   {
     "Cliente": "037829",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78017,7 +78017,7 @@
   },
   {
     "Cliente": "050576",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78033,7 +78033,7 @@
   },
   {
     "Cliente": "058373",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78049,7 +78049,7 @@
   },
   {
     "Cliente": "058443",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78065,7 +78065,7 @@
   },
   {
     "Cliente": "047526",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78081,7 +78081,7 @@
   },
   {
     "Cliente": "058581",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78097,7 +78097,7 @@
   },
   {
     "Cliente": "056351",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78113,7 +78113,7 @@
   },
   {
     "Cliente": "051677",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78129,7 +78129,7 @@
   },
   {
     "Cliente": "047526",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78145,7 +78145,7 @@
   },
   {
     "Cliente": "045565",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78161,7 +78161,7 @@
   },
   {
     "Cliente": "058807",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02027B",
     "Descricao": 0,
@@ -78177,7 +78177,7 @@
   },
   {
     "Cliente": "053431",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78193,7 +78193,7 @@
   },
   {
     "Cliente": "055638",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78209,7 +78209,7 @@
   },
   {
     "Cliente": "045928",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78225,7 +78225,7 @@
   },
   {
     "Cliente": "001700",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78241,7 +78241,7 @@
   },
   {
     "Cliente": "055545",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78257,7 +78257,7 @@
   },
   {
     "Cliente": "041810",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02028A",
     "Descricao": 0,
@@ -78273,7 +78273,7 @@
   },
   {
     "Cliente": "054035",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78289,7 +78289,7 @@
   },
   {
     "Cliente": "040303",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78305,7 +78305,7 @@
   },
   {
     "Cliente": "058729",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78321,7 +78321,7 @@
   },
   {
     "Cliente": "055826",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78337,7 +78337,7 @@
   },
   {
     "Cliente": "055316",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78353,7 +78353,7 @@
   },
   {
     "Cliente": "058806",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78369,7 +78369,7 @@
   },
   {
     "Cliente": "050933",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78385,7 +78385,7 @@
   },
   {
     "Cliente": "052447",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78401,7 +78401,7 @@
   },
   {
     "Cliente": "058771",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78417,7 +78417,7 @@
   },
   {
     "Cliente": "043110",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78433,7 +78433,7 @@
   },
   {
     "Cliente": "050188",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G100",
     "Codigo": "02029A",
     "Descricao": 0,
@@ -78449,7 +78449,7 @@
   },
   {
     "Cliente": "050305",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02035A",
     "Descricao": 0,
@@ -78465,7 +78465,7 @@
   },
   {
     "Cliente": "056975",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02036A",
     "Descricao": 0,
@@ -78481,7 +78481,7 @@
   },
   {
     "Cliente": "042144",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02036A",
     "Descricao": 0,
@@ -78497,7 +78497,7 @@
   },
   {
     "Cliente": "043317",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02036A",
     "Descricao": 0,
@@ -78513,7 +78513,7 @@
   },
   {
     "Cliente": "040097",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02036A",
     "Descricao": 0,
@@ -78529,7 +78529,7 @@
   },
   {
     "Cliente": "044242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02053A",
     "Descricao": 0,
@@ -78545,7 +78545,7 @@
   },
   {
     "Cliente": "044242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02053C",
     "Descricao": 0,
@@ -78561,7 +78561,7 @@
   },
   {
     "Cliente": "044242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02053H",
     "Descricao": 0,
@@ -78577,7 +78577,7 @@
   },
   {
     "Cliente": "044242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02053I",
     "Descricao": 0,
@@ -78593,7 +78593,7 @@
   },
   {
     "Cliente": "044242",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02053K",
     "Descricao": 0,
@@ -78609,7 +78609,7 @@
   },
   {
     "Cliente": "051464",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02055C",
     "Descricao": 0,
@@ -78625,7 +78625,7 @@
   },
   {
     "Cliente": "043836",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02055C",
     "Descricao": 0,
@@ -78641,7 +78641,7 @@
   },
   {
     "Cliente": "043674",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02057A",
     "Descricao": 0,
@@ -78657,7 +78657,7 @@
   },
   {
     "Cliente": "048947",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02057A",
     "Descricao": 0,
@@ -78673,7 +78673,7 @@
   },
   {
     "Cliente": "044456",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02057A",
     "Descricao": 0,
@@ -78689,7 +78689,7 @@
   },
   {
     "Cliente": "039962",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060A",
     "Descricao": 0,
@@ -78705,7 +78705,7 @@
   },
   {
     "Cliente": "038536",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060A",
     "Descricao": 0,
@@ -78721,7 +78721,7 @@
   },
   {
     "Cliente": "047438",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060A",
     "Descricao": 0,
@@ -78737,7 +78737,7 @@
   },
   {
     "Cliente": "058511",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060A",
     "Descricao": 0,
@@ -78753,7 +78753,7 @@
   },
   {
     "Cliente": "044456",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060A",
     "Descricao": 0,
@@ -78769,7 +78769,7 @@
   },
   {
     "Cliente": "058511",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060C",
     "Descricao": 0,
@@ -78785,7 +78785,7 @@
   },
   {
     "Cliente": "044456",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060C",
     "Descricao": 0,
@@ -78801,7 +78801,7 @@
   },
   {
     "Cliente": "050237",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02060C",
     "Descricao": 0,
@@ -78817,7 +78817,7 @@
   },
   {
     "Cliente": "043674",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064A",
     "Descricao": 0,
@@ -78833,7 +78833,7 @@
   },
   {
     "Cliente": "056975",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064A",
     "Descricao": 0,
@@ -78849,7 +78849,7 @@
   },
   {
     "Cliente": "038850",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064A",
     "Descricao": 0,
@@ -78865,7 +78865,7 @@
   },
   {
     "Cliente": "058790",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064A",
     "Descricao": 0,
@@ -78881,7 +78881,7 @@
   },
   {
     "Cliente": "058511",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064A",
     "Descricao": 0,
@@ -78897,7 +78897,7 @@
   },
   {
     "Cliente": "056105",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064C",
     "Descricao": 0,
@@ -78913,7 +78913,7 @@
   },
   {
     "Cliente": "050237",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02064C",
     "Descricao": 0,
@@ -78929,7 +78929,7 @@
   },
   {
     "Cliente": "054652",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02066A",
     "Descricao": 0,
@@ -78945,7 +78945,7 @@
   },
   {
     "Cliente": "056804",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02066A",
     "Descricao": 0,
@@ -78961,7 +78961,7 @@
   },
   {
     "Cliente": "037673",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02066A",
     "Descricao": 0,
@@ -78977,7 +78977,7 @@
   },
   {
     "Cliente": "051470",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02067C",
     "Descricao": 0,
@@ -78993,7 +78993,7 @@
   },
   {
     "Cliente": "052831",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02067C",
     "Descricao": 0,
@@ -79009,7 +79009,7 @@
   },
   {
     "Cliente": "058779",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79025,7 +79025,7 @@
   },
   {
     "Cliente": "040194",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79041,7 +79041,7 @@
   },
   {
     "Cliente": "053531",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79057,7 +79057,7 @@
   },
   {
     "Cliente": "058792",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79073,7 +79073,7 @@
   },
   {
     "Cliente": "037279",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79089,7 +79089,7 @@
   },
   {
     "Cliente": "052917",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79105,7 +79105,7 @@
   },
   {
     "Cliente": "053552",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79121,7 +79121,7 @@
   },
   {
     "Cliente": "044559",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79137,7 +79137,7 @@
   },
   {
     "Cliente": "044559",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79153,7 +79153,7 @@
   },
   {
     "Cliente": "052811",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79169,7 +79169,7 @@
   },
   {
     "Cliente": "052452",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79185,7 +79185,7 @@
   },
   {
     "Cliente": "052811",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79201,7 +79201,7 @@
   },
   {
     "Cliente": "041564",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79217,7 +79217,7 @@
   },
   {
     "Cliente": "052586",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070A",
     "Descricao": 0,
@@ -79233,7 +79233,7 @@
   },
   {
     "Cliente": "054182",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070C",
     "Descricao": 0,
@@ -79249,7 +79249,7 @@
   },
   {
     "Cliente": "053552",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070C",
     "Descricao": 0,
@@ -79265,7 +79265,7 @@
   },
   {
     "Cliente": "054182",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070C",
     "Descricao": 0,
@@ -79281,7 +79281,7 @@
   },
   {
     "Cliente": "049727",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02070C",
     "Descricao": 0,
@@ -79297,7 +79297,7 @@
   },
   {
     "Cliente": "049261",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79313,7 +79313,7 @@
   },
   {
     "Cliente": "049261",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79329,7 +79329,7 @@
   },
   {
     "Cliente": "049261",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79345,7 +79345,7 @@
   },
   {
     "Cliente": "049261",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79361,7 +79361,7 @@
   },
   {
     "Cliente": "049261",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79377,7 +79377,7 @@
   },
   {
     "Cliente": "053552",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071A",
     "Descricao": 0,
@@ -79393,7 +79393,7 @@
   },
   {
     "Cliente": "053552",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02071C",
     "Descricao": 0,
@@ -79409,7 +79409,7 @@
   },
   {
     "Cliente": "043640",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072A",
     "Descricao": 0,
@@ -79425,7 +79425,7 @@
   },
   {
     "Cliente": "051106",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072C",
     "Descricao": 0,
@@ -79441,7 +79441,7 @@
   },
   {
     "Cliente": "056849",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072C",
     "Descricao": 0,
@@ -79457,7 +79457,7 @@
   },
   {
     "Cliente": "057644",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072C",
     "Descricao": 0,
@@ -79473,7 +79473,7 @@
   },
   {
     "Cliente": "047383",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072D",
     "Descricao": 0,
@@ -79489,7 +79489,7 @@
   },
   {
     "Cliente": "054615",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072F",
     "Descricao": 0,
@@ -79505,7 +79505,7 @@
   },
   {
     "Cliente": "055929",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072F",
     "Descricao": 0,
@@ -79521,7 +79521,7 @@
   },
   {
     "Cliente": "036517",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02072F",
     "Descricao": 0,
@@ -79537,7 +79537,7 @@
   },
   {
     "Cliente": "053621",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02073C",
     "Descricao": 0,
@@ -79553,7 +79553,7 @@
   },
   {
     "Cliente": "054615",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02073C",
     "Descricao": 0,
@@ -79569,7 +79569,7 @@
   },
   {
     "Cliente": "057381",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02073C",
     "Descricao": 0,
@@ -79585,7 +79585,7 @@
   },
   {
     "Cliente": "053621",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02073F",
     "Descricao": 0,
@@ -79601,7 +79601,7 @@
   },
   {
     "Cliente": "055314",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074A",
     "Descricao": 0,
@@ -79617,7 +79617,7 @@
   },
   {
     "Cliente": "048512",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074A",
     "Descricao": 0,
@@ -79633,7 +79633,7 @@
   },
   {
     "Cliente": "043110",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074A",
     "Descricao": 0,
@@ -79649,7 +79649,7 @@
   },
   {
     "Cliente": "053315",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074A",
     "Descricao": 0,
@@ -79665,7 +79665,7 @@
   },
   {
     "Cliente": "049339",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074A",
     "Descricao": 0,
@@ -79681,7 +79681,7 @@
   },
   {
     "Cliente": "056849",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074C",
     "Descricao": 0,
@@ -79697,7 +79697,7 @@
   },
   {
     "Cliente": "026295",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074D",
     "Descricao": 0,
@@ -79713,7 +79713,7 @@
   },
   {
     "Cliente": "041972",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074D",
     "Descricao": 0,
@@ -79729,7 +79729,7 @@
   },
   {
     "Cliente": "045928",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074F",
     "Descricao": 0,
@@ -79745,7 +79745,7 @@
   },
   {
     "Cliente": "041972",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074F",
     "Descricao": 0,
@@ -79761,7 +79761,7 @@
   },
   {
     "Cliente": "054007",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02074F",
     "Descricao": 0,
@@ -79777,7 +79777,7 @@
   },
   {
     "Cliente": "041115",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076A",
     "Descricao": 0,
@@ -79793,7 +79793,7 @@
   },
   {
     "Cliente": "043836",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076A",
     "Descricao": 0,
@@ -79809,7 +79809,7 @@
   },
   {
     "Cliente": "057250",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076C",
     "Descricao": 0,
@@ -79825,7 +79825,7 @@
   },
   {
     "Cliente": "058786",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076C",
     "Descricao": 0,
@@ -79841,7 +79841,7 @@
   },
   {
     "Cliente": "057708",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076C",
     "Descricao": 0,
@@ -79857,7 +79857,7 @@
   },
   {
     "Cliente": "056849",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076C",
     "Descricao": 0,
@@ -79873,7 +79873,7 @@
   },
   {
     "Cliente": "057381",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076C",
     "Descricao": 0,
@@ -79889,7 +79889,7 @@
   },
   {
     "Cliente": "048898",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076D",
     "Descricao": 0,
@@ -79905,7 +79905,7 @@
   },
   {
     "Cliente": "057708",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076D",
     "Descricao": 0,
@@ -79921,7 +79921,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02076F",
     "Descricao": 0,
@@ -79937,7 +79937,7 @@
   },
   {
     "Cliente": "029429",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078A",
     "Descricao": 0,
@@ -79953,7 +79953,7 @@
   },
   {
     "Cliente": "041115",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078A",
     "Descricao": 0,
@@ -79969,7 +79969,7 @@
   },
   {
     "Cliente": "043836",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078A",
     "Descricao": 0,
@@ -79985,7 +79985,7 @@
   },
   {
     "Cliente": "042963",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078C",
     "Descricao": 0,
@@ -80001,7 +80001,7 @@
   },
   {
     "Cliente": "041972",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078C",
     "Descricao": 0,
@@ -80017,7 +80017,7 @@
   },
   {
     "Cliente": "057381",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078C",
     "Descricao": 0,
@@ -80033,7 +80033,7 @@
   },
   {
     "Cliente": "033852",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078F",
     "Descricao": 0,
@@ -80049,7 +80049,7 @@
   },
   {
     "Cliente": "040036",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078F",
     "Descricao": 0,
@@ -80065,7 +80065,7 @@
   },
   {
     "Cliente": "040036",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02078F",
     "Descricao": 0,
@@ -80081,7 +80081,7 @@
   },
   {
     "Cliente": "038536",
-    "Filial": "08",
+    "Filial": "01",
     "Grupo": "G150",
     "Codigo": "02079C",
     "Descricao": 0,

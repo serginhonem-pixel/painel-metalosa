@@ -9,6 +9,7 @@ const DEVOLUCAO_INPUT = path.resolve('src', 'Faturamento', 'devolução.xlsx');
 const DEVOLUCAO_OUTPUT = path.resolve('src', 'data', 'devolucao.json');
 const DEVOLUCAO_SHEET = 'SCAFNYW0';
 const CFOP_DEVOLUCAO = new Set(['1201', '2201', '1202', '2202']);
+const FILIAIS_FORCADAS_GRUPO = new Set(['G100', 'G110', 'G120', 'G150', 'G200']);
 const CUSTOS_INPUT = path.resolve('src', 'Faturamento', 'custos.xlsx');
 const CUSTOS_OUTPUT = path.resolve('src', 'data', 'custos.json');
 const CUSTOS_SHEET = 'Sheet1';
@@ -303,6 +304,15 @@ const extrairCustosIndiretos = (sheet) => {
   }, []);
 };
 
+const aplicarFilialGrupos = (linhas) =>
+  linhas.map((linha) => {
+    if (!linha) return linha;
+    if (FILIAIS_FORCADAS_GRUPO.has(String(linha.Grupo || '').trim().toUpperCase())) {
+      return { ...linha, Filial: '01' };
+    }
+    return linha;
+  });
+
 const main = () => {
   if (!fs.existsSync(INPUT)) {
     throw new Error(`Arquivo nao encontrado: ${INPUT}`);
@@ -314,7 +324,7 @@ const main = () => {
     throw new Error(`Aba nao encontrada: ${SHEET}`);
   }
 
-  const dados = extrairFaturamento(sheet);
+  const dados = aplicarFilialGrupos(extrairFaturamento(sheet));
   fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
   fs.writeFileSync(OUTPUT, JSON.stringify(dados, null, 2));
   console.log(`Gerado ${OUTPUT} com ${dados.length} linhas.`);
@@ -326,7 +336,7 @@ const main = () => {
       throw new Error(`Aba nao encontrada: ${DEVOLUCAO_SHEET}`);
     }
 
-    const devolucoes = extrairDevolucoes(devolucaoSheet);
+    const devolucoes = aplicarFilialGrupos(extrairDevolucoes(devolucaoSheet));
     fs.mkdirSync(path.dirname(DEVOLUCAO_OUTPUT), { recursive: true });
     fs.writeFileSync(DEVOLUCAO_OUTPUT, JSON.stringify(devolucoes, null, 2));
     console.log(`Gerado ${DEVOLUCAO_OUTPUT} com ${devolucoes.length} linhas.`);
