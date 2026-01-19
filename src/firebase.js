@@ -3,13 +3,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCD0MUk6azoj-cp1v5TP5Q0QP80SKNq-ds',
-  authDomain: 'inventario-bobina2.firebaseapp.com',
-  projectId: 'inventario-bobina2',
-  storageBucket: 'inventario-bobina2.firebasestorage.app',
-  messagingSenderId: '628276135464',
-  appId: '1:628276135464:web:e33c84479c8fccb0c7171d',
-  measurementId: 'G-TZS89ZE0TS',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);

@@ -59,25 +59,8 @@ const ITENS_MENU = [
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
 
-const MANUTENCAO_KPIS = [
-  { id: 'abertas', label: 'OS Abertas', value: 12, tone: 'bg-amber-500/20 text-amber-200' },
-  { id: 'andamento', label: 'Em Andamento', value: 5, tone: 'bg-blue-500/20 text-blue-200' },
-  { id: 'finalizadas', label: 'Finalizadas (30d)', value: 86, tone: 'bg-emerald-500/20 text-emerald-200' },
-  { id: 'mttr', label: 'MTTR Medio', value: '2h 18m', tone: 'bg-slate-500/20 text-slate-200' },
-];
-
-const MANUTENCAO_ORDENS = [
-  { id: 'OS-2019', ativo: 'Injetora 01', setor: 'Producao A', prioridade: 'Alta', status: 'Em andamento', responsavel: 'Ana' },
-  { id: 'OS-2018', ativo: 'Compressor Central', setor: 'Utilidades', prioridade: 'Critica', status: 'Aberta', responsavel: 'Carlos' },
-  { id: 'OS-2017', ativo: 'Torno CNC', setor: 'Usinagem', prioridade: 'Media', status: 'Aguardando peca', responsavel: 'Joao' },
-  { id: 'OS-2016', ativo: 'Chiller 02', setor: 'Utilidades', prioridade: 'Baixa', status: 'Finalizada', responsavel: 'Paulo' },
-];
-
-const MANUTENCAO_PARADAS = [
-  { id: 'P-401', ativo: 'Empilhadeira 02', motivo: 'Bateria', impacto: 'Baixo', tempo: '00:45' },
-  { id: 'P-402', ativo: 'Esteira 03', motivo: 'Sensor', impacto: 'Medio', tempo: '01:20' },
-  { id: 'P-403', ativo: 'Injetora 04', motivo: 'Hidraulica', impacto: 'Alto', tempo: '02:40' },
-];
+const MANUTENCAO_KPIS = [];
+const MANUTENCAO_PARADAS = [];
 
 
 const SETORES_INICIAIS = [];
@@ -593,6 +576,10 @@ export default function App() {
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
+  const [manutencaoOrdens, setManutencaoOrdens] = useState([]);
+  const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
+  const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
+  const [manutencaoSaveError, setManutencaoSaveError] = useState('');
   const [novaOsForm, setNovaOsForm] = useState({
     ativo: '',
     setor: '',
@@ -606,17 +593,64 @@ export default function App() {
     setNovaOsForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNovaOsSubmit = (e) => {
+  const handleNovaOsSubmit = async (e) => {
     e.preventDefault();
-    setManutencaoModalOpen(false);
-    setNovaOsForm({
-      ativo: '',
-      setor: '',
-      prioridade: 'Media',
-      tipo: 'Corretiva',
-      descricao: '',
-    });
+    setManutencaoSaveError('');
+    const osId = `os-${Date.now()}`;
+    const payload = {
+      ativo: novaOsForm.ativo,
+      setor: novaOsForm.setor,
+      prioridade: novaOsForm.prioridade,
+      tipo: novaOsForm.tipo,
+      descricao: novaOsForm.descricao,
+      status: 'Aberta',
+      responsavel: authUser?.displayName || authUser?.email || 'Usuario',
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      await setDoc(doc(db, 'manutencao_os', osId), payload);
+      setManutencaoOrdens((prev) => [{ id: osId, ...payload }, ...prev]);
+      setManutencaoModalOpen(false);
+      setNovaOsForm({
+        ativo: '',
+        setor: '',
+        prioridade: 'Media',
+        tipo: 'Corretiva',
+        descricao: '',
+      });
+    } catch (err) {
+      setManutencaoSaveError('Nao foi possivel salvar a OS.');
+    }
   };
+
+  useEffect(() => {
+    if (!authUser) {
+      setManutencaoOrdens([]);
+      setManutencaoOrdensLoading(false);
+      return;
+    }
+
+    const loadOrdens = async () => {
+      setManutencaoOrdensLoading(true);
+      setManutencaoOrdensError('');
+      try {
+        const snap = await getDocs(collection(db, 'manutencao_os'));
+        const items = snap.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }));
+        items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+        setManutencaoOrdens(items);
+      } catch (err) {
+        setManutencaoOrdensError('Nao foi possivel carregar as ordens.');
+      } finally {
+        setManutencaoOrdensLoading(false);
+      }
+    };
+
+    loadOrdens();
+  }, [authUser]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -5760,80 +5794,64 @@ const resumoCustosIndiretos = useMemo(() => {
 
                 {subAbaManutencao === 'resumo' && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {MANUTENCAO_KPIS.map((kpi) => (
-                        <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-2xl font-black text-white">{kpi.value}</span>
-                            <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                    {MANUTENCAO_KPIS.length ? (
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {MANUTENCAO_KPIS.map((kpi) => (
+                          <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                            <div className="mt-2 flex items-center justify-between">
+                              <span className="text-2xl font-black text-white">{kpi.value}</span>
+                              <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
+                        KPIs sem dados no momento.
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Paradas em andamento</h3>
-                        <div className="space-y-3">
-                          {MANUTENCAO_PARADAS.map((item) => {
-                            const impactoTone =
-                              item.impacto === 'Alto'
-                                ? 'border-rose-400/80 bg-rose-500/10 text-rose-200'
-                                : item.impacto === 'Medio'
-                                  ? 'border-amber-400/80 bg-amber-500/10 text-amber-200'
-                                  : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-200';
-                            return (
-                              <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
-                                <div>
-                                  <p className="text-sm font-bold text-white">{item.ativo}</p>
-                                  <p className="text-xs text-slate-400">{item.motivo} - {item.tempo}</p>
+                        {MANUTENCAO_PARADAS.length ? (
+                          <div className="space-y-3">
+                            {MANUTENCAO_PARADAS.map((item) => {
+                              const impactoTone =
+                                item.impacto === 'Alto'
+                                  ? 'border-rose-400/80 bg-rose-500/10 text-rose-200'
+                                  : item.impacto === 'Medio'
+                                    ? 'border-amber-400/80 bg-amber-500/10 text-amber-200'
+                                    : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-200';
+                              return (
+                                <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
+                                  <div>
+                                    <p className="text-sm font-bold text-white">{item.ativo}</p>
+                                    <p className="text-xs text-slate-400">{item.motivo} - {item.tempo}</p>
+                                  </div>
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.impacto}</span>
                                 </div>
-                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.impacto}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                            Sem paradas registradas.
+                          </div>
+                        )}
                       </div>
 
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Alertas rapidos</h3>
-                        <div className="space-y-3 text-sm text-slate-300">
-                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                            <span>Manutencao preventiva atrasada (5 ativos)</span>
-                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-200">Atraso</span>
-                          </div>
-                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                            <span>Checklists pendentes (3 turnos)</span>
-                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">Hoje</span>
-                          </div>
-                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                            <span>Consumo de pecas acima do previsto</span>
-                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-rose-500/20 text-rose-200">Risco</span>
-                          </div>
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                          Sem alertas cadastrados.
                         </div>
                       </div>
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por setor</h3>
-                        <div className="space-y-3 text-sm text-slate-300">
-                          {[
-                            { setor: 'Producao A', valor: 6 },
-                            { setor: 'Utilidades', valor: 4 },
-                            { setor: 'Usinagem', valor: 3 },
-                          ].map((item) => (
-                            <div key={item.setor} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-200">{item.setor}</span>
-                                <span className="text-xs font-bold text-slate-200">{item.valor}</span>
-                              </div>
-                              <div className="mt-2 h-1.5 rounded-full bg-slate-800">
-                                <div
-                                  className="h-1.5 rounded-full bg-gradient-to-r from-cyan-400/80 to-blue-500/80"
-                                  style={{ width: `${Math.min(item.valor * 15, 100)}%` }}
-                                />
-                              </div>
-                            </div>
-                          ))}
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                          Sem dados de backlog.
                         </div>
                       </div>
                     </div>
@@ -5862,20 +5880,40 @@ const resumoCustosIndiretos = useMemo(() => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800 text-slate-200">
-                          {MANUTENCAO_ORDENS.map((ordem) => (
-                            <tr key={ordem.id} className="hover:bg-slate-900/60">
-                              <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
-                              <td className="px-4 py-3 text-slate-300">{ordem.ativo}</td>
-                              <td className="px-4 py-3 text-slate-400">{ordem.setor}</td>
-                              <td className="px-4 py-3">
-                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade}</span>
+                          {manutencaoOrdensLoading ? (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={6}>
+                                Carregando ordens...
                               </td>
-                              <td className="px-4 py-3">
-                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status}</span>
-                              </td>
-                              <td className="px-4 py-3 text-slate-300">{ordem.responsavel}</td>
                             </tr>
-                          ))}
+                          ) : manutencaoOrdensError ? (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={6}>
+                                {manutencaoOrdensError}
+                              </td>
+                            </tr>
+                          ) : manutencaoOrdens.length ? (
+                            manutencaoOrdens.map((ordem) => (
+                              <tr key={ordem.id} className="hover:bg-slate-900/60">
+                                <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
+                                <td className="px-4 py-3 text-slate-300">{ordem.ativo || '-'}</td>
+                                <td className="px-4 py-3 text-slate-400">{ordem.setor || '-'}</td>
+                                <td className="px-4 py-3">
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3 text-slate-300">{ordem.responsavel || '-'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={6}>
+                                Sem ordens registradas.
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -5960,6 +5998,11 @@ const resumoCustosIndiretos = useMemo(() => {
                           <label className="text-xs font-bold text-slate-400">Descricao</label>
                           <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
                         </div>
+                        {manutencaoSaveError && (
+                          <div className="text-xs text-rose-300">
+                            {manutencaoSaveError}
+                          </div>
+                        )}
                         <div className="flex justify-end gap-3 border-t border-slate-800 pt-4">
                           <button type="button" onClick={() => setManutencaoModalOpen(false)} className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-500">Cancelar</button>
                           <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">Salvar OS</button>
