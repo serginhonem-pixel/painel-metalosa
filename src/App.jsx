@@ -496,9 +496,12 @@ export default function App() {
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
-  const [listaSetores, setListaSetores] = useState(SETORES_INICIAIS);
+  const [listaSetores, setListaSetores] = useState([]);
   const [listaGestores, setListaGestores] = useState(GESTORES_INICIAIS);
   const [listaMaquinas, setListaMaquinas] = useState(MAQUINAS_INICIAIS);
+  const [maquinasErro, setMaquinasErro] = useState('');
+  const [setoresErro, setSetoresErro] = useState('');
+  const [setoresCarregadosFirestore, setSetoresCarregadosFirestore] = useState(false);
   const [colaboradores, setColaboradores] = useState([]);
   const [funcionariosFirestore, setFuncionariosFirestore] = useState([]);
   const [faturamentoDados, setFaturamentoDados] = useState({
@@ -559,6 +562,18 @@ export default function App() {
 
   const handleNovaOsChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'ativo') {
+      const valorNorm = normalizarTexto(value);
+      const maquina = listaMaquinas.find(
+        (item) => normalizarTexto(item.nome) === valorNorm
+      );
+      setNovaOsForm((prev) => ({
+        ...prev,
+        ativo: value,
+        setor: maquina?.setor || prev.setor,
+      }));
+      return;
+    }
     setNovaOsForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -745,6 +760,90 @@ export default function App() {
 
     loadOrdens();
   }, [authUser, isAllowedDomain]);
+
+  const handleSalvarMaquina = async (nome, setor) => {
+    const nomeLimpo = String(nome || '').trim();
+    if (!nomeLimpo) return;
+    if (!authUser || !isAllowedDomain) {
+      setMaquinasErro('Sem permissao para salvar maquinas.');
+      return;
+    }
+    const setorLimpo = String(setor || '').trim();
+    const baseId = normalizarIdFirestore(nomeLimpo);
+    const existe = listaMaquinas.some((item) => item.id === baseId);
+    const id = baseId && !existe ? baseId : `${baseId || 'maquina'}-${Date.now()}`;
+    const payload = {
+      nome: nomeLimpo,
+      setor: setorLimpo,
+      createdAt: new Date().toISOString(),
+    };
+
+    setMaquinasErro('');
+    try {
+      await setDoc(doc(db, 'maquinas', id), payload);
+      setListaMaquinas((prev) => {
+        const atualizado = prev.some((item) => item.id === id)
+          ? prev.map((item) => (item.id === id ? { ...item, ...payload } : item))
+          : [...prev, { id, ...payload }];
+        return atualizado.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+      });
+    } catch (err) {
+      setMaquinasErro('Nao foi possivel salvar a maquina.');
+    }
+  };
+
+  const handleExcluirMaquina = async (id) => {
+    if (!authUser || !isAllowedDomain) {
+      setMaquinasErro('Sem permissao para excluir maquinas.');
+      return;
+    }
+    setMaquinasErro('');
+    try {
+      await deleteDoc(doc(db, 'maquinas', id));
+      setListaMaquinas((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setMaquinasErro('Nao foi possivel excluir a maquina.');
+    }
+  };
+
+  const handleSalvarSetor = async (nome) => {
+    const nomeLimpo = String(nome || '').trim();
+    if (!nomeLimpo) return;
+    if (!authUser || !isAllowedDomain) {
+      setSetoresErro('Sem permissao para salvar setores.');
+      return;
+    }
+    const nomeNorm = normalizarTexto(nomeLimpo);
+    const existe = listaSetores.some((item) => normalizarTexto(item) === nomeNorm);
+    if (existe) return;
+    const id = normalizarIdFirestore(nomeLimpo);
+    const payload = { nome: nomeLimpo, createdAt: new Date().toISOString() };
+    setSetoresErro('');
+    try {
+      await setDoc(doc(db, 'setores', id), payload);
+      setListaSetores((prev) =>
+        [...prev, nomeLimpo].sort((a, b) => String(a).localeCompare(String(b)))
+      );
+      setSetoresCarregadosFirestore(true);
+    } catch (err) {
+      setSetoresErro('Nao foi possivel salvar o setor.');
+    }
+  };
+
+  const handleExcluirSetor = async (nome) => {
+    if (!authUser || !isAllowedDomain) {
+      setSetoresErro('Sem permissao para excluir setores.');
+      return;
+    }
+    const id = normalizarIdFirestore(nome);
+    setSetoresErro('');
+    try {
+      await deleteDoc(doc(db, 'setores', id));
+      setListaSetores((prev) => prev.filter((item) => item !== nome));
+    } catch (err) {
+      setSetoresErro('Nao foi possivel excluir o setor.');
+    }
+  };
 
   const toggleCfopFilter = (option) => {
     if (!option) return;
@@ -958,7 +1057,7 @@ export default function App() {
 
       setColaboradores(colaboradoresIniciais);
     }
-    if (!listaSetores.length || funcionariosFirestore.length > 0) {
+    if (!setoresCarregadosFirestore && (!listaSetores.length || funcionariosFirestore.length > 0)) {
       const setores = new Set((funcionariosFonte || []).map((item) => item.setor).filter(Boolean));
       if (presencaLeandroExcel?.colaboradores?.length) {
         presencaLeandroExcel.colaboradores.forEach((colab) => {
@@ -969,7 +1068,14 @@ export default function App() {
       }
       setListaSetores(Array.from(setores));
     }
-  }, [presencaLeandroExcel, funcionariosFonte, funcionariosFirestore.length, colaboradores.length, listaSetores.length]);
+  }, [
+    presencaLeandroExcel,
+    funcionariosFonte,
+    funcionariosFirestore.length,
+    colaboradores.length,
+    listaSetores.length,
+    setoresCarregadosFirestore,
+  ]);
 
   useEffect(() => {
     if (!presencaLeandroExcel?.colaboradores?.length) return;
@@ -1039,6 +1145,60 @@ export default function App() {
     };
 
     carregarSupervisores();
+    return () => {
+      ativo = false;
+    };
+  }, [isAllowedDomain]);
+
+  useEffect(() => {
+    if (!isAllowedDomain) return;
+    let ativo = true;
+    const carregarMaquinas = async () => {
+      setMaquinasErro('');
+      try {
+        const snap = await getDocs(collection(db, 'maquinas'));
+        if (!ativo) return;
+        const items = snap.docs.map((docRef) => ({
+          id: docRef.id,
+          ...docRef.data(),
+        }));
+        items.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+        setListaMaquinas(items);
+      } catch (err) {
+        if (!ativo) return;
+        setMaquinasErro('Nao foi possivel carregar as maquinas.');
+      }
+    };
+
+    carregarMaquinas();
+    return () => {
+      ativo = false;
+    };
+  }, [isAllowedDomain]);
+
+  useEffect(() => {
+    if (!isAllowedDomain) return;
+    let ativo = true;
+    const carregarSetores = async () => {
+      setSetoresErro('');
+      try {
+        const snap = await getDocs(collection(db, 'setores'));
+        if (!ativo) return;
+        const items = snap.docs
+          .map((docRef) => docRef.data().nome || docRef.id)
+          .filter(Boolean);
+        const merged = Array.from(new Set(items))
+          .filter(Boolean)
+          .sort((a, b) => String(a).localeCompare(String(b)));
+        setListaSetores(merged);
+        setSetoresCarregadosFirestore(true);
+      } catch (err) {
+        if (!ativo) return;
+        setSetoresErro('Nao foi possivel carregar os setores.');
+      }
+    };
+
+    carregarSetores();
     return () => {
       ativo = false;
     };
@@ -3603,7 +3763,7 @@ const resumoCustosIndiretos = useMemo(() => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {[
                   {
                     titulo: 'Faturamento Total',
@@ -3649,7 +3809,7 @@ const resumoCustosIndiretos = useMemo(() => {
                     icon: CalendarIcon,
                     corFundo: 'bg-slate-400',
                   },
-                ].map((kpi) => (
+                ].filter((kpi) => !['Faltas hoje', 'FÇ¸rias hoje'].includes(kpi.titulo)).map((kpi) => (
                   <CardInformativo
                     key={kpi.titulo}
                     titulo={kpi.titulo}
@@ -4813,7 +4973,10 @@ const resumoCustosIndiretos = useMemo(() => {
 
                             return (
                               <div className="space-y-4">
-                                <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
+                                <svg
+                                  viewBox={`0 0 ${width} ${height}`}
+                                  className="w-full h-80"
+                                >
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
@@ -6523,7 +6686,7 @@ const resumoCustosIndiretos = useMemo(() => {
                             <input name="ativo" list="manutencao-ativos" value={novaOsForm.ativo} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Injetora 01" required />
                             <datalist id="manutencao-ativos">
                               {listaMaquinas.map((item) => (
-                                <option key={item.id} value={item.nome}>{item.setor}</option>
+                                <option key={item.id} value={item.nome}>{`${item.nome} • ${item.setor}`}</option>
                               ))}
                             </datalist>
                           </div>
@@ -6618,20 +6781,25 @@ const resumoCustosIndiretos = useMemo(() => {
                   <div className="space-y-6">
                     <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                     <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Layers size={22} className="text-blue-600" /> Setores Estruturais</h3>
-                    <form className="flex gap-4 mb-8" onSubmit={(e) => {
+                    <form className="flex flex-wrap gap-4 mb-8" onSubmit={async (e) => {
                       e.preventDefault();
                       const v = e.target.elements.novoSetor.value;
-                      if(v && !listaSetores.includes(v)) setListaSetores([...listaSetores, v]);
+                      await handleSalvarSetor(v);
                       e.target.reset();
                     }}>
                        <input name="novoSetor" type="text" className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Ex: Acabamento" />
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Criar</button>
                     </form>
+                    {setoresErro && (
+                      <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                        {setoresErro}
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                        {listaSetores.map(s => (
                          <div key={s} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center group">
                             <span className="font-bold text-slate-700 text-sm">{s}</span>
-                            <Trash2 size={16} className="text-slate-300 hover:text-rose-500 cursor-pointer" onClick={() => setListaSetores(listaSetores.filter(x => x !== s))} />
+                            <Trash2 size={16} className="text-slate-300 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirSetor(s)} />
                          </div>
                        ))}
                     </div>
@@ -6709,11 +6877,11 @@ const resumoCustosIndiretos = useMemo(() => {
                 {subAbaConfig === 'maquinas' && (
                   <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                     <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Cpu size={22} className="text-blue-600" /> Cadastro de Ativos</h3>
-                    <form className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" onSubmit={(e) => {
+                    <form className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" onSubmit={async (e) => {
                       e.preventDefault();
                       const n = e.target.elements.nomeMaq.value;
                       const s = e.target.elements.setorMaq.value;
-                      if(n) setListaMaquinas([...listaMaquinas, { id: Date.now(), nome: n, setor: s }]);
+                      await handleSalvarMaquina(n, s);
                       e.target.reset();
                     }}>
                        <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Máquina" />
@@ -6722,11 +6890,16 @@ const resumoCustosIndiretos = useMemo(() => {
                        </select>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
                     </form>
+                    {maquinasErro && (
+                      <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                        {maquinasErro}
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                        {listaMaquinas.map(m => (
                          <div key={m.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center border-l-4 border-l-blue-600 shadow-sm">
                             <div><p className="font-bold text-slate-800 text-sm">{m.nome}</p><p className="text-[10px] text-blue-600 font-bold uppercase">{m.setor}</p></div>
-                            <Trash2 size={16} className="text-slate-200 hover:text-rose-500 cursor-pointer" onClick={() => setListaMaquinas(listaMaquinas.filter(x => x.id !== m.id))} />
+                            <Trash2 size={16} className="text-slate-200 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirMaquina(m.id)} />
                          </div>
                        ))}
                     </div>
