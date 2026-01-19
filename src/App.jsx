@@ -12,6 +12,7 @@ import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import vendedoresData from './data/vendedores.json';
 import { computeCostBreakdown } from './services/costing';
+import * as XLSX from 'xlsx';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
@@ -489,6 +490,9 @@ export default function App() {
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
   const [diaFaturamentoSelecionado, setDiaFaturamentoSelecionado] = useState(null);
+  const [faturamentoTabelaView, setFaturamentoTabelaView] = useState('dia');
+  const [faturamentoInicio, setFaturamentoInicio] = useState('');
+  const [faturamentoFim, setFaturamentoFim] = useState('');
   const [carregando, setCarregando] = useState(true);
 
   // --- Estados de Dados ---
@@ -2333,6 +2337,135 @@ export default function App() {
       totalDevolucaoDia,
     };
   }, [diaFaturamentoSelecionado, faturamentoAtual.linhas]);
+
+  const clientesPorCodigoVendedor = useMemo(
+    () =>
+      new Map(
+        (clientesData?.clientes || []).map((cliente) => [
+          normalizarCodigoCliente(cliente.Codigo),
+          normalizarCodigoVendedor(cliente.Vendedor),
+        ])
+      ),
+    [clientesData]
+  );
+
+  const vendedoresPorCodigo = useMemo(
+    () =>
+      new Map(
+        (vendedoresData || []).map((vendedor) => [
+          normalizarCodigoVendedor(vendedor.Codigo),
+          vendedor.Nome || '',
+        ])
+      ),
+    [vendedoresData]
+  );
+
+  const faturamentoLinhasComVendedor = useMemo(
+    () =>
+      faturamentoAtual.linhas.map((row) => {
+        const codigoCliente = normalizarCodigoCliente(row.cliente);
+        const vendedorCodigo = clientesPorCodigoVendedor.get(codigoCliente) || '';
+        const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
+        return { ...row, vendedorNome };
+      }),
+    [faturamentoAtual.linhas, clientesPorCodigoVendedor, vendedoresPorCodigo]
+  );
+
+  const faturamentoLinhasFiltradas = useMemo(() => {
+    if (!faturamentoInicio && !faturamentoFim) return faturamentoLinhasComVendedor;
+    return faturamentoLinhasComVendedor.filter((row) => {
+      const emissao = row.emissao instanceof Date ? row.emissao : parseEmissaoData(row.emissao);
+      if (!emissao) return false;
+      const dataISO = emissao.toISOString().slice(0, 10);
+      if (faturamentoInicio && dataISO < faturamentoInicio) return false;
+      if (faturamentoFim && dataISO > faturamentoFim) return false;
+      return true;
+    });
+  }, [faturamentoLinhasComVendedor, faturamentoInicio, faturamentoFim]);
+
+  const faturamentoPorVendedor = useMemo(() => {
+    const mapa = new Map();
+    faturamentoLinhasFiltradas.forEach((row) => {
+      const vendedor = row.vendedorNome || 'Sem vendedor';
+      if (!mapa.has(vendedor)) {
+        mapa.set(vendedor, {
+          vendedor,
+          total: 0,
+          vendas: 0,
+          devolucoes: 0,
+          linhas: 0,
+        });
+      }
+      const item = mapa.get(vendedor);
+      const valor = obterValorLiquido(row);
+      item.total += valor;
+      if (normalizarTipoMovimento(row.tipoMovimento) === 'devolucao') {
+        item.devolucoes += Math.abs(valor);
+      } else {
+        item.vendas += valor;
+      }
+      item.linhas += 1;
+    });
+    return Array.from(mapa.values()).sort((a, b) => Math.abs(b.total) - Math.abs(a.total));
+  }, [faturamentoLinhasFiltradas]);
+
+  const faturamentoTotalFiltrado = useMemo(
+    () => faturamentoLinhasFiltradas.reduce((acc, row) => acc + (row.valorTotal || 0), 0),
+    [faturamentoLinhasFiltradas]
+  );
+
+  const exportFaturamentoDisponivel =
+    faturamentoTabelaView === 'dia'
+      ? (detalhesDiaFaturamento?.linhas || []).length > 0
+      : faturamentoLinhasFiltradas.length > 0;
+
+  const handleExportarFaturamentoExcel = () => {
+    const linhasBase =
+      faturamentoTabelaView === 'dia' && diaFaturamentoSelecionado
+        ? detalhesDiaFaturamento?.linhas || []
+        : faturamentoLinhasFiltradas;
+
+    if (!linhasBase.length) return;
+
+    const produtosPorCodigo = new Map(
+      (produtosData || []).map((produto) => [
+        normalizarCodigoProduto(produto.codigo),
+        produto.descricao || '',
+      ])
+    );
+
+    const formatarData = (valor) => {
+      const data = valor instanceof Date ? valor : parseEmissaoData(valor);
+      return data ? data.toLocaleDateString('pt-BR') : '';
+    };
+
+    const linhasExport = linhasBase.map((row) => ({
+      Data: formatarData(row.emissao) || diaFaturamentoSelecionado || '',
+      Tipo: row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda',
+      Cliente: row.cliente || '',
+      Nome: row.clienteNome || '',
+      Vendedor: row.vendedorNome || '',
+      Filial: row.filial || '',
+      Grupo: row.grupo || '',
+      Codigo: row.codigo || '',
+      Descricao: row.descricao || produtosPorCodigo.get(normalizarCodigoProduto(row.codigo)) || '',
+      Quantidade: row.quantidade ?? 0,
+      Unidade: row.unidade || '',
+      Valor: row.valorTotal ?? 0,
+      NF: row.nf || '',
+      CFOP: row.cfop || '',
+    }));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(linhasExport);
+    XLSX.utils.book_append_sheet(wb, ws, 'Faturamento');
+
+    const periodo = diaFaturamentoSelecionado
+      ? diaFaturamentoSelecionado
+      : [faturamentoInicio, faturamentoFim].filter(Boolean).join('_') || 'completo';
+    const nomeArquivo = `faturamento_${periodo}.xlsx`;
+    XLSX.writeFile(wb, nomeArquivo);
+  };
 
   useEffect(() => {
     if (!diaFaturamentoSelecionado) return;
@@ -4770,101 +4903,247 @@ const resumoCustosIndiretos = useMemo(() => {
                                   );
                                 })}
                               </svg>
-                              {diaFaturamentoSelecionado ? (
-                                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5">
-                                  <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <div>
-                                      <p className="text-xs uppercase tracking-widest text-slate-400 font-bold">
-                                        Detalhe do dia
-                                      </p>
-                                      <p className="text-lg font-black text-white">
-                                        {new Date(`${diaFaturamentoSelecionado}T00:00:00`).toLocaleDateString('pt-BR')}
-                                      </p>
+                              <div className="rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                  <div>
+                                    <p className="text-xs uppercase tracking-widest text-slate-400 font-bold">
+                                      {faturamentoTabelaView === 'dia' ? 'Detalhe do dia' : 'Visao por vendedor'}
+                                    </p>
+                                    {faturamentoTabelaView === 'dia' ? (
+                                      diaFaturamentoSelecionado ? (
+                                        <p className="text-lg font-black text-white">
+                                          {new Date(`${diaFaturamentoSelecionado}T00:00:00`).toLocaleDateString('pt-BR')}
+                                        </p>
+                                      ) : (
+                                        <p className="text-sm text-slate-400">
+                                          Selecione um dia no grafico para ver as linhas.
+                                        </p>
+                                      )
+                                    ) : (
+                                      <p className="text-sm text-slate-400">Resumo por vendedor no periodo.</p>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <div className="flex rounded-full border border-slate-700/80 bg-slate-950/70 p-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
+                                      <button
+                                        type="button"
+                                        onClick={() => setFaturamentoTabelaView('dia')}
+                                        className={`rounded-full px-3 py-1 transition ${
+                                          faturamentoTabelaView === 'dia'
+                                            ? 'bg-sky-300 text-slate-900 shadow'
+                                            : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+                                        }`}
+                                      >
+                                        Dia
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setFaturamentoTabelaView('vendedor')}
+                                        className={`rounded-full px-3 py-1 transition ${
+                                          faturamentoTabelaView === 'vendedor'
+                                            ? 'bg-sky-300 text-slate-900 shadow'
+                                            : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+                                        }`}
+                                      >
+                                        Vendedor
+                                      </button>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                                      <input
+                                        type="date"
+                                        value={faturamentoInicio}
+                                        onChange={(event) => setFaturamentoInicio(event.target.value)}
+                                        className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-slate-200"
+                                      />
+                                      <span className="text-slate-500">a</span>
+                                      <input
+                                        type="date"
+                                        value={faturamentoFim}
+                                        onChange={(event) => setFaturamentoFim(event.target.value)}
+                                        className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-slate-200"
+                                      />
+                                      {(faturamentoInicio || faturamentoFim) && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setFaturamentoInicio('');
+                                            setFaturamentoFim('');
+                                          }}
+                                          className="rounded-full border border-slate-700 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-white"
+                                        >
+                                          Limpar datas
+                                        </button>
+                                      )}
                                     </div>
                                     <button
                                       type="button"
-                                      onClick={() => setDiaFaturamentoSelecionado(null)}
-                                      className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white"
+                                      onClick={handleExportarFaturamentoExcel}
+                                      disabled={!exportFaturamentoDisponivel}
+                                      className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
+                                        exportFaturamentoDisponivel
+                                          ? 'border-emerald-400 text-emerald-200 hover:text-white'
+                                          : 'border-slate-700 text-slate-500 cursor-not-allowed'
+                                      }`}
                                     >
-                                      Limpar
+                                      Baixar Excel
                                     </button>
-                                  </div>
-                                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
-                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                                      <p>Total do dia</p>
-                                      <p className="text-base font-black text-white mt-1">
-                                        {formatarMoeda(detalhesDiaFaturamento?.totalDia || 0)}
-                                      </p>
-                                    </div>
-                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                                      <p>Faturamento</p>
-                                      <p className="text-base font-black text-emerald-300 mt-1">
-                                        {formatarMoeda(detalhesDiaFaturamento?.totalBrutoDia || 0)}
-                                      </p>
-                                    </div>
-                                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                                      <p>Devolucoes</p>
-                                      <p className="text-base font-black text-rose-300 mt-1">
-                                        {formatarMoeda(detalhesDiaFaturamento?.totalDevolucaoDia || 0)}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="mt-4 max-h-80 overflow-auto rounded-xl border border-slate-800">
-                                    <table className="w-full text-left text-xs">
-                                      <thead className="sticky top-0 bg-slate-900 text-slate-400 uppercase tracking-wider">
-                                        <tr>
-                                          <th className="px-3 py-3">Tipo</th>
-                                          <th className="px-3 py-3">Cliente</th>
-                                          <th className="px-3 py-3">Nome</th>
-                                          <th className="px-3 py-3">Vendedor</th>
-                                          <th className="px-3 py-3">Filial</th>
-                                          <th className="px-3 py-3">Grupo</th>
-                                          <th className="px-3 py-3">Codigo</th>
-                                          <th className="px-3 py-3">Descricao</th>
-                                          <th className="px-3 py-3 text-right">Qtd</th>
-                                          <th className="px-3 py-3">Un</th>
-                                          <th className="px-3 py-3 text-right">Valor</th>
-                                          <th className="px-3 py-3">NF</th>
-                                          <th className="px-3 py-3">CFOP</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="divide-y divide-slate-800 text-slate-200">
-                                        {(detalhesDiaFaturamento?.linhas || []).map((row, index) => (
-                                          <tr key={`${row.nf || row.codigo}-${index}`}>
-                                            <td
-                                              className={`px-3 py-2 font-bold ${
-                                                row.tipoMovimento === 'devolucao' ? 'text-rose-300' : 'text-emerald-300'
-                                              }`}
-                                            >
-                                              {row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda'}
-                                            </td>
-                                            <td className="px-3 py-2">{row.cliente || '-'}</td>
-                                            <td className="px-3 py-2">{row.clienteNome || '-'}</td>
-                                            <td className="px-3 py-2">{row.vendedorNome || '-'}</td>
-                                            <td className="px-3 py-2">{row.filial || '-'}</td>
-                                            <td className="px-3 py-2">{row.grupo || '-'}</td>
-                                            <td className="px-3 py-2 font-semibold">{row.codigo || '-'}</td>
-                                            <td className="px-3 py-2">{row.descricao || '-'}</td>
-                                            <td className="px-3 py-2 text-right">
-                                              {Number(row.quantidade || 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}
-                                            </td>
-                                            <td className="px-3 py-2">{row.unidade || '-'}</td>
-                                            <td className="px-3 py-2 text-right font-semibold">
-                                              {formatarMoeda(row.valorTotal)}
-                                            </td>
-                                            <td className="px-3 py-2">{row.nf || '-'}</td>
-                                            <td className="px-3 py-2">{row.cfop || '-'}</td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                    {faturamentoTabelaView === 'dia' && diaFaturamentoSelecionado && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setDiaFaturamentoSelecionado(null)}
+                                        className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white"
+                                      >
+                                        Limpar dia
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
-                              ) : (
-                                <p className="text-xs text-slate-400 text-center">
-                                  Clique em um dia no grafico para abrir a tabela com faturamento e devolucoes.
-                                </p>
-                              )}
+                                {faturamentoTabelaView === 'dia' ? (
+                                  diaFaturamentoSelecionado ? (
+                                    <>
+                                      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Total do dia</p>
+                                          <p className="text-base font-black text-white mt-1">
+                                            {formatarMoeda(detalhesDiaFaturamento?.totalDia || 0)}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Faturamento</p>
+                                          <p className="text-base font-black text-emerald-300 mt-1">
+                                            {formatarMoeda(detalhesDiaFaturamento?.totalBrutoDia || 0)}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Devolucoes</p>
+                                          <p className="text-base font-black text-rose-300 mt-1">
+                                            {formatarMoeda(detalhesDiaFaturamento?.totalDevolucaoDia || 0)}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <div className="mt-4 max-h-80 overflow-auto rounded-xl border border-slate-800">
+                                        <table className="w-full text-left text-xs">
+                                          <thead className="sticky top-0 bg-slate-900 text-slate-400 uppercase tracking-wider">
+                                            <tr>
+                                              <th className="px-3 py-3">Tipo</th>
+                                              <th className="px-3 py-3">Cliente</th>
+                                              <th className="px-3 py-3">Nome</th>
+                                              <th className="px-3 py-3">Vendedor</th>
+                                              <th className="px-3 py-3">Filial</th>
+                                              <th className="px-3 py-3">Grupo</th>
+                                              <th className="px-3 py-3">Codigo</th>
+                                              <th className="px-3 py-3">Descricao</th>
+                                              <th className="px-3 py-3 text-right">Qtd</th>
+                                              <th className="px-3 py-3">Un</th>
+                                              <th className="px-3 py-3 text-right">Valor</th>
+                                              <th className="px-3 py-3">NF</th>
+                                              <th className="px-3 py-3">CFOP</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="divide-y divide-slate-800 text-slate-200">
+                                            {(detalhesDiaFaturamento?.linhas || []).map((row, index) => (
+                                              <tr key={`${row.nf || row.codigo}-${index}`}>
+                                                <td
+                                                  className={`px-3 py-2 font-bold ${
+                                                    row.tipoMovimento === 'devolucao'
+                                                      ? 'text-rose-300'
+                                                      : 'text-emerald-300'
+                                                  }`}
+                                                >
+                                                  {row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda'}
+                                                </td>
+                                                <td className="px-3 py-2">{row.cliente || '-'}</td>
+                                                <td className="px-3 py-2">{row.clienteNome || '-'}</td>
+                                                <td className="px-3 py-2">{row.vendedorNome || '-'}</td>
+                                                <td className="px-3 py-2">{row.filial || '-'}</td>
+                                                <td className="px-3 py-2">{row.grupo || '-'}</td>
+                                                <td className="px-3 py-2 font-semibold">{row.codigo || '-'}</td>
+                                                <td className="px-3 py-2">{row.descricao || '-'}</td>
+                                                <td className="px-3 py-2 text-right">
+                                                  {Number(row.quantidade || 0).toLocaleString('pt-BR', {
+                                                    maximumFractionDigits: 2,
+                                                  })}
+                                                </td>
+                                                <td className="px-3 py-2">{row.unidade || '-'}</td>
+                                                <td className="px-3 py-2 text-right font-semibold">
+                                                  {formatarMoeda(row.valorTotal)}
+                                                </td>
+                                                <td className="px-3 py-2">{row.nf || '-'}</td>
+                                                <td className="px-3 py-2">{row.cfop || '-'}</td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <p className="text-xs text-slate-400 text-center mt-4">
+                                      Clique em um dia no grafico para abrir a tabela com faturamento e devolucoes.
+                                    </p>
+                                  )
+                                ) : (
+                                  <>
+                                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
+                                      <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                        <p>Vendedores</p>
+                                        <p className="text-base font-black text-white mt-1">
+                                          {faturamentoPorVendedor.length}
+                                        </p>
+                                      </div>
+                                      <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                        <p>Linhas no periodo</p>
+                                        <p className="text-base font-black text-white mt-1">
+                                          {faturamentoLinhasFiltradas.length}
+                                        </p>
+                                      </div>
+                                      <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                        <p>Total no periodo</p>
+                                        <p className="text-base font-black text-emerald-300 mt-1">
+                                          {formatarMoeda(faturamentoTotalFiltrado)}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="mt-4 max-h-80 overflow-auto rounded-xl border border-slate-800">
+                                      <table className="w-full text-left text-xs">
+                                        <thead className="sticky top-0 bg-slate-900 text-slate-400 uppercase tracking-wider">
+                                          <tr>
+                                            <th className="px-3 py-3">Vendedor</th>
+                                            <th className="px-3 py-3 text-right">Total</th>
+                                            <th className="px-3 py-3 text-right">Vendas</th>
+                                            <th className="px-3 py-3 text-right">Devolucoes</th>
+                                            <th className="px-3 py-3 text-right">Linhas</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-800 text-slate-200">
+                                          {faturamentoPorVendedor.length === 0 ? (
+                                            <tr>
+                                              <td className="px-3 py-4 text-center text-slate-400" colSpan={5}>
+                                                Sem dados no periodo.
+                                              </td>
+                                            </tr>
+                                          ) : (
+                                            faturamentoPorVendedor.map((item) => (
+                                              <tr key={item.vendedor}>
+                                                <td className="px-3 py-2 font-semibold">{item.vendedor}</td>
+                                                <td className="px-3 py-2 text-right font-semibold">
+                                                  {formatarMoeda(item.total)}
+                                                </td>
+                                                <td className="px-3 py-2 text-right text-emerald-300">
+                                                  {formatarMoeda(item.vendas)}
+                                                </td>
+                                                <td className="px-3 py-2 text-right text-rose-300">
+                                                  {formatarMoeda(item.devolucoes)}
+                                                </td>
+                                                <td className="px-3 py-2 text-right">{item.linhas}</td>
+                                              </tr>
+                                            ))
+                                          )}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
                               </div>
                             );
                           })()}
