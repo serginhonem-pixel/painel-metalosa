@@ -10,6 +10,7 @@ import custosIndiretosData from './data/custos_indiretos.json';
 import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
+import vendedoresData from './data/vendedores.json';
 import { computeCostBreakdown } from './services/costing';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -227,6 +228,11 @@ const normalizarCodigoCliente = (valor) => {
 const normalizarCodigoProduto = (valor) =>
   String(valor ?? '')
     .replace(/\s+/g, '')
+    .toUpperCase();
+
+const normalizarCodigoVendedor = (valor) =>
+  String(valor ?? '')
+    .trim()
     .toUpperCase();
 
 const UF_CENTROID = {
@@ -631,6 +637,7 @@ export default function App() {
     authUser?.email?.toLowerCase()?.endsWith('@metalosa.com.br');
   const isManutencaoOnly =
     authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+  const currentUserLabel = authUser?.displayName || authUser?.email || 'Usuario';
 
   const menuItems = useMemo(
     () =>
@@ -639,6 +646,14 @@ export default function App() {
         : ITENS_MENU,
     [isManutencaoOnly]
   );
+
+  const manutencaoOperadorListas = useMemo(() => {
+    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
+    const minhas = manutencaoOrdens.filter((os) =>
+      (os.responsavel || '').toLowerCase() === currentUserLabel.toLowerCase()
+    );
+    return { abertas, minhas };
+  }, [manutencaoOrdens, currentUserLabel]);
 
   const manutencaoKpis = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta').length;
@@ -681,6 +696,22 @@ export default function App() {
 
   const handleLogout = async () => {
     await signOut(auth);
+  };
+
+  const atualizarOs = async (osId, updates) => {
+    if (!isAllowedDomain) {
+      setManutencaoSaveError('Sem permissao para salvar.');
+      return;
+    }
+    const patch = { ...updates, updatedAt: new Date().toISOString() };
+    try {
+      await setDoc(doc(db, 'manutencao_os', osId), patch, { merge: true });
+      setManutencaoOrdens((prev) =>
+        prev.map((item) => (item.id === osId ? { ...item, ...patch } : item))
+      );
+    } catch (err) {
+      setManutencaoSaveError('Nao foi possivel atualizar a OS.');
+    }
   };
 
   useEffect(() => {
@@ -2250,7 +2281,16 @@ export default function App() {
     const clientesPorCodigo = new Map(
       (clientesData?.clientes || []).map((cliente) => [
         normalizarCodigoCliente(cliente.Codigo),
-        cliente.Nome || '',
+        {
+          nome: cliente.Nome || '',
+          vendedor: normalizarCodigoVendedor(cliente.Vendedor),
+        },
+      ])
+    );
+    const vendedoresPorCodigo = new Map(
+      (vendedoresData || []).map((vendedor) => [
+        normalizarCodigoVendedor(vendedor.Codigo),
+        vendedor.Nome || '',
       ])
     );
     const linhasDia = faturamentoAtual.linhas.filter((row) => {
@@ -2272,11 +2312,12 @@ export default function App() {
       return { ...row, descricao };
     });
     const linhasComCliente = linhasComDescricao.map((row) => {
-      const nomeAtual = row.clienteNome ?? '';
-      if (nomeAtual) return row;
       const codigoCliente = normalizarCodigoCliente(row.cliente);
-      const clienteNome = clientesPorCodigo.get(codigoCliente) || '';
-      return { ...row, clienteNome };
+      const infoCliente = clientesPorCodigo.get(codigoCliente);
+      const clienteNome = row.clienteNome ?? infoCliente?.nome ?? '';
+      const vendedorCodigo = infoCliente?.vendedor || '';
+      const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
+      return { ...row, clienteNome, vendedorNome };
     });
     const totalDia = linhasDia.reduce((acc, row) => acc + row.valorTotal, 0);
     const totalBrutoDia = linhasDia
@@ -4775,6 +4816,7 @@ const resumoCustosIndiretos = useMemo(() => {
                                           <th className="px-3 py-3">Tipo</th>
                                           <th className="px-3 py-3">Cliente</th>
                                           <th className="px-3 py-3">Nome</th>
+                                          <th className="px-3 py-3">Vendedor</th>
                                           <th className="px-3 py-3">Filial</th>
                                           <th className="px-3 py-3">Grupo</th>
                                           <th className="px-3 py-3">Codigo</th>
@@ -4798,6 +4840,7 @@ const resumoCustosIndiretos = useMemo(() => {
                                             </td>
                                             <td className="px-3 py-2">{row.cliente || '-'}</td>
                                             <td className="px-3 py-2">{row.clienteNome || '-'}</td>
+                                            <td className="px-3 py-2">{row.vendedorNome || '-'}</td>
                                             <td className="px-3 py-2">{row.filial || '-'}</td>
                                             <td className="px-3 py-2">{row.grupo || '-'}</td>
                                             <td className="px-3 py-2 font-semibold">{row.codigo || '-'}</td>
@@ -5869,6 +5912,9 @@ const resumoCustosIndiretos = useMemo(() => {
                       <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
                       <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
                       <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
+                      {isManutencaoOnly && (
+                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
+                      )}
                    </div>
                    <div className="ml-auto flex gap-2">
                       <button
@@ -6072,6 +6118,108 @@ const resumoCustosIndiretos = useMemo(() => {
                 {subAbaManutencao === 'agenda' && (
                   <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
                     Agenda sem dados no momento.
+                  </div>
+                )}
+
+                {subAbaManutencao === 'operador' && isManutencaoOnly && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Fila de OS</h3>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {manutencaoOperadorListas.abertas.length} abertas
+                        </span>
+                      </div>
+                      {manutencaoOperadorListas.abertas.length ? (
+                        <div className="space-y-3">
+                          {manutencaoOperadorListas.abertas.map((os) => (
+                            <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
+                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} · {os.prioridade || '-'}</p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    atualizarOs(os.id, {
+                                      responsavel: currentUserLabel,
+                                      status: 'Em andamento',
+                                    })
+                                  }
+                                  className="rounded-full border border-cyan-400/60 px-3 py-1 text-xs font-bold text-cyan-100 hover:bg-cyan-500/10"
+                                >
+                                  Assumir
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                          Nenhuma OS aguardando atendimento.
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas OS</h3>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {manutencaoOperadorListas.minhas.length} atribuida(s)
+                        </span>
+                      </div>
+                      {manutencaoOperadorListas.minhas.length ? (
+                        <div className="space-y-3">
+                          {manutencaoOperadorListas.minhas.map((os) => (
+                            <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                              <div className="flex items-center justify-between gap-3">
+                                <div>
+                                  <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
+                                  <p className="text-xs text-slate-400">
+                                    {os.status || '-'} · {os.statusMaquina || 'Rodando'}
+                                  </p>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2 text-xs">
+                                  <button
+                                    type="button"
+                                    onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
+                                    className="rounded-full border border-blue-400/60 px-3 py-1 font-bold text-blue-100 hover:bg-blue-500/10"
+                                  >
+                                    Iniciar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => atualizarOs(os.id, { status: 'Aguardando peca' })}
+                                    className="rounded-full border border-amber-400/60 px-3 py-1 font-bold text-amber-100 hover:bg-amber-500/10"
+                                  >
+                                    Pausar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => atualizarOs(os.id, { status: 'Finalizada' })}
+                                    className="rounded-full border border-emerald-400/60 px-3 py-1 font-bold text-emerald-100 hover:bg-emerald-500/10"
+                                  >
+                                    Finalizar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditarOs(os)}
+                                    className="rounded-full border border-slate-600 px-3 py-1 font-bold text-slate-200 hover:bg-slate-800"
+                                  >
+                                    Editar
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                          Nenhuma OS atribuida a voce.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
