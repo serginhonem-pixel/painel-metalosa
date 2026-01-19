@@ -13,7 +13,8 @@ import { computeCostBreakdown } from './services/costing';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { db, auth } from './firebase';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -39,6 +40,7 @@ import {
   Filter,
   Search,
   Activity,
+  Wrench,
   Cpu,
   UserCog,
   Briefcase,
@@ -53,8 +55,30 @@ const ITENS_MENU = [
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
+  { id: 'manutencao', label: 'Manutencao', icon: Wrench },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
+
+const MANUTENCAO_KPIS = [
+  { id: 'abertas', label: 'OS Abertas', value: 12, tone: 'bg-amber-500/20 text-amber-200' },
+  { id: 'andamento', label: 'Em Andamento', value: 5, tone: 'bg-blue-500/20 text-blue-200' },
+  { id: 'finalizadas', label: 'Finalizadas (30d)', value: 86, tone: 'bg-emerald-500/20 text-emerald-200' },
+  { id: 'mttr', label: 'MTTR Medio', value: '2h 18m', tone: 'bg-slate-500/20 text-slate-200' },
+];
+
+const MANUTENCAO_ORDENS = [
+  { id: 'OS-2019', ativo: 'Injetora 01', setor: 'Producao A', prioridade: 'Alta', status: 'Em andamento', responsavel: 'Ana' },
+  { id: 'OS-2018', ativo: 'Compressor Central', setor: 'Utilidades', prioridade: 'Critica', status: 'Aberta', responsavel: 'Carlos' },
+  { id: 'OS-2017', ativo: 'Torno CNC', setor: 'Usinagem', prioridade: 'Media', status: 'Aguardando peca', responsavel: 'Joao' },
+  { id: 'OS-2016', ativo: 'Chiller 02', setor: 'Utilidades', prioridade: 'Baixa', status: 'Finalizada', responsavel: 'Paulo' },
+];
+
+const MANUTENCAO_PARADAS = [
+  { id: 'P-401', ativo: 'Empilhadeira 02', motivo: 'Bateria', impacto: 'Baixo', tempo: '00:45' },
+  { id: 'P-402', ativo: 'Esteira 03', motivo: 'Sensor', impacto: 'Medio', tempo: '01:20' },
+  { id: 'P-403', ativo: 'Injetora 04', motivo: 'Hidraulica', impacto: 'Alto', tempo: '02:40' },
+];
+
 
 const SETORES_INICIAIS = [];
 const GESTORES_INICIAIS = ['Thalles'];
@@ -102,6 +126,51 @@ const CardInformativo = ({ titulo, valor, subtitulo, icon: Icon, corFundo, tende
 
 const BarraProgresso = ({ rotulo, atual, total, unidade = "%", cor = "bg-blue-600", detalhe = "" }) => {
   const percentual = total > 0 ? Math.min(Math.round((atual / total) * 100), 100) : 0;
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="text-sm font-bold tracking-widest text-slate-400">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!authUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
+        <form onSubmit={handleLoginSubmit} className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-4">
+          <div>
+            <h1 className="text-xl font-black text-white">Login</h1>
+            <p className="text-xs text-slate-400">Use seu acesso do Firebase Auth</p>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-400">Email</label>
+            <input
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+              placeholder="usuario@metalosa.com.br"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-400">Senha</label>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          {loginError && <div className="text-xs text-rose-400">{loginError}</div>}
+          <button type="submit" className="w-full rounded-lg bg-blue-600 text-white text-xs font-bold py-2 hover:bg-blue-500">Entrar</button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-4">
       <div className="flex justify-between items-end mb-1">
@@ -458,10 +527,16 @@ const isDiaDesconsiderado = (dataISO) =>
 // --- Aplicação Principal ---
 
 export default function App() {
+  const [authUser, setAuthUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   const [abaAtiva, setAbaAtiva] = useState('executivo');
   const [subAbaGestao, setSubAbaGestao] = useState('lista');
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
+  const [subAbaManutencao, setSubAbaManutencao] = useState('resumo');
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
   const [filtroCfops2025, setFiltroCfops2025] = useState([]);
   const [filtroFilial, setFiltroFilial] = useState('Todas');
@@ -517,6 +592,73 @@ export default function App() {
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
+  const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
+  const [novaOsForm, setNovaOsForm] = useState({
+    ativo: '',
+    setor: '',
+    prioridade: 'Media',
+    tipo: 'Corretiva',
+    descricao: '',
+  });
+
+  const handleNovaOsChange = (e) => {
+    const { name, value } = e.target;
+    setNovaOsForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNovaOsSubmit = (e) => {
+    e.preventDefault();
+    setManutencaoModalOpen(false);
+    setNovaOsForm({
+      ativo: '',
+      setor: '',
+      prioridade: 'Media',
+      tipo: 'Corretiva',
+      descricao: '',
+    });
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthUser(user);
+      setAuthLoading(false);
+      if (user) {
+        setLoginError('');
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const isManutencaoOnly =
+    authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+
+  const menuItems = useMemo(
+    () =>
+      isManutencaoOnly
+        ? ITENS_MENU.filter((item) => item.id === 'manutencao')
+        : ITENS_MENU,
+    [isManutencaoOnly]
+  );
+
+  useEffect(() => {
+    if (isManutencaoOnly && abaAtiva !== 'manutencao') {
+      setAbaAtiva('manutencao');
+    }
+  }, [isManutencaoOnly, abaAtiva]);
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    try {
+      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+    } catch (err) {
+      setLoginError('Email ou senha invalidos.');
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
 
   const toggleCfopFilter = (option) => {
     if (!option) return;
@@ -2999,7 +3141,7 @@ const resumoCustosIndiretos = useMemo(() => {
           </div>
 
           <nav className="space-y-1">
-            {ITENS_MENU.map((item) => (
+            {menuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setAbaAtiva(item.id)}
@@ -3017,10 +3159,32 @@ const resumoCustosIndiretos = useMemo(() => {
         </div>
         
         <div className="mt-auto p-6 border-t border-slate-800">
-          <div className="flex items-center gap-3 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
-            Conectado ao TOTVS
-          </div>
+          {authUser && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-full bg-slate-800 text-slate-200 flex items-center justify-center text-xs font-black uppercase">
+                  {(authUser.displayName || authUser.email || '?')
+                    .trim()
+                    .split(/\s+/)
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join('')}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-slate-200 truncate">
+                    {authUser.displayName || (authUser.email ? authUser.email.split('@')[0] : 'Usuario')}
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate">{authUser.email}</div>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full rounded-lg border border-slate-700 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-white hover:border-slate-500"
+              >
+                Sair
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -5573,6 +5737,240 @@ const resumoCustosIndiretos = useMemo(() => {
             </div>
           )}
 
+
+
+          
+          {/* ABA DE MANUTENCAO */}
+          {abaAtiva === 'manutencao' && (
+             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
+                <div className="pointer-events-none absolute -top-20 -right-10 h-56 w-56 rounded-full bg-blue-500/15 blur-3xl"></div>
+                <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
+                <div className="relative space-y-8 animate-in slide-in-from-top duration-500">
+                <div className="flex flex-wrap items-center gap-3">
+                   <div className="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
+                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
+                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
+                   </div>
+                   <div className="ml-auto flex gap-2">
+                      <button onClick={() => setManutencaoModalOpen(true)} className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400/90 to-blue-500/90 text-slate-950 text-xs font-bold shadow hover:brightness-110">Nova OS</button>
+                      <button className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white">Exportar</button>
+                   </div>
+                </div>
+
+                {subAbaManutencao === 'resumo' && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {MANUTENCAO_KPIS.map((kpi) => (
+                        <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className="text-2xl font-black text-white">{kpi.value}</span>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Paradas em andamento</h3>
+                        <div className="space-y-3">
+                          {MANUTENCAO_PARADAS.map((item) => {
+                            const impactoTone =
+                              item.impacto === 'Alto'
+                                ? 'border-rose-400/80 bg-rose-500/10 text-rose-200'
+                                : item.impacto === 'Medio'
+                                  ? 'border-amber-400/80 bg-amber-500/10 text-amber-200'
+                                  : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-200';
+                            return (
+                              <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
+                                <div>
+                                  <p className="text-sm font-bold text-white">{item.ativo}</p>
+                                  <p className="text-xs text-slate-400">{item.motivo} - {item.tempo}</p>
+                                </div>
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.impacto}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Alertas rapidos</h3>
+                        <div className="space-y-3 text-sm text-slate-300">
+                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <span>Manutencao preventiva atrasada (5 ativos)</span>
+                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-200">Atraso</span>
+                          </div>
+                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <span>Checklists pendentes (3 turnos)</span>
+                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">Hoje</span>
+                          </div>
+                          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <span>Consumo de pecas acima do previsto</span>
+                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-rose-500/20 text-rose-200">Risco</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por setor</h3>
+                        <div className="space-y-3 text-sm text-slate-300">
+                          {[
+                            { setor: 'Producao A', valor: 6 },
+                            { setor: 'Utilidades', valor: 4 },
+                            { setor: 'Usinagem', valor: 3 },
+                          ].map((item) => (
+                            <div key={item.setor} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-200">{item.setor}</span>
+                                <span className="text-xs font-bold text-slate-200">{item.valor}</span>
+                              </div>
+                              <div className="mt-2 h-1.5 rounded-full bg-slate-800">
+                                <div
+                                  className="h-1.5 rounded-full bg-gradient-to-r from-cyan-400/80 to-blue-500/80"
+                                  style={{ width: `${Math.min(item.valor * 15, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {subAbaManutencao === 'ordens' && (
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)] overflow-hidden">
+                    <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
+                      <div className="flex gap-2 text-xs">
+                        <button className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 font-bold">Todas</button>
+                        <button className="px-3 py-1 rounded-full bg-blue-500/30 text-blue-200 font-bold">Abertas</button>
+                      </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-slate-950/70 text-slate-400 uppercase text-[10px] tracking-wider">
+                          <tr>
+                            <th className="px-4 py-3">OS</th>
+                            <th className="px-4 py-3">Ativo</th>
+                            <th className="px-4 py-3">Setor</th>
+                            <th className="px-4 py-3">Prioridade</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3">Responsavel</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 text-slate-200">
+                          {MANUTENCAO_ORDENS.map((ordem) => (
+                            <tr key={ordem.id} className="hover:bg-slate-900/60">
+                              <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
+                              <td className="px-4 py-3 text-slate-300">{ordem.ativo}</td>
+                              <td className="px-4 py-3 text-slate-400">{ordem.setor}</td>
+                              <td className="px-4 py-3">
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade}</span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status}</span>
+                              </td>
+                              <td className="px-4 py-3 text-slate-300">{ordem.responsavel}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {subAbaManutencao === 'agenda' && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Plano semanal</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((dia) => (
+                          <div key={dia} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <p className="text-xs font-bold text-slate-400 uppercase">{dia}</p>
+                            <p className="mt-2 text-slate-200">2 preventivas</p>
+                            <p className="text-xs text-slate-500">1 corretiva</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Equipe de plantao</h3>
+                      <div className="space-y-3 text-sm text-slate-300">
+                        {['Ana', 'Carlos', 'Joao', 'Paulo'].map((nome) => (
+                          <div key={nome} className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                            <span className="font-semibold text-white">{nome}</span>
+                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">08:00-17:00</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {manutencaoModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 px-4">
+                    <div className="w-full max-w-xl rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
+                      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
+                        <div>
+                          <h3 className="text-lg font-black text-white">Nova Ordem de Servico</h3>
+                          <p className="text-xs text-slate-400">Registro rapido de OS (mock)</p>
+                        </div>
+                        <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
+                      </div>
+                      <form onSubmit={handleNovaOsSubmit} className="space-y-4 px-6 py-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Ativo</label>
+                            <input name="ativo" list="manutencao-ativos" value={novaOsForm.ativo} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Injetora 01" required />
+                            <datalist id="manutencao-ativos">
+                              {listaMaquinas.map((item) => (
+                                <option key={item.id} value={item.nome}>{item.setor}</option>
+                              ))}
+                            </datalist>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Setor</label>
+                            <input name="setor" value={novaOsForm.setor} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Producao A" required />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Prioridade</label>
+                            <select name="prioridade" value={novaOsForm.prioridade} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Baixa</option>
+                              <option>Media</option>
+                              <option>Alta</option>
+                              <option>Critica</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Tipo</label>
+                            <select name="tipo" value={novaOsForm.tipo} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Corretiva</option>
+                              <option>Preventiva</option>
+                              <option>Inspecao</option>
+                              <option>Melhoria</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400">Descricao</label>
+                          <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
+                        </div>
+                        <div className="flex justify-end gap-3 border-t border-slate-800 pt-4">
+                          <button type="button" onClick={() => setManutencaoModalOpen(false)} className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-500">Cancelar</button>
+                          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">Salvar OS</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+                </div>
+             </div>
+          )}
           {/* ABA DE CONFIGURAÇÃO */}
           {abaAtiva === 'configuracao' && (
              <div className="space-y-8 animate-in slide-in-from-top duration-500">
@@ -5739,7 +6137,7 @@ const resumoCustosIndiretos = useMemo(() => {
       {/* Menu Mobile Inferior */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
         <div className="grid grid-cols-6">
-          {ITENS_MENU.map((item) => (
+          {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setAbaAtiva(item.id)}
