@@ -9,6 +9,7 @@ import custosPrevanoData from './data/custos_prevano.json';
 import custosIndiretosData from './data/custos_indiretos.json';
 import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
+import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import { computeCostBreakdown } from './services/costing';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -109,51 +110,6 @@ const CardInformativo = ({ titulo, valor, subtitulo, icon: Icon, corFundo, tende
 
 const BarraProgresso = ({ rotulo, atual, total, unidade = "%", cor = "bg-blue-600", detalhe = "" }) => {
   const percentual = total > 0 ? Math.min(Math.round((atual / total) * 100), 100) : 0;
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
-        <div className="text-sm font-bold tracking-widest text-slate-400">Carregando...</div>
-      </div>
-    );
-  }
-
-  if (!authUser) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
-        <form onSubmit={handleLoginSubmit} className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-4">
-          <div>
-            <h1 className="text-xl font-black text-white">Login</h1>
-            <p className="text-xs text-slate-400">Use seu acesso do Firebase Auth</p>
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-400">Email</label>
-            <input
-              type="email"
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
-              placeholder="usuario@metalosa.com.br"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-400">Senha</label>
-            <input
-              type="password"
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          {loginError && <div className="text-xs text-rose-400">{loginError}</div>}
-          <button type="submit" className="w-full rounded-lg bg-blue-600 text-white text-xs font-bold py-2 hover:bg-blue-500">Entrar</button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div className="mb-4">
       <div className="flex justify-between items-end mb-1">
@@ -164,7 +120,7 @@ const BarraProgresso = ({ rotulo, atual, total, unidade = "%", cor = "bg-blue-60
         <span className="text-slate-900 text-xs font-bold">{atual}{unidade}</span>
       </div>
       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-        <div 
+        <div
           className={`h-full ${cor} transition-all duration-1000`}
           style={{ width: `${percentual}%` }}
         />
@@ -580,11 +536,14 @@ export default function App() {
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
+  const [manutencaoEditId, setManutencaoEditId] = useState(null);
   const [novaOsForm, setNovaOsForm] = useState({
     ativo: '',
     setor: '',
     prioridade: 'Media',
     tipo: 'Corretiva',
+    status: 'Aberta',
+    statusMaquina: 'Rodando',
     descricao: '',
   });
 
@@ -596,27 +555,39 @@ export default function App() {
   const handleNovaOsSubmit = async (e) => {
     e.preventDefault();
     setManutencaoSaveError('');
-    const osId = `os-${Date.now()}`;
+    if (!isAllowedDomain) {
+      setManutencaoSaveError('Sem permissao para salvar.');
+      return;
+    }
+    const osId = manutencaoEditId || `os-${Date.now()}`;
     const payload = {
       ativo: novaOsForm.ativo,
       setor: novaOsForm.setor,
       prioridade: novaOsForm.prioridade,
       tipo: novaOsForm.tipo,
+      status: novaOsForm.status,
+      statusMaquina: novaOsForm.statusMaquina,
       descricao: novaOsForm.descricao,
-      status: 'Aberta',
       responsavel: authUser?.displayName || authUser?.email || 'Usuario',
-      createdAt: new Date().toISOString(),
+      createdAt: manutencaoEditId ? novaOsForm.createdAt : new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     try {
       await setDoc(doc(db, 'manutencao_os', osId), payload);
-      setManutencaoOrdens((prev) => [{ id: osId, ...payload }, ...prev]);
+      setManutencaoOrdens((prev) => {
+        const next = prev.filter((item) => item.id !== osId);
+        return [{ id: osId, ...payload }, ...next];
+      });
       setManutencaoModalOpen(false);
+      setManutencaoEditId(null);
       setNovaOsForm({
         ativo: '',
         setor: '',
         prioridade: 'Media',
         tipo: 'Corretiva',
+        status: 'Aberta',
+        statusMaquina: 'Rodando',
         descricao: '',
       });
     } catch (err) {
@@ -624,8 +595,96 @@ export default function App() {
     }
   };
 
+  const handleEditarOs = (ordem) => {
+    setManutencaoEditId(ordem.id);
+    setNovaOsForm({
+      ativo: ordem.ativo || '',
+      setor: ordem.setor || '',
+      prioridade: ordem.prioridade || 'Media',
+      tipo: ordem.tipo || 'Corretiva',
+      status: ordem.status || 'Aberta',
+      statusMaquina: ordem.statusMaquina || 'Rodando',
+      descricao: ordem.descricao || '',
+      createdAt: ordem.createdAt || new Date().toISOString(),
+    });
+    setManutencaoSaveError('');
+    setManutencaoModalOpen(true);
+  };
+
   useEffect(() => {
-    if (!authUser) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthUser(user);
+      setAuthLoading(false);
+      if (user) {
+        setLoginError('');
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setCarregando(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const isAllowedDomain =
+    authUser?.email?.toLowerCase()?.endsWith('@metalosa.com.br');
+  const isManutencaoOnly =
+    authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+
+  const menuItems = useMemo(
+    () =>
+      isManutencaoOnly
+        ? ITENS_MENU.filter((item) => item.id === 'manutencao')
+        : ITENS_MENU,
+    [isManutencaoOnly]
+  );
+
+  const manutencaoKpis = useMemo(() => {
+    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta').length;
+    const emAndamento = manutencaoOrdens.filter((os) => os.status === 'Em andamento').length;
+    const finalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
+    const total = manutencaoOrdens.length;
+    return [
+      { id: 'abertas', label: 'OS Abertas', value: abertas, tone: 'bg-amber-500/20 text-amber-200' },
+      { id: 'andamento', label: 'Em andamento', value: emAndamento, tone: 'bg-blue-500/20 text-blue-200' },
+      { id: 'finalizadas', label: 'Finalizadas', value: finalizadas, tone: 'bg-emerald-500/20 text-emerald-200' },
+      { id: 'total', label: 'Total de OS', value: total, tone: 'bg-slate-500/20 text-slate-200' },
+    ];
+  }, [manutencaoOrdens]);
+
+  const manutencaoParadas = useMemo(
+    () =>
+      manutencaoOrdens.filter((os) =>
+        ['Parada', 'Parada programada', 'Parada nao programada', 'Em manutencao'].includes(
+          os.statusMaquina
+        )
+      ),
+    [manutencaoOrdens]
+  );
+
+  useEffect(() => {
+    if (isManutencaoOnly && abaAtiva !== 'manutencao') {
+      setAbaAtiva('manutencao');
+    }
+  }, [isManutencaoOnly, abaAtiva]);
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    try {
+      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+    } catch (err) {
+      setLoginError('Email ou senha invalidos.');
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  useEffect(() => {
+    if (!authUser || !isAllowedDomain) {
       setManutencaoOrdens([]);
       setManutencaoOrdensLoading(false);
       return;
@@ -650,49 +709,7 @@ export default function App() {
     };
 
     loadOrdens();
-  }, [authUser]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthUser(user);
-      setAuthLoading(false);
-      if (user) {
-        setLoginError('');
-      }
-    });
-    return unsubscribe;
-  }, []);
-
-  const isManutencaoOnly =
-    authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
-
-  const menuItems = useMemo(
-    () =>
-      isManutencaoOnly
-        ? ITENS_MENU.filter((item) => item.id === 'manutencao')
-        : ITENS_MENU,
-    [isManutencaoOnly]
-  );
-
-  useEffect(() => {
-    if (isManutencaoOnly && abaAtiva !== 'manutencao') {
-      setAbaAtiva('manutencao');
-    }
-  }, [isManutencaoOnly, abaAtiva]);
-
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setLoginError('');
-    try {
-      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
-    } catch (err) {
-      setLoginError('Email ou senha invalidos.');
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
+  }, [authUser, isAllowedDomain]);
 
   const toggleCfopFilter = (option) => {
     if (!option) return;
@@ -754,11 +771,6 @@ export default function App() {
     });
     return map;
   }, [colaboradores]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setCarregando(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     let ativo = true;
@@ -961,6 +973,7 @@ export default function App() {
   }, [presencaLeandroExcel]);
 
   useEffect(() => {
+    if (!isAllowedDomain) return;
     let ativo = true;
     const carregarSupervisores = async () => {
       try {
@@ -994,9 +1007,10 @@ export default function App() {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [isAllowedDomain]);
 
   useEffect(() => {
+    if (!isAllowedDomain) return;
     let ativo = true;
     const carregarFuncionarios = async () => {
       try {
@@ -1023,7 +1037,7 @@ export default function App() {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [isAllowedDomain]);
 
   useEffect(() => {
     if (!colaboradores.length) return;
@@ -1139,6 +1153,7 @@ export default function App() {
   }, [legacyIdMap]);
 
   useEffect(() => {
+    if (!isAllowedDomain) return;
     let ativo = true;
     const carregarFaltas = async () => {
       try {
@@ -1166,9 +1181,10 @@ export default function App() {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [isAllowedDomain]);
 
   useEffect(() => {
+    if (!isAllowedDomain) return;
     if (!faltasCarregadas) return;
     const salvar = async () => {
       const dias = Object.keys(registrosPorData).filter((dia) => dia.startsWith('2026-'));
@@ -2733,6 +2749,74 @@ const resumoCustosIndiretos = useMemo(() => {
       </div>
     );
   };
+
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="text-sm font-bold tracking-widest text-slate-400">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!authUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
+        <form onSubmit={handleLoginSubmit} className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-4">
+          <div>
+            <h1 className="text-xl font-black text-white">Login</h1>
+            <p className="text-xs text-slate-400">Use seu acesso do Firebase Auth</p>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-400">Email</label>
+            <input
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+              placeholder="usuario@metalosa.com.br"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-400">Senha</label>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+              placeholder="********"
+              required
+            />
+          </div>
+          {loginError && <div className="text-xs text-rose-400">{loginError}</div>}
+          <button type="submit" className="w-full rounded-lg bg-blue-600 text-white text-xs font-bold py-2 hover:bg-blue-500">Entrar</button>
+        </form>
+      </div>
+    );
+  }
+
+  if (!isAllowedDomain) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-4">
+          <div>
+            <h1 className="text-xl font-black text-white">Sem permissao</h1>
+            <p className="text-xs text-slate-400">
+              Use um email @metalosa.com.br para acessar o painel.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full rounded-lg border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (carregando) {
     return (
@@ -5787,30 +5871,85 @@ const resumoCustosIndiretos = useMemo(() => {
                       <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
                    </div>
                    <div className="ml-auto flex gap-2">
-                      <button onClick={() => setManutencaoModalOpen(true)} className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400/90 to-blue-500/90 text-slate-950 text-xs font-bold shadow hover:brightness-110">Nova OS</button>
+                      <button
+                        onClick={() => {
+                          setManutencaoEditId(null);
+                          setNovaOsForm({
+                            ativo: '',
+                            setor: '',
+                            prioridade: 'Media',
+                            tipo: 'Corretiva',
+                            status: 'Aberta',
+                            statusMaquina: 'Rodando',
+                            descricao: '',
+                          });
+                          setManutencaoSaveError('');
+                          setManutencaoModalOpen(true);
+                        }}
+                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400/90 to-blue-500/90 text-slate-950 text-xs font-bold shadow hover:brightness-110"
+                      >
+                        Nova OS
+                      </button>
                       <button className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white">Exportar</button>
                    </div>
                 </div>
 
                 {subAbaManutencao === 'resumo' && (
                   <div className="space-y-6">
-                    {MANUTENCAO_KPIS.length ? (
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {MANUTENCAO_KPIS.map((kpi) => (
-                          <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="text-2xl font-black text-white">{kpi.value}</span>
-                              <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                    <div className="rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-500/20 via-slate-900/60 to-slate-900/20 p-5 shadow-[0_12px_40px_-20px_rgba(244,63,94,0.6)]">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-[0.3em] text-rose-200/80">Alerta de parada</p>
+                          <h3 className="mt-2 text-lg font-black text-white">
+                            {manutencaoParadas.length
+                              ? `${manutencaoParadas.length} processo(s) parado(s)`
+                              : 'Nenhuma parada registrada'}
+                          </h3>
+                          <p className="mt-1 text-xs text-slate-300">
+                            {manutencaoParadas.length
+                              ? 'Processos dependentes de manutencao.'
+                              : 'Sem processos parados no momento.'}
+                          </p>
+                          {manutencaoParadas.length ? (
+                            <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
+                              {manutencaoParadas.slice(0, 4).map((os) => (
+                                <span key={os.id} className="rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-1">
+                                  {os.ativo || os.setor || os.id}
+                                </span>
+                              ))}
+                              {manutencaoParadas.length > 4 && (
+                                <span className="rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-1">
+                                  +{manutencaoParadas.length - 4} mais
+                                </span>
+                              )}
                             </div>
+                          ) : null}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full bg-rose-500/30 px-3 py-1 text-xs font-bold text-rose-100">
+                            {manutencaoParadas.length ? 'Critico' : 'OK'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setSubAbaManutencao('ordens')}
+                            className="rounded-full border border-rose-400/60 px-3 py-1 text-xs font-bold text-rose-100 hover:bg-rose-500/20"
+                          >
+                            Ver OS
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {manutencaoKpis.map((kpi) => (
+                        <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className="text-2xl font-black text-white">{kpi.value}</span>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
-                        KPIs sem dados no momento.
-                      </div>
-                    )}
+                        </div>
+                      ))}
+                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
@@ -5877,18 +6016,19 @@ const resumoCustosIndiretos = useMemo(() => {
                             <th className="px-4 py-3">Prioridade</th>
                             <th className="px-4 py-3">Status</th>
                             <th className="px-4 py-3">Responsavel</th>
+                            <th className="px-4 py-3">Acoes</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800 text-slate-200">
                           {manutencaoOrdensLoading ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={6}>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
                                 Carregando ordens...
                               </td>
                             </tr>
                           ) : manutencaoOrdensError ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={6}>
+                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={7}>
                                 {manutencaoOrdensError}
                               </td>
                             </tr>
@@ -5905,11 +6045,20 @@ const resumoCustosIndiretos = useMemo(() => {
                                   <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status || '-'}</span>
                                 </td>
                                 <td className="px-4 py-3 text-slate-300">{ordem.responsavel || '-'}</td>
+                                <td className="px-4 py-3">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditarOs(ordem)}
+                                    className="text-xs font-bold text-cyan-200 hover:text-white"
+                                  >
+                                    Editar
+                                  </button>
+                                </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={6}>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
                                 Sem ordens registradas.
                               </td>
                             </tr>
@@ -5921,30 +6070,8 @@ const resumoCustosIndiretos = useMemo(() => {
                 )}
 
                 {subAbaManutencao === 'agenda' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Plano semanal</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((dia) => (
-                          <div key={dia} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase">{dia}</p>
-                            <p className="mt-2 text-slate-200">2 preventivas</p>
-                            <p className="text-xs text-slate-500">1 corretiva</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Equipe de plantao</h3>
-                      <div className="space-y-3 text-sm text-slate-300">
-                        {['Ana', 'Carlos', 'Joao', 'Paulo'].map((nome) => (
-                          <div key={nome} className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-3">
-                            <span className="font-semibold text-white">{nome}</span>
-                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">08:00-17:00</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
+                    Agenda sem dados no momento.
                   </div>
                 )}
 
@@ -5953,8 +6080,12 @@ const resumoCustosIndiretos = useMemo(() => {
                     <div className="w-full max-w-xl rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
                       <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
                         <div>
-                          <h3 className="text-lg font-black text-white">Nova Ordem de Servico</h3>
-                          <p className="text-xs text-slate-400">Registro rapido de OS (mock)</p>
+                          <h3 className="text-lg font-black text-white">
+                            {manutencaoEditId ? 'Editar Ordem de Servico' : 'Nova Ordem de Servico'}
+                          </h3>
+                          <p className="text-xs text-slate-400">
+                            {manutencaoEditId ? 'Atualize os dados da OS.' : 'Registro rapido de OS.'}
+                          </p>
                         </div>
                         <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
                       </div>
@@ -5994,6 +6125,28 @@ const resumoCustosIndiretos = useMemo(() => {
                             </select>
                           </div>
                         </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Status da OS</label>
+                            <select name="status" value={novaOsForm.status} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Aberta</option>
+                              <option>Em andamento</option>
+                              <option>Aguardando peca</option>
+                              <option>Finalizada</option>
+                              <option>Cancelada</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Status da maquina</label>
+                            <select name="statusMaquina" value={novaOsForm.statusMaquina} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Rodando</option>
+                              <option>Parada</option>
+                              <option>Parada programada</option>
+                              <option>Parada nao programada</option>
+                              <option>Em manutencao</option>
+                            </select>
+                          </div>
+                        </div>
                         <div>
                           <label className="text-xs font-bold text-slate-400">Descricao</label>
                           <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
@@ -6004,8 +6157,19 @@ const resumoCustosIndiretos = useMemo(() => {
                           </div>
                         )}
                         <div className="flex justify-end gap-3 border-t border-slate-800 pt-4">
-                          <button type="button" onClick={() => setManutencaoModalOpen(false)} className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-500">Cancelar</button>
-                          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">Salvar OS</button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setManutencaoModalOpen(false);
+                              setManutencaoEditId(null);
+                            }}
+                            className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-500"
+                          >
+                            Cancelar
+                          </button>
+                          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">
+                            {manutencaoEditId ? 'Salvar alteracoes' : 'Salvar OS'}
+                          </button>
                         </div>
                       </form>
                     </div>
