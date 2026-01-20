@@ -656,6 +656,7 @@ export default function App() {
     authUser?.email?.toLowerCase()?.endsWith('@metalosa.com.br');
   const isManutencaoOnly =
     authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+  const isPortfolioDisabled = true;
   const currentUserLabel = authUser?.displayName || authUser?.email || 'Usuario';
 
   const menuItems = useMemo(
@@ -702,6 +703,12 @@ export default function App() {
       setAbaAtiva('manutencao');
     }
   }, [isManutencaoOnly, abaAtiva]);
+
+  useEffect(() => {
+    if (isPortfolioDisabled && abaAtiva === 'portfolio') {
+      setAbaAtiva('executivo');
+    }
+  }, [isPortfolioDisabled, abaAtiva]);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -3594,18 +3601,25 @@ const resumoCustosIndiretos = useMemo(() => {
 
           <nav className="space-y-1">
             {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setAbaAtiva(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  abaAtiva === item.id 
-                    ? 'bg-blue-600 text-white shadow-lg' 
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <item.icon size={18} />
-                {item.label}
-              </button>
+              (() => {
+                const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => !isDisabled && setAbaAtiva(item.id)}
+                    disabled={isDisabled}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      abaAtiva === item.id
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                    } ${isDisabled ? 'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-slate-400' : ''}`}
+                    title={isDisabled ? 'Em ajuste' : undefined}
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                  </button>
+                );
+              })()
             ))}
           </nav>
         </div>
@@ -5479,7 +5493,7 @@ const resumoCustosIndiretos = useMemo(() => {
           )}
 
           {/* ABA DE PORTFOLIO */}
-          {abaAtiva === 'portfolio' && (
+          {abaAtiva === 'portfolio' && !isPortfolioDisabled && (
             <div className="space-y-8 animate-in slide-in-from-right duration-700">
               <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-2xl">
                 <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
@@ -6945,18 +6959,25 @@ const resumoCustosIndiretos = useMemo(() => {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
         <div className="grid grid-cols-6">
           {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setAbaAtiva(item.id)}
-              className={`flex flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
-                abaAtiva === item.id
-                  ? 'text-blue-400'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <item.icon size={18} />
-              <span className="whitespace-nowrap">{item.label.split(' ')[0]}</span>
-            </button>
+            (() => {
+              const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => !isDisabled && setAbaAtiva(item.id)}
+                  disabled={isDisabled}
+                  className={`flex flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                    abaAtiva === item.id
+                      ? 'text-blue-400'
+                      : 'text-slate-400 hover:text-slate-200'
+                  } ${isDisabled ? 'cursor-not-allowed opacity-50 hover:text-slate-400' : ''}`}
+                  title={isDisabled ? 'Em ajuste' : undefined}
+                >
+                  <item.icon size={18} />
+                  <span className="whitespace-nowrap">{item.label.split(' ')[0]}</span>
+                </button>
+              );
+            })()
           ))}
         </div>
       </nav>
