@@ -352,6 +352,38 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": "020897",
+    "Filial": "08",
+    "Grupo": "G015",
+    "Codigo": "02410",
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 40.807388,
+    "ValorTotal": 40.8,
+    "Emissao": "2026-01-19T03:00:28.000Z",
+    "NF": "000584951",
+    "MesEmissao": "01/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "020897",
+    "Filial": "08",
+    "Grupo": "G015",
+    "Codigo": "02501",
+    "Descricao": 0,
+    "Quantidade": 42,
+    "Unidade": "PC",
+    "ValorUnitario": 30.151482,
+    "ValorTotal": 1266.36,
+    "Emissao": "2026-01-19T03:00:28.000Z",
+    "NF": "000584951",
+    "MesEmissao": "01/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "D01172",
     "Filial": "08",
     "Grupo": "G020",
