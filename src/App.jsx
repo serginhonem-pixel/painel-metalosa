@@ -17,7 +17,8 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { db, auth } from './firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, auth, storage } from './firebase';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -550,6 +551,8 @@ export default function App() {
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
   const [manutencaoEditId, setManutencaoEditId] = useState(null);
+  const [novaOsFotoFile, setNovaOsFotoFile] = useState(null);
+  const [novaOsFotoPreview, setNovaOsFotoPreview] = useState('');
   const [novaOsForm, setNovaOsForm] = useState({
     ativo: '',
     setor: '',
@@ -558,6 +561,7 @@ export default function App() {
     status: 'Aberta',
     statusMaquina: 'Rodando',
     descricao: '',
+    fotoUrl: '',
   });
 
   const handleNovaOsChange = (e) => {
@@ -577,6 +581,22 @@ export default function App() {
     setNovaOsForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    if (!novaOsFotoPreview) return undefined;
+    return () => {
+      URL.revokeObjectURL(novaOsFotoPreview);
+    };
+  }, [novaOsFotoPreview]);
+
+  const handleNovaOsFotoChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    if (novaOsFotoPreview) {
+      URL.revokeObjectURL(novaOsFotoPreview);
+    }
+    setNovaOsFotoFile(file);
+    setNovaOsFotoPreview(file ? URL.createObjectURL(file) : '');
+  };
+
   const handleNovaOsSubmit = async (e) => {
     e.preventDefault();
     setManutencaoSaveError('');
@@ -585,6 +605,13 @@ export default function App() {
       return;
     }
     const osId = manutencaoEditId || `os-${Date.now()}`;
+    let fotoUrl = novaOsForm.fotoUrl || '';
+    if (novaOsFotoFile) {
+      const safeName = `${Date.now()}-${novaOsFotoFile.name}`;
+      const storageRef = ref(storage, `manutencao_os/${osId}/${safeName}`);
+      await uploadBytes(storageRef, novaOsFotoFile);
+      fotoUrl = await getDownloadURL(storageRef);
+    }
     const payload = {
       ativo: novaOsForm.ativo,
       setor: novaOsForm.setor,
@@ -593,6 +620,7 @@ export default function App() {
       status: novaOsForm.status,
       statusMaquina: novaOsForm.statusMaquina,
       descricao: novaOsForm.descricao,
+      fotoUrl,
       responsavel: authUser?.displayName || authUser?.email || 'Usuario',
       createdAt: manutencaoEditId ? novaOsForm.createdAt : new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -606,6 +634,8 @@ export default function App() {
       });
       setManutencaoModalOpen(false);
       setManutencaoEditId(null);
+      setNovaOsFotoFile(null);
+      setNovaOsFotoPreview('');
       setNovaOsForm({
         ativo: '',
         setor: '',
@@ -614,6 +644,7 @@ export default function App() {
         status: 'Aberta',
         statusMaquina: 'Rodando',
         descricao: '',
+        fotoUrl: '',
       });
     } catch (err) {
       setManutencaoSaveError('Nao foi possivel salvar a OS.');
@@ -630,8 +661,11 @@ export default function App() {
       status: ordem.status || 'Aberta',
       statusMaquina: ordem.statusMaquina || 'Rodando',
       descricao: ordem.descricao || '',
+      fotoUrl: ordem.fotoUrl || '',
       createdAt: ordem.createdAt || new Date().toISOString(),
     });
+    setNovaOsFotoFile(null);
+    setNovaOsFotoPreview('');
     setManutencaoSaveError('');
     setManutencaoModalOpen(true);
   };
@@ -6456,22 +6490,23 @@ const resumoCustosIndiretos = useMemo(() => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Paradas em andamento</h3>
-                        {MANUTENCAO_PARADAS.length ? (
+                        {manutencaoParadas.length ? (
                           <div className="space-y-3">
-                            {MANUTENCAO_PARADAS.map((item) => {
+                            {manutencaoParadas.map((item) => {
+                              const prioridade = String(item.prioridade || 'Media').toLowerCase();
                               const impactoTone =
-                                item.impacto === 'Alto'
+                                prioridade === 'alta'
                                   ? 'border-rose-400/80 bg-rose-500/10 text-rose-200'
-                                  : item.impacto === 'Medio'
+                                  : prioridade === 'media'
                                     ? 'border-amber-400/80 bg-amber-500/10 text-amber-200'
                                     : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-200';
                               return (
                                 <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
                                   <div>
-                                    <p className="text-sm font-bold text-white">{item.ativo}</p>
-                                    <p className="text-xs text-slate-400">{item.motivo} - {item.tempo}</p>
+                                    <p className="text-sm font-bold text-white">{item.ativo || item.setor || item.id}</p>
+                                    <p className="text-xs text-slate-400">{item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}</p>
                                   </div>
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.impacto}</span>
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.prioridade || 'Media'}</span>
                                 </div>
                               );
                             })}
@@ -6754,6 +6789,27 @@ const resumoCustosIndiretos = useMemo(() => {
                         <div>
                           <label className="text-xs font-bold text-slate-400">Descricao</label>
                           <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400">Foto da OS</label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={handleNovaOsFotoChange}
+                            className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600/20 file:px-3 file:py-1 file:text-xs file:font-bold file:text-blue-100 hover:file:bg-blue-600/30"
+                          />
+                          {novaOsFotoPreview || novaOsForm.fotoUrl ? (
+                            <div className="mt-3">
+                              <img
+                                src={novaOsFotoPreview || novaOsForm.fotoUrl}
+                                alt="Foto da OS"
+                                className="h-28 w-28 rounded-xl border border-slate-800 object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <p className="mt-2 text-[11px] text-slate-500">Sem foto anexada.</p>
+                          )}
                         </div>
                         {manutencaoSaveError && (
                           <div className="text-xs text-rose-300">
