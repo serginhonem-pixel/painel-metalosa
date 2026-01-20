@@ -3548,8 +3548,8 @@ const custoDetalhePedidos = useMemo(() => {
       )}
 
       {modalTabelaCustosOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
-          <div className="w-full max-w-4xl rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/95 p-4">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
             <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
@@ -3617,8 +3617,8 @@ const custoDetalhePedidos = useMemo(() => {
       )}
 
       {custoDetalheModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
-          <div className="w-full max-w-5xl rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/95 p-4">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
             <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
