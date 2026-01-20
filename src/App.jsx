@@ -57,6 +57,7 @@ import {
 const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
+  { id: 'custos', label: 'Custos', icon: Layers },
   { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
@@ -200,6 +201,23 @@ const parseEmissaoData = (valor) => {
     return Number.isNaN(parsed.valueOf()) ? null : parsed;
   }
   return null;
+};
+
+const obterNumeroNota = (row) => {
+  const valor =
+    row?.['Num. da Nota'] ??
+    row?.['Num da Nota'] ??
+    row?.['Num. Nota'] ??
+    row?.['Num Nota'] ??
+    row?.NumNota ??
+    row?.NumeroNota ??
+    row?.numeroNota ??
+    row?.NF ??
+    row?.Nf ??
+    row?.NotaFiscal ??
+    row?.notaFiscal ??
+    '';
+  return valor === null || valor === undefined ? '' : String(valor).trim();
 };
 
 const obterMesKey = (row) => {
@@ -486,7 +504,7 @@ export default function App() {
   const [subAbaManutencao, setSubAbaManutencao] = useState('resumo');
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
   const [filtroCfops2025, setFiltroCfops2025] = useState([]);
-  const [filtroFilial, setFiltroFilial] = useState('Todas');
+  const [filtroFilial, setFiltroFilial] = useState('08');
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
@@ -541,6 +559,8 @@ export default function App() {
   const [feriasFim, setFeriasFim] = useState('');
   const [feriasErro, setFeriasErro] = useState('');
   const [modalRapidoFiltroOpen, setModalRapidoFiltroOpen] = useState(false);
+  const [custoDetalheModalOpen, setCustoDetalheModalOpen] = useState(false);
+  const [custoDetalheItem, setCustoDetalheItem] = useState(null);
   const [rapidoSupervisor, setRapidoSupervisor] = useState('');
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
@@ -2197,7 +2217,7 @@ export default function App() {
         descricao: row?.Descricao ?? row?.descricao ?? '',
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
-        nf: row?.NF ?? row?.Nf ?? row?.NotaFiscal ?? row?.notaFiscal ?? '',
+        nf: obterNumeroNota(row),
         quantidade: obterQuantidadeLiquida(row),
         valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
         valorTotal: obterValorLiquido(row),
@@ -2736,7 +2756,7 @@ export default function App() {
         descricao,
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
-        nf: row?.NF ?? row?.Nf ?? row?.NotaFiscal ?? row?.notaFiscal ?? '',
+        nf: obterNumeroNota(row),
         quantidade: obterQuantidadeLiquida(row),
         valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
         valorTotal: obterValorLiquido(row),
@@ -3033,6 +3053,132 @@ const resumoCustosIndiretos = useMemo(() => {
   const total = ordenados.reduce((acc, item) => acc + item.total, 0);
   return { total, itens: ordenados, top };
 }, [custosIndiretosData]);
+
+const totalDiretoPlanilhaAtual = useMemo(() => {
+  if (!mesCustoAtual) return 0;
+  return custosData.reduce((acc, item) => acc + parseValor(item?.Valores?.[mesCustoAtual]), 0);
+}, [custosData, mesCustoAtual]);
+
+const totalDiretoPlanilhaPrev = useMemo(() => {
+  if (!mesCustoAtual) return 0;
+  return custosPrevanoData.reduce((acc, item) => acc + parseValor(item?.Valores?.[mesCustoAtual]), 0);
+}, [custosPrevanoData, mesCustoAtual]);
+
+const variacaoDiretoPlanilha = useMemo(() => {
+  if (!totalDiretoPlanilhaPrev) return 0;
+  return ((totalDiretoPlanilhaAtual - totalDiretoPlanilhaPrev) / totalDiretoPlanilhaPrev) * 100;
+}, [totalDiretoPlanilhaAtual, totalDiretoPlanilhaPrev]);
+
+const totalDiretoMes = faturamentoComCustos.summary?.totalDirect || 0;
+const totalIndiretoMes = faturamentoComCustos.summary?.cifTotal || 0;
+
+const percentualDireto = useMemo(() => {
+  if (totalCustosMes <= 0) return 0;
+  return (totalDiretoMes / totalCustosMes) * 100;
+}, [totalDiretoMes, totalCustosMes]);
+
+const percentualIndireto = useMemo(() => {
+  if (totalCustosMes <= 0) return 0;
+  return (totalIndiretoMes / totalCustosMes) * 100;
+}, [totalIndiretoMes, totalCustosMes]);
+
+const topCustoItens = useMemo(() => {
+  return [...itensCustosOrdenados]
+    .sort((a, b) => b.custo - a.custo)
+    .slice(0, 10);
+}, [itensCustosOrdenados]);
+
+const pioresMargens = useMemo(() => {
+  return itensCustosOrdenados
+    .filter((item) => item.margem < 0)
+    .sort((a, b) => a.margem - b.margem)
+    .slice(0, 10);
+}, [itensCustosOrdenados]);
+
+const semCustoTop = useMemo(
+  () => faturamentoComCustos.summary?.semCustoTop || [],
+  [faturamentoComCustos.summary]
+);
+
+const confiabilidadeCustos = useMemo(() => {
+  const counts = faturamentoComCustos.summary?.counts || {};
+  const total =
+    (counts.ATUAL || 0) +
+    (counts.FALLBACK_ANO_PASSADO || 0) +
+    (counts.TEORICO_PROXY || 0) +
+    (counts.SEM_CUSTO || 0);
+  if (!total) {
+    return {
+      total: 0,
+      atual: 0,
+      fallback: 0,
+      proxy: 0,
+      semCusto: 0,
+    };
+  }
+  return {
+    total,
+    atual: ((counts.ATUAL || 0) / total) * 100,
+    fallback: ((counts.FALLBACK_ANO_PASSADO || 0) / total) * 100,
+    proxy: ((counts.TEORICO_PROXY || 0) / total) * 100,
+    semCusto: ((counts.SEM_CUSTO || 0) / total) * 100,
+  };
+}, [faturamentoComCustos.summary]);
+
+const clientesLookup = useMemo(() => {
+  const map = new Map();
+  (clientesData?.clientes || []).forEach((cliente) => {
+    const codigo = normalizarCodigoCliente(cliente.Codigo);
+    if (!codigo) return;
+    map.set(codigo, {
+      nome: cliente.Nome || '',
+      estado: cliente.Estado || '',
+      municipio: cliente.Municipio || '',
+    });
+  });
+  return map;
+}, [clientesData]);
+
+const obterInfoCliente = (clienteRaw) => {
+  const codigo = normalizarCodigoCliente(clienteRaw || '');
+  const info = clientesLookup.get(codigo);
+  return {
+    nome: info?.nome || clienteRaw || 'Sem cliente',
+    local: info?.municipio ? `${info.municipio} / ${info.estado}` : '',
+  };
+};
+const custoDetalheLinhas = useMemo(() => {
+  if (!custoDetalheItem) return [];
+  const alvo = normalizarCodigoProduto(custoDetalheItem.codigo || custoDetalheItem.skuNormalized || '');
+  if (!alvo) return [];
+  return faturamentoAtual.linhas.filter(
+    (row) => normalizarCodigoProduto(row.codigo || '') === alvo
+  );
+}, [custoDetalheItem, faturamentoAtual.linhas]);
+
+const custoDetalhePedidos = useMemo(() => {
+  if (!custoDetalheLinhas.length) return [];
+  const pedidos = new Map();
+  custoDetalheLinhas.forEach((row) => {
+    const nf = String(row.nf || 'Sem NF');
+    const infoCliente = obterInfoCliente(row.cliente);
+    if (!pedidos.has(nf)) {
+      pedidos.set(nf, {
+        nf,
+        cliente: infoCliente.nome,
+        clienteLocal: infoCliente.local,
+        filial: row.filial || '-',
+        data: row.emissao ? row.emissao.toLocaleDateString('pt-BR') : 'Sem data',
+        quantidade: 0,
+        valor: 0,
+      });
+    }
+    const atual = pedidos.get(nf);
+    atual.quantidade += Number.isFinite(row.quantidade) ? row.quantidade : 0;
+    atual.valor += Number.isFinite(row.valorTotal) ? row.valorTotal : 0;
+  });
+  return Array.from(pedidos.values()).sort((a, b) => b.valor - a.valor);
+}, [custoDetalheLinhas, clientesLookup]);
 
   const municipiosBounds = useMemo(() => {
     if (faturamentoAtual.municipiosMapa.length === 0) return null;
@@ -3419,28 +3565,42 @@ const resumoCustosIndiretos = useMemo(() => {
             </div>
             <div className="p-6">
               {itensCustosOrdenados.length ? (
-                <div className="space-y-2">
-                  <div className="grid grid-cols-[120px_1fr_60px_80px_80px_70px_70px] items-center text-[10px] uppercase tracking-[0.3em] text-slate-500">
-                    <span>SKU</span>
-                    <span>Descrição</span>
-                    <span className="text-right">Qtd</span>
-                    <span className="text-right">Receita</span>
-                    <span className="text-right">Custo</span>
-                    <span className="text-right">Margem</span>
-                    <span className="text-right">Markup</span>
-                  </div>
-                  <div className="mt-3 max-h-[60vh] overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-                    <div className="space-y-3">
-                      {itensCustosOrdenados.slice(0, 40).map((item) => (
+                <div className="max-h-[60vh] overflow-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                  <div className="min-w-[1100px]">
+                    <div className="sticky top-0 z-10 grid grid-cols-[90px_1fr_60px_90px_80px_80px_80px_80px_80px_90px_70px_70px] items-center border-b border-slate-800 bg-slate-950/90 px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500 backdrop-blur">
+                      <span>SKU</span>
+                      <span>Descricao</span>
+                      <span className="text-right">Qtd</span>
+                      <span className="text-right">Receita</span>
+                      <span className="text-right">Preco medio</span>
+                      <span className="text-right">Custo</span>
+                      <span className="text-right">Custo unit</span>
+                      <span className="text-right">Direto</span>
+                      <span className="text-right">CIF total</span>
+                      <span className="text-right">Fonte</span>
+                      <span className="text-right">Margem</span>
+                      <span className="text-right">Markup</span>
+                    </div>
+                    <div className="space-y-3 px-3 py-3">
+                      {itensCustosOrdenados.map((item) => (
                         <div
                           key={`${item.codigo}-${item.descricao}`}
-                          className="grid grid-cols-[120px_1fr_60px_80px_80px_70px_70px] items-center text-[11px] text-slate-200"
+                          className="grid grid-cols-[90px_1fr_60px_90px_80px_80px_80px_80px_80px_90px_70px_70px] items-center text-[11px] text-slate-200"
                         >
                           <span className="text-slate-100">{item.codigo || '-'}</span>
-                          <span className="text-slate-400">{item.descricao || 'Sem descrição'}</span>
+                          <span className="text-slate-400">{item.descricao || 'Sem descricao'}</span>
                           <span className="text-right">{item.quantidade ? Math.round(item.quantidade) : 0}</span>
                           <span className="text-right text-emerald-300">{formatarMoeda(item.receita)}</span>
+                          <span className="text-right text-emerald-200">
+                            {formatarMoeda(item.quantidade ? item.receita / item.quantidade : 0)}
+                          </span>
                           <span className="text-right text-emerald-400">{formatarMoeda(item.custo)}</span>
+                          <span className="text-right text-slate-200">
+                            {formatarMoeda(item.quantidade ? item.custo / item.quantidade : 0)}
+                          </span>
+                          <span className="text-right text-slate-300">{formatarMoeda(item.custoDireto)}</span>
+                          <span className="text-right text-slate-300">{formatarMoeda(item.cifRateado)}</span>
+                          <span className="text-right text-slate-400">{item.fonteDireto || '-'}</span>
                           <span className="text-right">{item.margem.toFixed(1)}%</span>
                           <span className="text-right">{item.markup.toFixed(1)}%</span>
                         </div>
@@ -3450,6 +3610,157 @@ const resumoCustosIndiretos = useMemo(() => {
                 </div>
               ) : (
                 <p className="text-sm text-slate-400">Ainda não há dados de custos para mostrar.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {custoDetalheModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
+          <div className="w-full max-w-5xl rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+            <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
+                <p className="text-lg font-bold text-white">Margem negativa</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustoDetalheModalOpen(false);
+                  setCustoDetalheItem(null);
+                }}
+                className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {custoDetalheItem ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                      <p className="text-xs uppercase tracking-wider text-slate-400">SKU</p>
+                      <p className="text-lg font-bold text-white">{custoDetalheItem.codigo || '-'}</p>
+                      <p className="text-xs text-slate-400">{custoDetalheItem.descricao || 'Sem descricao'}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                      <p className="text-xs uppercase tracking-wider text-slate-400">Resumo</p>
+                      <p className="text-sm text-slate-200">Receita {formatarMoeda(custoDetalheItem.receita)}</p>
+                      <p className="text-sm text-slate-200">Custo {formatarMoeda(custoDetalheItem.custo)}</p>
+                      <p className="text-sm text-rose-300">Margem {custoDetalheItem.margem.toFixed(1)}%</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                      <p className="text-xs uppercase tracking-wider text-slate-400">Composicao</p>
+                      <p className="text-sm text-slate-200">Direto {formatarMoeda(custoDetalheItem.custoDireto)}</p>
+                      <p className="text-sm text-slate-200">CIF {formatarMoeda(custoDetalheItem.cifRateado)}</p>
+                      <p className="text-sm text-slate-400">Fonte {custoDetalheItem.fonteDireto || '-'}</p>
+                    </div>
+                  </div>
+
+                                                      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-slate-400">Pedidos (NF)</p>
+                        <p className="text-[11px] text-slate-500">Agrupado por nota fiscal</p>
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {custoDetalhePedidos.length} pedido(s)
+                      </span>
+                    </div>
+                    {custoDetalhePedidos.length ? (
+                      <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                        <div className="grid grid-cols-[110px_1fr_90px_80px_80px_90px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                          <span>NF</span>
+                          <span>Cliente</span>
+                          <span className="text-right">Data</span>
+                          <span className="text-right">Filial</span>
+                          <span className="text-right">Qtd</span>
+                          <span className="text-right">Valor</span>
+                        </div>
+                        <div className="divide-y divide-slate-800">
+                          {custoDetalhePedidos.map((pedido) => (
+                            <div
+                              key={`${pedido.nf}-${pedido.cliente}`}
+                              className="grid grid-cols-[110px_1fr_90px_80px_80px_90px] items-center px-3 py-2 text-[11px] text-slate-200"
+                            >
+                              <span className="text-slate-100">{pedido.nf}</span>
+                              <div className="text-slate-400">
+                                <div className="text-slate-200">{pedido.cliente}</div>
+                                {pedido.clienteLocal ? (
+                                  <div className="text-[10px] text-slate-500">{pedido.clienteLocal}</div>
+                                ) : null}
+                              </div>
+                              <span className="text-right text-slate-400">{pedido.data}</span>
+                              <span className="text-right text-slate-400">{pedido.filial}</span>
+                              <span className="text-right">{Math.round(pedido.quantidade)}</span>
+                              <span className="text-right text-emerald-300">{formatarMoeda(pedido.valor)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-3 text-xs text-slate-400">Sem pedidos encontrados para este SKU.</p>
+                    )}
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-slate-400">Linhas do faturamento</p>
+                        <p className="text-[11px] text-slate-500">Usa os filtros atuais de filial e CFOP.</p>
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {custoDetalheLinhas.length} linha(s)
+                      </span>
+                    </div>
+                    {custoDetalheLinhas.length ? (
+                      <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                        <div className="grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                          <span>NF</span>
+                          <span>Cliente</span>
+                          <span className="text-right">Data</span>
+                          <span className="text-right">Filial</span>
+                          <span className="text-right">Qtd</span>
+                          <span className="text-right">Unit</span>
+                          <span className="text-right">Total</span>
+                        </div>
+                        <div className="divide-y divide-slate-800">
+                          {custoDetalheLinhas.map((linha, index) => (
+                            <div
+                              key={`${linha.nf}-${index}`}
+                              className="grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px] items-center px-3 py-2 text-[11px] text-slate-200"
+                            >
+                              <span className="text-slate-100">{linha.nf || '-'}</span>
+                              {(() => {
+                                const info = obterInfoCliente(linha.cliente);
+                                return (
+                                  <div className="text-slate-400">
+                                    <div className="text-slate-200">{info.nome}</div>
+                                    {info.local ? (
+                                      <div className="text-[10px] text-slate-500">{info.local}</div>
+                                    ) : null}
+                                  </div>
+                                );
+                              })()}
+                              <span className="text-right text-slate-400">
+                                {linha.emissao ? linha.emissao.toLocaleDateString('pt-BR') : '-'}
+                              </span>
+                              <span className="text-right text-slate-400">{linha.filial || '-'}</span>
+                              <span className="text-right">{Math.round(linha.quantidade || 0)}</span>
+                              <span className="text-right text-slate-300">{formatarMoeda(linha.valorUnitario)}</span>
+                              <span className="text-right text-emerald-300">{formatarMoeda(linha.valorTotal)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-3 text-xs text-slate-400">Sem linhas de faturamento para este SKU.</p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-slate-400">Selecione um item para ver detalhes.</p>
               )}
             </div>
           </div>
@@ -4027,7 +4338,7 @@ const resumoCustosIndiretos = useMemo(() => {
                                 <span className="font-bold text-slate-900">{item.codigo || '-'}</span>
                                 <span className="text-emerald-500 font-black">{formatarMoeda(item.receita)}</span>
                               </div>
-                              <p className="text-[12px] text-slate-500">{item.descricao || 'Sem descrição'}</p>
+                              <p className="text-[12px] text-slate-500">{item.descricao || 'Sem descricao'}</p>
                               <p className="text-[11px] text-slate-400 mt-1">
                                 Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} · Markup{' '}
                                 {Number.isFinite(markupItem) ? `${markupItem.toFixed(1)}%` : '0%'}
@@ -4086,7 +4397,318 @@ const resumoCustosIndiretos = useMemo(() => {
               </div>
             </div>
           )}
-{/* ABA DE FATURAMENTO */}
+
+          {/* ABA DE CUSTOS */}
+          {abaAtiva === 'custos' && (
+            <div className="space-y-8 animate-in slide-in-from-right duration-700">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-2xl">
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-emerald-600/10 blur-3xl" />
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
+                <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-inner">
+                      <Layers size={28} className="text-emerald-300" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Custos consolidados</p>
+                      </div>
+                      <h2 className="text-3xl font-black text-white tracking-tight">Custos</h2>
+                      <p className="text-sm text-slate-400 mt-1 font-medium">
+                        Base {mesCustoAtual || 'planilha atual'} • {faturamentoAtual.movimentos || 0} movimentos
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[320px]">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Total de custos</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-2xl font-black text-emerald-300">{formatarMoeda(totalCustosMes)}</span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Custo / movimento</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-2xl font-black text-blue-200">{formatarMoeda(custoMedioMovimento)}</span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">% custo no faturamento</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-2xl font-black text-amber-200">
+                          {Number.isFinite(percentualCustoSobreFaturamento) ? `${percentualCustoSobreFaturamento.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <span className="mr-2">Filiais</span>
+                  {['Todas', ...(faturamentoAtual.filiais || [])].map((filial) => (
+                    <button
+                      key={filial}
+                      type="button"
+                      onClick={() => setFiltroFilial(filial)}
+                      className={`rounded-full px-3 py-1.5 transition-all ${
+                        filtroFilial === filial
+                          ? 'bg-emerald-500 text-slate-950 shadow'
+                          : 'bg-slate-800 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      {filial}
+                    </button>
+                  ))}
+                  {faturamentoAtual.filiais?.length === 0 && (
+                    <span className="text-[10px] text-slate-500">Sem filiais cadastradas.</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Indicadores</h3>
+                  <div className="grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-400">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-[10px]">Margem sobre faturamento</p>
+                      <p className="text-2xl font-bold text-emerald-400 mt-1">
+                        {Number.isFinite(margemPercentual) ? `${margemPercentual.toFixed(1)}%` : '-'}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-[10px]">Markup sobre custo</p>
+                      <p className="text-2xl font-bold text-blue-300 mt-1">
+                        {Number.isFinite(markupPercentual) ? `${markupPercentual.toFixed(1)}%` : '-'}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-[10px]">Custo medio / dia</p>
+                      <p className="text-2xl font-bold text-slate-100 mt-1">{formatarMoeda(custoMedioDia)}</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-[10px]">Qtd SKUs com custo</p>
+                      <p className="text-2xl font-bold text-slate-100 mt-1">{faturamentoComCustos.itens.length || 0}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Diretos x indiretos</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>Custos diretos</span>
+                        <span className="font-bold text-emerald-300">{formatarMoeda(totalDiretoMes)}</span>
+                      </div>
+                      <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                        <div className="h-full bg-emerald-500" style={{ width: `${Math.min(percentualDireto, 100)}%` }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>Custos indiretos (CIF)</span>
+                        <span className="font-bold text-amber-300">{formatarMoeda(totalIndiretoMes)}</span>
+                      </div>
+                      <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                        <div className="h-full bg-amber-400" style={{ width: `${Math.min(percentualIndireto, 100)}%` }} />
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-400">
+                      Rateio aplicado: {formatarMoeda(faturamentoComCustos.summary?.alocado || 0)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Comparativo ano anterior</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span>Direto mes atual</span>
+                      <span className="font-bold text-slate-100">{formatarMoeda(totalDiretoPlanilhaAtual)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span>Direto ano anterior</span>
+                      <span className="font-bold text-slate-100">{formatarMoeda(totalDiretoPlanilhaPrev)}</span>
+                    </div>
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex items-center justify-between text-xs text-slate-300">
+                      <span>Variacao</span>
+                      <span className={`flex items-center gap-2 font-bold ${variacaoDiretoPlanilha >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                        {variacaoDiretoPlanilha >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                        {Number.isFinite(variacaoDiretoPlanilha) ? `${variacaoDiretoPlanilha.toFixed(1)}%` : '-'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">Comparativo usa a mesma base de mes da planilha atual.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Top custos por SKU</h3>
+                    <button
+                      type="button"
+                      onClick={() => setModalTabelaCustosOpen(true)}
+                      className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:border-slate-500"
+                    >
+                      Ver detalhes
+                    </button>
+                  </div>
+                  {topCustoItens.length ? (
+                    <div className="space-y-3">
+                      {topCustoItens.map((item) => (
+                        <div key={`${item.codigo}-${item.descricao}`} role="button" tabIndex={0} onClick={() => { setCustoDetalheItem(item); setCustoDetalheModalOpen(true); }} onKeyDown={(e) => { if (e.key === 'Enter') { setCustoDetalheItem(item); setCustoDetalheModalOpen(true); } }} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-left transition hover:border-emerald-400/60 hover:bg-slate-950/70">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-100">{item.codigo || '-'}</span>
+                            <span className="text-xs font-bold text-emerald-300">{formatarMoeda(item.custo)}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+                            <span>Margem {Number.isFinite(item.margem) ? `${item.margem.toFixed(1)}%` : '-'}</span>
+                            <span>Receita {formatarMoeda(item.receita)}</span>
+                          </div>
+                          <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+                            <span>
+                              Preco medio {formatarMoeda(item.quantidade ? item.receita / item.quantidade : 0)}
+                            </span>
+                            <span>
+                              Custo medio {formatarMoeda(item.quantidade ? item.custo / item.quantidade : 0)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">Sem itens com custo.</p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Margens negativas</h3>
+                  {pioresMargens.length ? (
+                    <div className="space-y-3">
+                      {pioresMargens.map((item) => (
+                        <button
+                          key={`${item.codigo}-${item.descricao}`}
+                          type="button"
+                          onClick={() => {
+                            setCustoDetalheItem(item);
+                            setCustoDetalheModalOpen(true);
+                          }}
+                          className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-left transition hover:border-rose-400/70 hover:bg-rose-500/15"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-rose-100">{item.codigo || '-'}</span>
+                            <span className="text-xs font-bold text-rose-200">{item.margem.toFixed(1)}%</span>
+                          </div>
+                          <p className="text-[11px] text-rose-200/70">{item.descricao || 'Sem descricao'}</p>
+                          <div className="mt-2 flex items-center justify-between text-[10px] text-rose-200/70">
+                            <span>Custo {formatarMoeda(item.custo)}</span>
+                            <span>Receita {formatarMoeda(item.receita)}</span>
+                          </div>
+                          <div className="mt-1 flex items-center justify-between text-[10px] text-rose-200/70">
+                            <span>
+                              Preco medio {formatarMoeda(item.quantidade ? item.receita / item.quantidade : 0)}
+                            </span>
+                            <span>
+                              Custo medio {formatarMoeda(item.quantidade ? item.custo / item.quantidade : 0)}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">Nenhuma margem negativa encontrada.</p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Confiabilidade do custo</h3>
+                  {confiabilidadeCustos.total ? (
+                    <div className="space-y-3">
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Custo direto atual</span>
+                          <span className="font-bold text-emerald-300">{confiabilidadeCustos.atual.toFixed(1)}%</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-emerald-500" style={{ width: `${confiabilidadeCustos.atual}%` }} />
+                        </div>
+                      </div>
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Fallback ano anterior</span>
+                          <span className="font-bold text-blue-300">{confiabilidadeCustos.fallback.toFixed(1)}%</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-blue-500" style={{ width: `${confiabilidadeCustos.fallback}%` }} />
+                        </div>
+                      </div>
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Estimado/rateado</span>
+                          <span className="font-bold text-amber-300">{confiabilidadeCustos.proxy.toFixed(1)}%</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-amber-500" style={{ width: `${confiabilidadeCustos.proxy}%` }} />
+                        </div>
+                      </div>
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Sem custo direto</span>
+                          <span className="font-bold text-rose-300">{confiabilidadeCustos.semCusto.toFixed(1)}%</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-rose-500" style={{ width: `${confiabilidadeCustos.semCusto}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">Sem dados suficientes para medir confiabilidade.</p>
+                  )}
+                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-xs text-slate-400">
+                    Base analisada: {confiabilidadeCustos.total} SKUs com receita.
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">SKUs sem custo direto</h3>
+                    <p className="text-xs text-slate-400 mt-1">Itens com receita mas sem custo direto identificado.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setModalTabelaCustosOpen(true)}
+                    className="rounded-xl border border-emerald-500 bg-emerald-500/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-emerald-200"
+                  >
+                    Abrir detalhamento por SKU
+                  </button>
+                </div>
+                {semCustoTop.length ? (
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                    {semCustoTop.slice(0, 9).map((item) => (
+                      <div key={item.codigo} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-100">{item.codigo || '-'}</span>
+                          <span className="text-xs font-bold text-amber-300">{formatarMoeda(item.receita)}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-4 text-xs text-slate-400 italic">Nenhum SKU sem custo identificado.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ABA DE FATURAMENTO */}
           {abaAtiva === 'faturamento' && (
             <div className="space-y-8 animate-in slide-in-from-right duration-700">
               <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-2xl">
@@ -7051,3 +7673,5 @@ const resumoCustosIndiretos = useMemo(() => {
     </div>
   );
 }
+
+

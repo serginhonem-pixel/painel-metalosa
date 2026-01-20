@@ -113,6 +113,8 @@ const extrairFaturamento = (sheet) => {
     'nota',
     'numeronf',
     'numeronota',
+    'numdanota',
+    'numdanf',
     'numdoc',
     'documento',
   ]);
@@ -186,6 +188,8 @@ const extrairDevolucoes = (sheet) => {
     'numeronf',
     'nota',
     'notafiscal',
+    'numdanota',
+    'numdanf',
   ]);
 
   return rows.slice(headerIndex + 1).reduce((acc, row) => {
