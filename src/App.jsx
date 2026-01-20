@@ -6418,7 +6418,10 @@ const resumoCustosIndiretos = useMemo(() => {
                             status: 'Aberta',
                             statusMaquina: 'Rodando',
                             descricao: '',
+                            fotoUrl: '',
                           });
+                          setNovaOsFotoFile(null);
+                          setNovaOsFotoPreview('');
                           setManutencaoSaveError('');
                           setManutencaoModalOpen(true);
                         }}
@@ -6427,6 +6430,13 @@ const resumoCustosIndiretos = useMemo(() => {
                         Nova OS
                       </button>
                       <button className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white">Exportar</button>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white md:hidden"
+                      >
+                        Sair
+                      </button>
                    </div>
                 </div>
 
@@ -6791,7 +6801,7 @@ const resumoCustosIndiretos = useMemo(() => {
                           <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-slate-400">Foto da OS</label>
+                          <label className="text-xs font-bold text-slate-400">Foto do problema ou componente</label>
                           <input
                             type="file"
                             accept="image/*"
@@ -6799,6 +6809,7 @@ const resumoCustosIndiretos = useMemo(() => {
                             onChange={handleNovaOsFotoChange}
                             className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600/20 file:px-3 file:py-1 file:text-xs file:font-bold file:text-blue-100 hover:file:bg-blue-600/30"
                           />
+                          <p className="mt-2 text-[11px] text-slate-500">Use a foto para registrar o problema ou o componente envolvido.</p>
                           {novaOsFotoPreview || novaOsForm.fotoUrl ? (
                             <div className="mt-3">
                               <img
