@@ -846,5 +846,53 @@
     "MesEmissao": "01/2026",
     "CFOP": "1201",
     "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "058012",
+    "Filial": "01",
+    "Grupo": "G120",
+    "Codigo": "00284",
+    "Descricao": 0,
+    "Quantidade": 36,
+    "Unidade": "M",
+    "ValorUnitario": 10.75,
+    "ValorTotal": 387,
+    "Emissao": "2026-01-20T03:00:28.000Z",
+    "NF": "073484",
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "058012",
+    "Filial": "01",
+    "Grupo": "G110",
+    "Codigo": "01394",
+    "Descricao": 0,
+    "Quantidade": 60,
+    "Unidade": "M",
+    "ValorUnitario": 4.74,
+    "ValorTotal": 284.4,
+    "Emissao": "2026-01-20T03:00:28.000Z",
+    "NF": "073484",
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "058012",
+    "Filial": "01",
+    "Grupo": "G110",
+    "Codigo": "01396",
+    "Descricao": 0,
+    "Quantidade": 120,
+    "Unidade": "M",
+    "ValorUnitario": 2.98,
+    "ValorTotal": 357.6,
+    "Emissao": "2026-01-20T03:00:28.000Z",
+    "NF": "073484",
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
   }
 ]
