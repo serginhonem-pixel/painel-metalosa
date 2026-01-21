@@ -250,10 +250,14 @@ const normalizarCodigoProduto = (valor) =>
     .replace(/\s+/g, '')
     .toUpperCase();
 
-const normalizarCodigoVendedor = (valor) =>
-  String(valor ?? '')
-    .trim()
-    .toUpperCase();
+const normalizarCodigoVendedor = (valor) => {
+  const texto = String(valor ?? '').trim().toUpperCase();
+  if (!texto) return '';
+  if (/^\d+$/.test(texto)) {
+    return texto.length < 3 ? texto.padStart(3, '0') : texto;
+  }
+  return texto;
+};
 
 const UF_CENTROID = {
   AC: [-9.0238, -70.812],
