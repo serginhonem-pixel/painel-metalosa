@@ -379,7 +379,7 @@ const CFOP_SAIDA_TABLE = [
     cfop: '5915',
     descricaoFiscal: 'Remessa simbolica / retorno de industrializacao',
     pratica: 'Ajuste fiscal/logistico',
-    faturamento: 'NAO',
+    faturamento: 'Sim',
   },
   {
     cfop: '6108',
@@ -420,7 +420,7 @@ const CFOP_SAIDA_TABLE = [
 ];
 
 const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
-const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401']);
+const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '5915', '6107']);
 const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
 
 const CfopFilterSelector = ({
@@ -464,7 +464,7 @@ const CfopFilterSelector = ({
         <button
           type="button"
           key={option}
-          title={info[option] ? `${info[option].descricaoFiscal}\n${info[option].pratica}\nE considerado faturamento: ${info[option].faturamento}` : ""}
+          title={info[option] ? `CFOP ${option} - ${info[option].descricaoFiscal}\n${info[option].pratica}\nFaturamento: ${info[option].faturamento}` : `CFOP ${option}`}
           onClick={() => handleSelect(option)}
           className={`px-2.5 py-1 rounded-full transition-all ${
             selectedSet.has(option)
