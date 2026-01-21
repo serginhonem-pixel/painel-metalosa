@@ -376,6 +376,12 @@ const CFOP_SAIDA_TABLE = [
     faturamento: '❌ Não',
   },
   {
+    cfop: '5915',
+    descricaoFiscal: 'Remessa simbolica / retorno de industrializacao',
+    pratica: 'Ajuste fiscal/logistico',
+    faturamento: 'NAO',
+  },
+  {
     cfop: '6108',
     descricaoFiscal: 'Venda de mercadoria adquirida de terceiros com ST (interestadual)',
     pratica: 'Venda interestadual com ST e regra específica',
