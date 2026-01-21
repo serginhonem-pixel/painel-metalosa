@@ -379,7 +379,7 @@ const CFOP_SAIDA_TABLE = [
     cfop: '5915',
     descricaoFiscal: 'Remessa simbolica / retorno de industrializacao',
     pratica: 'Ajuste fiscal/logistico',
-    faturamento: 'Sim',
+    faturamento: 'NAO',
   },
   {
     cfop: '6108',
@@ -420,7 +420,7 @@ const CFOP_SAIDA_TABLE = [
 ];
 
 const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
-const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '5915', '6107']);
+const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '6107']);
 const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
 
 const CfopFilterSelector = ({
