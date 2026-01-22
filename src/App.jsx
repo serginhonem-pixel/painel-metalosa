@@ -4339,7 +4339,7 @@ const custoDetalheTitulo = custoDetalheItem
               <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
                 <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
                 <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-emerald-600/5 blur-3xl" />
-                <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                   <div className="flex items-center gap-6">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-inner">
                       <img src={logoMetalosa} alt="Metalosa" className="h-14 w-14 object-contain opacity-90" />
@@ -4347,35 +4347,35 @@ const custoDetalheTitulo = custoDetalheItem
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">
                           Operação em tempo real
                         </p>
                       </div>
-                      <h2 className="text-3xl font-black text-white tracking-tight">Painel Executivo</h2>
-                      <p className="text-sm text-slate-400 mt-1 font-medium">
+                      <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Painel Executivo</h2>
+                      <p className="text-xs md:text-sm text-slate-400 mt-1 font-medium">
                         Consolidado industrial · {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[320px]">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 min-w-[340px]">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Presença hoje</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Presença hoje</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-emerald-400">{resumoFaltas.percentualPresenca.toFixed(1)}%</span>
                         <span className="text-[10px] text-slate-500 mb-1">da meta</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Dias ativos</p>
                       <div className="flex items-end gap-1">
-                        <span className="text-2xl font-black text-amber-300">{faturamentoAtual.diasAtivos}</span>
+                        <span className="text-2xl font-black text-blue-300">{faturamentoAtual.diasAtivos}</span>
                         <span className="text-[10px] text-slate-500 mb-1">dias úteis</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mês</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Faturamento mês</p>
                       <div className="flex items-end gap-1">
-                        <span className="text-xl font-black text-blue-300">{formatarMoeda(faturamentoAtual.total)}</span>
+                        <span className="text-xl font-black text-emerald-300">{formatarMoeda(faturamentoAtual.total)}</span>
                       </div>
                     </div>
                   </div>
@@ -4386,7 +4386,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <button
                     type="button"
                     onClick={() => setMostrarFiltroCfop((prev) => !prev)}
-                    className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-600"
+                    className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600"
                   >
                     <ChevronRight
                       size={12}
@@ -4394,7 +4394,7 @@ const custoDetalheTitulo = custoDetalheItem
                     />
                     CFOPs de saida (Protheus)
                   </button>
-                  <span className="text-[9px] text-slate-400">
+                  <span className="text-[10px] text-slate-400">
                     {filtroCfops.length} selecionados
                   </span>
                 </div>
@@ -4405,7 +4405,7 @@ const custoDetalheTitulo = custoDetalheItem
                       onSelect={toggleCfopFilter}
                       label="Cod Fiscal"
                     />
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                       <span className="mr-2">Filiais</span>
                       {['Todas', ...(faturamentoAtual.filiais || [])].map((filial) => (
                         <button
@@ -4423,7 +4423,7 @@ const custoDetalheTitulo = custoDetalheItem
                       ))}
                     </div>
                     <div
-                      className="text-[9px] text-slate-500"
+                      className="text-[10px] text-slate-500"
                       title={filtroCfops.length ? filtroCfops.join(", ") : "Todos"}
                     >
                       {filtroCfops.length === 0
@@ -4436,7 +4436,7 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                 {[
                   {
                     titulo: 'Faturamento Total',
@@ -4459,28 +4459,28 @@ const custoDetalheTitulo = custoDetalheItem
                     valor: formatarMoeda(faturamentoAtual.ticketMedio),
                     subtitulo: 'Valor por pedido',
                     icon: ShoppingCart,
-                    corFundo: 'bg-purple-500',
+                    corFundo: 'bg-blue-500',
                   },
                   {
                     titulo: 'Clientes ativos',
                     valor: faturamentoAtual.clientesAtivos,
                     subtitulo: 'Carteira no mês',
                     icon: Users,
-                    corFundo: 'bg-amber-500',
+                    corFundo: 'bg-emerald-500',
                   },
                   {
                     titulo: 'Faltas hoje',
                     valor: resumoFaltas.ausentes,
                     subtitulo: 'Atenção operacional',
                     icon: UserX,
-                    corFundo: 'bg-rose-500',
+                    corFundo: 'bg-blue-500',
                   },
                   {
                     titulo: 'Férias hoje',
                     valor: resumoFaltas.porTipo['Ferias'] || 0,
                     subtitulo: 'Planejamento RH',
                     icon: CalendarIcon,
-                    corFundo: 'bg-slate-400',
+                    corFundo: 'bg-emerald-500',
                   },
                 ].filter((kpi) => !['Faltas hoje', 'FÇ¸rias hoje'].includes(kpi.titulo)).map((kpi) => (
                   <CardInformativo
