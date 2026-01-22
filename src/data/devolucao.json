@@ -352,6 +352,22 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": "043326",
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": "00140",
+    "Descricao": 0,
+    "Quantidade": 5,
+    "Unidade": "PC",
+    "ValorUnitario": 78.699488,
+    "ValorTotal": 393.49,
+    "Emissao": "2026-01-20T03:00:28.000Z",
+    "NF": "000121482",
+    "MesEmissao": "01/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "020897",
     "Filial": "08",
     "Grupo": "G015",
