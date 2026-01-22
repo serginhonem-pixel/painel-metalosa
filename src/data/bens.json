@@ -1,0 +1,3002 @@
+[
+  {
+    "bem": "ALI001",
+    "familia": "",
+    "nome": "ALIMENTADOR PNEUMATICO AP300/350"
+  },
+  {
+    "bem": "ALMOXARIFADO",
+    "familia": "",
+    "nome": "ALMOXARIFADO CENTRAL"
+  },
+  {
+    "bem": "APA001",
+    "familia": "",
+    "nome": "APARELHO DE COMUNICACAO DA CANTINA"
+  },
+  {
+    "bem": "ARMA",
+    "familia": "",
+    "nome": "ARMARIO"
+  },
+  {
+    "bem": "ARMA001",
+    "familia": "",
+    "nome": "ARMARIO P/ EQUIP/ SEGURANCA"
+  },
+  {
+    "bem": "ARMA002",
+    "familia": "",
+    "nome": "ARMARIO P/ EQUIP/ SEGURANCA"
+  },
+  {
+    "bem": "BCH01",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA BUCHA DO CARRO"
+  },
+  {
+    "bem": "BEB01",
+    "familia": "",
+    "nome": "BEBEDOURO CARREGAMENTO DO CARRO 01"
+  },
+  {
+    "bem": "BOM01",
+    "familia": "",
+    "nome": "BOMBA D'AGUA 1/2CV RETORNO CONDENSADO 01"
+  },
+  {
+    "bem": "BOM02",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DO CAMPO 02"
+  },
+  {
+    "bem": "BOM03",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DO SITIO 03"
+  },
+  {
+    "bem": "BOM04",
+    "familia": "",
+    "nome": "BOMBA D'AGUA MAQUINA DE TUBO 04"
+  },
+  {
+    "bem": "BOM05",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DA TORRE DO PNEU/INOX 15CV"
+  },
+  {
+    "bem": "BOM06",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DA TORRE DO PNEU/INOX 15CV"
+  },
+  {
+    "bem": "BOM07",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DO POCO - INOX"
+  },
+  {
+    "bem": "BOM08",
+    "familia": "",
+    "nome": "BOMBA D'AGUA DO POCO - CARRO"
+  },
+  {
+    "bem": "BOM09",
+    "familia": "",
+    "nome": "BOMBA D AGUA MAIOR INCENDIO"
+  },
+  {
+    "bem": "BOM10",
+    "familia": "",
+    "nome": "BOMBA D AGUA MENOR INCENDIO"
+  },
+  {
+    "bem": "BOMBA D'AGUA",
+    "familia": "",
+    "nome": "BOMBA D'GUA EMPILHADEIRA"
+  },
+  {
+    "bem": "BOR01",
+    "familia": "",
+    "nome": "BORJATRIZ BETONEIRA 400 L"
+  },
+  {
+    "bem": "CA01",
+    "familia": "",
+    "nome": "CALANDRA DE IMPREGNAR E LAMINAR 01"
+  },
+  {
+    "bem": "CA02",
+    "familia": "",
+    "nome": "MAQUINA DE CALANDRAR CHAPAS"
+  },
+  {
+    "bem": "CA03",
+    "familia": "",
+    "nome": "MAQUINA DE CALANDRAR BALDE"
+  },
+  {
+    "bem": "CA04",
+    "familia": "",
+    "nome": "MAQUINA VINCO CAIXA D'AGUA INOX"
+  },
+  {
+    "bem": "CABINE 01",
+    "familia": "",
+    "nome": "CABINE DE SUCCAO DE AR"
+  },
+  {
+    "bem": "CABINE 02",
+    "familia": "",
+    "nome": "CABINE DE SOLDA DA ESCADA 02"
+  },
+  {
+    "bem": "CABINE 03",
+    "familia": "",
+    "nome": "CABINE DE SOLDA DA ESCADA 03"
+  },
+  {
+    "bem": "CABINE 04",
+    "familia": "",
+    "nome": "CABINE DE SOLDA CARRO PLATAFORMA 04"
+  },
+  {
+    "bem": "CABINE 05",
+    "familia": "",
+    "nome": "CABINE DE SOLDA CARRO DE CARGA 05"
+  },
+  {
+    "bem": "CABINE06",
+    "familia": "",
+    "nome": "CABINE DE PINTURA"
+  },
+  {
+    "bem": "CAC01",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 01"
+  },
+  {
+    "bem": "CAC02",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 02"
+  },
+  {
+    "bem": "CAC03",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 03"
+  },
+  {
+    "bem": "CAC04",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 04"
+  },
+  {
+    "bem": "CAC05",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 05"
+  },
+  {
+    "bem": "CAC06",
+    "familia": "",
+    "nome": "CACAMBA DE SUCATA 06"
+  },
+  {
+    "bem": "CAC99",
+    "familia": "",
+    "nome": "CACAMBAS DE SUCATAS 99"
+  },
+  {
+    "bem": "CAD001",
+    "familia": "",
+    "nome": "CADEIRA DENTISTA 01"
+  },
+  {
+    "bem": "CADE01",
+    "familia": "",
+    "nome": "CADEIRA DE ESCRITORIO 01"
+  },
+  {
+    "bem": "CADEI01",
+    "familia": "",
+    "nome": "CADEIRA ERGONOMICA 01"
+  },
+  {
+    "bem": "CAIX001",
+    "familia": "",
+    "nome": "CAIXAS PARA PRODUTOS ACABADOS"
+  },
+  {
+    "bem": "CAIX002",
+    "familia": "",
+    "nome": "CAIXAS 1.20X1.00X1.20"
+  },
+  {
+    "bem": "CAIX003",
+    "familia": "",
+    "nome": "CAIXAS 1.20X1.00X1.20 ESCADA"
+  },
+  {
+    "bem": "CAIX004",
+    "familia": "",
+    "nome": "CAIXAS 1.20X1.00X1.20 CARRO"
+  },
+  {
+    "bem": "CAIX005",
+    "familia": "",
+    "nome": "CAIXAS 1.20X1.00X1.20 CARRO PLUS"
+  },
+  {
+    "bem": "CAIX006",
+    "familia": "",
+    "nome": "CAIXAS PARA ACESSORIOS TRACO"
+  },
+  {
+    "bem": "CAIX007",
+    "familia": "",
+    "nome": "CAIXAS 2.00X1.25X1.50 CARRO PLUS/MASTER"
+  },
+  {
+    "bem": "CAIX008",
+    "familia": "",
+    "nome": "CAIXAS 2.00X1.25X1.50 CARRO PLUS/MASTER"
+  },
+  {
+    "bem": "CAIX009",
+    "familia": "",
+    "nome": "CAIXAS 1.70X1.30X1.25 CARRO PLUS/MASTER"
+  },
+  {
+    "bem": "CALDEIRA 01",
+    "familia": "",
+    "nome": "CALDEIRA ESTANHAGEM 500 KG/H 01"
+  },
+  {
+    "bem": "CALDEIRA 02",
+    "familia": "",
+    "nome": "CALDEIRA PNEUS 500 KG/H 02"
+  },
+  {
+    "bem": "CALDEIRA 03",
+    "familia": "",
+    "nome": "CALDEIRA PNEUS 1000 KG/H 03"
+  },
+  {
+    "bem": "CANGA01",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 01"
+  },
+  {
+    "bem": "CANGA02",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 02"
+  },
+  {
+    "bem": "CANGA03",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 03"
+  },
+  {
+    "bem": "CANGA04",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 04"
+  },
+  {
+    "bem": "CANGA05",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 05"
+  },
+  {
+    "bem": "CANGA06",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 06"
+  },
+  {
+    "bem": "CANGA07",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 07"
+  },
+  {
+    "bem": "CANGA08",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 08"
+  },
+  {
+    "bem": "CANGA09",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 09"
+  },
+  {
+    "bem": "CANGA10",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 10"
+  },
+  {
+    "bem": "CANGA11",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 11"
+  },
+  {
+    "bem": "CANGA12",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 12"
+  },
+  {
+    "bem": "CANGA13",
+    "familia": "",
+    "nome": "CANGA DE MOVIMENTACAO DE MATERIAIS 13"
+  },
+  {
+    "bem": "CAR001",
+    "familia": "",
+    "nome": "CARROS PARA PNEUS MONTADOS"
+  },
+  {
+    "bem": "CAR002",
+    "familia": "",
+    "nome": "CARRO BICA DOS ACESSORIOS"
+  },
+  {
+    "bem": "CASA DE FORCA 01",
+    "familia": "",
+    "nome": "CASA DE FORCA 01 CARRO/PERFIL"
+  },
+  {
+    "bem": "CASA DE FORCA 02",
+    "familia": "",
+    "nome": "CASA DE FORCA 02 PNEUS/DBINOX"
+  },
+  {
+    "bem": "CASA DE FORCA 03",
+    "familia": "",
+    "nome": "CASA DE FORCA 03 ESCADA/LATAO/MANUTENCAO"
+  },
+  {
+    "bem": "CAV01",
+    "familia": "",
+    "nome": "CAVALETE SETOR DRYWALL"
+  },
+  {
+    "bem": "CAV02",
+    "familia": "",
+    "nome": "CAVALETE PARA BOBINAS DOIS"
+  },
+  {
+    "bem": "CAV03",
+    "familia": "",
+    "nome": "CAVALETE COMETA 03"
+  },
+  {
+    "bem": "CD01",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA DE CORTAR DIVISORIA"
+  },
+  {
+    "bem": "CELROB 01",
+    "familia": "",
+    "nome": "CELULA DE SOLDA 01"
+  },
+  {
+    "bem": "CHA001",
+    "familia": "",
+    "nome": "CHAVES GERAIS ELETRICA ALMOXARIFADO 001"
+  },
+  {
+    "bem": "CN01",
+    "familia": "",
+    "nome": "MAQUINA COLOCAR NUCLEO 01"
+  },
+  {
+    "bem": "CN02",
+    "familia": "",
+    "nome": "MAQUINA COLOCAR NUCLEO 02"
+  },
+  {
+    "bem": "COM001",
+    "familia": "",
+    "nome": "COMPRESSOR DE AR 2030"
+  },
+  {
+    "bem": "COM002",
+    "familia": "",
+    "nome": "COMPRESSOR DE AR 2050"
+  },
+  {
+    "bem": "COM003",
+    "familia": "",
+    "nome": "COMPRESSOR DE AR DE PISTAO ESCADA 003"
+  },
+  {
+    "bem": "COMP01",
+    "familia": "",
+    "nome": "COMPACTADORA DE BLOQUETES 01"
+  },
+  {
+    "bem": "COMP02",
+    "familia": "",
+    "nome": "COMPACTADORA DE CONCRETO"
+  },
+  {
+    "bem": "CORTE LASER 01",
+    "familia": "",
+    "nome": "CORTE LASER 01"
+  },
+  {
+    "bem": "CORTE PLASMA 01",
+    "familia": "",
+    "nome": "CORTE PLASMA  01"
+  },
+  {
+    "bem": "CORTE01",
+    "familia": "",
+    "nome": "CORTAR TUBO DA ESCADA 01"
+  },
+  {
+    "bem": "CP01",
+    "familia": "",
+    "nome": "CONFORMADORA DE PE"
+  },
+  {
+    "bem": "CPL01",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA DE CARIMBAR PLAQUETAS"
+  },
+  {
+    "bem": "CPL02",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA DE OVALIZAR O BALDE"
+  },
+  {
+    "bem": "CPL03",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA DE OVALIZAR O BALDE"
+  },
+  {
+    "bem": "CV01",
+    "familia": "",
+    "nome": "CONFORMADORA EXTREMIDADES TUBO DO VARAL"
+  },
+  {
+    "bem": "CV02",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA CONFORMAR O VARAL"
+  },
+  {
+    "bem": "CV03",
+    "familia": "",
+    "nome": "MAQUINA DE CURVAR O VARAL"
+  },
+  {
+    "bem": "CV04",
+    "familia": "",
+    "nome": "MAQUINA DE CURVAR VERGALHAO"
+  },
+  {
+    "bem": "CV05",
+    "familia": "",
+    "nome": "MAQUINA DE CURVAR O VARAL CARRO CARGA"
+  },
+  {
+    "bem": "CV06",
+    "familia": "",
+    "nome": "MAQUINA DE CURVAR O TUBO DA ESCADA"
+  },
+  {
+    "bem": "CV07",
+    "familia": "",
+    "nome": "MAQUINA DE CURVAR VERGALHAO MET FER ACO"
+  },
+  {
+    "bem": "DEBRUM 01",
+    "familia": "",
+    "nome": "MAQUINA INICIAR DEBRUM CACAMBA POP 01"
+  },
+  {
+    "bem": "DES TRDI 13",
+    "familia": "",
+    "nome": "DESBOBINADOR PRENSA BLAUTH"
+  },
+  {
+    "bem": "DES01",
+    "familia": "",
+    "nome": "DESBOBINADOR DO PE DO CARRO"
+  },
+  {
+    "bem": "DES02",
+    "familia": "",
+    "nome": "DESBOBINADOR DO ARO DO CARRO"
+  },
+  {
+    "bem": "DES03",
+    "familia": "",
+    "nome": "DESBOBINADOR DO MANCAL DO CARRO"
+  },
+  {
+    "bem": "DES04",
+    "familia": "",
+    "nome": "DESBOBINADOR DO DEGRAU E PATAMAR ESCADA"
+  },
+  {
+    "bem": "DES05",
+    "familia": "",
+    "nome": "DESBOBINADOR DE ARAME"
+  },
+  {
+    "bem": "DES06",
+    "familia": "",
+    "nome": "DESBOBINADOR DO CORTE DA SLITTER 06"
+  },
+  {
+    "bem": "DES07",
+    "familia": "",
+    "nome": "DESBOBINADOR DA PERFILADEIRA ZL 01"
+  },
+  {
+    "bem": "DES08",
+    "familia": "",
+    "nome": "DESBOBINADOR PERFILADEIRA TUBOS POLITRON"
+  },
+  {
+    "bem": "DES09",
+    "familia": "",
+    "nome": "DESBOBINADOR DA PERFILADEIRA REGGIANI 03"
+  },
+  {
+    "bem": "DES10",
+    "familia": "",
+    "nome": "DESBOBINADOR PERFILADERIA DRYWALL L E U"
+  },
+  {
+    "bem": "DES11",
+    "familia": "",
+    "nome": "DESBOBINADOR PERFILADEIRA DRYWALL C"
+  },
+  {
+    "bem": "DES12",
+    "familia": "",
+    "nome": "DESBOBINADOR DA PERFILADEIRA 07"
+  },
+  {
+    "bem": "DES13",
+    "familia": "",
+    "nome": "DESBOBINADOR DE FITAS"
+  },
+  {
+    "bem": "DES14",
+    "familia": "",
+    "nome": "DESBOBINADOR DO CORTE DE CHAPAS CACAMBA"
+  },
+  {
+    "bem": "DES15",
+    "familia": "",
+    "nome": "DESBOBINADOR DA PERFILADEIRA 08"
+  },
+  {
+    "bem": "DES16",
+    "familia": "",
+    "nome": "DESBOBINADOR MAQUINA DE TUBO 16"
+  },
+  {
+    "bem": "DES17",
+    "familia": "",
+    "nome": "DESBOBINADOR MAQUINA DE TUBO 17"
+  },
+  {
+    "bem": "DES18",
+    "familia": "",
+    "nome": "DESBOBINADOR DE FITAS"
+  },
+  {
+    "bem": "DISP01",
+    "familia": "",
+    "nome": "DISPOSITIVO DE DOBRA METALFORTE"
+  },
+  {
+    "bem": "DOB01",
+    "familia": "",
+    "nome": "DOBRADEIRA NEWTON 01"
+  },
+  {
+    "bem": "EMPILHA01",
+    "familia": "",
+    "nome": "EMPILHADEIRA YALE 2100KG 01"
+  },
+  {
+    "bem": "EMPILHA02",
+    "familia": "",
+    "nome": "EMPILHADEIRA YALE 3000KG 02"
+  },
+  {
+    "bem": "EMPILHA03",
+    "familia": "",
+    "nome": "EMPILHADEIRA YALE 3500KG 03"
+  },
+  {
+    "bem": "EMPILHA04",
+    "familia": "",
+    "nome": "EMPILHADEIRA MAXIMAL 2500KG 04"
+  },
+  {
+    "bem": "EMPILHA05",
+    "familia": "",
+    "nome": "EMPILHADEIRA ELETRICA YALE MS-16 1600KG"
+  },
+  {
+    "bem": "EMPILHA06",
+    "familia": "",
+    "nome": "EMPILHADEIRA HYUNDAI METALOSA FERRO ACO"
+  },
+  {
+    "bem": "EMPILHA07",
+    "familia": "",
+    "nome": "EMPILHADEIRA HYSTER 7000KG 07"
+  },
+  {
+    "bem": "EMPILHA08",
+    "familia": "",
+    "nome": "EMPILHADEIRA STILL FM-X17 1700KG 08"
+  },
+  {
+    "bem": "EMPILHA09",
+    "familia": "",
+    "nome": "EMPILHADEIRA STILL RC44-25C 2500KG 09"
+  },
+  {
+    "bem": "EMPILHA10",
+    "familia": "",
+    "nome": "EMPILHADEIRA STILL RC44-25C 2500KG 10"
+  },
+  {
+    "bem": "END01",
+    "familia": "",
+    "nome": "ENDIREITADOR DE CHAPAS 01"
+  },
+  {
+    "bem": "ENDALI 01",
+    "familia": "",
+    "nome": "ENDIREITADOR E ALIMENTADOR CONJUGADO 01"
+  },
+  {
+    "bem": "ESCA",
+    "familia": "",
+    "nome": "ESCADA ALMOXARIFADO CENTRAL"
+  },
+  {
+    "bem": "EST001",
+    "familia": "",
+    "nome": "ESTEIRA TRANSPORTADORA DE CHAPAS 01"
+  },
+  {
+    "bem": "EST002",
+    "familia": "",
+    "nome": "ESTEIRA TRANSPORTADORA DE ACESSORIOS"
+  },
+  {
+    "bem": "ESTR01",
+    "familia": "",
+    "nome": "ESTRUTURA METALICA DAS CALDEIRAS PNEU 01"
+  },
+  {
+    "bem": "ESTR02",
+    "familia": "",
+    "nome": "ESTRUTURA METALICA ALMOXARIFADO CENTRAL"
+  },
+  {
+    "bem": "ESTR03",
+    "familia": "",
+    "nome": "ESTRUTURA METALICA COMETA"
+  },
+  {
+    "bem": "EXAUSTOR 01",
+    "familia": "",
+    "nome": "EXAUSTOR CUBA 01"
+  },
+  {
+    "bem": "EXAUSTOR 02",
+    "familia": "",
+    "nome": "EXAUSTOR CUBA 02"
+  },
+  {
+    "bem": "EXAUSTOR 03",
+    "familia": "",
+    "nome": "EXAUSTOR VERNIZ 03"
+  },
+  {
+    "bem": "EXAUSTOR 04",
+    "familia": "",
+    "nome": "EXAUSTOR BANHEIRA 04"
+  },
+  {
+    "bem": "EXAUSTOR 05",
+    "familia": "",
+    "nome": "EXAUSTOR SETOR ESTRUTURA METALICA"
+  },
+  {
+    "bem": "EXP003",
+    "familia": "",
+    "nome": "EXPOSITOR CARRO"
+  },
+  {
+    "bem": "EXTRUS001",
+    "familia": "",
+    "nome": "ESTRUSORA DE TALAO"
+  },
+  {
+    "bem": "FAC01",
+    "familia": "",
+    "nome": "FACAS ROTATIVAS JOGO DRYWALL 01"
+  },
+  {
+    "bem": "FAC02",
+    "familia": "",
+    "nome": "FACAS ROTATIVAS JOGO TUBOS 02"
+  },
+  {
+    "bem": "FAC03",
+    "familia": "",
+    "nome": "FACAS ROTATIVAS JOGO PE 03"
+  },
+  {
+    "bem": "FER001",
+    "familia": "",
+    "nome": "FERRAMENTAS GERAL"
+  },
+  {
+    "bem": "FER01",
+    "familia": "",
+    "nome": "FERRAMENTA DE PONTA MONTADA PNEUM 01"
+  },
+  {
+    "bem": "FERRAM01",
+    "familia": "",
+    "nome": "CONJ FERRAMENTAL MONTANTE DRYWALL 01"
+  },
+  {
+    "bem": "FU00",
+    "familia": "",
+    "nome": "FURADEIRAS DO POSTE"
+  },
+  {
+    "bem": "FU01",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 01"
+  },
+  {
+    "bem": "FU02",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 02"
+  },
+  {
+    "bem": "FU03",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 03"
+  },
+  {
+    "bem": "FU04",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 04"
+  },
+  {
+    "bem": "FU05",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 05"
+  },
+  {
+    "bem": "FU06",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 06"
+  },
+  {
+    "bem": "FU07",
+    "familia": "",
+    "nome": "FURADEIRA DO POSTE 07"
+  },
+  {
+    "bem": "FU08",
+    "familia": "",
+    "nome": "FURADEIRA 08"
+  },
+  {
+    "bem": "FV01",
+    "familia": "",
+    "nome": "FURADEIRA DE VARAL"
+  },
+  {
+    "bem": "FV02",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA FURAR VARAL"
+  },
+  {
+    "bem": "GAB01",
+    "familia": "",
+    "nome": "GABARITO CARRO PLATAFORMA 01"
+  },
+  {
+    "bem": "GAL001",
+    "familia": "",
+    "nome": "GALPAO (VITORIA)"
+  },
+  {
+    "bem": "GAL002",
+    "familia": "",
+    "nome": "GALPAO (SERVICOS FORA)"
+  },
+  {
+    "bem": "GAN01",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 01"
+  },
+  {
+    "bem": "GAN02",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 02"
+  },
+  {
+    "bem": "GAN03",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 03"
+  },
+  {
+    "bem": "GAN04",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 04"
+  },
+  {
+    "bem": "GAN05",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 05"
+  },
+  {
+    "bem": "GAN06",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 06"
+  },
+  {
+    "bem": "GAN07",
+    "familia": "",
+    "nome": "GANCHO PARA MOVIMENTACAO DE MATERIAIS 07"
+  },
+  {
+    "bem": "GAS GLP",
+    "familia": "",
+    "nome": "CENTRAL DE GAS LIQUEFEITO DO PETROLEO"
+  },
+  {
+    "bem": "GAS GNC",
+    "familia": "",
+    "nome": "CENTRAL DE GAS NATURAL COMPRIMIDO"
+  },
+  {
+    "bem": "GAV001",
+    "familia": "",
+    "nome": "GAVETEIRO DE PRODUTOS SIDERURGICOS 001"
+  },
+  {
+    "bem": "GAV002",
+    "familia": "",
+    "nome": "GAVETEIRO DE PRODUTOS SIDERURGICOS 002"
+  },
+  {
+    "bem": "GAV003",
+    "familia": "",
+    "nome": "GAVETEIRO DE PRODUTOS SIDERURGICOS 003"
+  },
+  {
+    "bem": "GERAL01",
+    "familia": "",
+    "nome": "CONSTRUCAO CIVIL 01"
+  },
+  {
+    "bem": "GERAL02",
+    "familia": "",
+    "nome": "CONSTRUCAO CIVIL - ALMOXARIFADO 02"
+  },
+  {
+    "bem": "GERAL03",
+    "familia": "",
+    "nome": "PATIO DA EMPRESA 03"
+  },
+  {
+    "bem": "GERAL04",
+    "familia": "",
+    "nome": "PONTE PASSAGEM DO CAMPO"
+  },
+  {
+    "bem": "GERENC01",
+    "familia": "",
+    "nome": "GERENCIADOR DE SOLDA POLITRON"
+  },
+  {
+    "bem": "GERENC02",
+    "familia": "",
+    "nome": "GERENCIADOR DE SOLDA INDUCTOTHERM"
+  },
+  {
+    "bem": "GRADES",
+    "familia": "",
+    "nome": "GRADES PARA PNEUS"
+  },
+  {
+    "bem": "GUIN 01",
+    "familia": "",
+    "nome": "GUINCHOS"
+  },
+  {
+    "bem": "GUIN 02",
+    "familia": "",
+    "nome": "GUINCHO PERCLORO"
+  },
+  {
+    "bem": "GUIN 03",
+    "familia": "",
+    "nome": "GUINCHO SOLDA CONTINUA"
+  },
+  {
+    "bem": "GUIN 04",
+    "familia": "",
+    "nome": "GUINCHO DRYWALL 04"
+  },
+  {
+    "bem": "GUIN 05",
+    "familia": "",
+    "nome": "GUINCHO DRYWALL 05"
+  },
+  {
+    "bem": "GUIN 06",
+    "familia": "",
+    "nome": "GUINCHO PE DO CARRO"
+  },
+  {
+    "bem": "GUIN 07",
+    "familia": "",
+    "nome": "GUINCHO MANUTENCAO"
+  },
+  {
+    "bem": "GUIN 08",
+    "familia": "",
+    "nome": "GUIN 08 DINO 5T"
+  },
+  {
+    "bem": "ILUMINACAO 01",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR SOLDA CONTINUA"
+  },
+  {
+    "bem": "ILUMINACAO 02",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR ESCADA"
+  },
+  {
+    "bem": "ILUMINACAO 03",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR MANUTENCAO"
+  },
+  {
+    "bem": "ILUMINACAO 04",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR POSTE"
+  },
+  {
+    "bem": "ILUMINACAO 05",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR CORTE GERAL"
+  },
+  {
+    "bem": "ILUMINACAO 06",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR CARRO"
+  },
+  {
+    "bem": "ILUMINACAO 07",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR CAMARA"
+  },
+  {
+    "bem": "ILUMINACAO 08",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR COMPOSTO"
+  },
+  {
+    "bem": "ILUMINACAO 09",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR PNEU"
+  },
+  {
+    "bem": "ILUMINACAO 10",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR CUBA/INOX"
+  },
+  {
+    "bem": "ILUMINACAO 11",
+    "familia": "",
+    "nome": "ILUMINACAO SETOR CAIXA D'AGUA/INOX"
+  },
+  {
+    "bem": "ILUMINACAO 12",
+    "familia": "",
+    "nome": "ILUMINACAO ESCRITORIO"
+  },
+  {
+    "bem": "ILUMINACAO 13",
+    "familia": "",
+    "nome": "ILUMINACAO CANTINA"
+  },
+  {
+    "bem": "ILUMINACAO 14",
+    "familia": "",
+    "nome": "ILUMINACAO ALMOXARIFADO MATERIA PRIMA"
+  },
+  {
+    "bem": "ILUMINACAO 15",
+    "familia": "",
+    "nome": "ILUMINACAO ALMOXARIFADO PRODUTO ACABADO"
+  },
+  {
+    "bem": "ILUMINACAO 16",
+    "familia": "",
+    "nome": "ILUMINACAO  COMETA"
+  },
+  {
+    "bem": "ILUMINACAO 17",
+    "familia": "",
+    "nome": "ILUMINACAO DBZ"
+  },
+  {
+    "bem": "ILUMINACAO 18",
+    "familia": "",
+    "nome": "ILUMINACAO INDUSTRIA GERAL"
+  },
+  {
+    "bem": "ILUMINACAO 19",
+    "familia": "",
+    "nome": "ILUMINACAO PORTARIA"
+  },
+  {
+    "bem": "INJET01",
+    "familia": "",
+    "nome": "INJETORA DE PLASTICO"
+  },
+  {
+    "bem": "LINHA 001",
+    "familia": "",
+    "nome": "LINHA DE VAPOR DA CAMARA"
+  },
+  {
+    "bem": "LINHA 002",
+    "familia": "",
+    "nome": "LINHA DE AR COMPRIMIDO"
+  },
+  {
+    "bem": "LINHA 017",
+    "familia": "",
+    "nome": "LINHA DE AR COMPRIMIDO DA ANGESA"
+  },
+  {
+    "bem": "LP001",
+    "familia": "",
+    "nome": "LAVADOR DE PECAS DA MANUTENCAO"
+  },
+  {
+    "bem": "MAC01",
+    "familia": "",
+    "nome": "MISTURADOR ABERTO BAMBURY LUXOR 01"
+  },
+  {
+    "bem": "MAC02",
+    "familia": "",
+    "nome": "MISTURADOR ABERTO BAMBURY COPE 02"
+  },
+  {
+    "bem": "MAC03",
+    "familia": "",
+    "nome": "MISTURADOR ABERTO CAMARA 03"
+  },
+  {
+    "bem": "MAC04",
+    "familia": "",
+    "nome": "MISTURADOR ABERTO PNEU 04"
+  },
+  {
+    "bem": "MAN 01",
+    "familia": "",
+    "nome": "MANOMETRO 01"
+  },
+  {
+    "bem": "MAQ 02",
+    "familia": "",
+    "nome": "MAQUINA DE TESTAR CARRO"
+  },
+  {
+    "bem": "MAQ 03",
+    "familia": "",
+    "nome": "MAQUINA POLITRON DE FAZER TUBOS"
+  },
+  {
+    "bem": "MAQ03",
+    "familia": "",
+    "nome": "MAQUINA DE MONTAR PNEUS 01"
+  },
+  {
+    "bem": "MAQ04",
+    "familia": "",
+    "nome": "MAQUINA DE DEBRUM BALDE"
+  },
+  {
+    "bem": "MAQ05",
+    "familia": "",
+    "nome": "MAQUINA DE MONTAR PNEUS 02"
+  },
+  {
+    "bem": "MAQ06",
+    "familia": "",
+    "nome": "MAQUINA DE MONTAR PNEUS 03"
+  },
+  {
+    "bem": "MAQ07",
+    "familia": "",
+    "nome": "MAQUINA DE MONTAR PNEUS 04"
+  },
+  {
+    "bem": "MAQF",
+    "familia": "",
+    "nome": "MAQUINA DE FURAR RODAS"
+  },
+  {
+    "bem": "MAT005",
+    "familia": "",
+    "nome": "MANOMETRO 005"
+  },
+  {
+    "bem": "MAT01",
+    "familia": "",
+    "nome": "MATRIZ ORELHA DO BALDE 01"
+  },
+  {
+    "bem": "MAT02",
+    "familia": "",
+    "nome": "MATRIZ ABRACADEIRA DA ESCADA 02"
+  },
+  {
+    "bem": "MAT03",
+    "familia": "",
+    "nome": "MATRIZ DE EIXO DO CARRO 03"
+  },
+  {
+    "bem": "MAT04",
+    "familia": "",
+    "nome": "MATRIZ CUBA C1 04"
+  },
+  {
+    "bem": "MAT05",
+    "familia": "",
+    "nome": "MATRIZ CUBA C2 05"
+  },
+  {
+    "bem": "MAT06",
+    "familia": "",
+    "nome": "MATRIZ DE TRAVESSAO DO CARRO 06"
+  },
+  {
+    "bem": "MAT07",
+    "familia": "",
+    "nome": "MATRIZ DO SUPORTE DO CARRO 07"
+  },
+  {
+    "bem": "MAT08",
+    "familia": "",
+    "nome": "MATRIZ DE RECORTAR O SUPORTE DO CARRO 08"
+  },
+  {
+    "bem": "MAT09",
+    "familia": "",
+    "nome": "MATRIZ DE REFORCO DO CARRO 09"
+  },
+  {
+    "bem": "MAT10",
+    "familia": "",
+    "nome": "MATRIZ DO PE DO CARRO DA CP01 10"
+  },
+  {
+    "bem": "MAT11",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR CACAM CONSTRUTOR 11"
+  },
+  {
+    "bem": "MAT12",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR CACAM CONSTRUTOR NOVA 12"
+  },
+  {
+    "bem": "MAT13",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CACAM CONSTRUTOR 13"
+  },
+  {
+    "bem": "MAT14",
+    "familia": "",
+    "nome": "MATRIZ FURAR PONTEIRA ESCADA 14"
+  },
+  {
+    "bem": "MAT15",
+    "familia": "",
+    "nome": "MATRIZ FURO DA VALVULA DO ARO ANGESA 15"
+  },
+  {
+    "bem": "MAT16",
+    "familia": "",
+    "nome": "MATRIZ DEBRUM ARO 3ｺ OPER 10 FUROS 16"
+  },
+  {
+    "bem": "MAT17",
+    "familia": "",
+    "nome": "MATRIZ DO OMBRO DO LATAO DE LEITE 50L 17"
+  },
+  {
+    "bem": "MAT18",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CACAMBA REDONDA 18"
+  },
+  {
+    "bem": "MAT19",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CACAMBA REDONDA 19"
+  },
+  {
+    "bem": "MAT20",
+    "familia": "",
+    "nome": "MATRIZ DEBRUM ARO 3ｺ OPER 12 FUROS 20"
+  },
+  {
+    "bem": "MAT21",
+    "familia": "",
+    "nome": "MATRIZ DO MANCAL DO CARRO 21"
+  },
+  {
+    "bem": "MAT22",
+    "familia": "",
+    "nome": "MATRIZ DE CORTAR O ANGULO DE 31ｺ 22"
+  },
+  {
+    "bem": "MAT33",
+    "familia": "",
+    "nome": "MATRIZ VULC CAMARAS 33"
+  },
+  {
+    "bem": "MAT34",
+    "familia": "",
+    "nome": "MATRIZ TRAVESSAO CARRO REFORCADO"
+  },
+  {
+    "bem": "MAT35",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR FUNDO DO LATAO 30L"
+  },
+  {
+    "bem": "MAT36",
+    "familia": "",
+    "nome": "MATRIZ DEBRUM ARO 3ｺ OPERACAO ANGESA 36"
+  },
+  {
+    "bem": "MAT37",
+    "familia": "",
+    "nome": "MATRIZ RECRAVAR ARO 12 FUROS 4ｺ OPER 37"
+  },
+  {
+    "bem": "MAT38",
+    "familia": "",
+    "nome": "MATRIZ FURAR DEGRAU DA ESCADA 38"
+  },
+  {
+    "bem": "MAT39",
+    "familia": "",
+    "nome": "MATRIZ DO OMBRO DO LATAO DE LEITE 30L 39"
+  },
+  {
+    "bem": "MAT40",
+    "familia": "",
+    "nome": "MATRIZ FURAR E DEBRUM CACAMBA REDONDA 40"
+  },
+  {
+    "bem": "MAT41",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR DEGRAU DA ESCADA 41"
+  },
+  {
+    "bem": "MAT42",
+    "familia": "",
+    "nome": "MATRIZ MENOR DE FURAR O PE DO CARRO 42"
+  },
+  {
+    "bem": "MAT43",
+    "familia": "",
+    "nome": "MATRIZ DO ARTICULADOR DA ESCADA 43"
+  },
+  {
+    "bem": "MAT44",
+    "familia": "",
+    "nome": "MATRIZ CORTAR ARO 2ｺ OPER 12 F - ANGE 44"
+  },
+  {
+    "bem": "MAT45",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR FUNDO BALDE DE CONCRETO"
+  },
+  {
+    "bem": "MAT46",
+    "familia": "",
+    "nome": "MATRIZ RECRAVAR ARO 12 FUROS 4ｺ OPER ANG"
+  },
+  {
+    "bem": "MAT47",
+    "familia": "",
+    "nome": "MATRIZ REFORCO CARRO REFORCADO"
+  },
+  {
+    "bem": "MAT48",
+    "familia": "",
+    "nome": "MATRIZ RECRAVAR ARO 10FUROS 4ｺ OPER ANG"
+  },
+  {
+    "bem": "MAT49",
+    "familia": "",
+    "nome": "MATRIZ RECRAVAR ARO 12 FUROS 4ｺ OPER 49"
+  },
+  {
+    "bem": "MAT50",
+    "familia": "",
+    "nome": "MATRIZ DE DOBRAR OLHAL DO POSTE"
+  },
+  {
+    "bem": "MAT51",
+    "familia": "",
+    "nome": "MATRIZ DEBRUM ARO 3ｺ OPER 12 FUROS 51"
+  },
+  {
+    "bem": "MAT52",
+    "familia": "",
+    "nome": "MATRIZ ABRACADEIRA DO POSTE 52"
+  },
+  {
+    "bem": "MAT53",
+    "familia": "",
+    "nome": "MATRIZ FUR SUPORTE CACAM CARRO REFORCADO"
+  },
+  {
+    "bem": "MAT54",
+    "familia": "",
+    "nome": "MATRIZ TRDI DO SUPORTE DO CARRO 54"
+  },
+  {
+    "bem": "MAT55",
+    "familia": "",
+    "nome": "MATRIZ TRDI DO REFORCO DO CARRO 55"
+  },
+  {
+    "bem": "MAT56",
+    "familia": "",
+    "nome": "MATRIZ TRDI DO TRAVESSAO DO CARRO 56"
+  },
+  {
+    "bem": "MAT57",
+    "familia": "",
+    "nome": "MATRIZ TRDI DO MANCAL DO CARRO 57"
+  },
+  {
+    "bem": "MAT58",
+    "familia": "",
+    "nome": "MATRIZES TRDI DOS ACESSORIOS DO CARRO"
+  },
+  {
+    "bem": "MAT60",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CACAM CONSTRUTOR MCA 60"
+  },
+  {
+    "bem": "MAT61",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CACAM ZINCADA MCA 61"
+  },
+  {
+    "bem": "MAT62",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR ARO 1ｺ OPERACAO ANGESA 62"
+  },
+  {
+    "bem": "MAT63",
+    "familia": "",
+    "nome": "MATRIZ CARIMBAR LOGO SUPER 63"
+  },
+  {
+    "bem": "MAT64",
+    "familia": "",
+    "nome": "MATRIZ MARCAR GRADUACAO LITROS NO BALDE"
+  },
+  {
+    "bem": "MAT65",
+    "familia": "",
+    "nome": "MATRIZ DA TAMPA DO BALDE"
+  },
+  {
+    "bem": "MAT66",
+    "familia": "",
+    "nome": "MATRIZ CORTAR PE DO CARRO DE CARGA"
+  },
+  {
+    "bem": "MAT67",
+    "familia": "",
+    "nome": "MATRIZ INJETORA SEPARADOR 67"
+  },
+  {
+    "bem": "MAT68",
+    "familia": "",
+    "nome": "MATRIZ INJETORA BUCHA 68"
+  },
+  {
+    "bem": "MAT69",
+    "familia": "",
+    "nome": "MATRIZ INJETORA PONTEIRA DO CARRO 69"
+  },
+  {
+    "bem": "MAT70",
+    "familia": "",
+    "nome": "MATRIZ INJETORA PISO 70"
+  },
+  {
+    "bem": "MAT71",
+    "familia": "",
+    "nome": "MATRIZ INJETORA PONTEIRA DA ESCADA 71"
+  },
+  {
+    "bem": "MAT72",
+    "familia": "",
+    "nome": "MATRIZ REPUXAR ARO 1ｺ OPERACAO 72"
+  },
+  {
+    "bem": "MAT73",
+    "familia": "",
+    "nome": "MATRIZ CORTAR CANTONEIRA 1\"X1/8\" 73"
+  },
+  {
+    "bem": "MAT74",
+    "familia": "",
+    "nome": "MATRIZ DE CORTAR BALDE INOX 10L"
+  },
+  {
+    "bem": "MAT75",
+    "familia": "",
+    "nome": "MATRIZ DE CORTAR BALDE INOX 15L"
+  },
+  {
+    "bem": "MAT76",
+    "familia": "",
+    "nome": "MATRIZ FURAR VARAL"
+  },
+  {
+    "bem": "MAT77",
+    "familia": "",
+    "nome": "MATRIZ FURAR CANTO EIXO CARRO PLATAFORMA"
+  },
+  {
+    "bem": "MAT78",
+    "familia": "",
+    "nome": "MATRIZ DE CORTAR FUNDO BALDE INOX 15L"
+  },
+  {
+    "bem": "MAT79",
+    "familia": "",
+    "nome": "MATRIZ SUPORTE CACAMBA METAFORTE"
+  },
+  {
+    "bem": "MAT80",
+    "familia": "",
+    "nome": "MATRIZ BLANK METALFORTE METALTRAN 80"
+  },
+  {
+    "bem": "MAT81",
+    "familia": "",
+    "nome": "MATRIZ BLANK DEGRAU ESCADA"
+  },
+  {
+    "bem": "MAT82",
+    "familia": "",
+    "nome": "MATRIZ BLANK PATAMAR ESCADA"
+  },
+  {
+    "bem": "MAT83",
+    "familia": "",
+    "nome": "MATRIZ CARIMBAR CACAMBA CONSTRUTOR"
+  },
+  {
+    "bem": "MATR 01",
+    "familia": "",
+    "nome": "MATRIZ DE CORTAR BALDE INOX 5L"
+  },
+  {
+    "bem": "MATR 02",
+    "familia": "",
+    "nome": "MATRIZ DE ESTAMPAR CACAMBA"
+  },
+  {
+    "bem": "MATR02",
+    "familia": "",
+    "nome": "MATRIZ DE DEBRUM DO BALDE DE INOX 10L"
+  },
+  {
+    "bem": "MATR03",
+    "familia": "",
+    "nome": "MATRIZ DE DEBRUM DO BALDE DE INOX 15L"
+  },
+  {
+    "bem": "MATVC32",
+    "familia": "",
+    "nome": "MATRIZ VULC CAMARA 3.25-8 32"
+  },
+  {
+    "bem": "MATVC33",
+    "familia": "",
+    "nome": "MATRIZ VULC CAMARA 3.25-8 33"
+  },
+  {
+    "bem": "MATVP03",
+    "familia": "",
+    "nome": "MATRIZ VULC PNEU 2.50-8 03"
+  },
+  {
+    "bem": "MAV01",
+    "familia": "",
+    "nome": "MAQUINA EVERROLL DE AMARRAR VARAL 01"
+  },
+  {
+    "bem": "MAV02",
+    "familia": "",
+    "nome": "MAQUINA CYKLOP DE AMARRAR VARAL 02"
+  },
+  {
+    "bem": "MAV03",
+    "familia": "",
+    "nome": "MAQUINA CYKLOP DE AMARRAR VARAL 03"
+  },
+  {
+    "bem": "MAV04",
+    "familia": "",
+    "nome": "MAQUINA CYKLOP DE AMARRAR DRYWALL 04"
+  },
+  {
+    "bem": "MAV05",
+    "familia": "",
+    "nome": "MAQUINA CYKLOP DE AMARRAR DRYWALL 05"
+  },
+  {
+    "bem": "MAV06",
+    "familia": "",
+    "nome": "MAQUINA CYKLOP DE AMARRAR STEEL FRAME 06"
+  },
+  {
+    "bem": "MC01",
+    "familia": "",
+    "nome": "MAQUINA SOLDA CONTINUA FUNDO LATAO 01"
+  },
+  {
+    "bem": "MC02",
+    "familia": "",
+    "nome": "MAQUINA SOLDA CONTINUA OMBRO LATAO 02"
+  },
+  {
+    "bem": "MC03",
+    "familia": "",
+    "nome": "MAQUINA SOLDA CONTINUA CORPO LATAO 03"
+  },
+  {
+    "bem": "MC04",
+    "familia": "",
+    "nome": "MAQUINA SOLDA CONT. LATERAL CAIXA INOX"
+  },
+  {
+    "bem": "MC05",
+    "familia": "",
+    "nome": "MAQUINA SOLDA CONTINUA FUNDO CAIXA INOX"
+  },
+  {
+    "bem": "MCT01",
+    "familia": "",
+    "nome": "MAQUINA DE CORTAR TUBOS"
+  },
+  {
+    "bem": "MCV01",
+    "familia": "",
+    "nome": "MAQUINA DE CORTAR VERGALHAO 01"
+  },
+  {
+    "bem": "ME01",
+    "familia": "",
+    "nome": "MAQ SOLDA ELETRODO ESTRUTURA METALICA 01"
+  },
+  {
+    "bem": "MEC01",
+    "familia": "",
+    "nome": "MAQUINA DE EMBALAR CAIXA DO CARRO"
+  },
+  {
+    "bem": "MEC02",
+    "familia": "",
+    "nome": "MAQUINA DE EMBALAR CAIXA DO CARRO"
+  },
+  {
+    "bem": "MEC03",
+    "familia": "",
+    "nome": "MAQUINA DE EMBALAR CAIXA DO CARRO"
+  },
+  {
+    "bem": "MEQ 04",
+    "familia": "",
+    "nome": "MAQUINA DE MISTURAR TINTA"
+  },
+  {
+    "bem": "MEQ05",
+    "familia": "",
+    "nome": "MAQUINA DE MISTURAR PLASTICO (INJETORA)"
+  },
+  {
+    "bem": "MEQ06",
+    "familia": "",
+    "nome": "MAQUINA DE MISTURAR TINTA EM PO"
+  },
+  {
+    "bem": "MESA001",
+    "familia": "",
+    "nome": "MESAS PARA TELHAS"
+  },
+  {
+    "bem": "MESA002",
+    "familia": "",
+    "nome": "MESAS SETOR CARRO"
+  },
+  {
+    "bem": "MESA003",
+    "familia": "",
+    "nome": "MESA PARA MONTAGEM DE PNEUS"
+  },
+  {
+    "bem": "MESA004",
+    "familia": "",
+    "nome": "MESA PARA CAIXA DE ACESSORIOS"
+  },
+  {
+    "bem": "MESA005",
+    "familia": "",
+    "nome": "MESA PARA MATRIZ DE ACESSORIOS TRACO"
+  },
+  {
+    "bem": "MESA006",
+    "familia": "",
+    "nome": "MESAS PARA BLANCK DO BALDE DE INOX"
+  },
+  {
+    "bem": "MESA007",
+    "familia": "",
+    "nome": "MESA PARA MATRIZES"
+  },
+  {
+    "bem": "MIB01",
+    "familia": "",
+    "nome": "MISTURADOR INTERNO BAMBURY COPE 01"
+  },
+  {
+    "bem": "MIB02",
+    "familia": "",
+    "nome": "MISTURADOR INTERNO BAMBURY LUXOR 02"
+  },
+  {
+    "bem": "MIG001",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 01"
+  },
+  {
+    "bem": "ML01",
+    "familia": "",
+    "nome": "MAQUINA DE CORTAR LONA 01"
+  },
+  {
+    "bem": "ML02",
+    "familia": "",
+    "nome": "MAQUINA DE CORTAR LONA 02"
+  },
+  {
+    "bem": "MOT01",
+    "familia": "",
+    "nome": "MOTOR ELETRICO 4CV 220/380V WEG 01"
+  },
+  {
+    "bem": "MT01",
+    "familia": "",
+    "nome": "MAQUINA DE TALAO 01"
+  },
+  {
+    "bem": "MV01",
+    "familia": "",
+    "nome": "MAQUINA DE VINCO DO LATAO 01"
+  },
+  {
+    "bem": "MVB01",
+    "familia": "",
+    "nome": "PRENSA PNEUM DE FAZER OS VINCOS NO BALDE"
+  },
+  {
+    "bem": "NUCLEO 01",
+    "familia": "",
+    "nome": "MAQUINA DE COLOCAR NUCLEO 01"
+  },
+  {
+    "bem": "NUCLEO 02",
+    "familia": "",
+    "nome": "MAQUINA DE COLOCAR NUCLEO 02"
+  },
+  {
+    "bem": "PAINEL 01",
+    "familia": "",
+    "nome": "PAINEL ELETRICO GERAL 01 SETOR CARRO"
+  },
+  {
+    "bem": "PAINEL 02",
+    "familia": "",
+    "nome": "PAINEL ELETRICO GERAL 02 SETOR PERFIL"
+  },
+  {
+    "bem": "PAINEL 03",
+    "familia": "",
+    "nome": "PAINEL ELETRICO GERAL 03 SETOR PNEUS"
+  },
+  {
+    "bem": "PAINEL 04",
+    "familia": "",
+    "nome": "PAINEL ELETRICO GERAL 04 SETOR DBINOX"
+  },
+  {
+    "bem": "PAINEL 05",
+    "familia": "",
+    "nome": "PAINEL ELETRICO GERAL 05 SETOR LATAO"
+  },
+  {
+    "bem": "PAL01",
+    "familia": "",
+    "nome": "PALETEIRA TRANSPALET 01"
+  },
+  {
+    "bem": "PAL02",
+    "familia": "",
+    "nome": "PALETEIRA TRANSPALET 02"
+  },
+  {
+    "bem": "PAL03",
+    "familia": "",
+    "nome": "PALETEIRA TRANSPALET 03"
+  },
+  {
+    "bem": "PALL01",
+    "familia": "",
+    "nome": "PORTA-PALLET 01"
+  },
+  {
+    "bem": "PERF",
+    "familia": "",
+    "nome": "PERFILADEIRAS"
+  },
+  {
+    "bem": "PERF01",
+    "familia": "",
+    "nome": "PERFILADEIRA ZL 01"
+  },
+  {
+    "bem": "PERF02",
+    "familia": "",
+    "nome": "PERFILADEIRA DE TUBOS 02"
+  },
+  {
+    "bem": "PERF03",
+    "familia": "",
+    "nome": "PERFILADEIRA REGGIANI 03"
+  },
+  {
+    "bem": "PERF04",
+    "familia": "",
+    "nome": "PERFILADEIRA CHAPA RAIDA 04"
+  },
+  {
+    "bem": "PERF05",
+    "familia": "",
+    "nome": "PERFILADEIRA DRYWALL \"L\" E \"U\""
+  },
+  {
+    "bem": "PERF06",
+    "familia": "",
+    "nome": "PERFILADEIRA DRYWALL \"C\""
+  },
+  {
+    "bem": "PERF07",
+    "familia": "",
+    "nome": "PERFILADEIRA DRYWALL 07"
+  },
+  {
+    "bem": "PERF08",
+    "familia": "",
+    "nome": "PERFILADEIRA DRYWALL 08"
+  },
+  {
+    "bem": "PERF09",
+    "familia": "",
+    "nome": "PERFILADEIRA TELHA TRAPEZIO 40"
+  },
+  {
+    "bem": "PERF10",
+    "familia": "",
+    "nome": "PERFILADEIRA TELHA ONDULADA 17"
+  },
+  {
+    "bem": "PERF11",
+    "familia": "",
+    "nome": "PERFILADEIRA STEELFRAME"
+  },
+  {
+    "bem": "PERF12",
+    "familia": "",
+    "nome": "PERFILADEIRA MARAFON 12"
+  },
+  {
+    "bem": "PF001",
+    "familia": "",
+    "nome": "PRENSA FRICCAO SETOR LATAO 01"
+  },
+  {
+    "bem": "PHR01",
+    "familia": "",
+    "nome": "PRENSA HID CHARLES METROZ CORTAR BALDE"
+  },
+  {
+    "bem": "PHR010",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA ESTAMPAR RODA 50T"
+  },
+  {
+    "bem": "PHR011",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA DEBRUM RODA 40T"
+  },
+  {
+    "bem": "PHR012",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA CORTAR RODA 30T"
+  },
+  {
+    "bem": "PHR013",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA RECRAVAR RODA 20T"
+  },
+  {
+    "bem": "PHR014",
+    "familia": "",
+    "nome": "PRENSA DE FAZER O FURO DA VALVULA"
+  },
+  {
+    "bem": "PHR02",
+    "familia": "",
+    "nome": "PRENSA HID CHARLES METROZ ESTAMPAR LATAO"
+  },
+  {
+    "bem": "PHR03",
+    "familia": "",
+    "nome": "PRENSA HID SMG ESTAMPAR PATAMAR"
+  },
+  {
+    "bem": "PHR04 EVA",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA DE PNEUS BOR RECICLADA"
+  },
+  {
+    "bem": "PHVC01",
+    "familia": "",
+    "nome": "PRENSA HID CARAPINA VULCANIZAR CAMARA 01"
+  },
+  {
+    "bem": "PHVC02",
+    "familia": "",
+    "nome": "PRENSA HID LUXOR VULCANIZAR CAMARA 02"
+  },
+  {
+    "bem": "PHVC03",
+    "familia": "",
+    "nome": "PRENSA HID LUXOR VULCANIZAR CAMARA 03"
+  },
+  {
+    "bem": "PHVC04",
+    "familia": "",
+    "nome": "PRENSA HID LUXOR VULCANIZAR CAMARA 04"
+  },
+  {
+    "bem": "PHVC05",
+    "familia": "",
+    "nome": "PRENSA HID LUXOR VULCANIZAR CAMARA 05"
+  },
+  {
+    "bem": "PHVC06",
+    "familia": "",
+    "nome": "PRENSA HID CARAPINA VULCANIZAR CAMARA 06"
+  },
+  {
+    "bem": "PHVC07",
+    "familia": "",
+    "nome": "PRENSA HID CRESPI VULCANIZAR CAMARA 07"
+  },
+  {
+    "bem": "PHVPS01",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA VULCANIZAR PISO 01"
+  },
+  {
+    "bem": "PHVPS02",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA VULCANIZAR MANTA 02"
+  },
+  {
+    "bem": "PINTURA 01",
+    "familia": "",
+    "nome": "PINTURA ELETROSTATICA"
+  },
+  {
+    "bem": "PINTURA 02",
+    "familia": "",
+    "nome": "PINTURA POR IMERSAO CARRO"
+  },
+  {
+    "bem": "PINTURA 03",
+    "familia": "",
+    "nome": "PINTURA ELETROSTATICA TRANSPORTE DELTEC"
+  },
+  {
+    "bem": "PINTURA 04",
+    "familia": "",
+    "nome": "PINTURA ELETROSTATICA KWM"
+  },
+  {
+    "bem": "PLAC001",
+    "familia": "",
+    "nome": "PLACAS REPUXAR CACAMBA POP 01"
+  },
+  {
+    "bem": "PO01",
+    "familia": "",
+    "nome": "PONTEADEIRAS GERAL"
+  },
+  {
+    "bem": "PO06",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 06"
+  },
+  {
+    "bem": "PO08",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 08"
+  },
+  {
+    "bem": "PO09",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 09"
+  },
+  {
+    "bem": "PO11",
+    "familia": "",
+    "nome": "PONTEADEIRA SOLDA CONTINUA"
+  },
+  {
+    "bem": "PO12",
+    "familia": "",
+    "nome": "PONTEADEIRA ARO COM ROLETE"
+  },
+  {
+    "bem": "PO13",
+    "familia": "",
+    "nome": "PONTEADEIRA SOLDA CONTINUA"
+  },
+  {
+    "bem": "PO14",
+    "familia": "",
+    "nome": "PONTEADEIRA CAIXA INOX"
+  },
+  {
+    "bem": "POL01",
+    "familia": "",
+    "nome": "POLITRIZ 01"
+  },
+  {
+    "bem": "POL02",
+    "familia": "",
+    "nome": "POLITRIZ 02"
+  },
+  {
+    "bem": "POL03",
+    "familia": "",
+    "nome": "POLITRIZ 03"
+  },
+  {
+    "bem": "POL04",
+    "familia": "",
+    "nome": "POLITRIZ 04"
+  },
+  {
+    "bem": "POL05",
+    "familia": "",
+    "nome": "POLITRIZ 05"
+  },
+  {
+    "bem": "POL06",
+    "familia": "",
+    "nome": "POLITRIZ 06"
+  },
+  {
+    "bem": "POL07",
+    "familia": "",
+    "nome": "POLITRIZ 07"
+  },
+  {
+    "bem": "POL08",
+    "familia": "",
+    "nome": "POLITRIZ 08"
+  },
+  {
+    "bem": "POL09",
+    "familia": "",
+    "nome": "POLITRIZ 09"
+  },
+  {
+    "bem": "POL10",
+    "familia": "",
+    "nome": "POLITRIZ 10"
+  },
+  {
+    "bem": "POL11",
+    "familia": "",
+    "nome": "POLITRIZ 11"
+  },
+  {
+    "bem": "POL12",
+    "familia": "",
+    "nome": "POLITRIZ 12"
+  },
+  {
+    "bem": "POLIC01",
+    "familia": "",
+    "nome": "POLICORTE MANUTENCAO 01"
+  },
+  {
+    "bem": "POLIC02",
+    "familia": "",
+    "nome": "POLICORTE COMETA 02"
+  },
+  {
+    "bem": "POLITRIZES",
+    "familia": "",
+    "nome": "POLITRIZES"
+  },
+  {
+    "bem": "PONT08",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 08"
+  },
+  {
+    "bem": "PONT09",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 09"
+  },
+  {
+    "bem": "PONT12",
+    "familia": "",
+    "nome": "PONTEADEIRA LATAO 12"
+  },
+  {
+    "bem": "PONT13",
+    "familia": "",
+    "nome": "PONTEADEIRA ARO CARRO"
+  },
+  {
+    "bem": "PONT14",
+    "familia": "",
+    "nome": "PONTEADEIRA DRYWALL 14"
+  },
+  {
+    "bem": "PONTE01",
+    "familia": "",
+    "nome": "PONTE ROLANTE MUNCK 15T 01"
+  },
+  {
+    "bem": "PONTE02",
+    "familia": "",
+    "nome": "PONTE ROLANTE VASTEC 08T 02"
+  },
+  {
+    "bem": "PONTE03",
+    "familia": "",
+    "nome": "PONTE ROLANTE IMESA 5T 03"
+  },
+  {
+    "bem": "PONTE04",
+    "familia": "",
+    "nome": "PONTE ROLANTE IMESA 5T NOVA 04"
+  },
+  {
+    "bem": "PONTE05",
+    "familia": "",
+    "nome": "PONTE ROLANTE 3,5 T"
+  },
+  {
+    "bem": "PONTE06",
+    "familia": "",
+    "nome": "PONTE ROLANTE CFM 5T - FERRO E ACO 06"
+  },
+  {
+    "bem": "PONTE07",
+    "familia": "",
+    "nome": "PONTE ROLANTE INCA 15T"
+  },
+  {
+    "bem": "PONTE08",
+    "familia": "",
+    "nome": "PONTE ROLANTE INCA 5T"
+  },
+  {
+    "bem": "PORT01",
+    "familia": "",
+    "nome": "PORTAO"
+  },
+  {
+    "bem": "PP01",
+    "familia": "",
+    "nome": "PERFILADEIRA DE PE DO CARRO"
+  },
+  {
+    "bem": "PPAEVC01",
+    "familia": "",
+    "nome": "PRENSA APERTAR EMENDA E VALVULA CAMARA"
+  },
+  {
+    "bem": "PPCFC01",
+    "familia": "",
+    "nome": "PRENSA CORTAR E FURAR CAMARA 01"
+  },
+  {
+    "bem": "PPCP01",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA CONFORMAR PE"
+  },
+  {
+    "bem": "PPVS01",
+    "familia": "",
+    "nome": "PRENSA PNEUM VULC SUPORTE P/ TESTE 01"
+  },
+  {
+    "bem": "PR BLAUTH 45",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA BLAUTH 130T"
+  },
+  {
+    "bem": "PR01",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CONFORMAR EIXO"
+  },
+  {
+    "bem": "PR02",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CORTAR O VARAL"
+  },
+  {
+    "bem": "PR04",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CARIMBAR CACAMBA POP"
+  },
+  {
+    "bem": "PR05",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 05"
+  },
+  {
+    "bem": "PR07",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 07"
+  },
+  {
+    "bem": "PR08",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 08"
+  },
+  {
+    "bem": "PR09",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 09"
+  },
+  {
+    "bem": "PR10",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA PECAS DA ESCADA 10"
+  },
+  {
+    "bem": "PR11",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 11"
+  },
+  {
+    "bem": "PR12",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CONFORMAR SUPORTE"
+  },
+  {
+    "bem": "PR13",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 13"
+  },
+  {
+    "bem": "PR14",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA PECAS DA ESCADA 14"
+  },
+  {
+    "bem": "PR16",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CONFORMAR MANCAL"
+  },
+  {
+    "bem": "PR18",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CARIMBAR CACAMBA"
+  },
+  {
+    "bem": "PR19",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA PECAS DA ESCADA 19"
+  },
+  {
+    "bem": "PR20",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA FURAR FUNDO CAIXA INOX"
+  },
+  {
+    "bem": "PR22",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CONFORMAR TRAVESSAO"
+  },
+  {
+    "bem": "PR23",
+    "familia": "",
+    "nome": "PRENSA EXCENT CARIMBAR CACAMBA ZINCADA"
+  },
+  {
+    "bem": "PR24",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA FURAR FUNDO CAIXA INOX"
+  },
+  {
+    "bem": "PR25",
+    "familia": "",
+    "nome": "PRENSA EXCENT. CORTAR PONTAS BLANCK CUBA"
+  },
+  {
+    "bem": "PR26",
+    "familia": "",
+    "nome": "PRENSA EXCENT. CORTAR PONTAS CUBA INOX"
+  },
+  {
+    "bem": "PR27",
+    "familia": "",
+    "nome": "PRENSA EXCENT. FAZER O VINCO CUBA/INOX"
+  },
+  {
+    "bem": "PR28",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA CONFORMAR REFORCO"
+  },
+  {
+    "bem": "PR44",
+    "familia": "",
+    "nome": "PRENSA EXCENTRICA 44"
+  },
+  {
+    "bem": "PRAT",
+    "familia": "",
+    "nome": "PRATELEIRA"
+  },
+  {
+    "bem": "PRE001",
+    "familia": "",
+    "nome": "PRENSAS DE VULCANIZAR PNEUS"
+  },
+  {
+    "bem": "PRE002",
+    "familia": "",
+    "nome": "PRENSAS DE VULVANIZAR CAMARAS"
+  },
+  {
+    "bem": "PRE003",
+    "familia": "",
+    "nome": "PRENSAS HIDRAULICAS DO SETOR DE CARRO"
+  },
+  {
+    "bem": "PRE004",
+    "familia": "",
+    "nome": "PRENSAS EXCENTRICAS DA ESCADA"
+  },
+  {
+    "bem": "PRE005",
+    "familia": "",
+    "nome": "PRENSAS DO SETOR DE CUBA"
+  },
+  {
+    "bem": "PRE006",
+    "familia": "",
+    "nome": "PRENSAS DO SETOR DE CAIXA D'AGUA INOX"
+  },
+  {
+    "bem": "PRE008",
+    "familia": "",
+    "nome": "PRENSAS DO SETOR DO LATAO"
+  },
+  {
+    "bem": "PRE009",
+    "familia": "",
+    "nome": "PRENSAS HIDRAULICAS DO ARO PHR - LINHA 1"
+  },
+  {
+    "bem": "PRE01",
+    "familia": "",
+    "nome": "PR DE FURAR CAIXA DE ARMAZENAGEM PNEUS"
+  },
+  {
+    "bem": "PRE010",
+    "familia": "",
+    "nome": "PRENSAS HIDRAULICAS TIPO \"C\" DO ARO"
+  },
+  {
+    "bem": "PRE020",
+    "familia": "",
+    "nome": "PRENSAS EXCENTRICAS SETOR CARRO"
+  },
+  {
+    "bem": "PRE030",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA MANUT"
+  },
+  {
+    "bem": "PRE100",
+    "familia": "",
+    "nome": "PRENSAS METALOSA"
+  },
+  {
+    "bem": "PRH01",
+    "familia": "",
+    "nome": "PRENSA HID CARAPINA CONSTRUTOR 01"
+  },
+  {
+    "bem": "PRH02",
+    "familia": "",
+    "nome": "PRENSA HID CARAPINA CORTAR CACAMBA 02"
+  },
+  {
+    "bem": "PRH03",
+    "familia": "",
+    "nome": "PRENSA HID CARAPINA DEBRUM CACAMBA 03"
+  },
+  {
+    "bem": "PRH04",
+    "familia": "",
+    "nome": "PRENSA HID FKL ESTAMPAR CACAMBA 200T"
+  },
+  {
+    "bem": "PRH05",
+    "familia": "",
+    "nome": "PRENSA HIDR. FKL ESTAMPAR CACAMBA 320T"
+  },
+  {
+    "bem": "PRH06",
+    "familia": "",
+    "nome": "PRENSA HID FKL ESTAMPAR CUBA INOX 500T"
+  },
+  {
+    "bem": "PRH07",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA FURAR VALVULA CUBA 07"
+  },
+  {
+    "bem": "PRH08",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA PRATICO"
+  },
+  {
+    "bem": "PRH09",
+    "familia": "",
+    "nome": "PRENSA HIDR FKL ESTAMPAR CACAMBA 320T 09"
+  },
+  {
+    "bem": "PRH10",
+    "familia": "",
+    "nome": "PRENSA HIDR RD ESTAMPAR CACAMBA 250T 10"
+  },
+  {
+    "bem": "PRH11",
+    "familia": "",
+    "nome": "PRENSA HIDR RD ESTAMPAR CACAMBA 250T 11"
+  },
+  {
+    "bem": "PRH12",
+    "familia": "",
+    "nome": "PRENSA HID RD 150T FURAR E CORTAR CUBA"
+  },
+  {
+    "bem": "PRH13",
+    "familia": "",
+    "nome": "PRENSA HID RD 150T FURAR E CORTAR CUBA"
+  },
+  {
+    "bem": "PRHC01",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA TIPO \"C\" 65T 01"
+  },
+  {
+    "bem": "PRHC02",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA TIPO \"C\" 65T 02"
+  },
+  {
+    "bem": "PRHC03",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA FURAR ARO 03"
+  },
+  {
+    "bem": "PRHC04",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA TIPO \"C\" 60\"T 04"
+  },
+  {
+    "bem": "PRHVB01",
+    "familia": "",
+    "nome": "PRENSA HIDRAULICA VULCANIZAR BLADER 01"
+  },
+  {
+    "bem": "PRHVP07",
+    "familia": "",
+    "nome": "PRENSA HIDR. MAGGION VULCANIZAR PNEUS 07"
+  },
+  {
+    "bem": "PRHVP08",
+    "familia": "",
+    "nome": "PRENSA HIDR. MAGGION VULCANIZAR PNEUS 08"
+  },
+  {
+    "bem": "PRMVP01",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 01"
+  },
+  {
+    "bem": "PRMVP02",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 02"
+  },
+  {
+    "bem": "PRMVP03",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 03"
+  },
+  {
+    "bem": "PRMVP04",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 04"
+  },
+  {
+    "bem": "PRMVP05",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 05"
+  },
+  {
+    "bem": "PRMVP06",
+    "familia": "",
+    "nome": "PRENSA MECANICA DE VULCANIZAR PNEUS 06"
+  },
+  {
+    "bem": "PRO001",
+    "familia": "",
+    "nome": "GRADES DE PROTECAO"
+  },
+  {
+    "bem": "PROTECAO",
+    "familia": "",
+    "nome": "DIVERSOS"
+  },
+  {
+    "bem": "PROTO",
+    "familia": "",
+    "nome": "PROTOTIPO"
+  },
+  {
+    "bem": "PRP01",
+    "familia": "",
+    "nome": "PR PNEUMAT FURAR DOBRAR CACAM REFORCADA"
+  },
+  {
+    "bem": "PRPP01",
+    "familia": "",
+    "nome": "PRENSA PNEUMATICA PRENSAR PISO 01"
+  },
+  {
+    "bem": "PUX001",
+    "familia": "",
+    "nome": "PUXADOR DE TALAO"
+  },
+  {
+    "bem": "REB01",
+    "familia": "",
+    "nome": "REBOBINADOR DO CORTE DA SLINTTER 01"
+  },
+  {
+    "bem": "RELO",
+    "familia": "",
+    "nome": "RELOGIO PONTO"
+  },
+  {
+    "bem": "RES01",
+    "familia": "",
+    "nome": "RESERVATORIO PLUVIAL INOX 01"
+  },
+  {
+    "bem": "RES02",
+    "familia": "",
+    "nome": "RESERVATORIO PLUVIAL ANGESA 02"
+  },
+  {
+    "bem": "RET001",
+    "familia": "",
+    "nome": "RETIFICADORA DE NAVALHA PARA GUILHOTINA"
+  },
+  {
+    "bem": "SET01",
+    "familia": "",
+    "nome": "SETOR DE MANUTENCAO 01"
+  },
+  {
+    "bem": "SET02",
+    "familia": "",
+    "nome": "SETOR DE TRANSPORTES 02"
+  },
+  {
+    "bem": "SET03",
+    "familia": "",
+    "nome": "SETOR DE PERFIL DRYWALL ANGESA 03"
+  },
+  {
+    "bem": "SET04",
+    "familia": "",
+    "nome": "SETOR DA CANTINA 04"
+  },
+  {
+    "bem": "SET05",
+    "familia": "",
+    "nome": "SETOR DBINOX 05"
+  },
+  {
+    "bem": "SET06",
+    "familia": "",
+    "nome": "SETOR DA ESCADA 06"
+  },
+  {
+    "bem": "SET07",
+    "familia": "",
+    "nome": "SETOR ALMOXARIFADO CENTRAL 07"
+  },
+  {
+    "bem": "SET08",
+    "familia": "",
+    "nome": "SETOR ADMINISTRATIVO 08"
+  },
+  {
+    "bem": "SET09",
+    "familia": "",
+    "nome": "SETOR EMBALAGEM DO CARRO 09"
+  },
+  {
+    "bem": "SET10",
+    "familia": "",
+    "nome": "SETOR INDUSTRIA GERAL 10"
+  },
+  {
+    "bem": "SET11",
+    "familia": "",
+    "nome": "SETOR COMETA 11"
+  },
+  {
+    "bem": "SET12",
+    "familia": "",
+    "nome": "SETOR ESTRUTURA METALICA"
+  },
+  {
+    "bem": "SET13",
+    "familia": "",
+    "nome": "SETOR PERFIL"
+  },
+  {
+    "bem": "SET14",
+    "familia": "",
+    "nome": "SETOR CARRO"
+  },
+  {
+    "bem": "SET15",
+    "familia": "",
+    "nome": "SETOR CARREGAMENTO"
+  },
+  {
+    "bem": "SET16",
+    "familia": "",
+    "nome": "SETOR SOLDA CONTINUA (BALDE INOX)"
+  },
+  {
+    "bem": "SET17",
+    "familia": "",
+    "nome": "SETOR METALOSA FERRO E ACO 17"
+  },
+  {
+    "bem": "SET18",
+    "familia": "",
+    "nome": "SETOR POSTE PADRAO"
+  },
+  {
+    "bem": "SET19",
+    "familia": "",
+    "nome": "SETOR CORTE GERAL 19"
+  },
+  {
+    "bem": "SET20",
+    "familia": "",
+    "nome": "SETOR CUBA INOX"
+  },
+  {
+    "bem": "SET21",
+    "familia": "",
+    "nome": "SETOR DE POLIMENTO"
+  },
+  {
+    "bem": "SET22",
+    "familia": "",
+    "nome": "SETOR DE DRYWALL"
+  },
+  {
+    "bem": "SET23",
+    "familia": "",
+    "nome": "SETOR CAIXA D'AGUA INOX"
+  },
+  {
+    "bem": "SET24",
+    "familia": "",
+    "nome": "SETOR CARRO SOLDA"
+  },
+  {
+    "bem": "SET25",
+    "familia": "",
+    "nome": "SETOR BETONEIRA"
+  },
+  {
+    "bem": "SIRENE PONTO",
+    "familia": "",
+    "nome": "SIRENE PONTO"
+  },
+  {
+    "bem": "SOL001",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 01"
+  },
+  {
+    "bem": "SOL002",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA ELETRODO 02"
+  },
+  {
+    "bem": "SOL003",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 03"
+  },
+  {
+    "bem": "SOL004",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA ELETRODO 04"
+  },
+  {
+    "bem": "SOL005",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA ELETRODO TIG 05"
+  },
+  {
+    "bem": "SOL006",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 06"
+  },
+  {
+    "bem": "SOL007",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 07"
+  },
+  {
+    "bem": "SOL008",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 08"
+  },
+  {
+    "bem": "SOL009",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA MIG-MAG 09"
+  },
+  {
+    "bem": "SOL010",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA ELETRODO 10"
+  },
+  {
+    "bem": "SOL011",
+    "familia": "",
+    "nome": "MAQUINA DE SOLDA ELETRODO 11"
+  },
+  {
+    "bem": "SUP01",
+    "familia": "",
+    "nome": "SUPORTE DE RETIRAR BOBINAS DA SLITTER"
+  },
+  {
+    "bem": "SUP02",
+    "familia": "",
+    "nome": "SUPORTE PARA TRANSPORTE DE POSTES"
+  },
+  {
+    "bem": "SUP03",
+    "familia": "",
+    "nome": "SUPORTE PARA TRANSPORTE DE CARGA"
+  },
+  {
+    "bem": "SUP04",
+    "familia": "",
+    "nome": "SUPORTE DE SEGURANCA TRABALHOS EM ALTURA"
+  },
+  {
+    "bem": "SUP05",
+    "familia": "",
+    "nome": "SUPORTE DE SEGURANCA TRABALHOS EM ALTURA"
+  },
+  {
+    "bem": "TAM01",
+    "familia": "",
+    "nome": "TAMPOGRAFIA DE CAMARAS 01"
+  },
+  {
+    "bem": "TER01",
+    "familia": "",
+    "nome": "MAQUINA DE MONTAR PNEUS"
+  },
+  {
+    "bem": "TERCEIROS",
+    "familia": "",
+    "nome": "SERVICOS PARA TERCEIROS"
+  },
+  {
+    "bem": "TF01",
+    "familia": "",
+    "nome": "MAQUINA TAMPOGRAFIA CARIMBAR CAMARA"
+  },
+  {
+    "bem": "TG01",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA ACESSORIOS CARRO"
+  },
+  {
+    "bem": "TG02",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA BLANCK CUBA INOX"
+  },
+  {
+    "bem": "TG03",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA ACESSORIOS CARRO 03"
+  },
+  {
+    "bem": "TG05",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA BLANCK CAIXA INOX"
+  },
+  {
+    "bem": "TG06",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA 06"
+  },
+  {
+    "bem": "TG09",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA BLANK CACAMBA CARRO"
+  },
+  {
+    "bem": "TG10",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA DO CORTE"
+  },
+  {
+    "bem": "TG15",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA CORTAR APARAS PISO 15"
+  },
+  {
+    "bem": "TG55",
+    "familia": "",
+    "nome": "TESOURA GUILHOTINA 55"
+  },
+  {
+    "bem": "TL01",
+    "familia": "",
+    "nome": "TANQUE DE LAVAR TOALHAS 01"
+  },
+  {
+    "bem": "TL02",
+    "familia": "",
+    "nome": "TANQUE DE AQUECIMENTO LAVAR CUBAS 02"
+  },
+  {
+    "bem": "TL03",
+    "familia": "",
+    "nome": "TANQUE DE PERCLORO 03"
+  },
+  {
+    "bem": "TOM15",
+    "familia": "",
+    "nome": "TOMADAS ELETRICAS ALMOX PROD ACABADO 15"
+  },
+  {
+    "bem": "TOR01",
+    "familia": "",
+    "nome": "TORNOS MECANICOS"
+  },
+  {
+    "bem": "TOR02",
+    "familia": "",
+    "nome": "TORNO MEC PARA CORTAR CINTAS DOS BALDES"
+  },
+  {
+    "bem": "TOR06",
+    "familia": "",
+    "nome": "TORNO MECAMICO ROMI TORMAX 30"
+  },
+  {
+    "bem": "TORCNC01",
+    "familia": "",
+    "nome": "TORNO CNC ROMI CENTUR 30D"
+  },
+  {
+    "bem": "TORRE01",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 01"
+  },
+  {
+    "bem": "TORRE02",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 02"
+  },
+  {
+    "bem": "TORRE03",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 03"
+  },
+  {
+    "bem": "TORRE04",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 04"
+  },
+  {
+    "bem": "TORRE05",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 05"
+  },
+  {
+    "bem": "TORRE06",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO ANGESA 06"
+  },
+  {
+    "bem": "TORRE07",
+    "familia": "",
+    "nome": "TORRE DE RESFRIAMENTO 07"
+  },
+  {
+    "bem": "TORRES",
+    "familia": "",
+    "nome": "TORRES DE RESFRIAMENTO"
+  },
+  {
+    "bem": "TR01",
+    "familia": "",
+    "nome": "TESOURA ROTATIVA SLITTER 01"
+  },
+  {
+    "bem": "TR02",
+    "familia": "",
+    "nome": "TESOURA ROTATIVA SLITTER 02 MARAFON"
+  },
+  {
+    "bem": "TRA001",
+    "familia": "",
+    "nome": "TRAVA QUEDAS 01"
+  },
+  {
+    "bem": "TRATOR 01",
+    "familia": "",
+    "nome": "TRATOR AGRALE 01"
+  },
+  {
+    "bem": "TRATOR 02",
+    "familia": "",
+    "nome": "TRATOR SITIO 02"
+  },
+  {
+    "bem": "TRI001",
+    "familia": "",
+    "nome": "MAQUINA DE TRITURAR PLASTICO"
+  },
+  {
+    "bem": "TTT01",
+    "familia": "",
+    "nome": "TESOURA TICO TICO 01"
+  },
+  {
+    "bem": "TUBULACAO 01",
+    "familia": "",
+    "nome": "TUBULACAO DE SUCCAO DE AR 01"
+  },
+  {
+    "bem": "TUBULACAO 02",
+    "familia": "",
+    "nome": "TUBULACAO DE RETORNO D'AGUA 02"
+  },
+  {
+    "bem": "UNAGGE01",
+    "familia": "",
+    "nome": "UNIDADE DE AGUA GELADA"
+  },
+  {
+    "bem": "VACUO01",
+    "familia": "",
+    "nome": "BOMBA DE VACUO 01"
+  },
+  {
+    "bem": "VAL",
+    "familia": "",
+    "nome": "VALVULA SOLENOIDE PNEUMATICA P/ ACIONAME"
+  },
+  {
+    "bem": "VASO VP 2324",
+    "familia": "",
+    "nome": "VASO DE PRESSAO VP 2324"
+  },
+  {
+    "bem": "VEN01",
+    "familia": "",
+    "nome": "VENTILADORES DO SETOR DA ESCADA"
+  },
+  {
+    "bem": "VEN02",
+    "familia": "",
+    "nome": "VENTILADORES DO SETOR DO CARRO"
+  },
+  {
+    "bem": "VEN03",
+    "familia": "",
+    "nome": "VENTILADOR GRANDE DO SETOR DO CARRO"
+  },
+  {
+    "bem": "VEN04",
+    "familia": "",
+    "nome": "VENTILADORE GRANDE DO SETOR DA ESCADA"
+  },
+  {
+    "bem": "VI02",
+    "familia": "",
+    "nome": "VIRADEIRA DE CHAPAS MANUAL"
+  },
+  {
+    "bem": "VSP 01",
+    "familia": "",
+    "nome": "VALVULA DE SEGURANCA 01"
+  }
+]

@@ -11,11 +11,12 @@ import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import vendedoresData from './data/vendedores.json';
+import bensData from './data/bens.json';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, auth, storage } from './firebase';
@@ -572,6 +573,9 @@ export default function App() {
   const [custoDetalheItem, setCustoDetalheItem] = useState(null);
   const [custoDetalhePedidoModalOpen, setCustoDetalhePedidoModalOpen] = useState(false);
   const [custoDetalhePedidoSelecionado, setCustoDetalhePedidoSelecionado] = useState(null);
+  const [bensSeedLoading, setBensSeedLoading] = useState(false);
+  const [bensSeedError, setBensSeedError] = useState('');
+  const [bensSeedDone, setBensSeedDone] = useState(false);
   const [rapidoSupervisor, setRapidoSupervisor] = useState('');
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
@@ -589,6 +593,18 @@ export default function App() {
     setor: '',
     prioridade: 'Media',
     tipo: 'Corretiva',
+    categoria: '',
+    sintoma: '',
+    componente: '',
+    parada: 'Nao',
+    tempoParada: '',
+    impacto: 'Medio',
+    causaProvavel: '',
+    acaoImediata: '',
+    solicitante: '',
+    dataFalha: '',
+    tempoEstimado: '',
+    custoEstimado: '',
     status: 'Aberta',
     statusMaquina: 'Rodando',
     descricao: '',
@@ -648,6 +664,18 @@ export default function App() {
       setor: novaOsForm.setor,
       prioridade: novaOsForm.prioridade,
       tipo: novaOsForm.tipo,
+      categoria: novaOsForm.categoria,
+      sintoma: novaOsForm.sintoma,
+      componente: novaOsForm.componente,
+      parada: novaOsForm.parada,
+      tempoParada: novaOsForm.tempoParada,
+      impacto: novaOsForm.impacto,
+      causaProvavel: novaOsForm.causaProvavel,
+      acaoImediata: novaOsForm.acaoImediata,
+      solicitante: novaOsForm.solicitante,
+      dataFalha: novaOsForm.dataFalha,
+      tempoEstimado: novaOsForm.tempoEstimado,
+      custoEstimado: novaOsForm.custoEstimado,
       status: novaOsForm.status,
       statusMaquina: novaOsForm.statusMaquina,
       descricao: novaOsForm.descricao,
@@ -672,6 +700,18 @@ export default function App() {
         setor: '',
         prioridade: 'Media',
         tipo: 'Corretiva',
+        categoria: '',
+        sintoma: '',
+        componente: '',
+        parada: 'Nao',
+        tempoParada: '',
+        impacto: 'Medio',
+        causaProvavel: '',
+        acaoImediata: '',
+        solicitante: '',
+        dataFalha: '',
+        tempoEstimado: '',
+        custoEstimado: '',
         status: 'Aberta',
         statusMaquina: 'Rodando',
         descricao: '',
@@ -689,6 +729,18 @@ export default function App() {
       setor: ordem.setor || '',
       prioridade: ordem.prioridade || 'Media',
       tipo: ordem.tipo || 'Corretiva',
+      categoria: ordem.categoria || '',
+      sintoma: ordem.sintoma || '',
+      componente: ordem.componente || '',
+      parada: ordem.parada || 'Nao',
+      tempoParada: ordem.tempoParada || '',
+      impacto: ordem.impacto || 'Medio',
+      causaProvavel: ordem.causaProvavel || '',
+      acaoImediata: ordem.acaoImediata || '',
+      solicitante: ordem.solicitante || '',
+      dataFalha: ordem.dataFalha || '',
+      tempoEstimado: ordem.tempoEstimado || '',
+      custoEstimado: ordem.custoEstimado || '',
       status: ordem.status || 'Aberta',
       statusMaquina: ordem.statusMaquina || 'Rodando',
       descricao: ordem.descricao || '',
@@ -1234,11 +1286,38 @@ export default function App() {
           id: docRef.id,
           ...docRef.data(),
         }));
-        items.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
-        setListaMaquinas(items);
+        const fallback = (bensData || [])
+          .map((item) => ({
+            id: normalizarIdFirestore(item.bem || item.nome || ''),
+            nome: item.nome || item.bem || 'Sem nome',
+            setor: item.familia || 'Geral',
+          }))
+          .filter((item) => item.id);
+        const mergedMap = new Map();
+        items.forEach((item) => mergedMap.set(item.id, item));
+        fallback.forEach((item) => {
+          if (!mergedMap.has(item.id)) {
+            mergedMap.set(item.id, item);
+          }
+        });
+        const merged = Array.from(mergedMap.values());
+        merged.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+        setListaMaquinas(merged);
       } catch (err) {
         if (!ativo) return;
-        setMaquinasErro('Nao foi possivel carregar as maquinas.');
+        if (bensData?.length) {
+          const fallback = bensData
+            .map((item) => ({
+              id: normalizarIdFirestore(item.bem || item.nome || ''),
+              nome: item.nome || item.bem || 'Sem nome',
+              setor: item.familia || 'Geral',
+            }))
+            .filter((item) => item.id);
+          fallback.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+          setListaMaquinas(fallback);
+        } else {
+          setMaquinasErro('Nao foi possivel carregar as maquinas.');
+        }
       }
     };
 
@@ -1259,14 +1338,27 @@ export default function App() {
         const items = snap.docs
           .map((docRef) => docRef.data().nome || docRef.id)
           .filter(Boolean);
-        const merged = Array.from(new Set(items))
+        const merged = new Set(items);
+        (bensData || []).forEach((item) => {
+          if (item.familia) {
+            merged.add(item.familia);
+          }
+        });
+        const mergedList = Array.from(merged)
           .filter(Boolean)
           .sort((a, b) => String(a).localeCompare(String(b)));
-        setListaSetores(merged);
+        setListaSetores(mergedList);
         setSetoresCarregadosFirestore(true);
       } catch (err) {
         if (!ativo) return;
-        setSetoresErro('Nao foi possivel carregar os setores.');
+        if (bensData?.length) {
+          const fallback = Array.from(
+            new Set(bensData.map((item) => item.familia).filter(Boolean))
+          ).sort((a, b) => String(a).localeCompare(String(b)));
+          setListaSetores(fallback);
+        } else {
+          setSetoresErro('Nao foi possivel carregar os setores.');
+        }
       }
     };
 
@@ -3216,6 +3308,82 @@ const custosPorSkuMap = useMemo(() => {
   });
   return map;
 }, [itensCustosOrdenados]);
+
+const handleSeedBensFirestore = async () => {
+  if (!isAllowedDomain || !authUser) {
+    setBensSeedError('Sem permissao para importar bens.');
+    return;
+  }
+  if (!bensData?.length) {
+    setBensSeedError('Planilha de bens vazia ou nao carregada.');
+    return;
+  }
+  setBensSeedError('');
+  setBensSeedLoading(true);
+  try {
+    const maquinas = bensData
+      .map((item) => ({
+        id: normalizarIdFirestore(item.bem || item.nome || ''),
+        nome: item.nome || item.bem || 'Sem nome',
+        setor: item.familia || 'Geral',
+      }))
+      .filter((item) => item.id);
+
+    const setores = Array.from(
+      new Set(bensData.map((item) => item.familia).filter(Boolean))
+    ).sort((a, b) => String(a).localeCompare(String(b)));
+
+    const chunkSize = 450;
+    for (let i = 0; i < maquinas.length; i += chunkSize) {
+      const batch = writeBatch(db);
+      const slice = maquinas.slice(i, i + chunkSize);
+      slice.forEach((item) => {
+        batch.set(doc(db, 'maquinas', item.id), item, { merge: true });
+      });
+      await batch.commit();
+    }
+
+    if (setores.length) {
+      const batch = writeBatch(db);
+      setores.forEach((setor) => {
+        batch.set(doc(db, 'setores', normalizarIdFirestore(setor)), { nome: setor }, { merge: true });
+      });
+      await batch.commit();
+    }
+
+    await setDoc(
+      doc(db, 'seeds', 'bens_v1'),
+      {
+        updatedAt: new Date().toISOString(),
+        totalMaquinas: maquinas.length,
+        totalSetores: setores.length,
+      },
+      { merge: true }
+    );
+
+    const mergedMap = new Map();
+    listaMaquinas.forEach((item) => mergedMap.set(item.id, item));
+    maquinas.forEach((item) => {
+      if (!mergedMap.has(item.id)) {
+        mergedMap.set(item.id, item);
+      }
+    });
+    const merged = Array.from(mergedMap.values());
+    merged.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+    setListaMaquinas(merged);
+
+    const setoresMerged = Array.from(new Set([...listaSetores, ...setores]))
+      .filter(Boolean)
+      .sort((a, b) => String(a).localeCompare(String(b)));
+    setListaSetores(setoresMerged);
+
+    setBensSeedDone(true);
+  } catch (err) {
+    setBensSeedError('Nao foi possivel importar os bens no Firebase.');
+  } finally {
+    setBensSeedLoading(false);
+  }
+};
 
 const custoDetalheMargemNegativa = (custoDetalheItem?.margem ?? 0) < 0;
 const custoDetalheTitulo = custoDetalheItem
@@ -7485,8 +7653,8 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {manutencaoModalOpen && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 px-4">
-                    <div className="w-full max-w-xl rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 px-4 py-6">
+                    <div className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
                       <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
                         <div>
                           <h3 className="text-lg font-black text-white">
@@ -7498,7 +7666,7 @@ const custoDetalheTitulo = custoDetalheItem
                         </div>
                         <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
                       </div>
-                      <form onSubmit={handleNovaOsSubmit} className="space-y-4 px-6 py-5">
+                      <form onSubmit={handleNovaOsSubmit} className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Ativo</label>
@@ -7531,8 +7699,88 @@ const custoDetalheTitulo = custoDetalheItem
                               <option>Preventiva</option>
                               <option>Inspecao</option>
                               <option>Melhoria</option>
+                              <option>Outro</option>
                             </select>
                           </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Categoria do problema</label>
+                            <select name="categoria" value={novaOsForm.categoria} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option value="">Selecione</option>
+                              <option>Eletrico</option>
+                              <option>Mecanico</option>
+                              <option>Hidraulico</option>
+                              <option>Pneumatico</option>
+                              <option>Automacao/CLP</option>
+                              <option>Instrumentacao/Sensores</option>
+                              <option>Software</option>
+                              <option>Utilidades</option>
+                              <option>Qualidade</option>
+                              <option>Seguranca</option>
+                              <option>Outro</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Impacto</label>
+                            <select name="impacto" value={novaOsForm.impacto} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Baixo</option>
+                              <option>Medio</option>
+                              <option>Alto</option>
+                              <option>Critico</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Componente/parte</label>
+                            <input name="componente" value={novaOsForm.componente} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Motor, redutor, sensor" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Sintoma</label>
+                            <input name="sintoma" value={novaOsForm.sintoma} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Barulho, travando, vazamento" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Parada</label>
+                            <select name="parada" value={novaOsForm.parada} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Nao</option>
+                              <option>Sim</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Tempo de parada (hh:mm)</label>
+                            <input name="tempoParada" value={novaOsForm.tempoParada} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: 01:30" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Data/hora da falha</label>
+                            <input type="datetime-local" name="dataFalha" value={novaOsForm.dataFalha} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Tempo estimado (hh:mm)</label>
+                            <input name="tempoEstimado" value={novaOsForm.tempoEstimado} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: 02:00" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Solicitante</label>
+                            <input name="solicitante" value={novaOsForm.solicitante} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Nome/area" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Custo estimado (R$)</label>
+                            <input name="custoEstimado" value={novaOsForm.custoEstimado} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: 350,00" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400">Causa provavel</label>
+                          <input name="causaProvavel" value={novaOsForm.causaProvavel} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Desgaste, falta de lubrificacao" />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400">Acao imediata</label>
+                          <input name="acaoImediata" value={novaOsForm.acaoImediata} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Isolar equipamento, ajuste rapido" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
@@ -7718,7 +7966,7 @@ const custoDetalheTitulo = custoDetalheItem
                 {subAbaConfig === 'maquinas' && (
                   <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                     <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Cpu size={22} className="text-blue-600" /> Cadastro de Ativos</h3>
-                    <form className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" onSubmit={async (e) => {
+                    <form className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4" onSubmit={async (e) => {
                       e.preventDefault();
                       const n = e.target.elements.nomeMaq.value;
                       const s = e.target.elements.setorMaq.value;
@@ -7731,6 +7979,14 @@ const custoDetalheTitulo = custoDetalheItem
                        </select>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
                     </form>
+                    {bensSeedDone && !bensSeedError && (
+                      <div className="mb-4 text-xs font-semibold text-emerald-600">
+                        Bens importados no Firebase.
+                      </div>
+                    )}
+                    {bensSeedError && (
+                      <div className="mb-4 text-xs font-semibold text-rose-600">{bensSeedError}</div>
+                    )}
                     {maquinasErro && (
                       <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
                         {maquinasErro}
