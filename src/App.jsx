@@ -588,7 +588,7 @@ export default function App() {
   const [manutencaoEditId, setManutencaoEditId] = useState(null);
   const [novaOsFotoFile, setNovaOsFotoFile] = useState(null);
   const [novaOsFotoPreview, setNovaOsFotoPreview] = useState('');
-  const [novaOsForm, setNovaOsForm] = useState({
+  const novaOsDefaults = {
     ativo: '',
     setor: '',
     prioridade: 'Media',
@@ -609,7 +609,8 @@ export default function App() {
     statusMaquina: 'Rodando',
     descricao: '',
     fotoUrl: '',
-  });
+  };
+  const [novaOsForm, setNovaOsForm] = useState(novaOsDefaults);
 
   const handleNovaOsChange = (e) => {
     const { name, value } = e.target;
@@ -695,30 +696,14 @@ export default function App() {
       setManutencaoEditId(null);
       setNovaOsFotoFile(null);
       setNovaOsFotoPreview('');
-      setNovaOsForm({
-        ativo: '',
-        setor: '',
-        prioridade: 'Media',
-        tipo: 'Corretiva',
-        categoria: '',
-        sintoma: '',
-        componente: '',
-        parada: 'Nao',
-        tempoParada: '',
-        impacto: 'Medio',
-        causaProvavel: '',
-        acaoImediata: '',
-        solicitante: '',
-        dataFalha: '',
-        tempoEstimado: '',
-        custoEstimado: '',
-        status: 'Aberta',
-        statusMaquina: 'Rodando',
-        descricao: '',
-        fotoUrl: '',
-      });
+      setNovaOsForm(novaOsDefaults);
     } catch (err) {
-      setManutencaoSaveError('Nao foi possivel salvar a OS.');
+      console.error('Erro ao salvar OS:', err);
+      const message =
+        err?.message ||
+        err?.code ||
+        'Nao foi possivel salvar a OS.';
+      setManutencaoSaveError(message);
     }
   };
 
@@ -7338,16 +7323,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <button
                         onClick={() => {
                           setManutencaoEditId(null);
-                          setNovaOsForm({
-                            ativo: '',
-                            setor: '',
-                            prioridade: 'Media',
-                            tipo: 'Corretiva',
-                            status: 'Aberta',
-                            statusMaquina: 'Rodando',
-                            descricao: '',
-                            fotoUrl: '',
-                          });
+                          setNovaOsForm(novaOsDefaults);
                           setNovaOsFotoFile(null);
                           setNovaOsFotoPreview('');
                           setManutencaoSaveError('');
