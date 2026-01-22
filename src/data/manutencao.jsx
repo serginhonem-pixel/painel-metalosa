@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import { 
   Wrench, Activity, Clock, AlertTriangle, CheckCircle, Users, 
-  LayoutDashboard, PlusCircle, Search, Filter, Play, Pause, 
+  LayoutDashboard, PlusCircle, Filter, Play, Pause, 
   FileText, LogOut, Menu, X, ArrowUpRight, Download, Save,
   Calendar, Briefcase, Settings
 } from 'lucide-react';

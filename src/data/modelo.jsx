@@ -34,7 +34,6 @@ import {
   LayoutDashboard,
   Calendar as CalendarIcon,
   Filter,
-  Search,
   Activity,
   Cpu,
   UserCog,
@@ -2301,11 +2300,7 @@ export default function App() {
             </h1>
             <p className="text-slate-500 mt-1">Status da operação em {new Date().toLocaleDateString('pt-BR')}</p>
           </div>
-          <div className="flex gap-4">
-             <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
-                <Search size={20} className="text-slate-400" />
-             </div>
-          </div>
+          <div className="flex gap-4" />
         </header>
 
         <div className="max-w-7xl mx-auto">

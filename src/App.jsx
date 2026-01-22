@@ -42,7 +42,6 @@ import {
   LayoutDashboard,
   Calendar as CalendarIcon,
   Filter,
-  Search,
   Activity,
   Wrench,
   Cpu,
@@ -571,6 +570,8 @@ export default function App() {
   const [modalRapidoFiltroOpen, setModalRapidoFiltroOpen] = useState(false);
   const [custoDetalheModalOpen, setCustoDetalheModalOpen] = useState(false);
   const [custoDetalheItem, setCustoDetalheItem] = useState(null);
+  const [custoDetalhePedidoModalOpen, setCustoDetalhePedidoModalOpen] = useState(false);
+  const [custoDetalhePedidoSelecionado, setCustoDetalhePedidoSelecionado] = useState(null);
   const [rapidoSupervisor, setRapidoSupervisor] = useState('');
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
@@ -3190,6 +3191,39 @@ const custoDetalhePedidos = useMemo(() => {
   return Array.from(pedidos.values()).sort((a, b) => b.valor - a.valor);
 }, [custoDetalheLinhas, clientesLookup]);
 
+const custoDetalhePedidosLinhas = useMemo(() => {
+  const map = new Map();
+  if (!custoDetalheLinhas.length) return map;
+  custoDetalheLinhas.forEach((linha) => {
+    const nf = String(linha.nf || 'Sem NF');
+    if (!map.has(nf)) {
+      map.set(nf, []);
+    }
+    map.get(nf).push(linha);
+  });
+  return map;
+}, [custoDetalheLinhas]);
+
+const custosPorSkuMap = useMemo(() => {
+  const map = new Map();
+  itensCustosOrdenados.forEach((item) => {
+    const codigo = normalizarCodigoProduto(item.codigo || item.skuNormalized || '');
+    if (!codigo) return;
+    map.set(codigo, {
+      ...item,
+      custoUnit: item.quantidade ? item.custo / item.quantidade : 0,
+    });
+  });
+  return map;
+}, [itensCustosOrdenados]);
+
+const custoDetalheMargemNegativa = (custoDetalheItem?.margem ?? 0) < 0;
+const custoDetalheTitulo = custoDetalheItem
+  ? custoDetalheMargemNegativa
+    ? 'Margem negativa'
+    : 'Margem positiva'
+  : 'Detalhamento de margem';
+
   const municipiosBounds = useMemo(() => {
     if (faturamentoAtual.municipiosMapa.length === 0) return null;
     let minLat = 90;
@@ -3632,18 +3666,35 @@ const custoDetalhePedidos = useMemo(() => {
             <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
-                <p className="text-lg font-bold text-white">Margem negativa</p>
+                <p className="text-lg font-bold text-white">{custoDetalheTitulo}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setCustoDetalheModalOpen(false);
-                  setCustoDetalheItem(null);
-                }}
-                className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
-              >
-                Fechar
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalTabelaCustosOpen(true);
+                    setCustoDetalheModalOpen(false);
+                    setCustoDetalheItem(null);
+                    setCustoDetalhePedidoModalOpen(false);
+                    setCustoDetalhePedidoSelecionado(null);
+                  }}
+                  className="rounded-full border border-slate-800 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 hover:border-slate-500 hover:text-white"
+                >
+                  Custos por SKU
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustoDetalheModalOpen(false);
+                    setCustoDetalheItem(null);
+                    setCustoDetalhePedidoModalOpen(false);
+                    setCustoDetalhePedidoSelecionado(null);
+                  }}
+                  className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
             <div className="p-6 space-y-6">
               {custoDetalheItem ? (
@@ -3658,7 +3709,15 @@ const custoDetalhePedidos = useMemo(() => {
                       <p className="text-xs uppercase tracking-wider text-slate-400">Resumo</p>
                       <p className="text-sm text-slate-200">Receita {formatarMoeda(custoDetalheItem.receita)}</p>
                       <p className="text-sm text-slate-200">Custo {formatarMoeda(custoDetalheItem.custo)}</p>
-                      <p className="text-sm text-rose-300">Margem {custoDetalheItem.margem.toFixed(1)}%</p>
+                      <p className="text-sm text-slate-200">
+                        Preco medio{' '}
+                        {formatarMoeda(
+                          custoDetalheItem.quantidade ? custoDetalheItem.receita / custoDetalheItem.quantidade : 0
+                        )}
+                      </p>
+                      <p className={`text-sm ${custoDetalheMargemNegativa ? 'text-rose-300' : 'text-emerald-300'}`}>
+                        Margem {custoDetalheItem.margem.toFixed(1)}%
+                      </p>
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
                       <p className="text-xs uppercase tracking-wider text-slate-400">Composicao</p>
@@ -3680,19 +3739,29 @@ const custoDetalhePedidos = useMemo(() => {
                     </div>
                     {custoDetalhePedidos.length ? (
                       <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60">
-                        <div className="grid grid-cols-[110px_1fr_90px_80px_80px_90px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                        <div className="grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px_90px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
                           <span>NF</span>
                           <span>Cliente</span>
                           <span className="text-right">Data</span>
                           <span className="text-right">Filial</span>
                           <span className="text-right">Qtd</span>
                           <span className="text-right">Valor</span>
+                          <span className="text-right">Preco medio</span>
+                          <span className="text-right">Detalhe</span>
                         </div>
                         <div className="divide-y divide-slate-800">
                           {custoDetalhePedidos.map((pedido) => (
+                            (() => {
+                              const linhasPedido = custoDetalhePedidosLinhas.get(String(pedido.nf || 'Sem NF')) || [];
+                              const temMargemBaixa = linhasPedido.some((linha) => {
+                                const skuKey = normalizarCodigoProduto(linha.codigo || '');
+                                const skuInfo = skuKey ? custosPorSkuMap.get(skuKey) : null;
+                                return Number.isFinite(skuInfo?.margem) ? skuInfo.margem < 20 : false;
+                              });
+                              return (
                             <div
                               key={`${pedido.nf}-${pedido.cliente}`}
-                              className="grid grid-cols-[110px_1fr_90px_80px_80px_90px] items-center px-3 py-2 text-[11px] text-slate-200"
+                              className={`grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px_90px] items-center px-3 py-2 text-[11px] text-slate-200 ${temMargemBaixa ? 'bg-amber-500/10' : ''}`}
                             >
                               <span className="text-slate-100">{pedido.nf}</span>
                               <div className="text-slate-400">
@@ -3705,7 +3774,28 @@ const custoDetalhePedidos = useMemo(() => {
                               <span className="text-right text-slate-400">{pedido.filial}</span>
                               <span className="text-right">{Math.round(pedido.quantidade)}</span>
                               <span className="text-right text-emerald-300">{formatarMoeda(pedido.valor)}</span>
+                              <span className="text-right text-emerald-200">
+                                {formatarMoeda(pedido.quantidade ? pedido.valor / pedido.quantidade : 0)}
+                              </span>
+                              <div className="flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const linhas = linhasPedido;
+                                    setCustoDetalhePedidoSelecionado({
+                                      ...pedido,
+                                      linhas,
+                                    });
+                                    setCustoDetalhePedidoModalOpen(true);
+                                  }}
+                                  className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 hover:border-slate-500 hover:text-white"
+                                >
+                                  Detalhar
+                                </button>
+                              </div>
                             </div>
+                              );
+                            })()
                           ))}
                         </div>
                       </div>
@@ -3714,63 +3804,100 @@ const custoDetalhePedidos = useMemo(() => {
                     )}
                   </div>
 
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-slate-400">Linhas do faturamento</p>
-                        <p className="text-[11px] text-slate-500">Usa os filtros atuais de filial e CFOP.</p>
-                      </div>
-                      <span className="text-[10px] text-slate-500">
-                        {custoDetalheLinhas.length} linha(s)
-                      </span>
-                    </div>
-                    {custoDetalheLinhas.length ? (
-                      <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60">
-                        <div className="grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
-                          <span>NF</span>
-                          <span>Cliente</span>
-                          <span className="text-right">Data</span>
-                          <span className="text-right">Filial</span>
-                          <span className="text-right">Qtd</span>
-                          <span className="text-right">Unit</span>
-                          <span className="text-right">Total</span>
-                        </div>
-                        <div className="divide-y divide-slate-800">
-                          {custoDetalheLinhas.map((linha, index) => (
-                            <div
-                              key={`${linha.nf}-${index}`}
-                              className="grid grid-cols-[110px_1fr_90px_80px_80px_90px_90px] items-center px-3 py-2 text-[11px] text-slate-200"
-                            >
-                              <span className="text-slate-100">{linha.nf || '-'}</span>
-                              {(() => {
-                                const info = obterInfoCliente(linha.cliente);
-                                return (
-                                  <div className="text-slate-400">
-                                    <div className="text-slate-200">{info.nome}</div>
-                                    {info.local ? (
-                                      <div className="text-[10px] text-slate-500">{info.local}</div>
-                                    ) : null}
-                                  </div>
-                                );
-                              })()}
-                              <span className="text-right text-slate-400">
-                                {linha.emissao ? linha.emissao.toLocaleDateString('pt-BR') : '-'}
-                              </span>
-                              <span className="text-right text-slate-400">{linha.filial || '-'}</span>
-                              <span className="text-right">{Math.round(linha.quantidade || 0)}</span>
-                              <span className="text-right text-slate-300">{formatarMoeda(linha.valorUnitario)}</span>
-                              <span className="text-right text-emerald-300">{formatarMoeda(linha.valorTotal)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="mt-3 text-xs text-slate-400">Sem linhas de faturamento para este SKU.</p>
-                    )}
-                  </div>
                 </>
               ) : (
                 <p className="text-sm text-slate-400">Selecione um item para ver detalhes.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {custoDetalhePedidoModalOpen && custoDetalhePedidoSelecionado && (
+        <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-slate-950/95 p-4">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+            <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-slate-800 bg-slate-900 px-6 py-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhe do pedido</p>
+                <p className="text-lg font-bold text-white">NF {custoDetalhePedidoSelecionado.nf}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustoDetalhePedidoModalOpen(false);
+                  setCustoDetalhePedidoSelecionado(null);
+                }}
+                className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                  <div>
+                    <div className="text-slate-200 font-semibold">{custoDetalhePedidoSelecionado.cliente}</div>
+                    {custoDetalhePedidoSelecionado.clienteLocal ? (
+                      <div className="text-[10px] text-slate-500">{custoDetalhePedidoSelecionado.clienteLocal}</div>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span>Data {custoDetalhePedidoSelecionado.data}</span>
+                    <span>Filial {custoDetalhePedidoSelecionado.filial}</span>
+                    <span>Qtd {Math.round(custoDetalhePedidoSelecionado.quantidade)}</span>
+                    <span className="text-emerald-300 font-semibold">
+                      {formatarMoeda(custoDetalhePedidoSelecionado.valor)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {custoDetalhePedidoSelecionado.linhas?.length ? (
+                <div className="rounded-xl border border-slate-800 bg-slate-950/60">
+                  <div className="grid grid-cols-[90px_1fr_70px_90px_90px_90px_70px_70px] items-center px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                    <span>SKU</span>
+                    <span>Descricao</span>
+                    <span className="text-right">Qtd</span>
+                    <span className="text-right">Unit</span>
+                    <span className="text-right">Total</span>
+                    <span className="text-right">Custo unit</span>
+                    <span className="text-right">Margem</span>
+                    <span className="text-right">Markup</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    {custoDetalhePedidoSelecionado.linhas.map((linha, index) => (
+                      (() => {
+                        const skuKey = normalizarCodigoProduto(linha.codigo || '');
+                        const skuInfo = skuKey ? custosPorSkuMap.get(skuKey) : null;
+                        const custoUnit = skuInfo?.custoUnit || 0;
+                        const custoTotal = (linha.quantidade || 0) * custoUnit;
+                        return (
+                      <div
+                        key={`${linha.nf || 'nf'}-${linha.codigo || 'sku'}-${index}`}
+                        className="grid grid-cols-[90px_1fr_70px_90px_90px_90px_70px_70px] items-center px-3 py-2 text-[11px] text-slate-200"
+                      >
+                        <span className="text-slate-100">{linha.codigo || '-'}</span>
+                        <span className="text-slate-400">
+                          {linha.descricao || skuInfo?.descricao || 'Sem descricao'}
+                        </span>
+                        <span className="text-right">{Math.round(linha.quantidade || 0)}</span>
+                        <span className="text-right text-slate-300">{formatarMoeda(linha.valorUnitario || 0)}</span>
+                        <span className="text-right text-emerald-300">{formatarMoeda(linha.valorTotal || 0)}</span>
+                        <span className="text-right text-slate-300">{formatarMoeda(custoUnit)}</span>
+                        <span className="text-right text-slate-300">
+                          {Number.isFinite(skuInfo?.margem) ? `${skuInfo.margem.toFixed(1)}%` : '-'}
+                        </span>
+                        <span className="text-right text-slate-300">
+                          {Number.isFinite(skuInfo?.markup) ? `${skuInfo.markup.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                        );
+                      })()
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400">Sem linhas para este pedido.</p>
               )}
             </div>
           </div>
@@ -4014,16 +4141,16 @@ const custoDetalhePedidos = useMemo(() => {
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && (
           <header className="max-w-7xl mx-auto mb-8 flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-              {ITENS_MENU.find(i => i.id === abaAtiva)?.label}
-            </h1>
-            <p className="text-slate-500 mt-1">Status da operação em {new Date().toLocaleDateString('pt-BR')}</p>
+            {abaAtiva !== 'custos' && (
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                {ITENS_MENU.find(i => i.id === abaAtiva)?.label}
+              </h1>
+            )}
+            {abaAtiva !== 'custos' && (
+              <p className="text-slate-500 mt-1">Status da operação em {new Date().toLocaleDateString('pt-BR')}</p>
+            )}
           </div>
-          <div className="flex gap-4">
-             <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
-                <Search size={20} className="text-slate-400" />
-             </div>
-          </div>
+          <div className="flex gap-4" />
           </header>
         )}
 
@@ -4422,11 +4549,12 @@ const custoDetalhePedidos = useMemo(() => {
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Custos consolidados</p>
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Operacao em tempo real</p>
                       </div>
+                      
                       <h2 className="text-3xl font-black text-white tracking-tight">Custos</h2>
                       <p className="text-sm text-slate-400 mt-1 font-medium">
-                        Base {mesCustoAtual || 'planilha atual'} • {faturamentoAtual.movimentos || 0} movimentos
+                        Base {mesCustoAtual || 'planilha atual'} - {faturamentoAtual.movimentos || 0} movimentos
                       </p>
                     </div>
                   </div>
