@@ -1,0 +1,1745 @@
+[
+  {
+    "Des CC": "CARRO",
+    "Nome": "ELIZEU BERNADO",
+    "Data Admis.": 44825,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "VALDIR SANTO CHEVER",
+    "Data Admis.": 44852,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "DANIEL ALMEIDA DA SILVA",
+    "Data Admis.": 44965,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX PRODUCAO B"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "JOSE FERNANDO DE FREITAS",
+    "Data Admis.": 45140,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSISTENTE DE MANUTE"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "REIRINAN BASTOS DE SANTANA",
+    "Data Admis.": 45279,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FAXINEIRO (A)"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "TALITA PATRICIA DIOGO DOS SANT",
+    "Data Admis.": 45306,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "MARIA APARECIDA B DO CARMO",
+    "Data Admis.": 45404,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CORTE DOBRA VERGALHAO",
+    "Nome": "ANDRE PEREIRA DE SOUZA",
+    "Data Admis.": 45404,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "TRANSPORTES",
+    "Nome": "MARCOS VINICIUS BRAGANCA LOPES",
+    "Data Admis.": 45414,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "AUX CARREGAMENTO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "KELVIN CLAYTON DA SILVA",
+    "Data Admis.": 45414,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "GUILHERME SANDRO COURA ARRUDA",
+    "Data Admis.": 45439,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR MECANICO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "GISLENE BARBOSA DO CARMO MONFA",
+    "Data Admis.": 45453,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "JOSEMIR DALMASIO",
+    "Data Admis.": 45461,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "JONATHAN SPERANDIO",
+    "Data Admis.": 45475,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "NATALIA NUNES FERREIRA",
+    "Data Admis.": 45483,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "IGOR LENON DA SILVA",
+    "Data Admis.": 45496,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ANTONIO JOSE DA SILVA WAICHERT",
+    "Data Admis.": 45496,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "MARCOS VINICIUS DE O SILVA SEL",
+    "Data Admis.": 45496,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VALTER JOSE TOFOLI",
+    "Data Admis.": 34654,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SUP PRODUCAO CARRO"
+  },
+  {
+    "Des CC": "DRYWALL",
+    "Nome": "CARLOS ROBERTO LIMA",
+    "Data Admis.": 34151,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PERFILADEIRA"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "LUIZ TADEU DE ALVARENGA",
+    "Data Admis.": 29654,
+    "Sit. Folha": null,
+    "Desc.Funcao": "MOTORISTA OP EMPILHA"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "ALTAIR DOS SANTOS BREDER",
+    "Data Admis.": 31852,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "LUIZ ANGELO DA SILVA",
+    "Data Admis.": 34830,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PROD-PINTURA ELET"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VALDIR DUBERSTAIN BUSS",
+    "Data Admis.": 33117,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX ENCARREGADO"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "EDSON JOSE DE SOUSA",
+    "Data Admis.": 33805,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "PAULO ROBERTO DE SOUZA",
+    "Data Admis.": 35066,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP TESOURA MECANICA"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOAO CUSTODIO NUNES",
+    "Data Admis.": 35074,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP DE CALDEIRA"
+  },
+  {
+    "Des CC": "ESCADA",
+    "Nome": "JOSE ADELSO DE ALMEIDA",
+    "Data Admis.": 32371,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "ANTONIO ALVES BEARIS",
+    "Data Admis.": 33883,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PROD-PINTURA ELET"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "AMILTON RUFINO",
+    "Data Admis.": 36039,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSE PEREIRA DA SILVA",
+    "Data Admis.": 36039,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "EDNEIS SOUZA ACERBI",
+    "Data Admis.": 36648,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "TELHA GALVALUME",
+    "Nome": "LUCENILDO GRAUNKE",
+    "Data Admis.": 36937,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PERFILADEIRA"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "LUIZMAR DA CONCEICAO",
+    "Data Admis.": 37014,
+    "Sit. Folha": null,
+    "Desc.Funcao": "MANTENEDOR IND"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "SERGIO LAFAIETE NEVES",
+    "Data Admis.": 38120,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUCIANO MOREIRA GUIMARAES",
+    "Data Admis.": 38355,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP CONF TUBOS"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "CLEUDSON ANGELO LUPPE",
+    "Data Admis.": 38370,
+    "Sit. Folha": null,
+    "Desc.Funcao": "GER DE MANUTENCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "NILTON PEREIRA",
+    "Data Admis.": 38628,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "SUP PROD ACESSORIOS"
+  },
+  {
+    "Des CC": "DRYWALL",
+    "Nome": "SANDRO LIMA",
+    "Data Admis.": 38719,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "INJETORA DE PLASTICOS",
+    "Nome": "DIEGO PASSOS TUNINI",
+    "Data Admis.": 38964,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP INJETORA PLASTI"
+  },
+  {
+    "Des CC": "DRYWALL",
+    "Nome": "DARLAN GONCALVES CABRAL",
+    "Data Admis.": 39142,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "ADILSON CORREA DA SILVA",
+    "Data Admis.": 39266,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "EVANDRO MOURA",
+    "Data Admis.": 39430,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "ALCEU CARLOS GOMES",
+    "Data Admis.": 39519,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUCIANO PESCA",
+    "Data Admis.": 39716,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "ADENILSON DE SOUZA FERRAZ",
+    "Data Admis.": 31169,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "JUDISMAR OTACILIO",
+    "Data Admis.": 34778,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "SOLDADOR MONTADOR"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSE LUIZ BASTOS",
+    "Data Admis.": 39972,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MARCOS CASSIANO DA SILVA",
+    "Data Admis.": 40226,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "RENATO THEMOTEO",
+    "Data Admis.": 40245,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "IVANI FERREIRA LEITE",
+    "Data Admis.": 40281,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSIST ENCARREGADO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ALEX SANDRO CASSIANO DA SILVA",
+    "Data Admis.": 40304,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "EDIMAR TADEU RONCONI",
+    "Data Admis.": 40436,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "IZALTINO DE BARROS",
+    "Data Admis.": 40464,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "GIUBERTO FRANCISCO",
+    "Data Admis.": 40589,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ELIOMAR DE SOUZA AGUIAR",
+    "Data Admis.": 40605,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "AGOSTINHO ELISEU MILOTTI",
+    "Data Admis.": 40637,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "PAULO SERGIO CAETANO GOMES",
+    "Data Admis.": 40735,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "JOSE LUIS DA SILVA",
+    "Data Admis.": 40822,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSE CLAUDIO NUNES",
+    "Data Admis.": 40896,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ARY DIAS BATISTA",
+    "Data Admis.": 41087,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "PAULO ANECLETO BARBOSA",
+    "Data Admis.": 41171,
+    "Sit. Folha": null,
+    "Desc.Funcao": "MOTORISTA OP EMPILHA"
+  },
+  {
+    "Des CC": "CONTABILIDADE",
+    "Nome": "DANIEL IDEARTE TESSAROLO",
+    "Data Admis.": 41410,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUXILIAR CONTABIL"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "ALEX PINHEIRO GOMES",
+    "Data Admis.": 41666,
+    "Sit. Folha": null,
+    "Desc.Funcao": "TEC MANUTENCAO IND"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "ALMIR SIQUEIRA",
+    "Data Admis.": 41380,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "ELIEZER JOAO RODRIGUES",
+    "Data Admis.": 41743,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "GENESIO DE SOUZA DIAS",
+    "Data Admis.": 41744,
+    "Sit. Folha": null,
+    "Desc.Funcao": "VIGIA"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ESMERALDA GRAMLICH DE MELLO",
+    "Data Admis.": 41793,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "BRUNO DE SOUZA BELLATO",
+    "Data Admis.": 41808,
+    "Sit. Folha": null,
+    "Desc.Funcao": "VIGIA"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "ELEIA DO NASCIMENTO",
+    "Data Admis.": 41849,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MARIA APARECIDA FERNANDES",
+    "Data Admis.": 41932,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MARCONI RODRIGUES DA CRUZ",
+    "Data Admis.": 41977,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "JOAO CARLOS MURGIA RODRIGUES",
+    "Data Admis.": 41984,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP TESOURA MECANICA"
+  },
+  {
+    "Des CC": "POLIMENTO",
+    "Nome": "EVALDO RAMOS DOS SANTOS",
+    "Data Admis.": 40716,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENCAR POLIMENTO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "FABRICIO COSTA CORDEIRO",
+    "Data Admis.": 40983,
+    "Sit. Folha": null,
+    "Desc.Funcao": "TORNEIRO"
+  },
+  {
+    "Des CC": "POLIMENTO",
+    "Nome": "DARCIO DE ALMEIDA MIRANDA",
+    "Data Admis.": 41610,
+    "Sit. Folha": null,
+    "Desc.Funcao": "POLIDOR DE METAIS"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "GILMAR MENDONCA DOS SANTOS",
+    "Data Admis.": 41730,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "CRISTIANA CINELLE DE ALMEIDA",
+    "Data Admis.": 42031,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "WESLEY CORREA FROILICH",
+    "Data Admis.": 43053,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "CARLOS ANDRADE DE ALMEIDA",
+    "Data Admis.": 43130,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "TIAGO RODRIGUES",
+    "Data Admis.": 43150,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PROD-PINTURA ELET"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSE MESSIAS DA SILVA",
+    "Data Admis.": 43158,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSMAR CORREIA DOS SANTOS",
+    "Data Admis.": 43178,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "ALEXANDRE MENDONCA DOS SANTOS",
+    "Data Admis.": 43361,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSIST ENCARREGADO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "KARLOS MAGNO ALVES",
+    "Data Admis.": 43361,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "LUCIANO DE SOUZA RAIMUNDO",
+    "Data Admis.": 43570,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "RAFAEL DE OLIVEIRA BARROS",
+    "Data Admis.": 43578,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "SEBASTIAO FELIPE DE OLIVEIRA",
+    "Data Admis.": 43613,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "EMERSON HAASE",
+    "Data Admis.": 43992,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MAURO SERGIO LIBERATO MARQUES",
+    "Data Admis.": 44056,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "ALEX RIBEIRO DE SOUZA",
+    "Data Admis.": 44056,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MARCIO TADEU PEREIRA VIEIRA",
+    "Data Admis.": 44061,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "AGUINALDO SERAFIM DE CARVALHO",
+    "Data Admis.": 44076,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "EDIPO RENAN DA SILVA OLIVIO",
+    "Data Admis.": 44105,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "EBER AMARO FERREIRA",
+    "Data Admis.": 44174,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "AGUIMAR SANTIAGO COLOMBO",
+    "Data Admis.": 44299,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "FAXINEIRO (A)"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "LUCAS FERREIRA DE JESUS",
+    "Data Admis.": 44300,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "JOAO MANOEL DE SOUZA",
+    "Data Admis.": 44349,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OPERADOR DE OXICORTE"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "CARLOS ANTONIO CANDIDO",
+    "Data Admis.": 41954,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ENC. DE PRODUCAO"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "CRISTIANO LIMA",
+    "Data Admis.": 44396,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR MECANICO"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "TIMOTEO VAZ MACHADO",
+    "Data Admis.": 44718,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FERRAMENTEIRO MECANI"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "JOSE RICARDO DE BARROS",
+    "Data Admis.": 44956,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FERRAMENTEIRO MECANI"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "MARCIO GUERCON FIGUEIREDO",
+    "Data Admis.": 45012,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FERRAMENTEIRO"
+  },
+  {
+    "Des CC": "SOLDA ROBOTIZADA",
+    "Nome": "WANDERSON FELIPE DE OLIVEIRA",
+    "Data Admis.": 45055,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "SUPERV GERAL",
+    "Nome": "HEITOR DE LIMA",
+    "Data Admis.": 45056,
+    "Sit. Folha": null,
+    "Desc.Funcao": "COORD PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUIZ DIAS CHAVES",
+    "Data Admis.": 45125,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CORTE GERAL",
+    "Nome": "WALACE CARDOSO COELHO",
+    "Data Admis.": 45155,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ALAN BARBOSA PINHEIRO",
+    "Data Admis.": 45182,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX PRODUCAO B"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ELIANA DA CONCEICAO",
+    "Data Admis.": 45517,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "SANDRO SOUZA DOS SANTOS",
+    "Data Admis.": 43726,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "DRYWALL",
+    "Nome": "GLEISSON VAZ DE OLIVEIRA",
+    "Data Admis.": 45281,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "KELLY DOS SANTOS",
+    "Data Admis.": 45306,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "WENDER DO PRADO FELICIANO",
+    "Data Admis.": 45306,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "CARLOS ALEXANDRE CASSIANO RAMO",
+    "Data Admis.": 45306,
+    "Sit. Folha": "F",
+    "Desc.Funcao": "TORNEIRO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "WARLEM PEREIRA GOMES",
+    "Data Admis.": 45316,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR BETONEIRA"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "MARIA APARECIDA DA SILVA PERES",
+    "Data Admis.": 45327,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "ALEXANDRA ALTOE",
+    "Data Admis.": 45337,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUIZ RODRIGUES DO AMARAL",
+    "Data Admis.": 45369,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "WANDRA KELY ALVES DE SOUZA",
+    "Data Admis.": 45370,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "AYANI BARCELOS DE JESUS",
+    "Data Admis.": 45377,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VAGNER FERREIRA DOS SANTOS",
+    "Data Admis.": 45377,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "LUIZ HENRIQUE DE SOUZA VAZ",
+    "Data Admis.": 45377,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PERFILADEIRA"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "HUDSON TELIS DOS SANTOS MANEA",
+    "Data Admis.": 45377,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "SILANE DE ARAUJO IGLESIAS",
+    "Data Admis.": 45519,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOSE HENRIQUE MACHADO",
+    "Data Admis.": 45552,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ALEXSANDRO COZER",
+    "Data Admis.": 45552,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "ALEXSANDRA PEDRO",
+    "Data Admis.": 45552,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VALERIA OTT ZANOLE DE OLIVEIRA",
+    "Data Admis.": 45580,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "JURACI BARBOSA FERREIRA",
+    "Data Admis.": 45586,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JAILTON NASCIMENTO SILVA",
+    "Data Admis.": 45586,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "LUCAS RODRIGUES DA COSTA",
+    "Data Admis.": 45586,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "RICHARDSON COMIM PEREIRA",
+    "Data Admis.": 45614,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VANDERLEIA CORREIA SINGER",
+    "Data Admis.": 45621,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "DANIEL CHEROTO JULIATI PIMENTA",
+    "Data Admis.": 45621,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "TRANSPORTES",
+    "Nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+    "Data Admis.": 45628,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "SILVANO ALVES SANTIAGO",
+    "Data Admis.": 45635,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "CARLOS JOSE DE OLIVEIRA",
+    "Data Admis.": 45628,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP EMPILHADEIRA"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "ROBERT SOUZA SANTOS",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "LILIAN GABRIELLI SILVA SOARES",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "STEEL FRAME",
+    "Nome": "ODELSO FALLER JUNIOR",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "ESCADA",
+    "Nome": "JOCARLY ALVARENGA FRAGA",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "NEIDE ANGELA DE SOUZA",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "VINICIUS FRAZAO DE LIRA",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VALDECI GALVAO",
+    "Data Admis.": 45645,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "FERNANDO BARRETO LUDGERIO",
+    "Data Admis.": 45663,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "QUEILA LUCIA FERREIRA",
+    "Data Admis.": 45663,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "WALQUIRIA APARECIDA DOS PASSOS",
+    "Data Admis.": 45663,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VALDIR STINGHEL",
+    "Data Admis.": 45670,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RECURSOS HUMANOS",
+    "Nome": "GRAZIELLE VIEIRA B BERTOLDI",
+    "Data Admis.": 45674,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSIST DE RH"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "NUBIA CRISTINA CANDIDA MOTTA",
+    "Data Admis.": 45677,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ZANATO PINHEIRO",
+    "Data Admis.": 45694,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "MARCELO DE SOUSA",
+    "Data Admis.": 45694,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "LUCAS RODRIGUES SANTOS",
+    "Data Admis.": 45694,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "REINALDO PINTO DE OLIV. NETO",
+    "Data Admis.": 45694,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "JEAN CARLOS AMARO FERREIRA",
+    "Data Admis.": 45698,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ANALISTA PROC INDUST"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ODAIR JOSE DA SILVA",
+    "Data Admis.": 45701,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "STEEL FRAME",
+    "Nome": "ADEMARIO LEMOS DE OLIVEIRA",
+    "Data Admis.": 45701,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "RENATO RODRIGUES DA SILVA",
+    "Data Admis.": 45712,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "VALMIR DOS SANTOS JUNIOR",
+    "Data Admis.": 45712,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "WESLLEY REINOSO ENTRINGER",
+    "Data Admis.": 45722,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "ADRIANA BARBOSA DA SILVA",
+    "Data Admis.": 45722,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MARCELO BARBOSA DA SILVA",
+    "Data Admis.": 45722,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "BRUNO BARBOSA PEREIRA",
+    "Data Admis.": 45722,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "LEANDRO SILVA SOUZA",
+    "Data Admis.": 45722,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SUP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "JORGE SALES DA SILVA FILHO",
+    "Data Admis.": 45729,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JUAREZ BARBOSA FERREIRA",
+    "Data Admis.": 45733,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "STEEL FRAME",
+    "Nome": "ANTONIO HIDROLANDIO R SANTOS",
+    "Data Admis.": 45733,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "ESCADA",
+    "Nome": "BEATRIZ RAMOS BERNARDO DA CRUZ",
+    "Data Admis.": 45736,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "BRENO FEITOSA FERREIRA",
+    "Data Admis.": 45736,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSIST ENCARREGADO"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "EDINALDO FURTADO",
+    "Data Admis.": 45754,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "GILMARA BARBOSA",
+    "Data Admis.": 45761,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "MARCONDES SANTOS DE SOUZA",
+    "Data Admis.": 45761,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "MARLON MILIORELLI",
+    "Data Admis.": 45771,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FERRAMENTEIRO"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "DAVY DE JESUS DE OLIVEIRA",
+    "Data Admis.": 45771,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "GEOVANE PASSOS DA SILVA MIGUEL",
+    "Data Admis.": 45785,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "DIEGO VALIATI",
+    "Data Admis.": 45785,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "SILVIO SANTANA GIMENEZ",
+    "Data Admis.": 45796,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LURDELMA ALVES DO NASCIMENTO",
+    "Data Admis.": 45799,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "APRENDIZAGEM",
+    "Nome": "MARIA EDUARDA DE OLIVEIRA LEAL",
+    "Data Admis.": 45804,
+    "Sit. Folha": null,
+    "Desc.Funcao": "APRENDIZ EM ELET MAN"
+  },
+  {
+    "Des CC": "CORTE E DOBRA",
+    "Nome": "EDUARDO CYPRIANO DA SILVA",
+    "Data Admis.": 45817,
+    "Sit. Folha": "A",
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "ALDINO SANTIAGO",
+    "Data Admis.": 45733,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOAQUIM PEIXOTO FILHO",
+    "Data Admis.": 45825,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ANTONIO HENRIQUE TRANCOSO BARR",
+    "Data Admis.": 45825,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PINTURA ELETROSTATICA",
+    "Nome": "JACKSON PEREIRA DOS SANTOS",
+    "Data Admis.": 45831,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "ROMILDO ONOFRE GONCALVES",
+    "Data Admis.": 45831,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "KARLA GALLINI",
+    "Data Admis.": 45853,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SUP PRODUCAO"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "LAUDICEIA ELESBON DOS SANTOS",
+    "Data Admis.": 45859,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFILADOS",
+    "Nome": "DERNIVAL DA SILVA LOPES",
+    "Data Admis.": 45859,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "SEGURANCA DO TRABALHO",
+    "Nome": "MARCELO SILVA DE FRANCA",
+    "Data Admis.": 45859,
+    "Sit. Folha": null,
+    "Desc.Funcao": "TEC. SEG. TRABALHO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "APARECIDA MARIA DE JESUS",
+    "Data Admis.": 45880,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "ISMAEL PEREIRA DE OLIVEIRA",
+    "Data Admis.": 45880,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "SAMIRA DA SILVA VEQUI",
+    "Data Admis.": 45880,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOAO RICARDO SILVA DE OLIVEIRA",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "KISSYLA VEQUI FERREIRA",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFILADOS",
+    "Nome": "JEANDER DE ABREU",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "DAIANI CRISTINA MENEGASSI",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "GELSON LOPES",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUIZ CARLOS DA SILVA",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LEANDRO DE OLIVEIRA RITA JUNIO",
+    "Data Admis.": 45901,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "HIGOR GRAMMELISKI DE LIMA",
+    "Data Admis.": 45909,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "MAIKO RODRIGUES COSTA",
+    "Data Admis.": 45909,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "MATEUS GARCIA DOS REIS",
+    "Data Admis.": 45916,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ALVARO DE JESUS FREITAS",
+    "Data Admis.": 45916,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOCIMAR SODRE DE SOUZA",
+    "Data Admis.": 45916,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "BERTRAN DOS SANTOS",
+    "Data Admis.": 45916,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CORTE E DOBRA",
+    "Nome": "ALONSO BERNARDO",
+    "Data Admis.": 45916,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "BETONEIRA",
+    "Nome": "ELI LAUERS",
+    "Data Admis.": 45922,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "WALLACE DA SILVA RODRIGUES",
+    "Data Admis.": 45922,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "ESCADA",
+    "Nome": "ALICE VITORIA PIM GOMES",
+    "Data Admis.": 45936,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "INOX",
+    "Nome": "ZILANDA FERREIRA LOUBACHI",
+    "Data Admis.": 45936,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "FERNANDO GONCALVES",
+    "Data Admis.": 45936,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "CORTE DOBRA VERGALHAO",
+    "Nome": "SAMUEL DOS SANTOS SALES",
+    "Data Admis.": 45936,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JADIR FERREIRA FILHO",
+    "Data Admis.": 45936,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "DIONATAN ELIAS DE JESUS",
+    "Data Admis.": 45943,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "HENRY VALERY HUERTA SANCHEZ",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "ROGERIO AMORIM DE PAULA",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ELETRICISTA SENIOR"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ANA LUCIA DA SILVA BASTOS",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VANESSA BARBOSA DE JESUS",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "DANIELA DA SILVA CASSIMIRO",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "HALISSON FROIS SANTANA",
+    "Data Admis.": 45957,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "JOILSA DOS SANTOS ALVES",
+    "Data Admis.": 45957,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ANA PAULA BORGES",
+    "Data Admis.": 45957,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFILADOS",
+    "Nome": "MARCIA SILVA DO NASCIMENTO",
+    "Data Admis.": 45957,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFILADOS",
+    "Nome": "RONALDO BARBOSA DA SILVA",
+    "Data Admis.": 45957,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "SUELEN LOPES DE OLIVEIRA",
+    "Data Admis.": 45965,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "MANUTENCAO",
+    "Nome": "JULIANO CARLOS LIMA",
+    "Data Admis.": 45965,
+    "Sit. Folha": null,
+    "Desc.Funcao": "TEC EM ELETROTECNICA"
+  },
+  {
+    "Des CC": "INDUSTRIA GERAL",
+    "Nome": "ELAINE CRISTINA NUNES JACO",
+    "Data Admis.": 45965,
+    "Sit. Folha": null,
+    "Desc.Funcao": "FAXINEIRO(A) BANHEIR"
+  },
+  {
+    "Des CC": "RODADOS",
+    "Nome": "THIAGO RIBEIRO PIMENTEL DE LIM",
+    "Data Admis.": 45971,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "FRANCIELI DE SOUZA SILVA",
+    "Data Admis.": 45971,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LUCAS OLALIO DA SILVA DE SOUZA",
+    "Data Admis.": 45971,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "SUMAIA LOPES MIRANDA",
+    "Data Admis.": 45971,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "ELIENE DA CONCEICAO",
+    "Data Admis.": 45978,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "NOENNE JOSE PERONI BAYER",
+    "Data Admis.": 45978,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "GIOVANI SILVA VIEIRA",
+    "Data Admis.": 45978,
+    "Sit. Folha": null,
+    "Desc.Funcao": "SOLDADOR CHAPARIA"
+  },
+  {
+    "Des CC": "SOLDA CONTINUA",
+    "Nome": "DEBORA DE OLIVEIRA FERNANDES",
+    "Data Admis.": 45978,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO/SOLDA",
+    "Nome": "MARIA CLARA NEGRI ALVES",
+    "Data Admis.": 45985,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "RAWAN NUNES BABILON",
+    "Data Admis.": 45985,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "PERFILADOS",
+    "Nome": "JOAO VICTOR SOUTO BRANDAO",
+    "Data Admis.": 45985,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "CARLOS ALBERTO DUMER",
+    "Data Admis.": 45985,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "VITORIA CAROLINA LOPES DA ROCH",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "CONTROLE DE ESTOQUES",
+    "Nome": "ISABELA FRANCO FERMINO",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE ALMOXARIFADO"
+  },
+  {
+    "Des CC": "TRANSPORTES",
+    "Nome": "WELLINGTON CASSIO TOSTES DA SI",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX CARREGAMENTO A"
+  },
+  {
+    "Des CC": "CONTROLE DE ESTOQUES",
+    "Nome": "VINICIUS SANTOS ALBUQUERQUE",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE ESTOQUE"
+  },
+  {
+    "Des CC": "PERFIL",
+    "Nome": "ROMULO CESAR AZEVEDO DOS SANTO",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "OP PRODUCAO"
+  },
+  {
+    "Des CC": "CARRO",
+    "Nome": "LEONARDO ANTONIO RODRIGUES",
+    "Data Admis.": 45992,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX DE PRODUCAO A"
+  },
+  {
+    "Des CC": "P.C.P",
+    "Nome": "CLAUBER ALEXANDRE DE SOUZA",
+    "Data Admis.": 38355,
+    "Sit. Folha": null,
+    "Desc.Funcao": "ASSISTENTE DE PCP"
+  },
+  {
+    "Des CC": "P.C.P",
+    "Nome": "KAWAN BINDACO SPALENZA",
+    "Data Admis.": 45327,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUX.ADMINISTRATIVO"
+  },
+  {
+    "Des CC": "P.C.P",
+    "Nome": "RAFAEL ANDREATTA RIGOTTI",
+    "Data Admis.": 45887,
+    "Sit. Folha": null,
+    "Desc.Funcao": "AUXILIAR DE PCP"
+  },
+  {
+    "Des CC": "P.C.P",
+    "Nome": "SERGIO BETINI MARTINS",
+    "Data Admis.": 45950,
+    "Sit. Folha": null,
+    "Desc.Funcao": "COORDENADOR DE PCP"
+  }
+]

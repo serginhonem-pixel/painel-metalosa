@@ -523,6 +523,7 @@ export default function App() {
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [carregando, setCarregando] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // --- Estados de Dados ---
   const [listaSetores, setListaSetores] = useState([]);
@@ -4226,8 +4227,20 @@ const custoDetalheTitulo = custoDetalheItem
       )}
       
       {/* Sidebar Clássica */}
-      <aside className="hidden md:flex w-64 bg-slate-900 text-white flex-col fixed h-full z-20 shadow-2xl">
+      <aside
+        className={`hidden md:flex bg-slate-900 text-white flex-col sticky top-0 h-screen z-20 shadow-2xl transition-[width] duration-300 overflow-hidden shrink-0 ${
+          sidebarOpen ? 'w-64' : 'w-0'
+        } relative`}
+      >
         <div className="p-6">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+            aria-label={sidebarOpen ? 'Ocultar menu lateral' : 'Mostrar menu lateral'}
+            className="absolute -right-3 top-28 h-8 w-8 rounded-full border border-slate-800 bg-slate-900 text-slate-200 shadow-lg hover:text-white hover:border-slate-600 flex items-center justify-center"
+          >
+            {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+          </button>
           <div className="flex flex-col items-center justify-center mb-10">
             <div className="bg-slate-900 p-4 rounded-3xl shadow-lg transform scale-[1.8] origin-center">
               <img src={logoMetalosa} alt="Metalosa" className="h-16 w-16 object-contain brightness-0 invert" />
@@ -4289,10 +4302,21 @@ const custoDetalheTitulo = custoDetalheItem
         </div>
       </aside>
 
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Mostrar menu lateral"
+          className="hidden md:flex fixed left-2 top-28 z-30 h-9 w-9 items-center justify-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 shadow-lg hover:text-white hover:border-slate-600"
+        >
+          <ChevronRight size={16} />
+        </button>
+      )}
+
       {/* Conteúdo Principal */}
-      <main className="flex-1 md:ml-64 p-6 md:p-8 pb-24 md:pb-8">
+      <main className="flex-1 pb-24 md:pb-8 px-4 md:px-6">
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && (
-          <header className="max-w-7xl mx-auto mb-8 flex justify-between items-end">
+          <header className="w-full mb-8 flex justify-between items-end">
           <div>
             {abaAtiva !== 'custos' && (
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -4307,7 +4331,7 @@ const custoDetalheTitulo = custoDetalheItem
           </header>
         )}
 
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full">
           
           {/* ABA EXECUTIVA */}
           {abaAtiva === 'executivo' && (
