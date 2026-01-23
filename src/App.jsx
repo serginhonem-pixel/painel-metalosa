@@ -594,11 +594,14 @@ export default function App() {
   const [processoEditOpen, setProcessoEditOpen] = useState(false);
   const [processoEditId, setProcessoEditId] = useState(null);
   const [processoEditValue, setProcessoEditValue] = useState('');
+  const [novoAtivoCc, setNovoAtivoCc] = useState('');
+  const [novoAtivoProcesso, setNovoAtivoProcesso] = useState('');
   const [novaOsFotoFile, setNovaOsFotoFile] = useState(null);
   const [novaOsFotoPreview, setNovaOsFotoPreview] = useState('');
   const novaOsDefaults = {
     ativo: '',
     setor: '',
+    processo: '',
     prioridade: 'Media',
     tipo: 'Corretiva',
     categoria: '',
@@ -631,6 +634,7 @@ export default function App() {
         ...prev,
         ativo: value,
         setor: maquina?.setor || prev.setor,
+        processo: maquina?.processo || '',
       }));
       return;
     }
@@ -671,6 +675,7 @@ export default function App() {
     const payload = {
       ativo: novaOsForm.ativo,
       setor: novaOsForm.setor,
+      processo: novaOsForm.processo,
       prioridade: novaOsForm.prioridade,
       tipo: novaOsForm.tipo,
       categoria: novaOsForm.categoria,
@@ -886,7 +891,7 @@ export default function App() {
     loadOrdens();
   }, [authUser, isAllowedDomain]);
 
-  const handleSalvarMaquina = async (nome, setor) => {
+  const handleSalvarMaquina = async (nome, setor, processo) => {
     const nomeLimpo = String(nome || '').trim();
     if (!nomeLimpo) return;
     if (!authUser || !isAllowedDomain) {
@@ -894,12 +899,16 @@ export default function App() {
       return;
     }
     const setorLimpo = String(setor || '').trim();
+    const processoLimpoBase = String(processo || '').trim();
+    const processoLimpo =
+      normalizarTexto(setorLimpo) === 'industria' ? processoLimpoBase : '';
     const baseId = normalizarIdFirestore(nomeLimpo);
     const existe = listaMaquinas.some((item) => item.id === baseId);
     const id = baseId && !existe ? baseId : `${baseId || 'maquina'}-${Date.now()}`;
     const payload = {
       nome: nomeLimpo,
       setor: setorLimpo,
+      processo: processoLimpo,
       createdAt: new Date().toISOString(),
     };
 
@@ -7839,6 +7848,17 @@ const custoDetalheTitulo = custoDetalheItem
                             <input name="setor" value={novaOsForm.setor} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Producao A" required />
                           </div>
                         </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400">Processo</label>
+                          <input
+                            name="processo"
+                            value={novaOsForm.processo}
+                            onChange={handleNovaOsChange}
+                            readOnly
+                            className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+                            placeholder="Processo da industria"
+                          />
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Prioridade</label>
@@ -8051,38 +8071,6 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                     </div>
                     <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
-                      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Layers size={22} className="text-blue-600" /> Processos da Industria</h3>
-                      <form className="flex flex-wrap gap-4 mb-8" onSubmit={async (e) => {
-                        e.preventDefault();
-                        const v = e.target.elements.novoProcesso.value;
-                        await handleSalvarProcesso(v);
-                        e.target.reset();
-                      }}>
-                        <input name="novoProcesso" type="text" className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Ex: Laminação, Corte, Embalagem" />
-                        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wide">
-                          <Factory size={16} />
-                          Industria
-                        </div>
-                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Criar</button>
-                      </form>
-                      {processosErro && (
-                        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
-                          {processosErro}
-                        </div>
-                      )}
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {listaProcessos.map((p) => (
-                          <div key={p.id} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center group">
-                            <div>
-                              <span className="font-bold text-slate-700 text-sm">{p.nome}</span>
-                              <p className="text-[10px] text-blue-600 font-bold uppercase">Industria</p>
-                            </div>
-                            <Trash2 size={16} className="text-slate-300 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirProcesso(p.id)} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                       <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><UserCog size={22} className="text-blue-600" /> Supervisores</h3>
                       <form className="flex gap-4 mb-8" onSubmit={(e) => {
                         e.preventDefault();
@@ -8158,23 +8146,42 @@ const custoDetalheTitulo = custoDetalheItem
                     <form className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4" onSubmit={async (e) => {
                       e.preventDefault();
                       const n = e.target.elements.nomeMaq.value;
-                      const s = e.target.elements.setorMaq.value;
-                      await handleSalvarMaquina(n, s);
+                      const cc = novoAtivoCc;
+                      const processo = normalizarTexto(cc) === 'industria' ? novoAtivoProcesso : '';
+                      await handleSalvarMaquina(n, cc, processo);
                       e.target.reset();
+                      setNovoAtivoCc('');
+                      setNovoAtivoProcesso('');
                     }}>
                        <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Máquina" />
                        <div className="flex flex-col gap-2">
-                         <input
-                           name="setorMaq"
-                           list="setores-maquinas"
-                           className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
-                           placeholder="Setor (ex: Industria, Transporte)"
-                         />
-                         <datalist id="setores-maquinas">
-                           {listaSetores.map((s) => (
-                             <option key={s} value={s} />
-                           ))}
-                         </datalist>
+                         <div>
+                           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                             Centro de Custo
+                           </label>
+                           <select
+                             name="setorMaq"
+                             value={novoAtivoCc}
+                             onChange={(e) => setNovoAtivoCc(e.target.value)}
+                             className="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
+                             required
+                           >
+                             <option>Industria</option>
+                             <option>Transporte</option>
+                           </select>
+                         </div>
+                         {normalizarTexto(novoAtivoCc) === 'industria' && (
+                           <select
+                             value={novoAtivoProcesso}
+                             onChange={(e) => setNovoAtivoProcesso(e.target.value)}
+                             className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
+                           >
+                             <option value="">Processo da industria</option>
+                             {listaSetores.map((p) => (
+                               <option key={p} value={p}>{p}</option>
+                             ))}
+                           </select>
+                         )}
                        </div>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
                     </form>
@@ -8212,9 +8219,11 @@ const custoDetalheTitulo = custoDetalheItem
                             <div>
                               <p className="font-bold text-slate-800 text-sm">{m.nome}</p>
                               <p className="text-[10px] text-blue-600 font-bold uppercase">{m.setor}</p>
-                              <p className="text-[10px] font-bold uppercase text-emerald-600">
-                                {m.processo ? `Processo: ${m.processo}` : 'Sem processo'}
-                              </p>
+                              {normalizarTexto(m.setor) === 'industria' && (
+                                <p className="text-[10px] font-bold uppercase text-emerald-600">
+                                  {m.processo ? `Processo: ${m.processo}` : 'Sem processo'}
+                                </p>
+                              )}
                             </div>
                             <div className="flex items-center gap-3">
                               {normalizarTexto(m.setor) === 'industria' && (
@@ -8261,8 +8270,8 @@ const custoDetalheTitulo = custoDetalheItem
                                 className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none"
                               >
                                 <option value="">Selecione</option>
-                                {listaProcessos.map((p) => (
-                                  <option key={p.id} value={p.nome}>{p.nome}</option>
+                                {listaSetores.map((p) => (
+                                  <option key={p} value={p}>{p}</option>
                                 ))}
                               </select>
                             </div>
