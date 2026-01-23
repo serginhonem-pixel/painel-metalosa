@@ -12,6 +12,7 @@ import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import vendedoresData from './data/vendedores.json';
 import bensData from './data/bens.json';
+import veiculosData from './data/relacao_veiculos.json';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
@@ -67,7 +68,7 @@ const ITENS_MENU = [
 const MANUTENCAO_KPIS = [];
 const MANUTENCAO_PARADAS = [];
 
-
+const SETORES_BASE = ['Industria', 'Transporte'];
 const SETORES_INICIAIS = [];
 const GESTORES_INICIAIS = ['Thalles'];
 const MAQUINAS_INICIAIS = [];
@@ -530,8 +531,11 @@ export default function App() {
   const [listaGestores, setListaGestores] = useState(GESTORES_INICIAIS);
   const [listaMaquinas, setListaMaquinas] = useState(MAQUINAS_INICIAIS);
   const [maquinasErro, setMaquinasErro] = useState('');
+  const [filtroAtivos, setFiltroAtivos] = useState('Todos');
   const [setoresErro, setSetoresErro] = useState('');
   const [setoresCarregadosFirestore, setSetoresCarregadosFirestore] = useState(false);
+  const [listaProcessos, setListaProcessos] = useState([]);
+  const [processosErro, setProcessosErro] = useState('');
   const [colaboradores, setColaboradores] = useState([]);
   const [funcionariosFirestore, setFuncionariosFirestore] = useState([]);
   const [faturamentoDados, setFaturamentoDados] = useState({
@@ -587,6 +591,9 @@ export default function App() {
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
   const [manutencaoEditId, setManutencaoEditId] = useState(null);
+  const [processoEditOpen, setProcessoEditOpen] = useState(false);
+  const [processoEditId, setProcessoEditId] = useState(null);
+  const [processoEditValue, setProcessoEditValue] = useState('');
   const [novaOsFotoFile, setNovaOsFotoFile] = useState(null);
   const [novaOsFotoPreview, setNovaOsFotoPreview] = useState('');
   const novaOsDefaults = {
@@ -770,6 +777,14 @@ export default function App() {
     [isManutencaoOnly]
   );
 
+  const ativosFiltrados = useMemo(() => {
+    if (filtroAtivos === 'Todos') return listaMaquinas;
+    const filtroNorm = normalizarTexto(filtroAtivos);
+    return listaMaquinas.filter((item) =>
+      normalizarTexto(item.setor).includes(filtroNorm)
+    );
+  }, [filtroAtivos, listaMaquinas]);
+
   const manutencaoOperadorListas = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
     const minhas = manutencaoOrdens.filter((os) =>
@@ -891,6 +906,28 @@ export default function App() {
     setMaquinasErro('');
     try {
       await setDoc(doc(db, 'maquinas', id), payload);
+      if (setorLimpo) {
+        const setorNorm = normalizarTexto(setorLimpo);
+        const existeSetor = listaSetores.some(
+          (item) => normalizarTexto(item) === setorNorm
+        );
+        if (!existeSetor) {
+          const setorId = normalizarIdFirestore(setorLimpo);
+          try {
+            await setDoc(doc(db, 'setores', setorId), {
+              nome: setorLimpo,
+              createdAt: new Date().toISOString(),
+            });
+            setListaSetores((prev) =>
+              [...prev, setorLimpo].sort((a, b) => String(a).localeCompare(String(b)))
+            );
+            setSetoresCarregadosFirestore(true);
+          } catch (err) {
+            // Se falhar ao salvar setor, mantemos o ativo salvo.
+            console.error('Erro ao salvar setor da maquina:', err);
+          }
+        }
+      }
       setListaMaquinas((prev) => {
         const atualizado = prev.some((item) => item.id === id)
           ? prev.map((item) => (item.id === id ? { ...item, ...payload } : item))
@@ -952,6 +989,74 @@ export default function App() {
       setListaSetores((prev) => prev.filter((item) => item !== nome));
     } catch (err) {
       setSetoresErro('Nao foi possivel excluir o setor.');
+    }
+  };
+
+  const handleSalvarProcesso = async (nome) => {
+    const nomeLimpo = String(nome || '').trim();
+    if (!nomeLimpo) return;
+    if (!authUser || !isAllowedDomain) {
+      setProcessosErro('Sem permissao para salvar processos.');
+      return;
+    }
+    const nomeNorm = normalizarTexto(nomeLimpo);
+    const existe = listaProcessos.some((item) => normalizarTexto(item.nome) === nomeNorm);
+    if (existe) return;
+    const id = normalizarIdFirestore(nomeLimpo);
+    const payload = {
+      nome: nomeLimpo,
+      setor: 'Industria',
+      createdAt: new Date().toISOString(),
+    };
+    setProcessosErro('');
+    try {
+      await setDoc(doc(db, 'processos', id), payload);
+      setListaProcessos((prev) =>
+        [...prev, { id, ...payload }].sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')))
+      );
+    } catch (err) {
+      setProcessosErro('Nao foi possivel salvar o processo.');
+    }
+  };
+
+  const handleExcluirProcesso = async (id) => {
+    if (!authUser || !isAllowedDomain) {
+      setProcessosErro('Sem permissao para excluir processos.');
+      return;
+    }
+    setProcessosErro('');
+    try {
+      await deleteDoc(doc(db, 'processos', id));
+      setListaProcessos((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setProcessosErro('Nao foi possivel excluir o processo.');
+    }
+  };
+
+  const handleSalvarProcessoMaquina = async () => {
+    if (!processoEditId) return;
+    if (!authUser || !isAllowedDomain) {
+      setMaquinasErro('Sem permissao para salvar maquinas.');
+      return;
+    }
+    const processoLimpo = String(processoEditValue || '').trim();
+    setMaquinasErro('');
+    try {
+      await setDoc(
+        doc(db, 'maquinas', processoEditId),
+        { processo: processoLimpo },
+        { merge: true }
+      );
+      setListaMaquinas((prev) =>
+        prev.map((item) =>
+          item.id === processoEditId ? { ...item, processo: processoLimpo } : item
+        )
+      );
+      setProcessoEditOpen(false);
+      setProcessoEditId(null);
+      setProcessoEditValue('');
+    } catch (err) {
+      setMaquinasErro('Nao foi possivel salvar a maquina.');
     }
   };
 
@@ -1272,13 +1377,26 @@ export default function App() {
           id: docRef.id,
           ...docRef.data(),
         }));
-        const fallback = (bensData || [])
+        const fallbackBens = (bensData || [])
           .map((item) => ({
             id: normalizarIdFirestore(item.bem || item.nome || ''),
             nome: item.nome || item.bem || 'Sem nome',
-            setor: item.familia || 'Geral',
+            setor: item.familia || 'Industria',
           }))
           .filter((item) => item.id);
+        const fallbackVeiculos = (veiculosData || [])
+          .map((item) => {
+            const placa = item?.PLACAS || item?.placas || '';
+            const modelo = item?.MODELO || item?.modelo || '';
+            const nome = placa && modelo ? `${placa} - ${modelo}` : placa || modelo;
+            return {
+              id: normalizarIdFirestore(placa || modelo || ''),
+              nome: nome || 'Sem nome',
+              setor: 'Transporte',
+            };
+          })
+          .filter((item) => item.id);
+        const fallback = [...fallbackBens, ...fallbackVeiculos];
         const mergedMap = new Map();
         items.forEach((item) => mergedMap.set(item.id, item));
         fallback.forEach((item) => {
@@ -1291,14 +1409,27 @@ export default function App() {
         setListaMaquinas(merged);
       } catch (err) {
         if (!ativo) return;
-        if (bensData?.length) {
-          const fallback = bensData
+        if ((bensData?.length || 0) + (veiculosData?.length || 0) > 0) {
+          const fallbackBens = (bensData || [])
             .map((item) => ({
               id: normalizarIdFirestore(item.bem || item.nome || ''),
               nome: item.nome || item.bem || 'Sem nome',
-              setor: item.familia || 'Geral',
+              setor: item.familia || 'Industria',
             }))
             .filter((item) => item.id);
+          const fallbackVeiculos = (veiculosData || [])
+            .map((item) => {
+              const placa = item?.PLACAS || item?.placas || '';
+              const modelo = item?.MODELO || item?.modelo || '';
+              const nome = placa && modelo ? `${placa} - ${modelo}` : placa || modelo;
+              return {
+                id: normalizarIdFirestore(placa || modelo || ''),
+                nome: nome || 'Sem nome',
+                setor: 'Transporte',
+              };
+            })
+            .filter((item) => item.id);
+          const fallback = [...fallbackBens, ...fallbackVeiculos];
           fallback.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
           setListaMaquinas(fallback);
         } else {
@@ -1330,6 +1461,7 @@ export default function App() {
             merged.add(item.familia);
           }
         });
+        SETORES_BASE.forEach((setor) => merged.add(setor));
         const mergedList = Array.from(merged)
           .filter(Boolean)
           .sort((a, b) => String(a).localeCompare(String(b)));
@@ -1337,9 +1469,9 @@ export default function App() {
         setSetoresCarregadosFirestore(true);
       } catch (err) {
         if (!ativo) return;
-        if (bensData?.length) {
+        if (bensData?.length || SETORES_BASE.length) {
           const fallback = Array.from(
-            new Set(bensData.map((item) => item.familia).filter(Boolean))
+            new Set([...bensData.map((item) => item.familia).filter(Boolean), ...SETORES_BASE])
           ).sort((a, b) => String(a).localeCompare(String(b)));
           setListaSetores(fallback);
         } else {
@@ -1349,6 +1481,31 @@ export default function App() {
     };
 
     carregarSetores();
+    return () => {
+      ativo = false;
+    };
+  }, [isAllowedDomain]);
+
+  useEffect(() => {
+    if (!isAllowedDomain) return;
+    let ativo = true;
+    const carregarProcessos = async () => {
+      setProcessosErro('');
+      try {
+        const snap = await getDocs(collection(db, 'processos'));
+        if (!ativo) return;
+        const items = snap.docs
+          .map((docRef) => ({ id: docRef.id, ...docRef.data() }))
+          .filter((item) => item?.nome);
+        items.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+        setListaProcessos(items);
+      } catch (err) {
+        if (!ativo) return;
+        setProcessosErro('Nao foi possivel carregar os processos.');
+      }
+    };
+
+    carregarProcessos();
     return () => {
       ativo = false;
     };
@@ -7862,7 +8019,7 @@ const custoDetalheTitulo = custoDetalheItem
              <div className="space-y-8 animate-in slide-in-from-top duration-500">
                 <div className="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 w-fit">
                    <button onClick={() => setSubAbaConfig('processos')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaConfig === 'processos' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>Processos</button>
-                   <button onClick={() => setSubAbaConfig('maquinas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaConfig === 'maquinas' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>Máquinas</button>
+                   <button onClick={() => setSubAbaConfig('maquinas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaConfig === 'maquinas' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>Ativos</button>
                    <button onClick={() => setSubAbaConfig('equipe')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaConfig === 'equipe' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>Equipe</button>
                 </div>
 
@@ -7892,6 +8049,38 @@ const custoDetalheTitulo = custoDetalheItem
                          </div>
                        ))}
                     </div>
+                    </div>
+                    <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
+                      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Layers size={22} className="text-blue-600" /> Processos da Industria</h3>
+                      <form className="flex flex-wrap gap-4 mb-8" onSubmit={async (e) => {
+                        e.preventDefault();
+                        const v = e.target.elements.novoProcesso.value;
+                        await handleSalvarProcesso(v);
+                        e.target.reset();
+                      }}>
+                        <input name="novoProcesso" type="text" className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Ex: Laminação, Corte, Embalagem" />
+                        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wide">
+                          <Factory size={16} />
+                          Industria
+                        </div>
+                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Criar</button>
+                      </form>
+                      {processosErro && (
+                        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                          {processosErro}
+                        </div>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {listaProcessos.map((p) => (
+                          <div key={p.id} className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center group">
+                            <div>
+                              <span className="font-bold text-slate-700 text-sm">{p.nome}</span>
+                              <p className="text-[10px] text-blue-600 font-bold uppercase">Industria</p>
+                            </div>
+                            <Trash2 size={16} className="text-slate-300 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirProcesso(p.id)} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
                       <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><UserCog size={22} className="text-blue-600" /> Supervisores</h3>
@@ -7974,9 +8163,19 @@ const custoDetalheTitulo = custoDetalheItem
                       e.target.reset();
                     }}>
                        <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Máquina" />
-                       <select name="setorMaq" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none">
-                          {listaSetores.map(s => <option key={s} value={s}>{s}</option>)}
-                       </select>
+                       <div className="flex flex-col gap-2">
+                         <input
+                           name="setorMaq"
+                           list="setores-maquinas"
+                           className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
+                           placeholder="Setor (ex: Industria, Transporte)"
+                         />
+                         <datalist id="setores-maquinas">
+                           {listaSetores.map((s) => (
+                             <option key={s} value={s} />
+                           ))}
+                         </datalist>
+                       </div>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
                     </form>
                     {bensSeedDone && !bensSeedError && (
@@ -7992,14 +8191,114 @@ const custoDetalheTitulo = custoDetalheItem
                         {maquinasErro}
                       </div>
                     )}
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wide">
+                        <Filter size={14} />
+                        Filtro
+                      </div>
+                      <select
+                        value={filtroAtivos}
+                        onChange={(e) => setFiltroAtivos(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 outline-none"
+                      >
+                        <option>Todos</option>
+                        <option>Industria</option>
+                        <option>Transporte</option>
+                      </select>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                       {listaMaquinas.map(m => (
+                       {ativosFiltrados.map(m => (
                          <div key={m.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center border-l-4 border-l-blue-600 shadow-sm">
-                            <div><p className="font-bold text-slate-800 text-sm">{m.nome}</p><p className="text-[10px] text-blue-600 font-bold uppercase">{m.setor}</p></div>
-                            <Trash2 size={16} className="text-slate-200 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirMaquina(m.id)} />
-                         </div>
+                            <div>
+                              <p className="font-bold text-slate-800 text-sm">{m.nome}</p>
+                              <p className="text-[10px] text-blue-600 font-bold uppercase">{m.setor}</p>
+                              <p className="text-[10px] font-bold uppercase text-emerald-600">
+                                {m.processo ? `Processo: ${m.processo}` : 'Sem processo'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              {normalizarTexto(m.setor) === 'industria' && (
+                                <button
+                                  type="button"
+                                  className="text-xs font-bold text-blue-600 hover:text-blue-500"
+                                  onClick={() => {
+                                    setProcessoEditId(m.id);
+                                    setProcessoEditValue(m.processo || '');
+                                    setProcessoEditOpen(true);
+                                  }}
+                                >
+                                  Editar
+                                </button>
+                              )}
+                              <Trash2 size={16} className="text-slate-200 hover:text-rose-500 cursor-pointer" onClick={() => handleExcluirMaquina(m.id)} />
+                            </div>
+                          </div>
                        ))}
                     </div>
+                    {processoEditOpen && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6">
+                        <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200">
+                          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                            <h4 className="text-sm font-bold text-slate-800">Vincular processo</h4>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProcessoEditOpen(false);
+                                setProcessoEditId(null);
+                                setProcessoEditValue('');
+                              }}
+                              className="text-xs font-bold text-slate-400 hover:text-slate-600"
+                            >
+                              Fechar
+                            </button>
+                          </div>
+                          <div className="px-6 py-5 space-y-4">
+                            <div>
+                              <label className="text-xs font-bold text-slate-500">Processo da indústria</label>
+                              <select
+                                value={processoEditValue}
+                                onChange={(e) => setProcessoEditValue(e.target.value)}
+                                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none"
+                              >
+                                <option value="">Selecione</option>
+                                {listaProcessos.map((p) => (
+                                  <option key={p.id} value={p.nome}>{p.nome}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProcessoEditOpen(false);
+                                  setProcessoEditId(null);
+                                  setProcessoEditValue('');
+                                }}
+                                className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:border-slate-300"
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProcessoEditValue('');
+                                }}
+                                className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:border-slate-300"
+                              >
+                                Limpar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleSalvarProcessoMaquina}
+                                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500"
+                              >
+                                Salvar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
