@@ -136080,6 +136080,22 @@
     "TipoMovimento": "venda"
   },
   {
+    "Cliente": "041393",
+    "Filial": "08",
+    "Grupo": "G230",
+    "Codigo": "03002",
+    "Descricao": 0,
+    "Quantidade": 890,
+    "Unidade": "KG",
+    "ValorUnitario": 1.35,
+    "ValorTotal": 1201.5,
+    "Emissao": "2026-01-22T03:00:28.000Z",
+    "NF": "073689",
+    "CodFiscal": "5101",
+    "MesEmissao": "01/2026",
+    "TipoMovimento": "venda"
+  },
+  {
     "Cliente": "045615",
     "Filial": "08",
     "Grupo": "G230",

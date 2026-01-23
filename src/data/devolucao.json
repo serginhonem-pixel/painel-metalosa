@@ -144,6 +144,22 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": "C19450",
+    "Filial": "04",
+    "Grupo": "0041",
+    "Codigo": "05016A",
+    "Descricao": 0,
+    "Quantidade": 386.98,
+    "Unidade": "KG",
+    "ValorUnitario": 11.8,
+    "ValorTotal": 4566.36,
+    "Emissao": "2026-01-20T03:00:28.000Z",
+    "NF": "000043078",
+    "MesEmissao": "01/2026",
+    "CFOP": "1202",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "C25176",
     "Filial": "04",
     "Grupo": "0027",
@@ -315,6 +331,22 @@
     "ValorTotal": 301.92,
     "Emissao": "2026-01-07T03:00:28.000Z",
     "NF": "000007581",
+    "MesEmissao": "01/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": "035942",
+    "Filial": "08",
+    "Grupo": "G030",
+    "Codigo": "04751A",
+    "Descricao": 0,
+    "Quantidade": 40,
+    "Unidade": "PC",
+    "ValorUnitario": 38.696347,
+    "ValorTotal": 1547.85,
+    "Emissao": "2026-01-22T03:00:28.000Z",
+    "NF": "000011223",
     "MesEmissao": "01/2026",
     "CFOP": "1201",
     "TipoMovimento": "devolucao"
