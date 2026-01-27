@@ -6685,6 +6685,8 @@ const custoDetalheTitulo = custoDetalheItem
                           const chartW = width - margin.left - margin.right;
                           const chartH = height - margin.top - margin.bottom;
                           const maxValor = Math.max(...dados.map((item) => item.valor), 1);
+                          const media = dados.reduce((acc, item) => acc + item.valor, 0) / dados.length;
+                          const yMedia = margin.top + chartH - (media / maxValor) * chartH;
                           const barW = chartW / Math.max(dados.length, 1);
                           const barWidth = Math.max(barW - 12, 10);
                           return (
@@ -6695,6 +6697,24 @@ const custoDetalheTitulo = custoDetalheItem
                                   <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.9" />
                                 </linearGradient>
                               </defs>
+                              <line
+                                x1={margin.left}
+                                x2={width - margin.right}
+                                y1={yMedia}
+                                y2={yMedia}
+                                stroke="#22c55e"
+                                strokeDasharray="6 6"
+                              />
+                              <text
+                                x={width - margin.right}
+                                y={Math.max(yMedia - 6, 14)}
+                                textAnchor="end"
+                                fontSize="10"
+                                fill="#86efac"
+                                fontWeight="700"
+                              >
+                                Media {formatarValorCurto(media)}
+                              </text>
                               {dados.map((item, i) => {
                                 const barH = (item.valor / maxValor) * chartH;
                                 const x = margin.left + i * barW + (barW - barWidth) / 2;
@@ -6702,6 +6722,16 @@ const custoDetalheTitulo = custoDetalheItem
                                 return (
                                   <g key={item.dia}>
                                     <rect x={x} y={y} width={barWidth} height={barH} rx="6" fill="url(#dashBar)" />
+                                    <text
+                                      x={x + barWidth / 2}
+                                      y={Math.max(y - 6, 14)}
+                                      textAnchor="middle"
+                                      fontSize="10"
+                                      fill="#e2e8f0"
+                                      fontWeight="700"
+                                    >
+                                      {formatarValorCurto(item.valor)}
+                                    </text>
                                     <text
                                       x={x + barWidth / 2}
                                       y={margin.top + chartH + 18}
