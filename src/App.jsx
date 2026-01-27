@@ -56,6 +56,7 @@ import {
 // --- Constantes e Dados Iniciais ---
 
 const ITENS_MENU = [
+  { id: 'dashboard-tv', label: 'Dashboard TV', icon: LayoutDashboard },
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'custos', label: 'Custos', icon: Layers },
@@ -513,6 +514,7 @@ export default function App() {
   const [subAbaConfig, setSubAbaConfig] = useState('processos');
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
   const [subAbaManutencao, setSubAbaManutencao] = useState('resumo');
+  const [dashboardView, setDashboardView] = useState('faturamento');
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
   const [filtroCfops2025, setFiltroCfops2025] = useState([]);
   const [filtroFilial, setFiltroFilial] = useState('08');
@@ -524,6 +526,7 @@ export default function App() {
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [carregando, setCarregando] = useState(true);
+  const [agora, setAgora] = useState(() => new Date());
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // --- Estados de Dados ---
@@ -777,6 +780,11 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => setAgora(new Date()), 30000);
+    return () => clearInterval(timer);
   }, []);
 
   const isAllowedDomain =
@@ -6160,6 +6168,194 @@ const custoDetalheTitulo = custoDetalheItem
                   <p className="mt-4 text-xs text-slate-400 italic">Nenhum SKU sem custo identificado.</p>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* DASHBOARD TV */}
+          {abaAtiva === 'dashboard-tv' && (
+            <div className="space-y-8 animate-in slide-in-from-right duration-700">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90 p-7 shadow-2xl">
+                <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
+                <div className="absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
+                <div className="relative flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#10b981]" />
+                      <span className="text-[10px] uppercase tracking-[0.4em] text-emerald-200 font-bold">Live KPI</span>
+                    </div>
+                    <h2 className="text-3xl font-black text-white tracking-tight">Dashboard TV</h2>
+                    <p className="text-sm text-slate-400 mt-1 font-medium">
+                      Atualizado em {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} -{' '}
+                      {agora.toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDashboardView('faturamento')}
+                      className={`px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all ${
+                        dashboardView === 'faturamento'
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'border border-slate-700 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      Faturamento
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDashboardView('manutencao')}
+                      className={`px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all ${
+                        dashboardView === 'manutencao'
+                          ? 'bg-emerald-500 text-slate-950 shadow-lg'
+                          : 'border border-slate-700 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      Manutencao
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {dashboardView === 'faturamento' ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mes</p>
+                      <p className="text-3xl font-black text-blue-300 mt-2">{formatarMoeda(faturamentoAtual.total || 0)}</p>
+                      <p className="text-xs text-slate-500 mt-2">{faturamentoAtual.movimentos || 0} movimentos</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
+                      <p className="text-3xl font-black text-amber-300 mt-2">{faturamentoAtual.diasAtivos || 0}</p>
+                      <p className="text-xs text-slate-500 mt-2">{faturamentoAtual.porDia?.length || 0} dias no grafico</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
+                      <p className="text-3xl font-black text-emerald-300 mt-2">{formatarMoeda(faturamentoAtual.ticketMedio || 0)}</p>
+                      <p className="text-xs text-slate-500 mt-2">Por pedido</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Clientes ativos</p>
+                      <p className="text-3xl font-black text-slate-100 mt-2">{faturamentoAtual.clientesAtivos || 0}</p>
+                      <p className="text-xs text-slate-500 mt-2">No mes</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Devolucoes</p>
+                      <p className="text-3xl font-black text-rose-300 mt-2">{formatarMoeda(faturamentoAtual.totalDevolucao || 0)}</p>
+                      <p className="text-xs text-slate-500 mt-2">Impacto no mes</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Media diaria</p>
+                      <p className="text-3xl font-black text-blue-200 mt-2">
+                        {formatarMoeda(
+                          faturamentoAtual.diasAtivos
+                            ? faturamentoAtual.total / faturamentoAtual.diasAtivos
+                            : 0
+                        )}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-2">Faturamento/dia</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Top clientes</h3>
+                      <span className="text-xs text-slate-500">Top 6</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {(faturamentoAtual.topClientes || []).slice(0, 6).map((item) => {
+                        const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
+                        const nome = item.info?.nome || item.cliente;
+                        const local = [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ');
+                        return (
+                          <div key={item.cliente} className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                            <div className="flex items-center justify-between text-xs text-slate-300">
+                              <span className="font-semibold">{nome}</span>
+                              <span>{formatarValorCurto(item.valor)}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-1">{local || `Codigo: ${item.cliente}`}</p>
+                            <div className="mt-3 h-2 rounded-full bg-slate-800 overflow-hidden">
+                              <div className="h-full bg-emerald-400" style={{ width: `${Math.min(perc, 100)}%` }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {!(faturamentoAtual.topClientes || []).length && (
+                        <div className="text-xs text-slate-500 italic">Sem dados de clientes.</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {manutencaoKpis.map((kpi) => (
+                      <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">{kpi.label}</p>
+                        <div className="mt-3 flex items-center justify-between">
+                          <span className="text-3xl font-black text-white">{kpi.value}</span>
+                          <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="rounded-2xl border border-rose-500/50 bg-rose-500/10 p-6 shadow-[0_20px_40px_-30px_rgba(244,63,94,0.6)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-rose-200 font-bold">Paradas ativas</p>
+                      <p className="text-3xl font-black text-rose-100 mt-3">{manutencaoParadas.length}</p>
+                      <p className="text-xs text-rose-200/80 mt-2">Processos parados</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Paradas em andamento</h3>
+                      <div className="mt-4 space-y-3">
+                        {manutencaoParadas.length ? (
+                          manutencaoParadas.slice(0, 6).map((item) => (
+                            <div key={item.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-bold text-white">{item.ativo || item.setor || item.id}</p>
+                                  <p className="text-xs text-slate-400">{item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}</p>
+                                </div>
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">
+                                  {item.prioridade || 'Media'}
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                            Sem paradas registradas.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Resumo operacional</h3>
+                      <div className="mt-4 grid grid-cols-1 gap-4">
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">OS abertas</p>
+                          <p className="text-2xl font-black text-white mt-2">
+                            {manutencaoKpis.find((kpi) => kpi.id === 'abertas')?.value || 0}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Em andamento</p>
+                          <p className="text-2xl font-black text-blue-200 mt-2">
+                            {manutencaoKpis.find((kpi) => kpi.id === 'andamento')?.value || 0}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Finalizadas</p>
+                          <p className="text-2xl font-black text-emerald-200 mt-2">
+                            {manutencaoKpis.find((kpi) => kpi.id === 'finalizadas')?.value || 0}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
