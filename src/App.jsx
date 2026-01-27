@@ -15,6 +15,7 @@ import bensData from './data/bens.json';
 import veiculosData from './data/relacao_veiculos.json';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
+import pptxgen from 'pptxgenjs';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
@@ -4189,6 +4190,191 @@ export default function App() {
     () => faturamentoLinhasFiltradas.reduce((acc, row) => acc + (row.valorTotal || 0), 0),
     [faturamentoLinhasFiltradas]
   );
+
+  const handleExportarManutencaoPpt = () => {
+    const pptx = new pptxgen();
+    pptx.layout = 'LAYOUT_WIDE';
+    pptx.author = 'Painel Metalosa';
+    pptx.company = 'Metalosa';
+    pptx.subject = 'Relatorio de manutencao';
+
+    const now = new Date();
+    const dataRelatorio = now.toLocaleDateString('pt-BR');
+    const fileDate = now.toISOString().slice(0, 10);
+
+    const totalOs = manutencaoOrdens.length;
+    const totalParadas = manutencaoParadas.length;
+    const totalFinalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
+    const totalAbertas = manutencaoOrdens.filter(
+      (os) => os.status !== 'Finalizada' && os.status !== 'Cancelada'
+    ).length;
+
+    const ordensOrdenadas = [...manutencaoOrdens].sort((a, b) =>
+      String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
+    );
+
+    const formatDateOnlyRelatorio = (value) => {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleDateString('pt-BR');
+    };
+
+    const slideCover = pptx.addSlide();
+    slideCover.addShape(pptx.ShapeType.rect, {
+      x: 0,
+      y: 0,
+      w: 13.33,
+      h: 7.5,
+      fill: { color: '0F172A' },
+      line: { color: '0F172A' }
+    });
+    slideCover.addText('Manutencao', {
+      x: 0.6,
+      y: 0.55,
+      w: 8.8,
+      h: 0.6,
+      fontSize: 34,
+      bold: true,
+      color: 'FFFFFF'
+    });
+    slideCover.addText(`Status da operacao em ${dataRelatorio}`, {
+      x: 0.6,
+      y: 1.2,
+      w: 9,
+      h: 0.4,
+      fontSize: 12,
+      color: 'CBD5F5'
+    });
+
+    const kpis = [
+      { label: 'Total de OS', value: totalOs },
+      { label: 'Em aberto', value: totalAbertas },
+      { label: 'Finalizadas', value: totalFinalizadas },
+      { label: 'Paradas', value: totalParadas }
+    ];
+
+    const boxW = 3.05;
+    const boxH = 1.15;
+    const startX = 0.6;
+    const startY = 2.0;
+    const gap = 0.3;
+    kpis.forEach((kpi, index) => {
+      const x = startX + index * (boxW + gap);
+      slideCover.addShape(pptx.ShapeType.roundRect, {
+        x,
+        y: startY,
+        w: boxW,
+        h: boxH,
+        fill: { color: '1E293B' },
+        line: { color: '334155' },
+        radius: 0.08
+      });
+      slideCover.addText(kpi.label, {
+        x: x + 0.2,
+        y: startY + 0.15,
+        w: boxW - 0.4,
+        h: 0.3,
+        fontSize: 11,
+        color: '94A3B8'
+      });
+      slideCover.addText(String(kpi.value ?? '-'), {
+        x: x + 0.2,
+        y: startY + 0.45,
+        w: boxW - 0.4,
+        h: 0.5,
+        fontSize: 22,
+        bold: true,
+        color: 'E2E8F0'
+      });
+    });
+
+    const slideResumo = pptx.addSlide();
+    slideResumo.addText('Resumo de indicadores', {
+      x: 0.6,
+      y: 0.4,
+      w: 12,
+      h: 0.4,
+      fontSize: 20,
+      bold: true,
+      color: '0F172A'
+    });
+
+    const resumoRows = [
+      [
+        { text: 'Indicador', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Valor', options: { bold: true, color: 'FFFFFF' } }
+      ],
+      ...[
+        ...manutencaoKpis.map((kpi) => ({ label: kpi.label, value: kpi.value })),
+        { label: 'Paradas', value: totalParadas },
+        { label: 'OS finalizadas', value: totalFinalizadas },
+        { label: 'OS em aberto', value: totalAbertas }
+      ].map((kpi) => [String(kpi.label || ''), String(kpi.value ?? '-')])
+    ];
+
+    slideResumo.addTable(resumoRows, {
+      x: 0.6,
+      y: 1.1,
+      w: 12.1,
+      colW: [8.2, 3.9],
+      fontSize: 11,
+      color: '0F172A',
+      border: { type: 'solid', color: 'E2E8F0', pt: 1 },
+      fill: { color: 'F8FAFC' },
+      rowH: 0.35,
+      autoFit: true,
+      valign: 'middle',
+      header: true
+    });
+
+    const slideTabela = pptx.addSlide();
+    slideTabela.addText('Ultimas OS', {
+      x: 0.6,
+      y: 0.4,
+      w: 12,
+      h: 0.4,
+      fontSize: 20,
+      bold: true,
+      color: '0F172A'
+    });
+
+    const tabelaRows = [
+      [
+        { text: 'OS', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Ativo', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Setor', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Status', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Responsavel', options: { bold: true, color: 'FFFFFF' } },
+        { text: 'Criado em', options: { bold: true, color: 'FFFFFF' } }
+      ],
+      ...ordensOrdenadas.slice(0, 12).map((os) => [
+        String(os.id || ''),
+        String(os.ativo || ''),
+        String(os.setor || ''),
+        String(os.status || ''),
+        String(os.responsavel || ''),
+        formatDateOnlyRelatorio(os.createdAt || os.dataFalha)
+      ])
+    ];
+
+    slideTabela.addTable(tabelaRows, {
+      x: 0.6,
+      y: 1.1,
+      w: 12.1,
+      colW: [1.2, 2.3, 2.2, 2.0, 2.4, 2.0],
+      fontSize: 10,
+      color: '0F172A',
+      border: { type: 'solid', color: 'E2E8F0', pt: 1 },
+      fill: { color: 'FFFFFF' },
+      rowH: 0.33,
+      autoFit: true,
+      valign: 'middle',
+      header: true
+    });
+
+    pptx.writeFile({ fileName: `manutencao_${fileDate}.pptx` });
+  };
 
   const exportFaturamentoDisponivel =
     faturamentoTabelaView === 'dia'
@@ -9168,7 +9354,13 @@ const custoDetalheTitulo = custoDetalheItem
                         onClick={handleExportarManutencaoPdf}
                         className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
                       >
-                        Exportar
+                        Exportar PDF
+                      </button>
+                      <button
+                        onClick={handleExportarManutencaoPpt}
+                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                      >
+                        Exportar PPT
                       </button>
                       <button
                         type="button"
