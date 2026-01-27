@@ -821,28 +821,249 @@ export default function App() {
     [manutencaoOrdens]
   );
 
+  const formatDateTimeRelatorio = (value) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString('pt-BR');
+  };
+
+  const formatDateOnlyRelatorio = (value) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleDateString('pt-BR');
+  };
+
+  const escapeHtmlRelatorio = (value) =>
+    String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const printHtmlRelatorio = (html) => {
+    const existing = document.getElementById('manutencao-print-frame');
+    if (existing) {
+      existing.remove();
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'manutencao-print-frame';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+
+    const frameDoc = iframe.contentWindow?.document;
+    if (!frameDoc) {
+      alert('Nao foi possivel preparar o PDF.');
+      return;
+    }
+
+    frameDoc.open();
+    frameDoc.write(html);
+    frameDoc.close();
+
+    iframe.onload = () => {
+      const frameWindow = iframe.contentWindow;
+      if (!frameWindow) return;
+      frameWindow.focus();
+      frameWindow.print();
+      setTimeout(() => {
+        iframe.remove();
+      }, 1000);
+    };
+  };
+
+  const handleImprimirOs = (ordem) => {
+    const now = new Date();
+    const prioridade = String(ordem?.prioridade || '').toLowerCase();
+    const status = String(ordem?.status || '').toLowerCase();
+    const statusMaquina = String(ordem?.statusMaquina || '').toLowerCase();
+    const getBadgeTone = (value) => {
+      if (value.includes('crit')) return 'badge-danger';
+      if (value.includes('alta')) return 'badge-warn';
+      if (value.includes('media')) return 'badge-info';
+      if (value.includes('baixa')) return 'badge-muted';
+      if (value.includes('parada')) return 'badge-danger';
+      if (value.includes('andamento')) return 'badge-info';
+      if (value.includes('final')) return 'badge-success';
+      return 'badge-muted';
+    };
+
+    const linhas = [
+      ['OS', ordem?.id],
+      ['Ativo', ordem?.ativo],
+      ['Setor', ordem?.setor],
+      ['Processo', ordem?.processo],
+      ['Prioridade', ordem?.prioridade],
+      ['Tipo', ordem?.tipo],
+      ['Categoria', ordem?.categoria],
+      ['Status', ordem?.status],
+      ['Status maquina', ordem?.statusMaquina],
+      ['Responsavel', ordem?.responsavel],
+      ['Solicitante', ordem?.solicitante],
+      ['Data da falha', ordem?.dataFalha],
+      ['Criado em', ordem?.createdAt],
+      ['Atualizado em', ordem?.updatedAt],
+      ['Tempo de parada', ordem?.tempoParada],
+      ['Tempo estimado', ordem?.tempoEstimado],
+      ['Custo estimado', ordem?.custoEstimado],
+      ['Impacto', ordem?.impacto],
+      ['Componente', ordem?.componente],
+      ['Parada', ordem?.parada],
+      ['Causa provavel', ordem?.causaProvavel],
+      ['Acao imediata', ordem?.acaoImediata],
+    ];
+
+    const linhasHtml = linhas
+      .filter(([, valor]) => valor !== undefined && valor !== null && String(valor).trim() !== '')
+      .map(
+        ([label, valor]) => `
+          <tr>
+            <th>${escapeHtmlRelatorio(label)}</th>
+            <td>${escapeHtmlRelatorio(
+              ['Data da falha', 'Criado em', 'Atualizado em'].includes(label)
+                ? formatDateTimeRelatorio(valor)
+                : valor
+            )}</td>
+          </tr>
+        `
+      )
+      .join('');
+
+    const descricaoHtml = ordem?.descricao
+      ? `<div class="section"><h2>Descricao</h2><div class="box">${escapeHtmlRelatorio(ordem.descricao)}</div></div>`
+      : '';
+
+    const sintomaHtml = ordem?.sintoma
+      ? `<div class="section"><h2>Sintoma</h2><div class="box">${escapeHtmlRelatorio(ordem.sintoma)}</div></div>`
+      : '';
+
+    const fotoHtml = ordem?.fotoUrl
+      ? `<div class="section"><h2>Foto</h2><img src="${escapeHtmlRelatorio(ordem.fotoUrl)}" alt="Foto da OS" /></div>`
+      : '';
+
+    const html = `
+      <!doctype html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Impressao OS</title>
+        <style>
+          * { box-sizing: border-box; }
+          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f1f5f9; }
+          h1 { font-size: 22px; margin: 0; }
+          h2 { font-size: 12px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
+          .page { padding: 28px; }
+          .header { background: linear-gradient(120deg, #0f172a, #1e293b); color: #f8fafc; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+          .brand { display: flex; align-items: center; gap: 12px; }
+          .brand img { height: 40px; width: auto; }
+          .brand small { display: block; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; }
+          .meta { font-size: 11px; color: #cbd5f5; }
+          .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+          .badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; letter-spacing: 0.08em; }
+          .badge-danger { background: #fecaca; color: #991b1b; }
+          .badge-warn { background: #fde68a; color: #92400e; }
+          .badge-info { background: #bae6fd; color: #075985; }
+          .badge-success { background: #bbf7d0; color: #166534; }
+          .badge-muted { background: #e2e8f0; color: #475569; }
+          .section { margin-top: 18px; }
+          .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+          .card { background: #ffffff; border-radius: 14px; padding: 12px 14px; border: 1px solid #e2e8f0; }
+          .card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #94a3b8; }
+          .card .value { margin-top: 6px; font-size: 12px; font-weight: 700; color: #0f172a; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; border-radius: 12px; overflow: hidden; }
+          th, td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+          th { width: 28%; background: #f8fafc; color: #475569; font-weight: 600; }
+          tr:last-child td, tr:last-child th { border-bottom: none; }
+          .box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; font-size: 11px; line-height: 1.5; white-space: pre-wrap; background: #fff; }
+          .photo { background: #fff; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; }
+          .photo img { max-width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; }
+          .footer { margin-top: 18px; font-size: 10px; color: #64748b; text-align: right; }
+          @media print {
+            body { background: #fff; }
+            .page { padding: 12mm; }
+            .header { border-radius: 12px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <div class="brand">
+              <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
+              <div>
+                <h1>Ordem de Servico</h1>
+                <small>Relatorio tecnico</small>
+              </div>
+            </div>
+            <div>
+              <div class="meta">Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+              <div class="badges" style="margin-top:6px;">
+                <span class="badge ${getBadgeTone(prioridade)}">Prioridade: ${escapeHtmlRelatorio(ordem?.prioridade || '-')}</span>
+                <span class="badge ${getBadgeTone(status)}">Status: ${escapeHtmlRelatorio(ordem?.status || '-')}</span>
+                <span class="badge ${getBadgeTone(statusMaquina)}">Maquina: ${escapeHtmlRelatorio(ordem?.statusMaquina || '-')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <div class="label">OS</div>
+              <div class="value">${escapeHtmlRelatorio(ordem?.id || '-')}</div>
+            </div>
+            <div class="card">
+              <div class="label">Ativo</div>
+              <div class="value">${escapeHtmlRelatorio(ordem?.ativo || '-')}</div>
+            </div>
+            <div class="card">
+              <div class="label">Setor / Processo</div>
+              <div class="value">${escapeHtmlRelatorio(`${ordem?.setor || '-'} • ${ordem?.processo || '-'}`)}</div>
+            </div>
+            <div class="card">
+              <div class="label">Responsavel</div>
+              <div class="value">${escapeHtmlRelatorio(ordem?.responsavel || '-')}</div>
+            </div>
+            <div class="card">
+              <div class="label">Solicitante</div>
+              <div class="value">${escapeHtmlRelatorio(ordem?.solicitante || '-')}</div>
+            </div>
+            <div class="card">
+              <div class="label">Data da falha</div>
+              <div class="value">${escapeHtmlRelatorio(formatDateTimeRelatorio(ordem?.dataFalha))}</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Detalhes da OS</h2>
+            <table>
+              <tbody>
+                ${linhasHtml || '<tr><td colspan="2">Sem dados disponiveis.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          ${sintomaHtml}
+          ${descricaoHtml}
+          ${fotoHtml ? `<div class="section">${fotoHtml.replace('<div class="section">', '').replace('</div>', '')}</div>` : ''}
+          <div class="footer">Metalosa · Manutencao</div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    printHtmlRelatorio(html);
+  };
+
   const handleExportarManutencaoPdf = () => {
     const now = new Date();
-    const formatDateTime = (value) => {
-      if (!value) return '-';
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return String(value);
-      return date.toLocaleString('pt-BR');
-    };
-    const escapeHtml = (value) =>
-      String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-
-    const formatDateOnly = (value) => {
-      if (!value) return '-';
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return String(value);
-      return date.toLocaleDateString('pt-BR');
-    };
 
     const parseNumber = (value) => {
       if (value === null || value === undefined) return 0;
@@ -900,9 +1121,9 @@ export default function App() {
       .filter(Boolean)
       .sort((a, b) => a - b);
 
-    const periodoInicio = createdDates.length ? formatDateOnly(createdDates[0]) : '-';
+    const periodoInicio = createdDates.length ? formatDateOnlyRelatorio(createdDates[0]) : '-';
     const periodoFim = createdDates.length
-      ? formatDateOnly(createdDates[createdDates.length - 1])
+      ? formatDateOnlyRelatorio(createdDates[createdDates.length - 1])
       : '-';
 
     const kpisResumo = [
@@ -916,8 +1137,8 @@ export default function App() {
       .map(
         (kpi) => `
           <div class="kpi">
-            <div class="kpi-label">${escapeHtml(kpi.label)}</div>
-            <div class="kpi-value">${escapeHtml(kpi.value)}</div>
+            <div class="kpi-label">${escapeHtmlRelatorio(kpi.label)}</div>
+            <div class="kpi-value">${escapeHtmlRelatorio(kpi.value)}</div>
           </div>
         `
       )
@@ -934,7 +1155,7 @@ export default function App() {
         .map(
           ([label, value]) => `
             <tr>
-              <td>${escapeHtml(label)}</td>
+              <td>${escapeHtmlRelatorio(label)}</td>
               <td>${value}</td>
             </tr>
           `
@@ -963,22 +1184,22 @@ export default function App() {
     const ordensHtml = manutencaoOrdensLoading
       ? `<tr><td colspan="9" class="muted">Dados em carregamento.</td></tr>`
       : manutencaoOrdensError
-        ? `<tr><td colspan="9" class="muted">${escapeHtml(manutencaoOrdensError)}</td></tr>`
+        ? `<tr><td colspan="9" class="muted">${escapeHtmlRelatorio(manutencaoOrdensError)}</td></tr>`
         : ordensOrdenadas.length
           ? ordensOrdenadas
               .map(
                 (os) => `
                   <tr>
-                    <td>${escapeHtml(os.id || '-')}</td>
-                    <td>${escapeHtml(os.ativo || '-')}</td>
-                    <td>${escapeHtml(os.setor || '-')}</td>
-                    <td>${escapeHtml(os.processo || '-')}</td>
-                    <td>${escapeHtml(os.prioridade || '-')}</td>
-                    <td>${escapeHtml(os.tipo || '-')}</td>
-                    <td>${escapeHtml(os.status || '-')}</td>
-                    <td>${escapeHtml(os.statusMaquina || '-')}</td>
-                    <td>${escapeHtml(os.responsavel || '-')}</td>
-                    <td>${escapeHtml(formatDateTime(os.createdAt || os.dataFalha))}</td>
+                    <td>${escapeHtmlRelatorio(os.id || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.ativo || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.setor || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.processo || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.prioridade || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.tipo || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.status || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.statusMaquina || '-')}</td>
+                    <td>${escapeHtmlRelatorio(os.responsavel || '-')}</td>
+                    <td>${escapeHtmlRelatorio(formatDateTimeRelatorio(os.createdAt || os.dataFalha))}</td>
                   </tr>
                 `
               )
@@ -991,12 +1212,12 @@ export default function App() {
           .map(
             (os) => `
               <tr>
-                <td>${escapeHtml(os.id || '-')}</td>
-                <td>${escapeHtml(os.ativo || '-')}</td>
-                <td>${escapeHtml(os.setor || '-')}</td>
-                <td>${escapeHtml(os.prioridade || '-')}</td>
-                <td>${escapeHtml(os.status || '-')}</td>
-                <td>${escapeHtml(os.responsavel || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.id || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.ativo || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.setor || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.prioridade || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.status || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.responsavel || '-')}</td>
               </tr>
             `
           )
@@ -1038,9 +1259,9 @@ export default function App() {
       </head>
       <body>
         <h1>Relatorio de Manutencao</h1>
-        <p class="meta">Gerado em ${escapeHtml(formatDateTime(now))}</p>
-        <p class="meta">Total de OS: ${escapeHtml(manutencaoOrdens.length)}</p>
-        <p class="meta">Periodo considerado: ${escapeHtml(periodoInicio)} a ${escapeHtml(periodoFim)}</p>
+        <p class="meta">Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</p>
+        <p class="meta">Total de OS: ${escapeHtmlRelatorio(manutencaoOrdens.length)}</p>
+        <p class="meta">Periodo considerado: ${escapeHtmlRelatorio(periodoInicio)} a ${escapeHtmlRelatorio(periodoFim)}</p>
 
         <div class="section">
           <h2>Indicadores</h2>
@@ -1167,42 +1388,7 @@ export default function App() {
       </body>
       </html>
     `;
-
-    const existing = document.getElementById('manutencao-print-frame');
-    if (existing) {
-      existing.remove();
-    }
-
-    const iframe = document.createElement('iframe');
-    iframe.id = 'manutencao-print-frame';
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    iframe.style.visibility = 'hidden';
-    document.body.appendChild(iframe);
-
-    const frameDoc = iframe.contentWindow?.document;
-    if (!frameDoc) {
-      alert('Nao foi possivel preparar o PDF.');
-      return;
-    }
-
-    frameDoc.open();
-    frameDoc.write(html);
-    frameDoc.close();
-
-    iframe.onload = () => {
-      const frameWindow = iframe.contentWindow;
-      if (!frameWindow) return;
-      frameWindow.focus();
-      frameWindow.print();
-      setTimeout(() => {
-        iframe.remove();
-      }, 1000);
-    };
+    printHtmlRelatorio(html);
   };
 
   useEffect(() => {
@@ -8082,6 +8268,13 @@ const custoDetalheTitulo = custoDetalheItem
                                     className="text-xs font-bold text-cyan-200 hover:text-white"
                                   >
                                     Editar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleImprimirOs(ordem)}
+                                    className="ml-3 text-xs font-bold text-slate-300 hover:text-white"
+                                  >
+                                    Imprimir
                                   </button>
                                 </td>
                               </tr>
