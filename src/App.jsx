@@ -821,6 +821,390 @@ export default function App() {
     [manutencaoOrdens]
   );
 
+  const handleExportarManutencaoPdf = () => {
+    const now = new Date();
+    const formatDateTime = (value) => {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleString('pt-BR');
+    };
+    const escapeHtml = (value) =>
+      String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const formatDateOnly = (value) => {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleDateString('pt-BR');
+    };
+
+    const parseNumber = (value) => {
+      if (value === null || value === undefined) return 0;
+      const cleaned = String(value)
+        .replace(/\./g, '')
+        .replace(',', '.')
+        .replace(/[^0-9.-]/g, '');
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const formatCurrency = (value) =>
+      `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+    const formatTempo = (value) => {
+      if (!Number.isFinite(value)) return '-';
+      if (value <= 0) return '-';
+      return `${Math.round(value)} min`;
+    };
+
+    const ordensOrdenadas = [...manutencaoOrdens].sort((a, b) =>
+      String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
+    );
+
+    const countBy = (items, getter) => {
+      const map = {};
+      items.forEach((item) => {
+        const key = String(getter(item) || 'Nao informado');
+        map[key] = (map[key] || 0) + 1;
+      });
+      return map;
+    };
+
+    const sumBy = (items, getter) =>
+      items.reduce((acc, item) => acc + getter(item), 0);
+
+    const statusCounts = countBy(manutencaoOrdens, (os) => os.status);
+    const prioridadeCounts = countBy(manutencaoOrdens, (os) => os.prioridade);
+    const tipoCounts = countBy(manutencaoOrdens, (os) => os.tipo);
+    const setorCounts = countBy(manutencaoOrdens, (os) => os.setor);
+    const responsavelCounts = countBy(manutencaoOrdens, (os) => os.responsavel);
+    const ativoCounts = countBy(manutencaoOrdens, (os) => os.ativo);
+
+    const totalCustoEstimado = sumBy(manutencaoOrdens, (os) => parseNumber(os.custoEstimado));
+    const totalTempoParada = sumBy(manutencaoOrdens, (os) => parseNumber(os.tempoParada));
+    const mediaTempoParada =
+      manutencaoOrdens.length > 0 ? totalTempoParada / manutencaoOrdens.length : 0;
+
+    const createdDates = manutencaoOrdens
+      .map((os) => os.createdAt || os.dataFalha)
+      .map((value) => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+
+    const periodoInicio = createdDates.length ? formatDateOnly(createdDates[0]) : '-';
+    const periodoFim = createdDates.length
+      ? formatDateOnly(createdDates[createdDates.length - 1])
+      : '-';
+
+    const kpisResumo = [
+      ...manutencaoKpis.map((kpi) => ({ label: kpi.label, value: kpi.value })),
+      { label: 'Paradas', value: manutencaoParadas.length },
+      { label: 'Custo estimado total', value: formatCurrency(totalCustoEstimado) },
+      { label: 'Tempo parada medio', value: formatTempo(mediaTempoParada) },
+    ];
+
+    const kpisHtml = kpisResumo
+      .map(
+        (kpi) => `
+          <div class="kpi">
+            <div class="kpi-label">${escapeHtml(kpi.label)}</div>
+            <div class="kpi-value">${escapeHtml(kpi.value)}</div>
+          </div>
+        `
+      )
+      .join('');
+
+    const mapToRows = (map, limit = 8) => {
+      const rows = Object.entries(map)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit);
+      if (!rows.length) {
+        return `<tr><td colspan="2" class="muted">Sem dados.</td></tr>`;
+      }
+      return rows
+        .map(
+          ([label, value]) => `
+            <tr>
+              <td>${escapeHtml(label)}</td>
+              <td>${value}</td>
+            </tr>
+          `
+        )
+        .join('');
+    };
+
+    const pendencias = ordensOrdenadas.filter((os) => os.status !== 'Finalizada');
+
+    const paradasHtml = manutencaoParadas.length
+      ? manutencaoParadas
+          .map(
+            (os) => `
+              <tr>
+                <td>${escapeHtml(os.ativo || '-')}</td>
+                <td>${escapeHtml(os.setor || '-')}</td>
+                <td>${escapeHtml(os.processo || '-')}</td>
+                <td>${escapeHtml(os.statusMaquina || '-')}</td>
+                <td>${escapeHtml(os.prioridade || '-')}</td>
+              </tr>
+            `
+          )
+          .join('')
+      : `<tr><td colspan="5" class="muted">Sem paradas registradas.</td></tr>`;
+
+    const ordensHtml = manutencaoOrdensLoading
+      ? `<tr><td colspan="9" class="muted">Dados em carregamento.</td></tr>`
+      : manutencaoOrdensError
+        ? `<tr><td colspan="9" class="muted">${escapeHtml(manutencaoOrdensError)}</td></tr>`
+        : ordensOrdenadas.length
+          ? ordensOrdenadas
+              .map(
+                (os) => `
+                  <tr>
+                    <td>${escapeHtml(os.id || '-')}</td>
+                    <td>${escapeHtml(os.ativo || '-')}</td>
+                    <td>${escapeHtml(os.setor || '-')}</td>
+                    <td>${escapeHtml(os.processo || '-')}</td>
+                    <td>${escapeHtml(os.prioridade || '-')}</td>
+                    <td>${escapeHtml(os.tipo || '-')}</td>
+                    <td>${escapeHtml(os.status || '-')}</td>
+                    <td>${escapeHtml(os.statusMaquina || '-')}</td>
+                    <td>${escapeHtml(os.responsavel || '-')}</td>
+                    <td>${escapeHtml(formatDateTime(os.createdAt || os.dataFalha))}</td>
+                  </tr>
+                `
+              )
+              .join('')
+          : `<tr><td colspan="9" class="muted">Nenhuma OS cadastrada.</td></tr>`;
+
+    const pendenciasHtml = pendencias.length
+      ? pendencias
+          .slice(0, 25)
+          .map(
+            (os) => `
+              <tr>
+                <td>${escapeHtml(os.id || '-')}</td>
+                <td>${escapeHtml(os.ativo || '-')}</td>
+                <td>${escapeHtml(os.setor || '-')}</td>
+                <td>${escapeHtml(os.prioridade || '-')}</td>
+                <td>${escapeHtml(os.status || '-')}</td>
+                <td>${escapeHtml(os.responsavel || '-')}</td>
+              </tr>
+            `
+          )
+          .join('')
+      : `<tr><td colspan="6" class="muted">Nenhuma pendencia encontrada.</td></tr>`;
+
+    const html = `
+      <!doctype html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Relatorio de Manutencao</title>
+        <style>
+          * { box-sizing: border-box; }
+          body { font-family: Arial, Helvetica, sans-serif; margin: 24px; color: #0f172a; }
+          h1 { font-size: 20px; margin: 0 0 4px; }
+          h2 { font-size: 14px; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; }
+          p { margin: 0; }
+          .meta { font-size: 12px; color: #475569; }
+          .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+          .kpi { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; background: #f8fafc; }
+          .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; }
+          .kpi-value { font-size: 18px; font-weight: 700; margin-top: 6px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
+          th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+          th { background: #0f172a; color: #f8fafc; font-weight: 600; }
+          .muted { color: #94a3b8; text-align: center; }
+          .section { margin-top: 20px; }
+          .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+          .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #ffffff; }
+          .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; margin-bottom: 6px; }
+          .note { font-size: 10px; color: #64748b; margin-top: 6px; }
+          @media print {
+            body { margin: 12mm; }
+            .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Relatorio de Manutencao</h1>
+        <p class="meta">Gerado em ${escapeHtml(formatDateTime(now))}</p>
+        <p class="meta">Total de OS: ${escapeHtml(manutencaoOrdens.length)}</p>
+        <p class="meta">Periodo considerado: ${escapeHtml(periodoInicio)} a ${escapeHtml(periodoFim)}</p>
+
+        <div class="section">
+          <h2>Indicadores</h2>
+          <div class="kpis">
+            ${kpisHtml}
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Distribuicoes</h2>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Status das OS</div>
+              <table>
+                <tbody>
+                  ${mapToRows(statusCounts)}
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">Prioridade</div>
+              <table>
+                <tbody>
+                  ${mapToRows(prioridadeCounts)}
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">Tipo</div>
+              <table>
+                <tbody>
+                  ${mapToRows(tipoCounts)}
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">Setores</div>
+              <table>
+                <tbody>
+                  ${mapToRows(setorCounts)}
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">Responsaveis</div>
+              <table>
+                <tbody>
+                  ${mapToRows(responsavelCounts)}
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">Ativos mais acionados</div>
+              <table>
+                <tbody>
+                  ${mapToRows(ativoCounts)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="note">Listas exibem os 8 primeiros itens de cada grupo.</div>
+        </div>
+
+        <div class="section">
+          <h2>Paradas em andamento</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Ativo</th>
+                <th>Setor</th>
+                <th>Processo</th>
+                <th>Status Maquina</th>
+                <th>Prioridade</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${paradasHtml}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <h2>Pendencias (OS nao finalizadas)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ativo</th>
+                <th>Setor</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>Responsavel</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pendenciasHtml}
+            </tbody>
+          </table>
+          <div class="note">Exibindo ate 25 pendencias mais recentes.</div>
+        </div>
+
+        <div class="section">
+          <h2>Ordens de servico</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ativo</th>
+                <th>Setor</th>
+                <th>Processo</th>
+                <th>Prioridade</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Status maquina</th>
+                <th>Responsavel</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ordensHtml}
+            </tbody>
+          </table>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const existing = document.getElementById('manutencao-print-frame');
+    if (existing) {
+      existing.remove();
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'manutencao-print-frame';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+
+    const frameDoc = iframe.contentWindow?.document;
+    if (!frameDoc) {
+      alert('Nao foi possivel preparar o PDF.');
+      return;
+    }
+
+    frameDoc.open();
+    frameDoc.write(html);
+    frameDoc.close();
+
+    iframe.onload = () => {
+      const frameWindow = iframe.contentWindow;
+      if (!frameWindow) return;
+      frameWindow.focus();
+      frameWindow.print();
+      setTimeout(() => {
+        iframe.remove();
+      }, 1000);
+    };
+  };
+
   useEffect(() => {
     if (isManutencaoOnly && abaAtiva !== 'manutencao') {
       setAbaAtiva('manutencao');
@@ -7523,7 +7907,12 @@ const custoDetalheTitulo = custoDetalheItem
                       >
                         Nova OS
                       </button>
-                      <button className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white">Exportar</button>
+                      <button
+                        onClick={handleExportarManutencaoPdf}
+                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                      >
+                        Exportar
+                      </button>
                       <button
                         type="button"
                         onClick={handleLogout}
