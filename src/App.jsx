@@ -515,6 +515,7 @@ export default function App() {
   const [subAbaFaturamento, setSubAbaFaturamento] = useState('atual');
   const [subAbaManutencao, setSubAbaManutencao] = useState('resumo');
   const [dashboardView, setDashboardView] = useState('faturamento');
+  const [dashboardFilialIndex, setDashboardFilialIndex] = useState(0);
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
   const [filtroCfops2025, setFiltroCfops2025] = useState([]);
   const [filtroFilial, setFiltroFilial] = useState('08');
@@ -3732,6 +3733,318 @@ export default function App() {
     };
   }, [faturamentoLinhas, filtroFilial, filtroCfops]);
 
+  const dashboardFaturamentoBase = useMemo(() => {
+    const produtosPorCodigo = new Map(
+      (produtosData || []).map((produto) => [
+        normalizarCodigoProduto(produto.codigo),
+        produto.descricao || '',
+      ])
+    );
+    const municipiosPorChave = new Map(
+      (municipiosLatLong || []).map((item) => {
+        const chave = `${normalizarTexto(item.nome)}||${String(item.uf || '').toUpperCase()}`;
+        return [
+          chave,
+          {
+            nome: item.nome,
+            uf: String(item.uf || '').toUpperCase(),
+            lat: item.latitude,
+            lng: item.longitude,
+          },
+        ];
+      })
+    );
+    const clientesPorCodigo = new Map(
+      (clientesData?.clientes || []).map((cliente) => [
+        normalizarCodigoCliente(cliente.Codigo),
+        {
+          nome: cliente.Nome || '',
+          estado: cliente.Estado || '',
+          municipio: cliente.Municipio || '',
+        },
+      ])
+    );
+
+    if (!faturamentoLinhas.length) {
+      return {
+        linhasMes: [],
+        filiais: [],
+        mes: '',
+        produtosPorCodigo,
+        municipiosPorChave,
+        clientesPorCodigo,
+      };
+    }
+
+    const normalizadas = faturamentoLinhas.map((row) => {
+      const mesInfo = obterMesKey(row);
+      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      return {
+        cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
+        grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
+        codigo: row?.Codigo ?? row?.codigo ?? '',
+        descricao: row?.Descricao ?? row?.descricao ?? '',
+        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        unidade: row?.Unidade ?? row?.unidade ?? '',
+        nf: obterNumeroNota(row),
+        quantidade: obterQuantidadeLiquida(row),
+        valorUnitario: parseValor(row?.ValorUnitario ?? row?.valorUnitario),
+        valorTotal: obterValorLiquido(row),
+        emissao: parseEmissaoData(row?.Emissao ?? row?.emissao),
+        mesKey: mesInfo?.key,
+        mesDisplay: mesInfo?.display,
+        tipoMovimento,
+        cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
+      };
+    });
+
+    const mesKeys = normalizadas
+      .map((row) => row.mesKey)
+      .filter(Boolean)
+      .sort();
+    const mesAtual = mesKeys.length ? mesKeys[mesKeys.length - 1] : null;
+    const mesAtualDisplay =
+      normalizadas.find((row) => row.mesKey === mesAtual)?.mesDisplay || '';
+
+    const linhasMes = mesAtual
+      ? normalizadas.filter((row) => row.mesKey === mesAtual)
+      : normalizadas;
+
+    const filiais = Array.from(
+      new Set(linhasMes.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
+    ).sort((a, b) => String(a).localeCompare(String(b)));
+
+    return {
+      linhasMes,
+      filiais,
+      mes: mesAtualDisplay,
+      produtosPorCodigo,
+      municipiosPorChave,
+      clientesPorCodigo,
+    };
+  }, [faturamentoLinhas, produtosData, municipiosLatLong, clientesData]);
+
+  const dashboardFiliais = dashboardFaturamentoBase.filiais;
+  const dashboardFilialAtual =
+    dashboardFiliais.length > 0
+      ? dashboardFiliais[Math.min(dashboardFilialIndex, dashboardFiliais.length - 1)]
+      : null;
+
+  useEffect(() => {
+    setDashboardFilialIndex(0);
+  }, [dashboardFiliais.length]);
+
+  useEffect(() => {
+    if (
+      abaAtiva !== 'dashboard-tv' ||
+      dashboardView !== 'faturamento' ||
+      dashboardFiliais.length < 2
+    ) {
+      return undefined;
+    }
+    const timer = setInterval(() => {
+      setDashboardFilialIndex((prev) => (prev + 1) % dashboardFiliais.length);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [abaAtiva, dashboardView, dashboardFiliais.length]);
+
+  const dashboardFaturamentoFilial = useMemo(() => {
+    const { linhasMes, clientesPorCodigo, produtosPorCodigo, municipiosPorChave } = dashboardFaturamentoBase;
+    const linhasBase = dashboardFilialAtual
+      ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
+      : linhasMes;
+    const linhasFiltradas =
+      filtroCfops.length === 0
+        ? linhasBase
+        : linhasBase.filter((row) => {
+            if (row.tipoMovimento === 'devolucao') return true;
+            const cfop = String(row.cfop || '').trim();
+            return cfop ? filtroCfops.includes(cfop) : false;
+          });
+
+    if (!linhasFiltradas.length) {
+      return {
+        total: 0,
+        totalDevolucao: 0,
+        movimentos: 0,
+        ticketMedio: 0,
+        diasAtivos: 0,
+        clientesAtivos: 0,
+        porDia: [],
+        topClientes: [],
+        topProdutos: [],
+        topEstados: [],
+        topMunicipios: [],
+        municipiosMapa: [],
+      };
+    }
+
+    const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
+    const totalDevolucao = linhasFiltradas
+      .filter((row) => row.tipoMovimento === 'devolucao')
+      .reduce((acc, row) => acc + Math.abs(row.valorTotal), 0);
+
+    const clientesMap = new Map();
+    const produtosMap = new Map();
+    const diaMap = new Map();
+    const estadoMap = new Map();
+    const municipioMap = new Map();
+    const municipioClientesMap = new Map();
+
+    linhasFiltradas.forEach((row) => {
+      const codigoCliente = normalizarCodigoCliente(row.cliente);
+      const chaveCliente = codigoCliente || String(row.cliente || 'Sem cliente');
+      clientesMap.set(chaveCliente, (clientesMap.get(chaveCliente) || 0) + row.valorTotal);
+      const infoCliente = clientesPorCodigo.get(chaveCliente);
+      if (infoCliente?.estado) {
+        estadoMap.set(infoCliente.estado, (estadoMap.get(infoCliente.estado) || 0) + row.valorTotal);
+      }
+      if (infoCliente?.municipio) {
+        const municipioKey = `${normalizarTexto(infoCliente.municipio)}||${String(infoCliente.estado || '').toUpperCase()}`;
+        if (!municipioMap.has(municipioKey)) {
+          municipioMap.set(municipioKey, {
+            municipio: infoCliente.municipio,
+            uf: String(infoCliente.estado || '').toUpperCase(),
+            valor: 0,
+          });
+        }
+        municipioMap.get(municipioKey).valor += row.valorTotal;
+        if (!municipioClientesMap.has(municipioKey)) {
+          municipioClientesMap.set(municipioKey, new Map());
+        }
+        const clientesLocal = municipioClientesMap.get(municipioKey);
+        clientesLocal.set(chaveCliente, (clientesLocal.get(chaveCliente) || 0) + row.valorTotal);
+      }
+
+      const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
+      if (!produtosMap.has(chaveProd)) {
+        produtosMap.set(chaveProd, { valor: 0, quantidade: 0, unidades: new Map() });
+      }
+      const prod = produtosMap.get(chaveProd);
+      prod.valor += row.valorTotal;
+      const qtd = Number.isFinite(row.quantidade) ? row.quantidade : 0;
+      prod.quantidade += qtd;
+      const unidadeKey = String(row.unidade || 'N/A');
+      prod.unidades.set(unidadeKey, (prod.unidades.get(unidadeKey) || 0) + (qtd || 1));
+
+      if (row.emissao) {
+        const diaISO = row.emissao.toISOString().slice(0, 10);
+        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + row.valorTotal);
+      }
+    });
+
+    const porDia = Array.from(diaMap.entries())
+      .map(([dia, valor]) => ({ dia, valor }))
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+
+    const topClientes = Array.from(clientesMap.entries())
+      .map(([cliente, valor]) => ({
+        cliente,
+        valor,
+        info: clientesPorCodigo.get(cliente) || null,
+      }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const topProdutos = Array.from(produtosMap.entries())
+      .map(([chave, dados]) => {
+        const [codigo, descricao] = chave.split('||');
+        const codigoNorm = normalizarCodigoProduto(codigo);
+        const descricaoFinal = descricao || produtosPorCodigo.get(codigoNorm) || '';
+        let unidadePrincipal = '';
+        let unidadeQtd = 0;
+        dados.unidades.forEach((valor, unidade) => {
+          if (valor > unidadeQtd) {
+            unidadeQtd = valor;
+            unidadePrincipal = unidade;
+          }
+        });
+        return {
+          codigo,
+          descricao: descricaoFinal,
+          valor: dados.valor,
+          quantidade: dados.quantidade,
+          precoMedio: dados.quantidade > 0 ? dados.valor / dados.quantidade : 0,
+          unidade: unidadePrincipal,
+        };
+      })
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 8);
+
+    const topEstados = Array.from(estadoMap.entries())
+      .map(([estado, valor]) => ({ estado, valor }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const topMunicipios = Array.from(municipioMap.values())
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 6);
+
+    const municipiosMapa = Array.from(municipioMap.entries())
+      .map(([chave, item]) => {
+        const info = municipiosPorChave.get(chave);
+        if (!info) return null;
+        const clientesLocais = Array.from((municipioClientesMap.get(chave) || new Map()).entries())
+          .map(([cliente, valor]) => ({
+            cliente,
+            nome: clientesPorCodigo.get(cliente)?.nome || cliente,
+            valor,
+          }))
+          .sort((a, b) => b.valor - a.valor)
+          .slice(0, 10);
+        return {
+          municipio: info.nome,
+          uf: info.uf,
+          valor: item.valor,
+          lat: info.lat,
+          lng: info.lng,
+          topClientes: clientesLocais,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 25);
+
+    const movimentos = linhasFiltradas.length;
+    const clientesAtivos = clientesMap.size;
+    const ticketMedio = movimentos > 0 ? total / movimentos : 0;
+    const diasAtivos = diaMap.size;
+
+    return {
+      total,
+      totalDevolucao,
+      movimentos,
+      ticketMedio,
+      diasAtivos,
+      clientesAtivos,
+      porDia,
+      topClientes,
+      topProdutos,
+      topEstados,
+      topMunicipios,
+      municipiosMapa,
+    };
+  }, [dashboardFaturamentoBase, dashboardFilialAtual, filtroCfops]);
+
+  const dashboardMunicipiosBounds = useMemo(() => {
+    if (dashboardFaturamentoFilial.municipiosMapa.length === 0) return null;
+    let minLat = 90;
+    let maxLat = -90;
+    let minLng = 180;
+    let maxLng = -180;
+    dashboardFaturamentoFilial.municipiosMapa.forEach((item) => {
+      minLat = Math.min(minLat, item.lat);
+      maxLat = Math.max(maxLat, item.lat);
+      minLng = Math.min(minLng, item.lng);
+      maxLng = Math.max(maxLng, item.lng);
+    });
+    if (minLat === 90) return null;
+    return [
+      [minLat, minLng],
+      [maxLat, maxLng],
+    ];
+  }, [dashboardFaturamentoFilial.municipiosMapa]);
+
   const detalhesDiaFaturamento = useMemo(() => {
     if (!diaFaturamentoSelecionado) return null;
     const produtosPorCodigo = new Map(
@@ -4617,6 +4930,67 @@ const custoDetalheTitulo = custoDetalheItem
     );
   };
 
+  const renderMapaMunicipioDados = (municipiosMapa, bounds, containerClass, options = {}) => {
+    const { zoomControl = false } = options;
+    if (!municipiosMapa.length) {
+      return <p className="text-xs text-slate-500 italic">Sem dados por municipio.</p>;
+    }
+    const maxValor = Math.max(...municipiosMapa.map((item) => item.valor), 1);
+
+    return (
+      <div className={containerClass}>
+        <MapContainer
+          className="map-base"
+          key={bounds ? bounds.flat().join(',') : 'brasil'}
+          center={[-14.235, -51.9253]}
+          zoom={5}
+          bounds={bounds || undefined}
+          boundsOptions={{ padding: [24, 24], maxZoom: 9 }}
+          zoomControl={zoomControl}
+          scrollWheelZoom={false}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          />
+          {municipiosMapa.map((item) => {
+            const escala = Math.sqrt(item.valor / maxValor);
+            const radius = 6 + Math.min(12, escala * 12);
+            const clientesBase = item.topClientes || [];
+            const clientesTooltip = clientesBase.slice(0, 10);
+            return (
+              <CircleMarker
+                key={`${item.municipio}-${item.uf}`}
+                center={[item.lat, item.lng]}
+                radius={radius}
+                pathOptions={{ color: '#22c55e', weight: 1, fillColor: '#22c55e', fillOpacity: 0.6 }}
+              >
+                <Tooltip direction="top" opacity={1} className="map-tooltip">
+                  <div className="text-[11px] font-semibold text-slate-100">
+                    {item.municipio} / {item.uf}
+                  </div>
+                  <div className="text-[10px] text-slate-200">
+                    Total: R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                  {clientesTooltip.length > 0 && (
+                    <div className="mt-2 text-[10px] leading-4 text-slate-300 max-w-[260px] cliente-list">
+                      {clientesTooltip.map((cliente, index) => (
+                        <div key={`${cliente.nome}-${index}`} className="cliente-item">
+                          {cliente.nome}: R$ {cliente.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Tooltip>
+              </CircleMarker>
+            );
+          })}
+        </MapContainer>
+      </div>
+    );
+  };
+
 
   if (authLoading) {
     return (
@@ -5462,8 +5836,8 @@ const custoDetalheTitulo = custoDetalheItem
       )}
 
       {/* Conteúdo Principal */}
-      <main className="flex-1 pb-24 md:pb-8 px-4 md:px-6">
-        {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && (
+      <main className={`flex-1 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
+        {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && abaAtiva !== 'dashboard-tv' && (
           <header className="w-full mb-8 flex justify-between items-end">
           <div>
             {abaAtiva !== 'custos' && (
@@ -6174,7 +6548,7 @@ const custoDetalheTitulo = custoDetalheItem
           {/* DASHBOARD TV */}
           {abaAtiva === 'dashboard-tv' && (
             <div className="space-y-8 animate-in slide-in-from-right duration-700">
-              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90 p-7 shadow-2xl">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90 p-5 shadow-2xl">
                 <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
                 <div className="absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
                 <div className="relative flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
@@ -6189,7 +6563,12 @@ const custoDetalheTitulo = custoDetalheItem
                       {agora.toLocaleDateString('pt-BR')}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    {dashboardView === 'faturamento' && dashboardFilialAtual && (
+                      <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+                        Filial {dashboardFilialAtual} · troca 10s
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => setDashboardView('faturamento')}
@@ -6217,39 +6596,58 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               {dashboardView === 'faturamento' ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mes</p>
-                      <p className="text-3xl font-black text-blue-300 mt-2">{formatarMoeda(faturamentoAtual.total || 0)}</p>
-                      <p className="text-xs text-slate-500 mt-2">{faturamentoAtual.movimentos || 0} movimentos</p>
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">
+                        CFOPs ({filtroCfops.length || 'Todos'})
+                      </span>
                     </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                    <div className="mt-2">
+                      <CfopFilterSelector
+                        selected={filtroCfops}
+                        onSelect={toggleCfopFilter}
+                        label="CFOPs"
+                        className="justify-start"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">
+                        Faturamento total {dashboardFilialAtual ? `· Filial ${dashboardFilialAtual}` : ''}
+                      </p>
+                      <p className="text-xl font-black text-blue-300 mt-2">
+                        {formatarMoeda(dashboardFaturamentoFilial.total || 0)}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-2">{dashboardFaturamentoFilial.movimentos || 0} movimentos</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
-                      <p className="text-3xl font-black text-amber-300 mt-2">{faturamentoAtual.diasAtivos || 0}</p>
-                      <p className="text-xs text-slate-500 mt-2">{faturamentoAtual.porDia?.length || 0} dias no grafico</p>
+                      <p className="text-xl font-black text-amber-300 mt-2">{dashboardFaturamentoFilial.diasAtivos || 0}</p>
+                      <p className="text-xs text-slate-500 mt-2">{dashboardFaturamentoFilial.porDia?.length || 0} dias no grafico</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
-                      <p className="text-3xl font-black text-emerald-300 mt-2">{formatarMoeda(faturamentoAtual.ticketMedio || 0)}</p>
+                      <p className="text-xl font-black text-emerald-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.ticketMedio || 0)}</p>
                       <p className="text-xs text-slate-500 mt-2">Por pedido</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Clientes ativos</p>
-                      <p className="text-3xl font-black text-slate-100 mt-2">{faturamentoAtual.clientesAtivos || 0}</p>
+                      <p className="text-xl font-black text-slate-100 mt-2">{dashboardFaturamentoFilial.clientesAtivos || 0}</p>
                       <p className="text-xs text-slate-500 mt-2">No mes</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Devolucoes</p>
-                      <p className="text-3xl font-black text-rose-300 mt-2">{formatarMoeda(faturamentoAtual.totalDevolucao || 0)}</p>
+                      <p className="text-xl font-black text-rose-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.totalDevolucao || 0)}</p>
                       <p className="text-xs text-slate-500 mt-2">Impacto no mes</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Media diaria</p>
-                      <p className="text-3xl font-black text-blue-200 mt-2">
+                      <p className="text-xl font-black text-blue-200 mt-2">
                         {formatarMoeda(
-                          faturamentoAtual.diasAtivos
-                            ? faturamentoAtual.total / faturamentoAtual.diasAtivos
+                          dashboardFaturamentoFilial.diasAtivos
+                            ? dashboardFaturamentoFilial.total / dashboardFaturamentoFilial.diasAtivos
                             : 0
                         )}
                       </p>
@@ -6257,32 +6655,94 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                   </div>
 
-                  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Top clientes</h3>
-                      <span className="text-xs text-slate-500">Top 6</span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {(faturamentoAtual.topClientes || []).slice(0, 6).map((item) => {
-                        const perc = faturamentoAtual.total > 0 ? (item.valor / faturamentoAtual.total) * 100 : 0;
-                        const nome = item.info?.nome || item.cliente;
-                        const local = [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ');
-                        return (
-                          <div key={item.cliente} className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                            <div className="flex items-center justify-between text-xs text-slate-300">
-                              <span className="font-semibold">{nome}</span>
-                              <span>{formatarValorCurto(item.valor)}</span>
-                            </div>
-                            <p className="text-[10px] text-slate-500 mt-1">{local || `Codigo: ${item.cliente}`}</p>
-                            <div className="mt-3 h-2 rounded-full bg-slate-800 overflow-hidden">
-                              <div className="h-full bg-emerald-400" style={{ width: `${Math.min(perc, 100)}%` }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                      {!(faturamentoAtual.topClientes || []).length && (
-                        <div className="text-xs text-slate-500 italic">Sem dados de clientes.</div>
+                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 xl:col-span-2">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Mapa por municipio</h3>
+                        <span className="text-xs text-slate-500">Distribuicao geografica</span>
+                      </div>
+                      {renderMapaMunicipioDados(
+                        dashboardFaturamentoFilial.municipiosMapa,
+                        dashboardMunicipiosBounds,
+                        'h-[520px] overflow-hidden rounded-2xl border border-slate-800',
+                        { zoomControl: false }
                       )}
+                    </div>
+                    <div className="space-y-3">
+                      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Faturamento diario</h3>
+                          <span className="text-xs text-slate-500">Ultimos 10 dias</span>
+                        </div>
+                        {(() => {
+                          const dados = (dashboardFaturamentoFilial.porDia || []).slice(-10);
+                          if (!dados.length) {
+                            return <p className="text-xs text-slate-500 italic">Sem dados no periodo.</p>;
+                          }
+                          const width = 520;
+                          const height = 220;
+                          const margin = { top: 24, right: 16, bottom: 30, left: 16 };
+                          const chartW = width - margin.left - margin.right;
+                          const chartH = height - margin.top - margin.bottom;
+                          const maxValor = Math.max(...dados.map((item) => item.valor), 1);
+                          const barW = chartW / Math.max(dados.length, 1);
+                          const barWidth = Math.max(barW - 12, 10);
+                          return (
+                            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-44">
+                              <defs>
+                                <linearGradient id="dashBar" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.95" />
+                                  <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.9" />
+                                </linearGradient>
+                              </defs>
+                              {dados.map((item, i) => {
+                                const barH = (item.valor / maxValor) * chartH;
+                                const x = margin.left + i * barW + (barW - barWidth) / 2;
+                                const y = margin.top + chartH - barH;
+                                return (
+                                  <g key={item.dia}>
+                                    <rect x={x} y={y} width={barWidth} height={barH} rx="6" fill="url(#dashBar)" />
+                                    <text
+                                      x={x + barWidth / 2}
+                                      y={margin.top + chartH + 18}
+                                      textAnchor="middle"
+                                      fontSize="11"
+                                      fill="#94a3b8"
+                                    >
+                                      {item.dia.slice(8)}
+                                    </text>
+                                  </g>
+                                );
+                              })}
+                            </svg>
+                          );
+                        })()}
+                      </div>
+                      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Top estados</h3>
+                          <span className="text-xs text-slate-500">Top 6</span>
+                        </div>
+                        <div className="space-y-3">
+                          {(dashboardFaturamentoFilial.topEstados || []).slice(0, 6).map((item) => {
+                            const perc = dashboardFaturamentoFilial.total > 0 ? (item.valor / dashboardFaturamentoFilial.total) * 100 : 0;
+                            return (
+                              <div key={item.estado} className="space-y-1">
+                                <div className="flex items-center justify-between text-xs text-slate-300">
+                                  <span className="font-semibold">{item.estado}</span>
+                                  <span>{perc.toFixed(1)}%</span>
+                                </div>
+                                <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                                  <div className="h-full bg-indigo-400" style={{ width: `${Math.min(perc, 100)}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {!(dashboardFaturamentoFilial.topEstados || []).length && (
+                            <p className="text-xs text-slate-500 italic">Sem dados por estado.</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
