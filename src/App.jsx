@@ -620,6 +620,7 @@ export default function App() {
     statusMaquina: 'Rodando',
     descricao: '',
     fotoUrl: '',
+    fechadaEm: '',
   };
   const [novaOsForm, setNovaOsForm] = useState(novaOsDefaults);
 
@@ -672,6 +673,15 @@ export default function App() {
       await uploadBytes(storageRef, novaOsFotoFile);
       fotoUrl = await getDownloadURL(storageRef);
     }
+    let statusMaquinaFinal = novaOsForm.statusMaquina;
+    let fechadaEmFinal =
+      novaOsForm.status === 'Finalizada'
+        ? novaOsForm.fechadaEm || new Date().toISOString()
+        : '';
+    if (novaOsForm.status === 'Finalizada') {
+      const liberada = window.confirm('A maquina foi liberada?');
+      statusMaquinaFinal = liberada ? 'Rodando' : 'Parada';
+    }
     const payload = {
       ativo: novaOsForm.ativo,
       setor: novaOsForm.setor,
@@ -691,11 +701,12 @@ export default function App() {
       tempoEstimado: novaOsForm.tempoEstimado,
       custoEstimado: novaOsForm.custoEstimado,
       status: novaOsForm.status,
-      statusMaquina: novaOsForm.statusMaquina,
+      statusMaquina: statusMaquinaFinal,
       descricao: novaOsForm.descricao,
       fotoUrl,
       responsavel: authUser?.displayName || authUser?.email || 'Usuario',
       createdAt: manutencaoEditId ? novaOsForm.createdAt : new Date().toISOString(),
+      fechadaEm: fechadaEmFinal,
       updatedAt: new Date().toISOString(),
     };
 
@@ -743,6 +754,7 @@ export default function App() {
       statusMaquina: ordem.statusMaquina || 'Rodando',
       descricao: ordem.descricao || '',
       fotoUrl: ordem.fotoUrl || '',
+      fechadaEm: ordem.fechadaEm || '',
       createdAt: ordem.createdAt || new Date().toISOString(),
     });
     setNovaOsFotoFile(null);
@@ -771,6 +783,10 @@ export default function App() {
     authUser?.email?.toLowerCase()?.endsWith('@metalosa.com.br');
   const isManutencaoOnly =
     authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+  const isManutencaoOperador = [
+    'manutencao@metalosa.com.br',
+    'pcp@metalosa.com.br',
+  ].includes(authUser?.email?.toLowerCase());
   const isPortfolioDisabled = true;
   const currentUserLabel = authUser?.displayName || authUser?.email || 'Usuario';
 
@@ -814,6 +830,8 @@ export default function App() {
   const manutencaoParadas = useMemo(
     () =>
       manutencaoOrdens.filter((os) =>
+        os.status !== 'Finalizada' &&
+        os.status !== 'Cancelada' &&
         ['Parada', 'Parada programada', 'Parada nao programada', 'Em manutencao'].includes(
           os.statusMaquina
         )
@@ -1075,13 +1093,94 @@ export default function App() {
       return Number.isFinite(parsed) ? parsed : 0;
     };
 
+    const parseTempoMin = (value) => {
+      if (value === null || value === undefined) return 0;
+      const raw = String(value).trim();
+      if (!raw) return 0;
+    if (raw.includes(':')) {
+      const parts = raw.split(':').map((part) => String(part || '').trim());
+      if (parts.length >= 2) {
+        const h = Number(parts[0].replace(',', '.'));
+        const m = Number(parts[1].replace(',', '.'));
+        const s = parts.length >= 3 ? Number(parts[2].replace(',', '.')) : 0;
+        if (Number.isFinite(h) && Number.isFinite(m) && Number.isFinite(s)) {
+          return Math.max(0, Math.round(h * 60 + m + s / 60));
+        }
+      }
+    }
+      const hMatch = raw.match(/(\d+(?:[.,]\d+)?)\s*h/i);
+      const mMatch = raw.match(/(\d+(?:[.,]\d+)?)\s*m/i);
+      if (hMatch || mMatch) {
+        const h = hMatch ? Number(hMatch[1].replace(',', '.')) : 0;
+        const m = mMatch ? Number(mMatch[1].replace(',', '.')) : 0;
+        if (Number.isFinite(h) || Number.isFinite(m)) {
+          return Math.max(
+            0,
+            Math.round((Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0))
+          );
+        }
+      }
+      return Math.max(0, Math.round(parseNumber(raw)));
+    };
+
+    const diffMin = (start, end) => {
+      const startDate = start ? new Date(start) : null;
+      const endDate = end ? new Date(end) : null;
+      if (!startDate || !endDate) return 0;
+      const ms = endDate.getTime() - startDate.getTime();
+      if (!Number.isFinite(ms) || ms <= 0) return 0;
+      return Math.round(ms / 60000);
+    };
+
+    const calcShiftMinutes = (start, end) => {
+      const startDate = start ? new Date(start) : null;
+      const endDate = end ? new Date(end) : null;
+      if (!startDate || !endDate) return 0;
+      if (endDate <= startDate) return 0;
+      let total = 0;
+      const cursor = new Date(startDate);
+      cursor.setHours(0, 0, 0, 0);
+      const last = new Date(endDate);
+      last.setHours(0, 0, 0, 0);
+      while (cursor <= last) {
+        const shiftStart = new Date(cursor);
+        shiftStart.setHours(7, 0, 0, 0);
+        const shiftEnd = new Date(cursor);
+        shiftEnd.setHours(17, 0, 0, 0);
+        const rangeStart = new Date(Math.max(shiftStart.getTime(), startDate.getTime()));
+        const rangeEnd = new Date(Math.min(shiftEnd.getTime(), endDate.getTime()));
+        if (rangeEnd > rangeStart) {
+          total += Math.round((rangeEnd.getTime() - rangeStart.getTime()) / 60000);
+        }
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return total;
+    };
+
+    const getTempoParadaMin = (os) => {
+      const informado = parseTempoMin(os?.tempoParada);
+      if (informado > 0) return informado;
+      if (String(os?.status || '').toLowerCase() !== 'finalizada') return 0;
+      return calcShiftMinutes(os?.dataFalha, os?.fechadaEm || os?.updatedAt);
+    };
+
+    const getTempoParadaTotalMin = (os) => {
+      if (String(os?.status || '').toLowerCase() !== 'finalizada') return 0;
+      return diffMin(os?.dataFalha, os?.fechadaEm || os?.updatedAt);
+    };
+
     const formatCurrency = (value) =>
       `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
     const formatTempo = (value) => {
       if (!Number.isFinite(value)) return '-';
       if (value <= 0) return '-';
-      return `${Math.round(value)} min`;
+      const total = Math.round(value);
+      const hours = Math.floor(total / 60);
+      const minutes = total % 60;
+      if (hours > 0 && minutes > 0) return `${hours}h ${minutes}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${minutes}m`;
     };
 
     const ordensOrdenadas = [...manutencaoOrdens].sort((a, b) =>
@@ -1106,11 +1205,24 @@ export default function App() {
     const setorCounts = countBy(manutencaoOrdens, (os) => os.setor);
     const responsavelCounts = countBy(manutencaoOrdens, (os) => os.responsavel);
     const ativoCounts = countBy(manutencaoOrdens, (os) => os.ativo);
+    const impactoCounts = countBy(manutencaoOrdens, (os) => os.impacto);
+    const paradaCounts = countBy(manutencaoOrdens, (os) => os.parada);
+    const categoriaCounts = countBy(manutencaoOrdens, (os) => os.categoria);
 
     const totalCustoEstimado = sumBy(manutencaoOrdens, (os) => parseNumber(os.custoEstimado));
-    const totalTempoParada = sumBy(manutencaoOrdens, (os) => parseNumber(os.tempoParada));
+    const totalTempoParadaTurno = sumBy(manutencaoOrdens, (os) => getTempoParadaMin(os));
+    const totalTempoParadaTotal = sumBy(manutencaoOrdens, (os) => getTempoParadaTotalMin(os));
     const mediaTempoParada =
-      manutencaoOrdens.length > 0 ? totalTempoParada / manutencaoOrdens.length : 0;
+      manutencaoOrdens.length > 0 ? totalTempoParadaTurno / manutencaoOrdens.length : 0;
+    const totalTempoEstimado = sumBy(manutencaoOrdens, (os) => parseTempoMin(os.tempoEstimado));
+    const mediaTempoEstimado =
+      manutencaoOrdens.length > 0 ? totalTempoEstimado / manutencaoOrdens.length : 0;
+    const totalFinalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
+    const taxaFinalizadas =
+      manutencaoOrdens.length > 0
+        ? `${Math.round((totalFinalizadas / manutencaoOrdens.length) * 100)}%`
+        : '-';
+    const comTempoParada = manutencaoOrdens.filter((os) => getTempoParadaMin(os) > 0).length;
 
     const createdDates = manutencaoOrdens
       .map((os) => os.createdAt || os.dataFalha)
@@ -1129,8 +1241,15 @@ export default function App() {
     const kpisResumo = [
       ...manutencaoKpis.map((kpi) => ({ label: kpi.label, value: kpi.value })),
       { label: 'Paradas', value: manutencaoParadas.length },
+      { label: 'OS com tempo parada', value: comTempoParada },
       { label: 'Custo estimado total', value: formatCurrency(totalCustoEstimado) },
+      { label: 'Tempo parada (turno 07-17)', value: formatTempo(totalTempoParadaTurno) },
+      { label: 'Tempo parada total (24h)', value: formatTempo(totalTempoParadaTotal) },
       { label: 'Tempo parada medio', value: formatTempo(mediaTempoParada) },
+      { label: 'Tempo estimado total', value: formatTempo(totalTempoEstimado) },
+      { label: 'Tempo estimado medio', value: formatTempo(mediaTempoEstimado) },
+      { label: 'OS finalizadas', value: totalFinalizadas },
+      { label: 'Taxa de finalizacao', value: taxaFinalizadas },
     ];
 
     const kpisHtml = kpisResumo
@@ -1163,28 +1282,31 @@ export default function App() {
         .join('');
     };
 
+
     const pendencias = ordensOrdenadas.filter((os) => os.status !== 'Finalizada');
+    const finalizadas = ordensOrdenadas.filter((os) => os.status === 'Finalizada');
 
     const paradasHtml = manutencaoParadas.length
       ? manutencaoParadas
           .map(
             (os) => `
               <tr>
-                <td>${escapeHtml(os.ativo || '-')}</td>
-                <td>${escapeHtml(os.setor || '-')}</td>
-                <td>${escapeHtml(os.processo || '-')}</td>
-                <td>${escapeHtml(os.statusMaquina || '-')}</td>
-                <td>${escapeHtml(os.prioridade || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.ativo || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.setor || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.processo || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.statusMaquina || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.prioridade || '-')}</td>
+                <td>${escapeHtmlRelatorio(formatTempo(getTempoParadaMin(os)))}</td>
               </tr>
             `
           )
           .join('')
-      : `<tr><td colspan="5" class="muted">Sem paradas registradas.</td></tr>`;
+      : `<tr><td colspan="6" class="muted">Sem paradas registradas.</td></tr>`;
 
     const ordensHtml = manutencaoOrdensLoading
-      ? `<tr><td colspan="9" class="muted">Dados em carregamento.</td></tr>`
+      ? `<tr><td colspan="11" class="muted">Dados em carregamento.</td></tr>`
       : manutencaoOrdensError
-        ? `<tr><td colspan="9" class="muted">${escapeHtmlRelatorio(manutencaoOrdensError)}</td></tr>`
+        ? `<tr><td colspan="11" class="muted">${escapeHtmlRelatorio(manutencaoOrdensError)}</td></tr>`
         : ordensOrdenadas.length
           ? ordensOrdenadas
               .map(
@@ -1199,12 +1321,13 @@ export default function App() {
                     <td>${escapeHtmlRelatorio(os.status || '-')}</td>
                     <td>${escapeHtmlRelatorio(os.statusMaquina || '-')}</td>
                     <td>${escapeHtmlRelatorio(os.responsavel || '-')}</td>
+                    <td>${escapeHtmlRelatorio(formatTempo(getTempoParadaMin(os)))}</td>
                     <td>${escapeHtmlRelatorio(formatDateTimeRelatorio(os.createdAt || os.dataFalha))}</td>
                   </tr>
                 `
               )
               .join('')
-          : `<tr><td colspan="9" class="muted">Nenhuma OS cadastrada.</td></tr>`;
+          : `<tr><td colspan="11" class="muted">Nenhuma OS cadastrada.</td></tr>`;
 
     const pendenciasHtml = pendencias.length
       ? pendencias
@@ -1224,6 +1347,29 @@ export default function App() {
           .join('')
       : `<tr><td colspan="6" class="muted">Nenhuma pendencia encontrada.</td></tr>`;
 
+    const finalizadasHtml = finalizadas.length
+      ? finalizadas
+          .slice(0, 25)
+          .map(
+            (os) => `
+              <tr>
+                <td>${escapeHtmlRelatorio(os.id || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.ativo || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.setor || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.prioridade || '-')}</td>
+                <td>${escapeHtmlRelatorio(os.responsavel || '-')}</td>
+                <td>${escapeHtmlRelatorio(formatTempo(getTempoParadaMin(os)))}</td>
+                <td>${escapeHtmlRelatorio(
+                  formatDateTimeRelatorio(
+                    os.fechadaEm || os.updatedAt || os.createdAt || os.dataFalha || now
+                  )
+                )}</td>
+              </tr>
+            `
+          )
+          .join('')
+      : `<tr><td colspan="7" class="muted">Nenhuma OS finalizada.</td></tr>`;
+
     const html = `
       <!doctype html>
       <html lang="pt-BR">
@@ -1232,52 +1378,230 @@ export default function App() {
         <title>Relatorio de Manutencao</title>
         <style>
           * { box-sizing: border-box; }
-          body { font-family: Arial, Helvetica, sans-serif; margin: 24px; color: #0f172a; }
-          h1 { font-size: 20px; margin: 0 0 4px; }
-          h2 { font-size: 14px; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; }
+          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #111827; background: #ffffff; }
           p { margin: 0; }
-          .meta { font-size: 12px; color: #475569; }
-          .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
-          .kpi { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; background: #f8fafc; }
-          .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; }
-          .kpi-value { font-size: 18px; font-weight: 700; margin-top: 6px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
-          th, td { padding: 8px; border: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
-          th { background: #0f172a; color: #f8fafc; font-weight: 600; }
-          .muted { color: #94a3b8; text-align: center; }
-          .section { margin-top: 20px; }
-          .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-          .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #ffffff; }
-          .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; margin-bottom: 6px; }
-          .note { font-size: 10px; color: #64748b; margin-top: 6px; }
+          .page { max-width: 1100px; margin: 18px auto; background: #ffffff; border: 1px solid #e5e7eb; padding: 20px 22px; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+          .brand { display: flex; align-items: center; gap: 10px; }
+          .brand img { width: 40px; height: 40px; object-fit: contain; }
+          .title { font-size: 18px; font-weight: 700; letter-spacing: 0.01em; }
+          .subtitle { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.16em; margin-top: 2px; }
+          .meta-block { display: grid; gap: 4px; font-size: 11px; color: #374151; text-align: right; }
+          .meta-block span { color: #9ca3af; }
+          h2 { font-size: 11px; margin: 18px 0 6px; text-transform: uppercase; letter-spacing: 0.16em; color: #4b5563; }
+          table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+          th, td { padding: 7px 8px; border: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
+          th { background: #f3f4f6; color: #111827; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+          tbody tr:nth-child(even) { background: #fafafa; }
+          .muted { color: #9ca3af; text-align: center; }
+          .section { margin-top: 14px; }
+          .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+          .note { font-size: 10px; color: #6b7280; margin-top: 6px; }
           @media print {
-            body { margin: 12mm; }
-            .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            body { background: #ffffff; }
+            .page { margin: 0; border: none; }
             th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
         </style>
       </head>
       <body>
-        <h1>Relatorio de Manutencao</h1>
-        <p class="meta">Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</p>
-        <p class="meta">Total de OS: ${escapeHtmlRelatorio(manutencaoOrdens.length)}</p>
-        <p class="meta">Periodo considerado: ${escapeHtmlRelatorio(periodoInicio)} a ${escapeHtmlRelatorio(periodoFim)}</p>
-
-        <div class="section">
-          <h2>Indicadores</h2>
-          <div class="kpis">
-            ${kpisHtml}
+        <div class="page">
+          <div class="header">
+            <div class="brand">
+              <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
+              <div>
+                <div class="title">Relatorio de Manutencao</div>
+                <div class="subtitle">Metalosa</div>
+              </div>
+            </div>
+            <div class="meta-block">
+              <div><span>Gerado em:</span> ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+              <div><span>Periodo:</span> ${escapeHtmlRelatorio(periodoInicio)} a ${escapeHtmlRelatorio(periodoFim)}</div>
+            </div>
           </div>
-        </div>
 
-        <div class="section">
-          <h2>Distribuicoes</h2>
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-title">Status das OS</div>
-              <table>
-                <tbody>
-                  ${mapToRows(statusCounts)}
+          <div class="section">
+            <h2>Resumo</h2>
+            <table>
+              <tbody>
+                <tr>
+                  <th>Total de OS</th>
+                  <td>${escapeHtmlRelatorio(manutencaoOrdens.length)}</td>
+                  <th>OS finalizadas</th>
+                  <td>${escapeHtmlRelatorio(totalFinalizadas)}</td>
+                </tr>
+                <tr>
+                  <th>Pendencias</th>
+                  <td>${escapeHtmlRelatorio(pendencias.length)}</td>
+                  <th>Paradas em andamento</th>
+                  <td>${escapeHtmlRelatorio(manutencaoParadas.length)}</td>
+                </tr>
+                <tr>
+                  <th>Periodo</th>
+                  <td colspan="3">${escapeHtmlRelatorio(periodoInicio)} a ${escapeHtmlRelatorio(periodoFim)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2>Indicadores</h2>
+            <table>
+              <tbody>
+                ${kpisResumo
+                  .map(
+                    (kpi) => `
+                      <tr>
+                        <th>${escapeHtmlRelatorio(kpi.label)}</th>
+                        <td>${escapeHtmlRelatorio(kpi.value)}</td>
+                      </tr>
+                    `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2>Distribuicoes</h2>
+            <div class="grid-2">
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Status das OS</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(statusCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Prioridade</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(prioridadeCounts)}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(tipoCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Setores</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(setorCounts)}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Responsaveis</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(responsavelCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Ativos</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(ativoCounts)}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Impacto</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(impactoCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Categoria</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(categoriaCounts)}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Parada</th>
+                      <th>Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${mapToRows(paradaCounts)}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="note">Listas exibem os 8 primeiros itens de cada grupo.</div>
+          </div>
+
+          <div class="section">
+            <h2>Distribuicoes</h2>
+            <div class="grid-4">
+              <div class="card">
+                <div class="card-title">Status das OS</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(statusCounts)}
                 </tbody>
               </table>
             </div>
@@ -1305,85 +1629,132 @@ export default function App() {
                 </tbody>
               </table>
             </div>
-            <div class="card">
-              <div class="card-title">Responsaveis</div>
-              <table>
-                <tbody>
-                  ${mapToRows(responsavelCounts)}
+              <div class="card">
+                <div class="card-title">Responsaveis</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(responsavelCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div class="card">
+                <div class="card-title">Impacto</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(impactoCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div class="card">
+                <div class="card-title">Ativos mais acionados</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(ativoCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div class="card">
+                <div class="card-title">Categoria</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(categoriaCounts)}
+                  </tbody>
+                </table>
+              </div>
+              <div class="card">
+                <div class="card-title">Parada</div>
+                <table>
+                  <tbody>
+                    ${mapToRows(paradaCounts)}
                 </tbody>
               </table>
             </div>
-            <div class="card">
-              <div class="card-title">Ativos mais acionados</div>
-              <table>
-                <tbody>
-                  ${mapToRows(ativoCounts)}
-                </tbody>
-              </table>
             </div>
+            <div class="note">Listas exibem os 8 primeiros itens de cada grupo.</div>
           </div>
-          <div class="note">Listas exibem os 8 primeiros itens de cada grupo.</div>
-        </div>
 
-        <div class="section">
-          <h2>Paradas em andamento</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Ativo</th>
-                <th>Setor</th>
-                <th>Processo</th>
-                <th>Status Maquina</th>
-                <th>Prioridade</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${paradasHtml}
-            </tbody>
-          </table>
-        </div>
+          <div class="section">
+            <h2>Paradas em andamento</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Setor</th>
+                  <th>Processo</th>
+                  <th>Status Maquina</th>
+                  <th>Prioridade</th>
+                <th>Tempo parada (turno 07-17)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${paradasHtml}
+              </tbody>
+            </table>
+          </div>
 
-        <div class="section">
-          <h2>Pendencias (OS nao finalizadas)</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Ativo</th>
-                <th>Setor</th>
-                <th>Prioridade</th>
-                <th>Status</th>
-                <th>Responsavel</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${pendenciasHtml}
-            </tbody>
-          </table>
-          <div class="note">Exibindo ate 25 pendencias mais recentes.</div>
-        </div>
+          <div class="section">
+            <h2>Finalizadas (OS encerradas)</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ativo</th>
+                  <th>Setor</th>
+                  <th>Prioridade</th>
+                  <th>Responsavel</th>
+                <th>Tempo parada (turno 07-17)</th>
+                  <th>Fechada em</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${finalizadasHtml}
+              </tbody>
+            </table>
+          </div>
 
-        <div class="section">
-          <h2>Ordens de servico</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Ativo</th>
-                <th>Setor</th>
-                <th>Processo</th>
-                <th>Prioridade</th>
-                <th>Tipo</th>
-                <th>Status</th>
-                <th>Status maquina</th>
-                <th>Responsavel</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${ordensHtml}
-            </tbody>
-          </table>
+          <div class="section">
+            <h2>Pendencias (OS nao finalizadas)</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ativo</th>
+                  <th>Setor</th>
+                  <th>Prioridade</th>
+                  <th>Status</th>
+                  <th>Responsavel</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${pendenciasHtml}
+              </tbody>
+            </table>
+            <div class="note">Exibindo ate 25 pendencias mais recentes.</div>
+          </div>
+
+          <div class="section">
+            <h2>Ordens de servico</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ativo</th>
+                  <th>Setor</th>
+                  <th>Processo</th>
+                  <th>Prioridade</th>
+                  <th>Tipo</th>
+                  <th>Status</th>
+                  <th>Status maquina</th>
+                  <th>Responsavel</th>
+                  <th>Tempo parada (turno 07-17)</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${ordensHtml}
+              </tbody>
+            </table>
+          </div>
         </div>
       </body>
       </html>
@@ -1423,6 +1794,15 @@ export default function App() {
       return;
     }
     const patch = { ...updates, updatedAt: new Date().toISOString() };
+    if (String(updates?.status || '').toLowerCase() === 'finalizada') {
+      if (!updates?.statusMaquina) {
+        const liberada = window.confirm('A maquina foi liberada?');
+        patch.statusMaquina = liberada ? 'Rodando' : 'Parada';
+      }
+      if (!updates?.fechadaEm) {
+        patch.fechadaEm = patch.updatedAt;
+      }
+    }
     try {
       await setDoc(doc(db, 'manutencao_os', osId), patch, { merge: true });
       setManutencaoOrdens((prev) =>
@@ -1445,10 +1825,34 @@ export default function App() {
       setManutencaoOrdensError('');
       try {
         const snap = await getDocs(collection(db, 'manutencao_os'));
-        const items = snap.docs.map((docSnap) => ({
+        let items = snap.docs.map((docSnap) => ({
           id: docSnap.id,
           ...docSnap.data(),
         }));
+        const nowIso = new Date().toISOString();
+        const finalizadasSemFechamento = items.filter(
+          (os) => os.status === 'Finalizada' && !os.fechadaEm
+        );
+        if (finalizadasSemFechamento.length) {
+          try {
+            await Promise.all(
+              finalizadasSemFechamento.map((os) =>
+                setDoc(
+                  doc(db, 'manutencao_os', os.id),
+                  { fechadaEm: nowIso, updatedAt: nowIso },
+                  { merge: true }
+                )
+              )
+            );
+            items = items.map((os) =>
+              os.status === 'Finalizada' && !os.fechadaEm
+                ? { ...os, fechadaEm: nowIso, updatedAt: nowIso }
+                : os
+            );
+          } catch (err) {
+            console.error('Erro ao definir fechadaEm nas OS finalizadas:', err);
+          }
+        }
         items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
         setManutencaoOrdens(items);
       } catch (err) {
@@ -8075,7 +8479,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
                       <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
                       <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
-                      {isManutencaoOnly && (
+                      {isManutencaoOperador && (
                         <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
                       )}
                    </div>
@@ -8298,7 +8702,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 )}
 
-                {subAbaManutencao === 'operador' && isManutencaoOnly && (
+                {subAbaManutencao === 'operador' && isManutencaoOperador && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                       <div className="flex items-center justify-between mb-4">
