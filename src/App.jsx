@@ -17,7 +17,7 @@ import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, auth, storage } from './firebase';
@@ -1829,11 +1829,12 @@ export default function App() {
       return;
     }
 
-    const loadOrdens = async () => {
-      setManutencaoOrdensLoading(true);
-      setManutencaoOrdensError('');
-      try {
-        const snap = await getDocs(collection(db, 'manutencao_os'));
+    setManutencaoOrdensLoading(true);
+    setManutencaoOrdensError('');
+    let firstSnapshot = true;
+    const unsubscribe = onSnapshot(
+      collection(db, 'manutencao_os'),
+      async (snap) => {
         let items = snap.docs.map((docSnap) => ({
           id: docSnap.id,
           ...docSnap.data(),
@@ -1864,14 +1865,18 @@ export default function App() {
         }
         items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
         setManutencaoOrdens(items);
-      } catch (err) {
+        if (firstSnapshot) {
+          setManutencaoOrdensLoading(false);
+          firstSnapshot = false;
+        }
+      },
+      () => {
         setManutencaoOrdensError('Nao foi possivel carregar as ordens.');
-      } finally {
         setManutencaoOrdensLoading(false);
       }
-    };
+    );
 
-    loadOrdens();
+    return () => unsubscribe();
   }, [authUser, isAllowedDomain]);
 
   const handleSalvarMaquina = async (nome, setor, processo) => {
@@ -6557,22 +6562,22 @@ const custoDetalheTitulo = custoDetalheItem
                       <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#10b981]" />
                       <span className="text-[10px] uppercase tracking-[0.4em] text-emerald-200 font-bold">Live KPI</span>
                     </div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">Dashboard TV</h2>
-                    <p className="text-sm text-slate-400 mt-1 font-medium">
+                    <h2 className="text-5xl font-black text-white tracking-tight">Dashboard TV</h2>
+                    <p className="text-lg text-slate-300 mt-1 font-medium">
                       Atualizado em {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} -{' '}
                       {agora.toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     {dashboardView === 'faturamento' && dashboardFilialAtual && (
-                      <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+                      <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-emerald-200">
                         Filial {dashboardFilialAtual} · troca 10s
                       </span>
                     )}
                     <button
                       type="button"
                       onClick={() => setDashboardView('faturamento')}
-                      className={`px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all ${
+                      className={`px-6 py-3 rounded-2xl text-base font-bold uppercase tracking-wider transition-all ${
                         dashboardView === 'faturamento'
                           ? 'bg-blue-500 text-white shadow-lg'
                           : 'border border-slate-700 text-slate-300 hover:text-white'
@@ -6583,7 +6588,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <button
                       type="button"
                       onClick={() => setDashboardView('manutencao')}
-                      className={`px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all ${
+                      className={`px-6 py-3 rounded-2xl text-base font-bold uppercase tracking-wider transition-all ${
                         dashboardView === 'manutencao'
                           ? 'bg-emerald-500 text-slate-950 shadow-lg'
                           : 'border border-slate-700 text-slate-300 hover:text-white'
@@ -6596,83 +6601,58 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               {dashboardView === 'faturamento' ? (
-                <div className="space-y-3">
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">
-                        CFOPs ({filtroCfops.length || 'Todos'})
-                      </span>
-                    </div>
-                    <div className="mt-2">
-                      <CfopFilterSelector
-                        selected={filtroCfops}
-                        onSelect={toggleCfopFilter}
-                        label="CFOPs"
-                        className="justify-start"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">
+                      <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
                         Faturamento total {dashboardFilialAtual ? `· Filial ${dashboardFilialAtual}` : ''}
                       </p>
-                      <p className="text-xl font-black text-blue-300 mt-2">
+                      <p className="text-3xl font-black text-blue-300 mt-2">
                         {formatarMoeda(dashboardFaturamentoFilial.total || 0)}
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">{dashboardFaturamentoFilial.movimentos || 0} movimentos</p>
+                      <p className="text-base text-slate-400 mt-2">{dashboardFaturamentoFilial.movimentos || 0} movimentos</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
-                      <p className="text-xl font-black text-amber-300 mt-2">{dashboardFaturamentoFilial.diasAtivos || 0}</p>
-                      <p className="text-xs text-slate-500 mt-2">{dashboardFaturamentoFilial.porDia?.length || 0} dias no grafico</p>
+                      <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Devolucoes</p>
+                      <p className="text-3xl font-black text-rose-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.totalDevolucao || 0)}</p>
+                      <p className="text-base text-slate-400 mt-2">Impacto no mes</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
-                      <p className="text-xl font-black text-emerald-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.ticketMedio || 0)}</p>
-                      <p className="text-xs text-slate-500 mt-2">Por pedido</p>
+                      <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
+                      <p className="text-3xl font-black text-emerald-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.ticketMedio || 0)}</p>
+                      <p className="text-base text-slate-400 mt-2">Por pedido</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Clientes ativos</p>
-                      <p className="text-xl font-black text-slate-100 mt-2">{dashboardFaturamentoFilial.clientesAtivos || 0}</p>
-                      <p className="text-xs text-slate-500 mt-2">No mes</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Devolucoes</p>
-                      <p className="text-xl font-black text-rose-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.totalDevolucao || 0)}</p>
-                      <p className="text-xs text-slate-500 mt-2">Impacto no mes</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Media diaria</p>
-                      <p className="text-xl font-black text-blue-200 mt-2">
+                      <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Media diaria</p>
+                      <p className="text-3xl font-black text-blue-200 mt-2">
                         {formatarMoeda(
                           dashboardFaturamentoFilial.diasAtivos
                             ? dashboardFaturamentoFilial.total / dashboardFaturamentoFilial.diasAtivos
                             : 0
                         )}
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">Faturamento/dia</p>
+                      <p className="text-base text-slate-400 mt-2">Faturamento/dia</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 xl:col-span-2">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Mapa por municipio</h3>
-                        <span className="text-xs text-slate-500">Distribuicao geografica</span>
+                        <h3 className="text-lg font-black uppercase tracking-widest text-slate-300">Mapa por municipio</h3>
+                        <span className="text-base text-slate-500">Distribuicao geografica</span>
                       </div>
                       {renderMapaMunicipioDados(
                         dashboardFaturamentoFilial.municipiosMapa,
                         dashboardMunicipiosBounds,
-                        'h-[520px] overflow-hidden rounded-2xl border border-slate-800',
+                        'h-[640px] overflow-hidden rounded-2xl border border-slate-800',
                         { zoomControl: false }
                       )}
                     </div>
                     <div className="space-y-3">
                       <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Faturamento diario</h3>
-                          <span className="text-xs text-slate-500">Ultimos 10 dias</span>
+                          <h3 className="text-lg font-black uppercase tracking-widest text-slate-200">Faturamento diario</h3>
+                          <span className="text-base text-slate-400">Ultimos 10 dias</span>
                         </div>
                         {(() => {
                           const dados = (dashboardFaturamentoFilial.porDia || []).slice(-10);
@@ -6680,21 +6660,41 @@ const custoDetalheTitulo = custoDetalheItem
                             return <p className="text-xs text-slate-500 italic">Sem dados no periodo.</p>;
                           }
                           const width = 520;
-                          const height = 220;
+                            const height = 380;
                           const margin = { top: 24, right: 16, bottom: 30, left: 16 };
                           const chartW = width - margin.left - margin.right;
                           const chartH = height - margin.top - margin.bottom;
                           const maxValor = Math.max(...dados.map((item) => item.valor), 1);
+                          const media = dados.reduce((acc, item) => acc + item.valor, 0) / dados.length;
+                          const yMedia = margin.top + chartH - (media / maxValor) * chartH;
                           const barW = chartW / Math.max(dados.length, 1);
                           const barWidth = Math.max(barW - 12, 10);
                           return (
-                            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-44">
+                            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
                               <defs>
                                 <linearGradient id="dashBar" x1="0" y1="0" x2="0" y2="1">
                                   <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.95" />
                                   <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0.9" />
                                 </linearGradient>
                               </defs>
+                              <line
+                                x1={margin.left}
+                                x2={width - margin.right}
+                                y1={yMedia}
+                                y2={yMedia}
+                                stroke="#22c55e"
+                                strokeDasharray="6 6"
+                              />
+                              <text
+                                x={width - margin.right}
+                                y={Math.max(yMedia - 6, 16)}
+                                textAnchor="end"
+                                fontSize="14"
+                                fill="#bbf7d0"
+                                fontWeight="800"
+                              >
+                                Media {formatarValorCurto(media)}
+                              </text>
                               {dados.map((item, i) => {
                                 const barH = (item.valor / maxValor) * chartH;
                                 const x = margin.left + i * barW + (barW - barWidth) / 2;
@@ -6704,10 +6704,21 @@ const custoDetalheTitulo = custoDetalheItem
                                     <rect x={x} y={y} width={barWidth} height={barH} rx="6" fill="url(#dashBar)" />
                                     <text
                                       x={x + barWidth / 2}
+                                      y={Math.max(y - 10, 22)}
+                                      textAnchor="middle"
+                                      fontSize="14"
+                                      fill="#ffffff"
+                                      fontWeight="800"
+                                    >
+                                      {formatarValorCurto(item.valor)}
+                                    </text>
+                                    <text
+                                      x={x + barWidth / 2}
                                       y={margin.top + chartH + 18}
                                       textAnchor="middle"
-                                      fontSize="11"
-                                      fill="#94a3b8"
+                                      fontSize="14"
+                                      fill="#e2e8f0"
+                                      fontWeight="700"
                                     >
                                       {item.dia.slice(8)}
                                     </text>
@@ -6720,8 +6731,8 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                       <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4">
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Top estados</h3>
-                          <span className="text-xs text-slate-500">Top 6</span>
+                          <h3 className="text-lg font-black uppercase tracking-widest text-slate-300">Top estados</h3>
+                          <span className="text-base text-slate-500">Top 6</span>
                         </div>
                         <div className="space-y-3">
                           {(dashboardFaturamentoFilial.topEstados || []).slice(0, 6).map((item) => {
