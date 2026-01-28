@@ -888,25 +888,30 @@ export default function App() {
     iframe.style.visibility = 'hidden';
     document.body.appendChild(iframe);
 
-    const frameDoc = iframe.contentWindow?.document;
-    if (!frameDoc) {
+    const frameWindow = iframe.contentWindow;
+    const frameDoc = frameWindow?.document;
+    if (!frameWindow || !frameDoc) {
       alert('Nao foi possivel preparar o PDF.');
       return;
     }
 
-    frameDoc.open();
-    frameDoc.write(html);
-    frameDoc.close();
-
-    iframe.onload = () => {
-      const frameWindow = iframe.contentWindow;
-      if (!frameWindow) return;
+    let printed = false;
+    const handlePrint = () => {
+      if (printed) return;
+      printed = true;
       frameWindow.focus();
       frameWindow.print();
       setTimeout(() => {
         iframe.remove();
       }, 1000);
     };
+
+    iframe.onload = handlePrint;
+    frameDoc.open();
+    frameDoc.write(html);
+    frameDoc.close();
+
+    setTimeout(handlePrint, 700);
   };
 
   const handleImprimirOs = (ordem) => {
@@ -4202,6 +4207,118 @@ export default function App() {
     const dataRelatorio = now.toLocaleDateString('pt-BR');
     const fileDate = now.toISOString().slice(0, 10);
 
+    const parseNumber = (value) => {
+      if (value === null || value === undefined) return 0;
+      const cleaned = String(value)
+        .replace(/\./g, '')
+        .replace(',', '.')
+        .replace(/[^0-9.-]/g, '');
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const parseTempoMin = (value) => {
+      if (value === null || value === undefined) return 0;
+      const raw = String(value).trim();
+      if (!raw) return 0;
+      if (raw.includes(':')) {
+        const parts = raw.split(':').map((part) => String(part || '').trim());
+        if (parts.length >= 2) {
+          const h = Number(parts[0].replace(',', '.'));
+          const m = Number(parts[1].replace(',', '.'));
+          const s = parts.length >= 3 ? Number(parts[2].replace(',', '.')) : 0;
+          if (Number.isFinite(h) && Number.isFinite(m) && Number.isFinite(s)) {
+            return Math.max(0, Math.round(h * 60 + m + s / 60));
+          }
+        }
+      }
+      const hMatch = raw.match(/(\d+(?:[.,]\d+)?)\s*h/i);
+      const mMatch = raw.match(/(\d+(?:[.,]\d+)?)\s*m/i);
+      if (hMatch || mMatch) {
+        const h = hMatch ? Number(hMatch[1].replace(',', '.')) : 0;
+        const m = mMatch ? Number(mMatch[1].replace(',', '.')) : 0;
+        if (Number.isFinite(h) || Number.isFinite(m)) {
+          return Math.max(
+            0,
+            Math.round((Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0))
+          );
+        }
+      }
+      return Math.max(0, Math.round(parseNumber(raw)));
+    };
+
+    const diffMin = (start, end) => {
+      const startDate = start ? new Date(start) : null;
+      const endDate = end ? new Date(end) : null;
+      if (!startDate || !endDate) return 0;
+      const ms = endDate.getTime() - startDate.getTime();
+      if (!Number.isFinite(ms) || ms <= 0) return 0;
+      return Math.round(ms / 60000);
+    };
+
+    const calcShiftMinutes = (start, end) => {
+      const startDate = start ? new Date(start) : null;
+      const endDate = end ? new Date(end) : null;
+      if (!startDate || !endDate) return 0;
+      if (endDate <= startDate) return 0;
+      let total = 0;
+      const cursor = new Date(startDate);
+      cursor.setHours(0, 0, 0, 0);
+      const last = new Date(endDate);
+      last.setHours(0, 0, 0, 0);
+      while (cursor <= last) {
+        const shiftStart = new Date(cursor);
+        shiftStart.setHours(7, 0, 0, 0);
+        const shiftEnd = new Date(cursor);
+        shiftEnd.setHours(17, 0, 0, 0);
+        const rangeStart = new Date(Math.max(shiftStart.getTime(), startDate.getTime()));
+        const rangeEnd = new Date(Math.min(shiftEnd.getTime(), endDate.getTime()));
+        if (rangeEnd > rangeStart) {
+          total += Math.round((rangeEnd.getTime() - rangeStart.getTime()) / 60000);
+        }
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return total;
+    };
+
+    const getTempoParadaMin = (os) => {
+      const informado = parseTempoMin(os?.tempoParada);
+      if (informado > 0) return informado;
+      if (String(os?.status || '').toLowerCase() !== 'finalizada') return 0;
+      return calcShiftMinutes(os?.dataFalha, os?.fechadaEm || os?.updatedAt);
+    };
+
+    const getTempoParadaTotalMin = (os) => {
+      if (String(os?.status || '').toLowerCase() !== 'finalizada') return 0;
+      return diffMin(os?.dataFalha, os?.fechadaEm || os?.updatedAt);
+    };
+
+    const formatCurrency = (value) =>
+      `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+    const formatTempo = (value) => {
+      if (!Number.isFinite(value)) return '-';
+      if (value <= 0) return '-';
+      const total = Math.round(value);
+      const hours = Math.floor(total / 60);
+      const minutes = total % 60;
+      if (hours > 0 && minutes > 0) return `${hours}h ${minutes}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${minutes}m`;
+    };
+
+    const countBy = (items, getter) => {
+      const map = {};
+      items.forEach((item) => {
+        const key = String(getter(item) || 'Nao informado');
+        map[key] = (map[key] || 0) + 1;
+      });
+      return map;
+    };
+
+    const sumBy = (items, getter) =>
+      items.reduce((acc, item) => acc + getter(item), 0);
+
     const totalOs = manutencaoOrdens.length;
     const totalParadas = manutencaoParadas.length;
     const totalFinalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
@@ -4218,6 +4335,207 @@ export default function App() {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return String(value);
       return date.toLocaleDateString('pt-BR');
+    };
+
+    const formatDateTimeRelatorio = (value) => {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleString('pt-BR');
+    };
+
+    const statusCounts = countBy(manutencaoOrdens, (os) => os.status);
+    const prioridadeCounts = countBy(manutencaoOrdens, (os) => os.prioridade);
+    const tipoCounts = countBy(manutencaoOrdens, (os) => os.tipo);
+    const setorCounts = countBy(manutencaoOrdens, (os) => os.setor);
+    const responsavelCounts = countBy(manutencaoOrdens, (os) => os.responsavel);
+    const ativoCounts = countBy(manutencaoOrdens, (os) => os.ativo);
+    const impactoCounts = countBy(manutencaoOrdens, (os) => os.impacto);
+    const paradaCounts = countBy(manutencaoOrdens, (os) => os.parada);
+    const categoriaCounts = countBy(manutencaoOrdens, (os) => os.categoria);
+
+    const totalCustoEstimado = sumBy(manutencaoOrdens, (os) => parseNumber(os.custoEstimado));
+    const totalTempoParadaTurno = sumBy(manutencaoOrdens, (os) => getTempoParadaMin(os));
+    const totalTempoParadaTotal = sumBy(manutencaoOrdens, (os) => getTempoParadaTotalMin(os));
+    const mediaTempoParada =
+      manutencaoOrdens.length > 0 ? totalTempoParadaTurno / manutencaoOrdens.length : 0;
+    const totalTempoEstimado = sumBy(manutencaoOrdens, (os) => parseTempoMin(os.tempoEstimado));
+    const mediaTempoEstimado =
+      manutencaoOrdens.length > 0 ? totalTempoEstimado / manutencaoOrdens.length : 0;
+    const comTempoParada = manutencaoOrdens.filter((os) => getTempoParadaMin(os) > 0).length;
+
+    const createdDates = manutencaoOrdens
+      .map((os) => os.createdAt || os.dataFalha)
+      .map((value) => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+
+    const periodoInicio = createdDates.length ? formatDateOnlyRelatorio(createdDates[0]) : '-';
+    const periodoFim = createdDates.length
+      ? formatDateOnlyRelatorio(createdDates[createdDates.length - 1])
+      : '-';
+
+    const kpisResumo = [
+      ...manutencaoKpis.map((kpi) => ({ label: kpi.label, value: kpi.value })),
+      { label: 'Paradas', value: totalParadas },
+      { label: 'OS com tempo parada', value: comTempoParada },
+      { label: 'Custo estimado total', value: formatCurrency(totalCustoEstimado) },
+      { label: 'Tempo parada (turno 07-17)', value: formatTempo(totalTempoParadaTurno) },
+      { label: 'Tempo parada total (24h)', value: formatTempo(totalTempoParadaTotal) },
+      { label: 'Tempo parada medio', value: formatTempo(mediaTempoParada) },
+      { label: 'Tempo estimado total', value: formatTempo(totalTempoEstimado) },
+      { label: 'Tempo estimado medio', value: formatTempo(mediaTempoEstimado) },
+      { label: 'OS finalizadas', value: totalFinalizadas },
+      { label: 'Taxa de finalizacao', value: totalOs > 0 ? `${Math.round((totalFinalizadas / totalOs) * 100)}%` : '-' }
+    ];
+
+    const pendencias = ordensOrdenadas.filter((os) => os.status !== 'Finalizada');
+    const finalizadas = ordensOrdenadas.filter((os) => os.status === 'Finalizada');
+
+    const mapToRows = (map, limit = 8) => {
+      const rows = Object.entries(map)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit);
+      return rows.length ? rows : [['Sem dados', 0]];
+    };
+
+    const tableHeaderRow = (headers) =>
+      headers.map((text) => ({ text, options: { bold: true, color: 'FFFFFF' } }));
+
+    const addTableSlide = ({
+      title,
+      headers,
+      rows,
+      colW,
+      fontSize = 10,
+      rowH = 0.3,
+      maxRows = 16
+    }) => {
+      if (!rows.length) {
+        const slide = pptx.addSlide();
+        slide.addText(title, {
+          x: 0.6,
+          y: 0.4,
+          w: 12,
+          h: 0.4,
+          fontSize: 20,
+          bold: true,
+          color: '0F172A'
+        });
+        slide.addText('Sem dados.', {
+          x: 0.6,
+          y: 1.2,
+          w: 12,
+          h: 0.4,
+          fontSize,
+          color: '64748B'
+        });
+        return;
+      }
+
+      const pages = [];
+      for (let i = 0; i < rows.length; i += maxRows) {
+        pages.push(rows.slice(i, i + maxRows));
+      }
+
+      pages.forEach((pageRows, index) => {
+        const slide = pptx.addSlide();
+        const pageTitle = pages.length > 1 ? `${title} (${index + 1}/${pages.length})` : title;
+        slide.addText(pageTitle, {
+          x: 0.6,
+          y: 0.4,
+          w: 12,
+          h: 0.4,
+          fontSize: 20,
+          bold: true,
+          color: '0F172A'
+        });
+        const tableRows = [tableHeaderRow(headers), ...pageRows];
+        slide.addTable(tableRows, {
+          x: 0.6,
+          y: 1.1,
+          w: 12.1,
+          colW,
+          fontSize,
+          color: '0F172A',
+          border: { type: 'solid', color: 'E2E8F0', pt: 1 },
+          fill: { color: 'FFFFFF' },
+          rowH,
+          autoFit: true,
+          valign: 'middle',
+          header: true
+        });
+      });
+    };
+
+    const addDuoTableSlide = ({
+      title,
+      leftTitle,
+      leftRows,
+      rightTitle,
+      rightRows
+    }) => {
+      const slide = pptx.addSlide();
+      slide.addText(title, {
+        x: 0.6,
+        y: 0.35,
+        w: 12,
+        h: 0.4,
+        fontSize: 20,
+        bold: true,
+        color: '0F172A'
+      });
+      slide.addText(leftTitle, {
+        x: 0.6,
+        y: 0.9,
+        w: 5.8,
+        h: 0.3,
+        fontSize: 12,
+        bold: true,
+        color: '334155'
+      });
+      slide.addText(rightTitle, {
+        x: 6.9,
+        y: 0.9,
+        w: 5.8,
+        h: 0.3,
+        fontSize: 12,
+        bold: true,
+        color: '334155'
+      });
+
+      slide.addTable([tableHeaderRow(['Item', 'Qtd']), ...leftRows], {
+        x: 0.6,
+        y: 1.3,
+        w: 5.8,
+        colW: [4.2, 1.6],
+        fontSize: 10,
+        color: '0F172A',
+        border: { type: 'solid', color: 'E2E8F0', pt: 1 },
+        fill: { color: 'FFFFFF' },
+        rowH: 0.32,
+        autoFit: true,
+        valign: 'middle',
+        header: true
+      });
+
+      slide.addTable([tableHeaderRow(['Item', 'Qtd']), ...rightRows], {
+        x: 6.9,
+        y: 1.3,
+        w: 5.8,
+        colW: [4.2, 1.6],
+        fontSize: 10,
+        color: '0F172A',
+        border: { type: 'solid', color: 'E2E8F0', pt: 1 },
+        fill: { color: 'FFFFFF' },
+        rowH: 0.32,
+        autoFit: true,
+        valign: 'middle',
+        header: true
+      });
     };
 
     const slideCover = pptx.addSlide();
@@ -4306,10 +4624,7 @@ export default function App() {
         { text: 'Valor', options: { bold: true, color: 'FFFFFF' } }
       ],
       ...[
-        ...manutencaoKpis.map((kpi) => ({ label: kpi.label, value: kpi.value })),
-        { label: 'Paradas', value: totalParadas },
-        { label: 'OS finalizadas', value: totalFinalizadas },
-        { label: 'OS em aberto', value: totalAbertas }
+        ...kpisResumo
       ].map((kpi) => [String(kpi.label || ''), String(kpi.value ?? '-')])
     ];
 
@@ -4328,49 +4643,132 @@ export default function App() {
       header: true
     });
 
-    const slideTabela = pptx.addSlide();
-    slideTabela.addText('Ultimas OS', {
-      x: 0.6,
-      y: 0.4,
-      w: 12,
-      h: 0.4,
-      fontSize: 20,
-      bold: true,
-      color: '0F172A'
+    addDuoTableSlide({
+      title: 'Distribuicoes (1/4)',
+      leftTitle: 'Status das OS',
+      leftRows: mapToRows(statusCounts).map(([label, value]) => [String(label), String(value)]),
+      rightTitle: 'Prioridade',
+      rightRows: mapToRows(prioridadeCounts).map(([label, value]) => [String(label), String(value)])
     });
 
-    const tabelaRows = [
-      [
-        { text: 'OS', options: { bold: true, color: 'FFFFFF' } },
-        { text: 'Ativo', options: { bold: true, color: 'FFFFFF' } },
-        { text: 'Setor', options: { bold: true, color: 'FFFFFF' } },
-        { text: 'Status', options: { bold: true, color: 'FFFFFF' } },
-        { text: 'Responsavel', options: { bold: true, color: 'FFFFFF' } },
-        { text: 'Criado em', options: { bold: true, color: 'FFFFFF' } }
-      ],
-      ...ordensOrdenadas.slice(0, 12).map((os) => [
-        String(os.id || ''),
-        String(os.ativo || ''),
-        String(os.setor || ''),
-        String(os.status || ''),
-        String(os.responsavel || ''),
-        formatDateOnlyRelatorio(os.createdAt || os.dataFalha)
-      ])
-    ];
+    addDuoTableSlide({
+      title: 'Distribuicoes (2/4)',
+      leftTitle: 'Tipo',
+      leftRows: mapToRows(tipoCounts).map(([label, value]) => [String(label), String(value)]),
+      rightTitle: 'Setores',
+      rightRows: mapToRows(setorCounts).map(([label, value]) => [String(label), String(value)])
+    });
 
-    slideTabela.addTable(tabelaRows, {
-      x: 0.6,
-      y: 1.1,
-      w: 12.1,
-      colW: [1.2, 2.3, 2.2, 2.0, 2.4, 2.0],
-      fontSize: 10,
-      color: '0F172A',
-      border: { type: 'solid', color: 'E2E8F0', pt: 1 },
-      fill: { color: 'FFFFFF' },
-      rowH: 0.33,
-      autoFit: true,
-      valign: 'middle',
-      header: true
+    addDuoTableSlide({
+      title: 'Distribuicoes (3/4)',
+      leftTitle: 'Responsaveis',
+      leftRows: mapToRows(responsavelCounts).map(([label, value]) => [String(label), String(value)]),
+      rightTitle: 'Ativos',
+      rightRows: mapToRows(ativoCounts).map(([label, value]) => [String(label), String(value)])
+    });
+
+    addDuoTableSlide({
+      title: 'Distribuicoes (4/4)',
+      leftTitle: 'Impacto',
+      leftRows: mapToRows(impactoCounts).map(([label, value]) => [String(label), String(value)]),
+      rightTitle: 'Categoria',
+      rightRows: mapToRows(categoriaCounts).map(([label, value]) => [String(label), String(value)])
+    });
+
+    addTableSlide({
+      title: 'Distribuicao - Parada',
+      headers: ['Parada', 'Qtd'],
+      rows: mapToRows(paradaCounts).map(([label, value]) => [String(label), String(value)]),
+      colW: [9.2, 2.9],
+      fontSize: 11,
+      rowH: 0.34,
+      maxRows: 18
+    });
+
+    addTableSlide({
+      title: 'Paradas em andamento',
+      headers: ['Ativo', 'Setor', 'Processo', 'Status Maquina', 'Prioridade', 'Tempo parada (07-17)'],
+      rows: manutencaoParadas.map((os) => [
+        String(os.ativo || '-'),
+        String(os.setor || '-'),
+        String(os.processo || '-'),
+        String(os.statusMaquina || '-'),
+        String(os.prioridade || '-'),
+        formatTempo(getTempoParadaMin(os))
+      ]),
+      colW: [2.1, 2.0, 2.2, 2.2, 1.6, 2.0],
+      fontSize: 9,
+      rowH: 0.3,
+      maxRows: 16
+    });
+
+    addTableSlide({
+      title: 'Finalizadas (OS encerradas)',
+      headers: ['ID', 'Ativo', 'Setor', 'Prioridade', 'Responsavel', 'Tempo parada (07-17)', 'Fechada em'],
+      rows: finalizadas.map((os) => [
+        String(os.id || '-'),
+        String(os.ativo || '-'),
+        String(os.setor || '-'),
+        String(os.prioridade || '-'),
+        String(os.responsavel || '-'),
+        formatTempo(getTempoParadaMin(os)),
+        formatDateTimeRelatorio(os.fechadaEm || os.updatedAt || os.createdAt || os.dataFalha || now)
+      ]),
+      colW: [1.1, 2.2, 2.0, 1.5, 2.0, 2.0, 1.9],
+      fontSize: 9,
+      rowH: 0.3,
+      maxRows: 16
+    });
+
+    addTableSlide({
+      title: 'Pendencias (OS nao finalizadas)',
+      headers: ['ID', 'Ativo', 'Setor', 'Prioridade', 'Status', 'Responsavel'],
+      rows: pendencias.map((os) => [
+        String(os.id || '-'),
+        String(os.ativo || '-'),
+        String(os.setor || '-'),
+        String(os.prioridade || '-'),
+        String(os.status || '-'),
+        String(os.responsavel || '-')
+      ]),
+      colW: [1.1, 2.5, 2.2, 1.7, 2.0, 2.6],
+      fontSize: 9,
+      rowH: 0.3,
+      maxRows: 16
+    });
+
+    addTableSlide({
+      title: 'Ordens de servico',
+      headers: [
+        'ID',
+        'Ativo',
+        'Setor',
+        'Processo',
+        'Prioridade',
+        'Tipo',
+        'Status',
+        'Status maquina',
+        'Responsavel',
+        'Tempo parada (07-17)',
+        'Data'
+      ],
+      rows: ordensOrdenadas.map((os) => [
+        String(os.id || '-'),
+        String(os.ativo || '-'),
+        String(os.setor || '-'),
+        String(os.processo || '-'),
+        String(os.prioridade || '-'),
+        String(os.tipo || '-'),
+        String(os.status || '-'),
+        String(os.statusMaquina || '-'),
+        String(os.responsavel || '-'),
+        formatTempo(getTempoParadaMin(os)),
+        formatDateTimeRelatorio(os.createdAt || os.dataFalha)
+      ]),
+      colW: [0.9, 1.6, 1.3, 1.6, 1.3, 1.3, 1.3, 1.5, 1.7, 1.9, 1.6],
+      fontSize: 8,
+      rowH: 0.27,
+      maxRows: 14
     });
 
     pptx.writeFile({ fileName: `manutencao_${fileDate}.pptx` });
