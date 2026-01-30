@@ -8316,16 +8316,16 @@ const custoDetalheTitulo = custoDetalheItem
                             <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
                           </div>
                           {(() => {
-                            const width = 1000;
-                            const height = 310;
-                            const margin = { top: 54, right: 20, bottom: 50, left: 58 };
+                            const width = 1400;
+                            const height = 420;
+                            const margin = { top: 54, right: 0, bottom: 50, left: 0 };
                             const chartW = width - margin.left - margin.right;
                             const chartH = height - margin.top - margin.bottom;
                             const dados = faturamentoAtual.porDia;
                             const maxValor = Math.max(...dados.map((item) => item.valor), 1);
                             const barW = chartW / Math.max(dados.length, 1);
-                            const barGap = 30;
-                            const barWidth = Math.max(barW - barGap, 6);
+                            const barGap = 8;
+                            const barWidth = Math.max(barW - barGap, 8);
                             const variacoes = dados.map((item, i) => {
                               if (i === 0) return null;
                               const anterior = dados[i - 1].valor;
@@ -8341,7 +8341,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <div className="space-y-4">
                                 <svg
                                   viewBox={`0 0 ${width} ${height}`}
-                                  className="w-full h-80"
+                                  className="w-full h-[420px]"
                                 >
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
@@ -8373,7 +8373,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   const isPositiva = variacao !== null && variacao >= 0;
                                   const corVariacao = isPositiva ? '#22c55e' : '#f87171';
                                   const xCentro = xBase + barWidth / 2;
-                                  const xVariacao = xBase - 8;
+                                  const xVariacao = xBase + barWidth / 2;
                                   const yVariacao = Math.min(y + 14, margin.top + chartH - 10);
                                   return (
                                     <g key={item.dia} className="cursor-pointer" onClick={() => handleDiaClick(item.dia)}>
