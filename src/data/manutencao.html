@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Industrial Pro - TV Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f1117;
+            color: white;
+            margin: 0;
+            overflow: hidden; /* Impede qualquer rolagem na TV */
+            height: 100vh;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Animação do Popup */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateX(120%) scale(0.8); opacity: 0; }
+            70% { transform: translateX(-10px) scale(1.05); opacity: 1; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to { transform: translateX(120%) scale(0.9); opacity: 0; }
+        }
+
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0); }
+            50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+            100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0); }
+        }
+
+        .notification-in { 
+            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+                       shake 0.4s ease-in-out 0.5s,
+                       glowPulse 2s infinite ease-in-out; 
+        }
+
+        .notification-out { animation: slideOut 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        
+        .progress-bar-fill {
+            animation: progress 8s linear forwards;
+        }
+
+        .glass {
+            background: rgba(24, 24, 27, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        #interaction-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 17, 23, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay para desbloquear áudio no navegador -->
+    <div id="interaction-overlay" onclick="startSystem()">
+        <div class="bg-blue-600 p-8 rounded-full animate-pulse mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2Z"/><path d="M12 12 2.1 12.5"/><path d="m16 2 1 6 6-1"/></svg>
+        </div>
+        <h2 class="text-3xl font-black italic tracking-tighter mb-2">LUMINARY OS</h2>
+        <p class="text-zinc-400 font-bold uppercase tracking-widest animate-bounce">Clique para Iniciar Monitorização</p>
+    </div>
+
+    <div id="app" class="h-screen w-full p-6 lg:p-8 flex flex-col gap-6 opacity-20 transition-opacity duration-1000">
+        <!-- HEADER -->
+        <header class="flex justify-between items-center border-b border-white/5 pb-4 shrink-0">
+            <div class="flex items-center gap-6">
+                <div class="bg-blue-600 px-4 py-2 rounded-lg font-black text-xl italic tracking-tighter">
+                    LUMINARY OS
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white tracking-tight leading-none mb-1">Monitoração de Produção</h1>
+                    <p id="current-date" class="text-zinc-500 font-medium text-xs uppercase tracking-widest"></p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-8">
+                <div class="text-right border-r border-white/10 pr-8 hidden lg:block">
+                    <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-1">Status do Sistema</p>
+                    <div class="flex items-center gap-2 justify-end text-emerald-500 font-bold text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        SISTEMA OPERACIONAL
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p id="current-time" class="text-5xl font-bold font-mono text-white tabular-nums leading-none"></p>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex flex-1 gap-6 min-h-0 overflow-hidden">
+            <!-- COLUNA ESQUERDA: GRID DE MÁQUINAS -->
+            <div class="flex-[1.8] flex flex-col min-h-0">
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <h2 class="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">Ocorrências Ativas</h2>
+                    <div class="px-3 py-1 bg-zinc-800 rounded text-xs font-bold text-zinc-400 border border-white/5">
+                        DISPOSITIVOS: <span id="stopped-count-badge" class="text-white">0</span>
+                    </div>
+                </div>
+                
+                <div id="machines-container" class="grid grid-cols-2 gap-4 flex-1 min-h-0">
+                    <!-- Cards dinâmicos via JS -->
+                </div>
+            </div>
+
+            <!-- COLUNA DIREITA: KPIs E GRÁFICO -->
+            <div class="flex-[1.2] flex flex-col gap-6 shrink-0">
+                <!-- KPI PRINCIPAL -->
+                <div class="bg-zinc-900/80 border border-white/10 rounded-3xl p-6 card-shadow relative overflow-hidden flex flex-col justify-center shrink-0 h-[160px]">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-zinc-500 font-bold uppercase text-xs tracking-widest">Paradas Críticas</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span id="stopped-count" class="text-7xl font-black leading-none tracking-tighter">00</span>
+                        <span class="text-zinc-400 font-bold text-lg uppercase leading-none">Equipamentos<br><span class="text-red-500">Parados Agora</span></span>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO DE OS -->
+                <div class="flex-1 bg-zinc-900/40 border border-white/5 rounded-3xl p-6 flex flex-col min-h-0">
+                    <div class="flex justify-between items-center mb-4 shrink-0">
+                        <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Histórico de OS (7 Dias)</h3>
+                        <div class="flex gap-4 text-[10px] font-bold uppercase">
+                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Abertas</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Finalizadas</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 relative">
+                        <canvas id="osChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- INDICADORES RÁPIDOS (HORIZONTAL) -->
+                <div class="grid grid-cols-2 gap-4 shrink-0">
+                    <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-zinc-500 font-bold uppercase text-[9px] tracking-widest mb-1">Pendente</p>
+                            <span class="text-3xl font-bold italic">14</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-zinc-500 font-bold uppercase text-[9px] tracking-widest mb-1">TMR Médio</p>
+                            <span class="text-3xl font-bold italic text-amber-500">38m</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- CONTAINER DE NOTIFICAÇÕES -->
+        <div id="notification-container" class="fixed top-8 right-8 z-50 flex flex-col gap-4 pointer-events-none">
+            <!-- Popups aparecem aqui -->
+        </div>
+    </div>
+
+    <script>
+        const staticMachines = [
+            { id: 1, name: "Conformadora Telha Marafon", type: "CRÍTICO", reason: "Quebra de Correia", time: "66h 24m", tech: "Carlos Alberto", status: "error" },
+            { id: 2, name: "Prensa Hidráulica L-02", type: "PREVENTIVA", reason: "Troca de Fluido", time: "02h 15m", tech: "Roberto S.", status: "warning" },
+            { id: 3, name: "Injetora Plástica 500T", type: "CORRETIVA", reason: "Aquecimento Motor", time: "04h 12m", tech: "Pendente", status: "error" },
+            { id: 4, name: "Esteira Transportadora C-01", type: "CRÍTICO", reason: "Alinhamento Eixo", time: "01h 20m", tech: "Marcos P.", status: "error" }
+        ];
+
+        let systemStarted = false;
+
+        function startSystem() {
+            systemStarted = true;
+            document.getElementById('interaction-overlay').style.display = 'none';
+            document.getElementById('app').style.opacity = '1';
+            
+            // Fala inicial
+            speakText("Sistema Luminary ativo. Monitorização de rede iniciada.");
+            
+            // Reativa o ciclo automático de simulação
+            setTimeout(simulateRandomAlert, 3000);
+            setInterval(simulateRandomAlert, 25000);
+        }
+
+        function simulateRandomAlert() {
+            const techs = ["Carlos A.", "Rodrigo M.", "Ana Clara", "Paulo V.", "Sérgio L."];
+            const items = ["Solda Robotizada 01", "Prensa L-05", "Compressor Central", "Elevador de Carga", "Ponte Rolante B"];
+            const reasons = ["Falha de Sensor", "Pressão Óleo Baixa", "Sobrecarga Elétrica", "Vibração Excessiva"];
+            
+            const tech = techs[Math.floor(Math.random() * techs.length)];
+            const machine = items[Math.floor(Math.random() * items.length)];
+            const reason = reasons[Math.floor(Math.random() * reasons.length)];
+            
+            window.triggerMachineAlert(machine, tech, reason, "red");
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('osChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                    datasets: [{
+                        label: 'Abertas',
+                        data: [12, 19, 15, 8, 22, 5, 3],
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }, {
+                        label: 'Finalizadas',
+                        data: [10, 21, 13, 11, 18, 7, 4],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#71717a', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance();
+                msg.text = text;
+                msg.lang = 'pt-BR';
+                msg.rate = 0.95; 
+                msg.pitch = 0.8; 
+                
+                const voices = window.speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Google') || v.name.includes('Daniel'))) 
+                                     || voices.find(v => v.lang.includes('pt-BR'));
+                
+                if (preferredVoice) msg.voice = preferredVoice;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        function playAlertSound() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(350, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        window.triggerMachineAlert = function(machineName, techName, reason, severity = "red") {
+            if (!systemStarted) return;
+
+            const container = document.getElementById('notification-container');
+            const id = 'notif-' + Date.now();
+            const notification = document.createElement('div');
+            notification.id = id;
+            
+            const colorClasses = {
+                red: { bg: 'bg-red-600', text: 'text-red-400', border: 'border-red-600/50', label: 'URGENTE' },
+                amber: { bg: 'bg-amber-600', text: 'text-amber-400', border: 'border-amber-600/50', label: 'AVISO' },
+                blue: { bg: 'bg-blue-600', text: 'text-blue-400', border: 'border-blue-600/50', label: 'INFO' }
+            };
+            const c = colorClasses[severity] || colorClasses.red;
+
+            notification.className = `notification-in glass border-2 ${c.border} p-6 rounded-2xl shadow-2xl w-[420px] pointer-events-auto relative overflow-hidden`;
+
+            notification.innerHTML = `
+                <div class="absolute bottom-0 left-0 h-1.5 bg-white/10 w-full">
+                    <div class="progress-bar-fill h-full ${c.bg}"></div>
+                </div>
+                <div class="flex gap-5">
+                    <div class="shrink-0">
+                        <div class="w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center border border-white/20">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[11px] font-black ${c.text} uppercase tracking-[0.2em]">${c.label}</span>
+                            <button onclick="closeNotification('${id}')" class="text-zinc-500 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+                        </div>
+                        <h4 class="text-white font-black text-xl mb-1 truncate">${machineName}</h4>
+                        <p class="text-zinc-300 text-sm font-semibold italic mb-4">${reason}</p>
+                        <div class="flex items-center justify-between bg-zinc-800/50 rounded-xl p-3 border border-white/5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-black text-white uppercase">${techName.substring(0, 2)}</div>
+                                <div><p class="text-[9px] text-zinc-500 font-bold leading-none mb-0.5 uppercase">Técnico</p><span class="text-white text-xs font-bold uppercase">${techName}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.prepend(notification); 
+            playAlertSound();
+            speakText(`Alerta na ${machineName}. ${reason}.`);
+            setTimeout(() => closeNotification(id), 8000);
+        };
+
+        function closeNotification(id) {
+            const el = document.getElementById(id);
+            if (el && !el.classList.contains('notification-out')) {
+                el.classList.add('notification-out');
+                setTimeout(() => el.remove(), 500);
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-date').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).toUpperCase();
+        }
+
+        function render() {
+            const container = document.getElementById('machines-container');
+            container.innerHTML = staticMachines.map(m => {
+                const badgeClass = m.status === 'error' ? 'bg-red-500' : 'bg-amber-500';
+                const borderClass = m.status === 'error' ? 'border-red-500/40 bg-red-500/5' : 'border-amber-500/40 bg-amber-500/5';
+                return `
+                    <div class="flex flex-col border rounded-2xl p-5 card-shadow ${borderClass} h-full justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded text-white uppercase ${badgeClass}">${m.type}</span>
+                            <span class="text-3xl font-bold font-mono ${m.status === 'error' ? 'text-red-500' : 'text-amber-500'} tabular-nums leading-none">${m.time}</span>
+                        </div>
+                        <div class="mt-2">
+                            <h3 class="text-xl font-extrabold text-white leading-tight mb-1 truncate">${m.name}</h3>
+                            <p class="text-zinc-400 text-xs italic flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full ${m.status === 'error' ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}"></span> ${m.reason}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('stopped-count').textContent = staticMachines.filter(m => m.status === 'error').length.toString().padStart(2, '0');
+            document.getElementById('stopped-count-badge').textContent = staticMachines.length;
+        }
+
+        window.onload = () => {
+            updateDateTime();
+            render();
+            initChart();
+            setInterval(updateDateTime, 1000);
+            window.speechSynthesis.getVoices();
+        };
+    </script>
+</body>
+</html>

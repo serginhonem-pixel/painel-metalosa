@@ -13,6 +13,7 @@ import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json'
 import vendedoresData from './data/vendedores.json';
 import bensData from './data/bens.json';
 import veiculosData from './data/relacao_veiculos.json';
+import DashboardManutencaoTV from './components/DashboardManutencaoTV';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
@@ -7342,74 +7343,12 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {manutencaoKpis.map((kpi) => (
-                      <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.9)]">
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">{kpi.label}</p>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="text-3xl font-black text-white">{kpi.value}</span>
-                          <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="rounded-2xl border border-rose-500/50 bg-rose-500/10 p-6 shadow-[0_20px_40px_-30px_rgba(244,63,94,0.6)]">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-rose-200 font-bold">Paradas ativas</p>
-                      <p className="text-3xl font-black text-rose-100 mt-3">{manutencaoParadas.length}</p>
-                      <p className="text-xs text-rose-200/80 mt-2">Processos parados</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Paradas em andamento</h3>
-                      <div className="mt-4 space-y-3">
-                        {manutencaoParadas.length ? (
-                          manutencaoParadas.slice(0, 6).map((item) => (
-                            <div key={item.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="text-sm font-bold text-white">{item.ativo || item.setor || item.id}</p>
-                                  <p className="text-xs text-slate-400">{item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}</p>
-                                </div>
-                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">
-                                  {item.prioridade || 'Media'}
-                                </span>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                            Sem paradas registradas.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Resumo operacional</h3>
-                      <div className="mt-4 grid grid-cols-1 gap-4">
-                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">OS abertas</p>
-                          <p className="text-2xl font-black text-white mt-2">
-                            {manutencaoKpis.find((kpi) => kpi.id === 'abertas')?.value || 0}
-                          </p>
-                        </div>
-                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Em andamento</p>
-                          <p className="text-2xl font-black text-blue-200 mt-2">
-                            {manutencaoKpis.find((kpi) => kpi.id === 'andamento')?.value || 0}
-                          </p>
-                        </div>
-                        <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                          <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Finalizadas</p>
-                          <p className="text-2xl font-black text-emerald-200 mt-2">
-                            {manutencaoKpis.find((kpi) => kpi.id === 'finalizadas')?.value || 0}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <DashboardManutencaoTV
+                  agora={agora}
+                  manutencaoParadas={manutencaoParadas}
+                  manutencaoOrdens={manutencaoOrdens}
+                  logoSrc={logoMetalosa}
+                />
               )}
             </div>
           )}
