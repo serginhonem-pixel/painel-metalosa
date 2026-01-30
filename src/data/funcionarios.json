@@ -813,5 +813,55 @@
     "nome": "Wesley Reinoso",
     "setor": "Perfilados",
     "gestor": "Karla"
+  },
+  {
+    "nome": "Judismar",
+    "setor": "Manutencao - Mecanico",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Marlon",
+    "setor": "Manutencao - Mecanico",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Alex",
+    "setor": "Manutencao - Mecanico",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Guilherme",
+    "setor": "Manutencao - Mecanico",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Jose Fernando",
+    "setor": "Manutencao - Mecanico",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Luizma",
+    "setor": "Manutencao - Caldeiraria",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Cristiano",
+    "setor": "Manutencao - Caldeiraria",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Juliano",
+    "setor": "Manutencao - Eletricista",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Rogerio",
+    "setor": "Manutencao - Eletricista",
+    "gestor": "Manutencao"
+  },
+  {
+    "nome": "Matheus",
+    "setor": "Manutencao - Eletricista",
+    "gestor": "Manutencao"
   }
 ]

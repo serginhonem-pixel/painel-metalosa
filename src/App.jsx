@@ -597,6 +597,9 @@ export default function App() {
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
   const [manutencaoEditId, setManutencaoEditId] = useState(null);
+  const [assumirModalOs, setAssumirModalOs] = useState(null);
+  const [assumirResponsavel, setAssumirResponsavel] = useState('');
+  const [assumirErro, setAssumirErro] = useState('');
   const [processoEditOpen, setProcessoEditOpen] = useState(false);
   const [processoEditId, setProcessoEditId] = useState(null);
   const [processoEditValue, setProcessoEditValue] = useState('');
@@ -792,22 +795,36 @@ export default function App() {
 
   const isAllowedDomain =
     authUser?.email?.toLowerCase()?.endsWith('@metalosa.com.br');
-  const isManutencaoOnly =
-    authUser?.email?.toLowerCase() === 'manutencao@metalosa.com.br';
+  const manutencaoRestritaEmails = [
+    'manutencao@metalosa.com.br',
+    'wilson@metalosa.com.br',
+  ];
+  const isManutencaoOnly = manutencaoRestritaEmails.includes(
+    authUser?.email?.toLowerCase()
+  );
   const isManutencaoOperador = [
     'manutencao@metalosa.com.br',
     'pcp@metalosa.com.br',
+    'wilson@metalosa.com.br',
   ].includes(authUser?.email?.toLowerCase());
   const isPortfolioDisabled = true;
-  const currentUserLabel = authUser?.displayName || authUser?.email || 'Usuario';
+  const currentUserLabel = useMemo(() => {
+    const email = authUser?.email?.toLowerCase();
+    if (email === 'pcp@metalosa.com.br') return 'Sergio Betini';
+    if (email === 'sergio@metalosa.com.br') return 'Sergio Betini';
+    if (email === 'wilson@metalosa.com.br') return 'Wilson';
+    if (email === 'industria@metalosa.com.br') return 'Leandro Freitas';
+    return authUser?.displayName || authUser?.email || 'Usuario';
+  }, [authUser?.displayName, authUser?.email]);
 
-  const menuItems = useMemo(
-    () =>
-      isManutencaoOnly
-        ? ITENS_MENU.filter((item) => item.id === 'manutencao')
-        : ITENS_MENU,
-    [isManutencaoOnly]
-  );
+  const menuItems = useMemo(() => {
+    if (isManutencaoOnly) {
+      return ITENS_MENU.filter((item) =>
+        ['dashboard-tv', 'manutencao'].includes(item.id)
+      );
+    }
+    return ITENS_MENU;
+  }, [isManutencaoOnly]);
 
   const ativosFiltrados = useMemo(() => {
     if (filtroAtivos === 'Todos') return listaMaquinas;
@@ -1779,10 +1796,16 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (isManutencaoOnly && abaAtiva !== 'manutencao') {
-      setAbaAtiva('manutencao');
+    if (isManutencaoOnly && !['dashboard-tv', 'manutencao'].includes(abaAtiva)) {
+      setAbaAtiva('dashboard-tv');
     }
   }, [isManutencaoOnly, abaAtiva]);
+
+  useEffect(() => {
+    if (isManutencaoOnly && dashboardView !== 'manutencao') {
+      setDashboardView('manutencao');
+    }
+  }, [isManutencaoOnly, dashboardView]);
 
   useEffect(() => {
     if (isPortfolioDisabled && abaAtiva === 'portfolio') {
@@ -2115,6 +2138,20 @@ export default function App() {
     () => (funcionariosFirestore.length ? funcionariosFirestore : funcionariosBase),
     [funcionariosFirestore]
   );
+  const manutencaoColaboradores = useMemo(() => {
+    return [
+      { nome: 'Judismar', setor: 'Manutencao - Mecanico' },
+      { nome: 'Marlon', setor: 'Manutencao - Mecanico' },
+      { nome: 'Alex', setor: 'Manutencao - Mecanico' },
+      { nome: 'Guilherme', setor: 'Manutencao - Mecanico' },
+      { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
+      { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
+      { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
+      { nome: 'Juliano', setor: 'Manutencao - Eletricista' },
+      { nome: 'Rogerio', setor: 'Manutencao - Eletricista' },
+      { nome: 'Matheus', setor: 'Manutencao - Eletricista' },
+    ];
+  }, []);
   const legacyIdMap = useMemo(() => {
     const map = new Map();
     colaboradores.forEach((colab) => {
@@ -9797,9 +9834,25 @@ const custoDetalheTitulo = custoDetalheItem
                                 <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
                                   <div>
                                     <p className="text-sm font-bold text-white">{item.ativo || item.setor || item.id}</p>
-                                    <p className="text-xs text-slate-400">{item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}</p>
+                                    <p className="text-xs text-slate-400">
+                                      {item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}
+                                    </p>
+                                    {item.responsavel && (
+                                      <p className="mt-1 text-xs font-semibold text-emerald-300">
+                                        Em atendimento: {item.responsavel}
+                                      </p>
+                                    )}
                                   </div>
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">{item.prioridade || 'Media'}</span>
+                                  <div className="flex flex-col items-end gap-2">
+                                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">
+                                      {item.prioridade || 'Media'}
+                                    </span>
+                                    {item.responsavel && (
+                                      <span className="text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-emerald-200">
+                                        Em atendimento
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               );
                             })}
@@ -9932,12 +9985,11 @@ const custoDetalheTitulo = custoDetalheItem
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    atualizarOs(os.id, {
-                                      responsavel: currentUserLabel,
-                                      status: 'Em andamento',
-                                    })
-                                  }
+                                  onClick={() => {
+                                    setAssumirModalOs(os);
+                                    setAssumirResponsavel('');
+                                    setAssumirErro('');
+                                  }}
                                   className="rounded-full border border-cyan-400/60 px-3 py-1 text-xs font-bold text-cyan-100 hover:bg-cyan-500/10"
                                 >
                                   Assumir
@@ -10032,13 +10084,37 @@ const custoDetalheTitulo = custoDetalheItem
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Ativo</label>
-                            <input name="ativo" list="manutencao-ativos" value={novaOsForm.ativo} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Injetora 01" required />
+                            <select
+                              name="ativo"
+                              value={novaOsForm.ativo}
+                              onChange={handleNovaOsChange}
+                              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none md:hidden"
+                              required
+                            >
+                              <option value="">Selecione...</option>
+                              {listaMaquinas.map((item) => (
+                                <option key={item.id} value={item.nome}>
+                                  {`${item.nome} - ${item.setor}`}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              name="ativo"
+                              list="manutencao-ativos"
+                              value={novaOsForm.ativo}
+                              onChange={handleNovaOsChange}
+                              className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none hidden md:block"
+                              placeholder="Ex: Injetora 01"
+                              required
+                            />
                             <datalist id="manutencao-ativos">
                               {listaMaquinas.map((item) => (
-                                <option key={item.id} value={item.nome}>{`${item.nome} • ${item.setor}`}</option>
+                                <option key={item.id} value={item.nome}>
+                                  {`${item.nome} - ${item.setor}`}
+                                </option>
                               ))}
                             </datalist>
-                          </div>
+</div>
                           <div>
                             <label className="text-xs font-bold text-slate-400">Setor</label>
                             <input name="setor" value={novaOsForm.setor} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Producao A" required />
@@ -10224,6 +10300,91 @@ const custoDetalheTitulo = custoDetalheItem
                           </button>
                         </div>
                       </form>
+                    </div>
+                  </div>
+                )}
+
+                {assumirModalOs && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 px-4 py-6">
+                    <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
+                      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
+                        <div>
+                          <h3 className="text-lg font-black text-white">Assumir OS</h3>
+                          <p className="text-xs text-slate-400">
+                            Selecione o responsavel para esta ordem.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setAssumirModalOs(null)}
+                          className="text-slate-400 hover:text-white"
+                        >
+                          <XCircle size={20} />
+                        </button>
+                      </div>
+
+                      <div className="px-6 py-5 space-y-4">
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                          <p className="text-xs text-slate-400">OS</p>
+                          <p className="text-sm font-bold text-white">
+                            {assumirModalOs.ativo || assumirModalOs.id}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {assumirModalOs.setor || 'Sem setor'} · {assumirModalOs.prioridade || '-'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-400 mb-2">
+                            Responsavel
+                          </label>
+                          <select
+                            value={assumirResponsavel}
+                            onChange={(e) => setAssumirResponsavel(e.target.value)}
+                            className="w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                          >
+                            <option value="">Selecione...</option>
+                            {manutencaoColaboradores.map((colab) => (
+                              <option key={colab.id || colab.nome} value={colab.nome}>
+                                {colab.nome} {colab.setor ? `- ${colab.setor}` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {assumirErro && (
+                          <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                            {assumirErro}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-end gap-3 border-t border-slate-800 px-6 py-4">
+                        <button
+                          type="button"
+                          onClick={() => setAssumirModalOs(null)}
+                          className="rounded-full border border-slate-700 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!assumirResponsavel) {
+                              setAssumirErro('Selecione um responsavel.');
+                              return;
+                            }
+                            atualizarOs(assumirModalOs.id, {
+                              responsavel: assumirResponsavel,
+                              status: 'Em andamento',
+                            });
+                            setAssumirModalOs(null);
+                          }}
+                          className="rounded-full border border-cyan-400/60 bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-100 hover:bg-cyan-500/20"
+                        >
+                          Confirmar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
