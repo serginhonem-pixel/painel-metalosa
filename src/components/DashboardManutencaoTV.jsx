@@ -63,6 +63,7 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
   const [rotationIndex, setRotationIndex] = useState(0);
   const [clockNow, setClockNow] = useState(() => new Date());
   const prevIdsRef = useRef(new Set());
+  const prevStateRef = useRef(new Map());
   const readyRef = useRef(false);
   const audioCtxRef = useRef(null);
 
@@ -156,14 +157,26 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     oscillator.type = 'sawtooth';
-    oscillator.frequency.setValueAtTime(350, audioCtx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.1);
-    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    gainNode.gain.setValueAtTime(0.0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 0.05);
+
+    // Sirene: varre entre 520Hz e 980Hz por ~2.2s
+    const start = audioCtx.currentTime;
+    const sweepUp = 0.35;
+    const sweepDown = 0.35;
+    let t = start;
+    for (let i = 0; i < 3; i += 1) {
+      oscillator.frequency.setValueAtTime(520, t);
+      oscillator.frequency.exponentialRampToValueAtTime(980, t + sweepUp);
+      oscillator.frequency.exponentialRampToValueAtTime(520, t + sweepUp + sweepDown);
+      t += sweepUp + sweepDown;
+    }
+
+    gainNode.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.4);
+    oscillator.start(start);
+    oscillator.stop(t + 0.3);
   };
 
   const speakText = (text) => {
@@ -191,7 +204,7 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
     }, 500);
   };
 
-  const triggerNotification = (os) => {
+  const triggerNotification = (os, override = {}) => {
     const id = `notif-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const prioridade = (os?.prioridade || '').toLowerCase();
     const tipo = (os?.tipo || '').toLowerCase();
@@ -201,10 +214,10 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
 
     const notif = {
       id,
-      severity,
+      severity: override.severity || severity,
       machine: os?.ativo || os?.setor || 'Equipamento',
       tech: os?.responsavel || os?.solicitante || 'Equipe',
-      reason: os?.sintoma || os?.descricao || 'Nova ocorrencia registrada.',
+      reason: override.reason || os?.sintoma || os?.descricao || 'Nova ocorrência registrada.',
     };
     setNotifications((prev) => [notif, ...prev].slice(0, 4));
     playAlertSound();
@@ -214,18 +227,80 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
 
   useEffect(() => {
     const ids = new Set(manutencaoOrdens.map((os) => os.id));
+    const nextMap = new Map(
+      manutencaoOrdens.map((os) => [
+        os.id,
+        {
+          status: os.status,
+          statusMaquina: os.statusMaquina,
+          responsavel: os.responsavel,
+          fechado: os.fechadaEm,
+        },
+      ])
+    );
+
     if (!readyRef.current) {
       prevIdsRef.current = ids;
+      prevStateRef.current = nextMap;
       readyRef.current = true;
       return;
     }
     if (!systemStarted) {
       prevIdsRef.current = ids;
+      prevStateRef.current = nextMap;
       return;
     }
+
     const novos = manutencaoOrdens.filter((os) => !prevIdsRef.current.has(os.id));
-    prevIdsRef.current = ids;
     novos.forEach((os) => triggerNotification(os));
+
+    manutencaoOrdens.forEach((os) => {
+      const prev = prevStateRef.current.get(os.id);
+      if (!prev) return;
+      const statusMudou = prev.status !== os.status;
+      const maquinaMudou = prev.statusMaquina !== os.statusMaquina;
+      const respMudou = (prev.responsavel || '').toLowerCase() !== (os.responsavel || '').toLowerCase();
+
+      if (respMudou && os.responsavel) {
+        triggerNotification(os, {
+          severity: 'blue',
+          reason: `OS assumida por ${os.responsavel}.`,
+        });
+      }
+
+      if (statusMudou && os.status) {
+        if (os.status.toLowerCase().includes('andamento')) {
+          triggerNotification(os, {
+            severity: 'amber',
+            reason: 'Serviço em andamento.',
+          });
+        }
+        if (os.status.toLowerCase().includes('finalizada')) {
+          triggerNotification(os, {
+            severity: 'blue',
+            reason: 'Serviço finalizado.',
+          });
+        }
+      }
+
+      if (maquinaMudou && os.statusMaquina) {
+        if (os.statusMaquina.toLowerCase().includes('rodando')) {
+          triggerNotification(os, {
+            severity: 'blue',
+            reason: 'Máquina liberada.',
+          });
+        }
+        if (os.statusMaquina.toLowerCase().includes('parada')) {
+          triggerNotification(os, {
+            severity: 'red',
+            reason: 'Máquina parada novamente.',
+          });
+        }
+      }
+    });
+
+    prevIdsRef.current = ids;
+    prevStateRef.current = nextMap;
   }, [manutencaoOrdens, systemStarted]);
 
   const startSystem = () => {
@@ -234,7 +309,7 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
     }
     setSystemStarted(true);
     window.speechSynthesis?.getVoices?.();
-    speakText('Sistema Luminary ativo. Monitorização de rede iniciada.');
+    speakText('Sistema de monitoramento Metalosa ativo. Monitorização de rede iniciada.');
   };
 
   const cards = paradasVisiveis.length ? paradasVisiveis : [];
@@ -314,41 +389,6 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
       )}
 
       <div className={`h-full w-full p-6 lg:p-8 flex flex-col gap-6 transition-opacity duration-700 ${systemStarted ? 'opacity-100' : 'opacity-20'}`}>
-        <header className="flex justify-between items-center border-b border-white/5 pb-4 shrink-0">
-          <div className="flex items-center gap-6">
-            {logoSrc && (
-              <div className="bg-blue-600 px-4 py-2 rounded-lg font-black text-xl italic tracking-tighter">
-                <img src={logoSrc} alt="Metalosa" className="h-6 w-auto object-contain" />
-              </div>
-            )}
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight leading-none mb-1">
-                Monitorização de Produção
-              </h1>
-              <p className="text-zinc-500 font-medium text-xs uppercase tracking-widest">
-                {clockNow
-                  .toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
-                  .toUpperCase()}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-8">
-            <div className="text-right border-r border-white/10 pr-8 hidden lg:block">
-              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-1">Status do sistema</p>
-              <div className="flex items-center gap-2 justify-end text-emerald-500 font-bold text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                SISTEMA OPERACIONAL
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-5xl font-bold font-mono text-white tabular-nums leading-none">
-                {clockNow.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </p>
-            </div>
-          </div>
-        </header>
-
         <main className="flex flex-1 gap-6 min-h-0 overflow-hidden">
           <div className="flex-[1.8] flex flex-col min-h-0">
             <div className="flex justify-between items-center mb-4 shrink-0">

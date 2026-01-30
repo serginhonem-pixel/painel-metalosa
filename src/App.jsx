@@ -786,7 +786,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => setAgora(new Date()), 30000);
+    const timer = setInterval(() => setAgora(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -7153,7 +7153,21 @@ const custoDetalheTitulo = custoDetalheItem
                       {agora.toLocaleDateString('pt-BR')}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="hidden md:flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-2">
+                      <div className="text-right border-r border-slate-700 pr-4">
+                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Status do sistema</p>
+                        <div className="flex items-center gap-2 justify-end text-emerald-400 font-bold text-xs">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                          SISTEMA OPERACIONAL
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-3xl font-black font-mono text-white tabular-nums leading-none">
+                          {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
                     {dashboardView === 'faturamento' && dashboardFilialAtual && (
                       <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-emerald-200">
                         Filial {dashboardFilialAtual} · troca 10s
