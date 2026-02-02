@@ -526,6 +526,12 @@ export default function App() {
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
   const [diaFaturamentoSelecionado, setDiaFaturamentoSelecionado] = useState(null);
   const [faturamentoTabelaView, setFaturamentoTabelaView] = useState('dia');
+  const [faturamentoAno, setFaturamentoAno] = useState(() =>
+    String(new Date().getFullYear())
+  );
+  const [faturamentoMes, setFaturamentoMes] = useState(() =>
+    String(new Date().getMonth() + 1).padStart(2, '0')
+  );
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [carregando, setCarregando] = useState(true);
@@ -3497,6 +3503,9 @@ export default function App() {
     const normalizadas = faturamentoLinhas.map((row) => {
       const mesInfo = obterMesKey(row);
       const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      const vendedorCodigo = normalizarCodigoVendedor(
+        row?.Vendedor1 ?? row?.vendedor1 ?? row?.Vendedor ?? row?.vendedor ?? ''
+      );
       return {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
@@ -3513,6 +3522,7 @@ export default function App() {
         mesDisplay: mesInfo?.display,
         tipoMovimento,
         cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
+        vendedorCodigo,
       };
     });
 
@@ -3527,15 +3537,25 @@ export default function App() {
     const linhasMes = mesAtual
       ? normalizadas.filter((row) => row.mesKey === mesAtual)
       : normalizadas;
+    const linhasPeriodo =
+      faturamentoInicio || faturamentoFim
+        ? normalizadas.filter((row) => {
+            if (!row.emissao) return false;
+            const dataISO = row.emissao.toISOString().slice(0, 10);
+            if (faturamentoInicio && dataISO < faturamentoInicio) return false;
+            if (faturamentoFim && dataISO > faturamentoFim) return false;
+            return true;
+          })
+        : linhasMes;
 
     const filiaisBase = Array.from(
-      new Set(linhasMes.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
+      new Set(linhasPeriodo.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
     ).sort((a, b) => String(a).localeCompare(String(b)));
 
     const filtradasPorFilial =
       filtroFilial === 'Todas'
-        ? linhasMes
-        : linhasMes.filter((row) => row.filial === filtroFilial);
+        ? linhasPeriodo
+        : linhasPeriodo.filter((row) => row.filial === filtroFilial);
     const linhasFiltradas =
       filtroCfops.length === 0
         ? filtradasPorFilial
@@ -3632,12 +3652,13 @@ export default function App() {
 
       if (row.emissao) {
         const diaISO = row.emissao.toISOString().slice(0, 10);
-        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + row.valorTotal);
+        const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
+        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
         if (!diaFilialMap.has(diaISO)) {
           diaFilialMap.set(diaISO, new Map());
         }
         const mapaFilial = diaFilialMap.get(diaISO);
-        mapaFilial.set(filial, (mapaFilial.get(filial) || 0) + row.valorTotal);
+        mapaFilial.set(filial, (mapaFilial.get(filial) || 0) + valorDia);
       }
     });
 
@@ -3780,7 +3801,7 @@ export default function App() {
       estadosTodos,
       municipiosMapa,
     };
-  }, [faturamentoLinhas, filtroFilial, filtroCfops]);
+  }, [faturamentoLinhas, filtroFilial, filtroCfops, faturamentoInicio, faturamentoFim]);
 
   const dashboardFaturamentoBase = useMemo(() => {
     const produtosPorCodigo = new Map(
@@ -3978,7 +3999,8 @@ export default function App() {
 
       if (row.emissao) {
         const diaISO = row.emissao.toISOString().slice(0, 10);
-        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + row.valorTotal);
+        const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
+        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
       }
     });
 
@@ -4139,7 +4161,7 @@ export default function App() {
       const codigoCliente = normalizarCodigoCliente(row.cliente);
       const infoCliente = clientesPorCodigo.get(codigoCliente);
       const clienteNome = row.clienteNome ?? infoCliente?.nome ?? '';
-      const vendedorCodigo = infoCliente?.vendedor || '';
+      const vendedorCodigo = row.vendedorCodigo || infoCliente?.vendedor || '';
       const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
       return { ...row, clienteNome, vendedorNome };
     });
@@ -4184,7 +4206,7 @@ export default function App() {
     () =>
       faturamentoAtual.linhas.map((row) => {
         const codigoCliente = normalizarCodigoCliente(row.cliente);
-        const vendedorCodigo = clientesPorCodigoVendedor.get(codigoCliente) || '';
+        const vendedorCodigo = row.vendedorCodigo || clientesPorCodigoVendedor.get(codigoCliente) || '';
         const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
         return { ...row, vendedorNome };
       }),
@@ -4202,6 +4224,39 @@ export default function App() {
       return true;
     });
   }, [faturamentoLinhasComVendedor, faturamentoInicio, faturamentoFim]);
+
+  const mesesDisponiveisPorAno = useMemo(() => {
+    const mapa = new Map();
+    (faturamentoLinhas || []).forEach((row) => {
+      const mesInfo = obterMesKey(row);
+      if (!mesInfo?.key) return;
+      const [ano, mes] = mesInfo.key.split('-');
+      if (!mapa.has(ano)) mapa.set(ano, new Set());
+      mapa.get(ano).add(mes);
+    });
+    const anoAtual = String(new Date().getFullYear());
+    if (!mapa.has(anoAtual)) mapa.set(anoAtual, new Set());
+    return Array.from(mapa.entries())
+      .map(([ano, meses]) => ({ ano, meses: Array.from(meses).sort() }))
+      .sort((a, b) => a.ano.localeCompare(b.ano));
+  }, [faturamentoLinhas]);
+
+  const mesesDoAnoSelecionado = useMemo(() => {
+    const registro = mesesDisponiveisPorAno.find((item) => item.ano === String(faturamentoAno));
+    if (registro && registro.meses.length) return registro.meses;
+    return ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  }, [mesesDisponiveisPorAno, faturamentoAno]);
+
+  const aplicarFiltroMes = (ano, mes) => {
+    if (!ano || !mes) return;
+    setFaturamentoAno(String(ano));
+    setFaturamentoMes(String(mes).padStart(2, '0'));
+    const inicio = new Date(Date.UTC(Number(ano), Number(mes) - 1, 1));
+    const fim = new Date(Date.UTC(Number(ano), Number(mes), 0));
+    setFaturamentoInicio(inicio.toISOString().slice(0, 10));
+    setFaturamentoFim(fim.toISOString().slice(0, 10));
+    setDiaFaturamentoSelecionado(null);
+  };
 
   const faturamentoPorVendedor = useMemo(() => {
     const mapa = new Map();
@@ -4872,6 +4927,12 @@ export default function App() {
       setDiaFaturamentoSelecionado(null);
     }
   }, [diaFaturamentoSelecionado, faturamentoAtual.porDia]);
+
+  useEffect(() => {
+    if (filtroFilial === 'Todas') return;
+    if (faturamentoAtual.filiais.includes(filtroFilial)) return;
+    setFiltroFilial('Todas');
+  }, [faturamentoAtual.filiais, filtroFilial]);
 
   const faturamento2025 = useMemo(() => {
     const clientesPorCodigo = new Map(
@@ -8322,7 +8383,7 @@ const custoDetalheTitulo = custoDetalheItem
                             const chartW = width - margin.left - margin.right;
                             const chartH = height - margin.top - margin.bottom;
                             const dados = faturamentoAtual.porDia;
-                            const maxValor = Math.max(...dados.map((item) => item.valor), 1);
+                            const maxValor = Math.max(...dados.map((item) => Math.abs(item.valor)), 1);
                             const barW = chartW / Math.max(dados.length, 1);
                             const barGap = 8;
                             const barWidth = Math.max(barW - barGap, 8);
@@ -8362,7 +8423,7 @@ const custoDetalheTitulo = custoDetalheItem
                                 ))}
                                 {dados.map((item, i) => {
                                   const xBase = margin.left + i * barW + barGap / 2;
-                                  const barH = (item.valor / maxValor) * chartH;
+                                  const barH = (Math.abs(item.valor) / maxValor) * chartH;
                                   const y = margin.top + chartH - barH;
                                   const isSelecionado = diaFaturamentoSelecionado === item.dia;
                                   const variacao = variacoes[i];
