@@ -3838,6 +3838,7 @@ export default function App() {
     if (!faturamentoLinhas.length) {
       return {
         linhasMes: [],
+        linhasTodas: [],
         filiais: [],
         mes: '',
         produtosPorCodigo,
@@ -3886,6 +3887,7 @@ export default function App() {
 
     return {
       linhasMes,
+      linhasTodas: normalizadas,
       filiais,
       mes: mesAtualDisplay,
       produtosPorCodigo,
@@ -3919,14 +3921,31 @@ export default function App() {
   }, [abaAtiva, dashboardView, dashboardFiliais.length]);
 
   const dashboardFaturamentoFilial = useMemo(() => {
-    const { linhasMes, clientesPorCodigo, produtosPorCodigo, municipiosPorChave } = dashboardFaturamentoBase;
+    const {
+      linhasMes,
+      linhasTodas,
+      clientesPorCodigo,
+      produtosPorCodigo,
+      municipiosPorChave,
+    } = dashboardFaturamentoBase;
     const linhasBase = dashboardFilialAtual
       ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
       : linhasMes;
+    const linhasBaseDia = dashboardFilialAtual
+      ? linhasTodas.filter((row) => row.filial === dashboardFilialAtual)
+      : linhasTodas;
     const linhasFiltradas =
       filtroCfops.length === 0
         ? linhasBase
         : linhasBase.filter((row) => {
+            if (row.tipoMovimento === 'devolucao') return true;
+            const cfop = String(row.cfop || '').trim();
+            return cfop ? filtroCfops.includes(cfop) : false;
+          });
+    const linhasFiltradasDia =
+      filtroCfops.length === 0
+        ? linhasBaseDia
+        : linhasBaseDia.filter((row) => {
             if (row.tipoMovimento === 'devolucao') return true;
             const cfop = String(row.cfop || '').trim();
             return cfop ? filtroCfops.includes(cfop) : false;
@@ -3997,11 +4016,13 @@ export default function App() {
       const unidadeKey = String(row.unidade || 'N/A');
       prod.unidades.set(unidadeKey, (prod.unidades.get(unidadeKey) || 0) + (qtd || 1));
 
-      if (row.emissao) {
-        const diaISO = row.emissao.toISOString().slice(0, 10);
-        const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
-        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
-      }
+    });
+
+    linhasFiltradasDia.forEach((row) => {
+      if (!row.emissao) return;
+      const diaISO = row.emissao.toISOString().slice(0, 10);
+      const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
+      diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
     });
 
     const porDia = Array.from(diaMap.entries())
@@ -7371,18 +7392,27 @@ const custoDetalheTitulo = custoDetalheItem
                           if (!dados.length) {
                             return <p className="text-xs text-slate-500 italic">Sem dados no periodo.</p>;
                           }
-                          const width = 520;
-                            const height = 380;
+                          const height = 380;
                           const margin = { top: 24, right: 16, bottom: 30, left: 16 };
+                          const slotWidth = 90;
+                          const minWidth = 360;
+                          const maxWidth = 520;
+                          const width = Math.max(
+                            minWidth,
+                            Math.min(maxWidth, margin.left + margin.right + slotWidth * Math.max(dados.length, 1))
+                          );
                           const chartW = width - margin.left - margin.right;
                           const chartH = height - margin.top - margin.bottom;
                           const maxValor = Math.max(...dados.map((item) => item.valor), 1);
                           const media = dados.reduce((acc, item) => acc + item.valor, 0) / dados.length;
                           const yMedia = margin.top + chartH - (media / maxValor) * chartH;
                           const barW = chartW / Math.max(dados.length, 1);
-                          const barWidth = Math.max(barW - 12, 10);
+                          const barWidth = Math.min(90, Math.max(barW - 12, 10));
                           return (
-                            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
+                            <svg
+                              viewBox={`0 0 ${width} ${height}`}
+                              className="w-full h-80"
+                            >
                               <defs>
                                 <linearGradient id="dashBar" x1="0" y1="0" x2="0" y2="1">
                                   <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.95" />
