@@ -4247,6 +4247,21 @@ export default function App() {
     return ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   }, [mesesDisponiveisPorAno, faturamentoAno]);
 
+  const mesesLabelFaturamento = [
+    'Janeiro',
+    'Fevereiro',
+    'Marco',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
+
   const aplicarFiltroMes = (ano, mes) => {
     if (!ano || !mes) return;
     setFaturamentoAno(String(ano));
@@ -6705,7 +6720,7 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                <div className="xl:col-span-6 space-y-4">
+                <div className="xl:col-span-4 space-y-4">
                   <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                       <div>
@@ -6813,7 +6828,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 </div>
 
-                <div className="xl:col-span-6 space-y-6">
+                <div className="xl:col-span-8 space-y-6">
                   <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm space-y-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -8372,21 +8387,58 @@ const custoDetalheTitulo = custoDetalheItem
 
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-3">
-                          <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center justify-between mb-4 gap-3">
                             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Faturamento por dia</h4>
-                            <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Mes</span>
+                                <select
+                                  value={faturamentoMes}
+                                  onChange={(event) => aplicarFiltroMes(faturamentoAno, event.target.value)}
+                                  className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                >
+                                  {mesesDoAnoSelecionado.map((mes) => (
+                                    <option key={mes} value={mes}>
+                                      {mesesLabelFaturamento[Number(mes) - 1] || mes}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <span className="text-xs text-slate-400">
+                                {faturamentoAtual.porDia.filter((item) =>
+                                  String(item.dia || '').startsWith(`${faturamentoAno}-${faturamentoMes}`)
+                                ).length}{' '}
+                                dias
+                              </span>
+                            </div>
                           </div>
                           {(() => {
-                            const width = 1400;
+                            const dadosMes = faturamentoAtual.porDia.filter((item) =>
+                              String(item.dia || '').startsWith(`${faturamentoAno}-${faturamentoMes}`)
+                            );
+                            const dados = dadosMes;
+                            if (!dados.length) {
+                              return (
+                                <div className="h-60 flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl">
+                                  <p className="text-slate-400 text-sm italic">Sem dados para o mês selecionado.</p>
+                                </div>
+                              );
+                            }
                             const height = 420;
-                            const margin = { top: 54, right: 0, bottom: 50, left: 0 };
+                            const margin = { top: 54, right: 16, bottom: 50, left: 16 };
+                            const slotWidth = 90;
+                            const minWidth = 520;
+                            const maxWidth = 1400;
+                            const width = Math.max(
+                              minWidth,
+                              Math.min(maxWidth, margin.left + margin.right + slotWidth * Math.max(dados.length, 1))
+                            );
                             const chartW = width - margin.left - margin.right;
                             const chartH = height - margin.top - margin.bottom;
-                            const dados = faturamentoAtual.porDia;
                             const maxValor = Math.max(...dados.map((item) => Math.abs(item.valor)), 1);
                             const barW = chartW / Math.max(dados.length, 1);
                             const barGap = 8;
-                            const barWidth = Math.max(barW - barGap, 8);
+                            const barWidth = Math.min(90, Math.max(barW - barGap, 10));
                             const variacoes = dados.map((item, i) => {
                               if (i === 0) return null;
                               const anterior = dados[i - 1].valor;
@@ -8400,10 +8452,12 @@ const custoDetalheTitulo = custoDetalheItem
 
                             return (
                               <div className="space-y-4">
-                                <svg
-                                  viewBox={`0 0 ${width} ${height}`}
-                                  className="w-full h-[420px]"
-                                >
+                                <div className="overflow-x-auto">
+                                  <svg
+                                    viewBox={`0 0 ${width} ${height}`}
+                                    className="h-[420px] block mx-auto"
+                                    style={{ width }}
+                                  >
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
@@ -8492,7 +8546,8 @@ const custoDetalheTitulo = custoDetalheItem
                                     </g>
                                   );
                                 })}
-                              </svg>
+                                  </svg>
+                                </div>
                               <div className="rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                   <div>

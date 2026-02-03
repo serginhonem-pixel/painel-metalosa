@@ -3146,12 +3146,18 @@ export default function App() {
                             <span className="text-xs text-slate-400">{faturamentoAtual.porDia.length} dias</span>
                           </div>
                           {(() => {
-                            const width = 1000;
+                            const dados = faturamentoAtual.porDia;
                             const height = 310;
                             const margin = { top: 54, right: 20, bottom: 50, left: 58 };
+                            const slotWidth = 120;
+                            const minWidth = 420;
+                            const maxWidth = 1000;
+                            const width = Math.max(
+                              minWidth,
+                              Math.min(maxWidth, margin.left + margin.right + slotWidth * Math.max(dados.length, 1))
+                            );
                             const chartW = width - margin.left - margin.right;
                             const chartH = height - margin.top - margin.bottom;
-                            const dados = faturamentoAtual.porDia;
                             const maxValor = Math.max(...dados.map((item) => item.valor), 1);
                             const barW = chartW / Math.max(dados.length, 1);
                             let acumulado = 0;
@@ -3167,7 +3173,12 @@ export default function App() {
                             const areaPath = `${margin.left},${margin.top + chartH} ${linePath} ${margin.left + (linePoints.length - 1) * barW + (barW - 14) / 2 + 7},${margin.top + chartH}`;
 
                             return (
-                              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-80">
+                              <div className="overflow-x-auto">
+                                <svg
+                                  viewBox={`0 0 ${width} ${height}`}
+                                  className="h-80 block mx-auto"
+                                  style={{ width }}
+                                >
                                 <defs>
                                   <linearGradient id="diaBar" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.95" />
@@ -3254,6 +3265,7 @@ export default function App() {
                                   />
                                 ))}
                               </svg>
+                              </div>
                             );
                           })()}
                         </div>
