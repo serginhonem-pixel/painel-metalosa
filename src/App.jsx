@@ -3932,8 +3932,8 @@ export default function App() {
       ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
       : linhasMes;
     const linhasBaseDia = dashboardFilialAtual
-      ? linhasTodas.filter((row) => row.filial === dashboardFilialAtual)
-      : linhasTodas;
+      ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
+      : linhasMes;
     const linhasFiltradas =
       filtroCfops.length === 0
         ? linhasBase
