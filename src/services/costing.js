@@ -190,6 +190,7 @@ export const computeCostBreakdown = ({
   custosDiretosAnoAnterior = [],
   custosIndiretos = [],
   mesCustoAtual = '',
+  diasAtivos = 0,
 }) => {
   const periodoAtual = obterPeriodoAtual(linhas);
   const anoAtual = periodoAtual ? Number(periodoAtual.slice(0, 4)) : new Date().getFullYear();
@@ -219,22 +220,30 @@ export const computeCostBreakdown = ({
   let cifTotal = 0;
   let cifFonte = 'ATUAL';
   let periodForCif = '';
+  let cifMensalBruto = 0;
+  
   if (currentPeriodKey && indiretosPorMes.has(currentPeriodKey)) {
-    cifTotal = indiretosPorMes.get(currentPeriodKey) || 0;
+    cifMensalBruto = indiretosPorMes.get(currentPeriodKey) || 0;
     cifFonte = 'ATUAL';
     periodForCif = currentPeriodKey;
   } else if (currentPeriodKey) {
     const previousYear = `${Number(currentPeriodKey.slice(0, 4)) - 1}-${currentPeriodKey.slice(5)}`;
     if (indiretosPorMes.has(previousYear)) {
-      cifTotal = indiretosPorMes.get(previousYear) || 0;
+      cifMensalBruto = indiretosPorMes.get(previousYear) || 0;
       cifFonte = 'ANO_PASSADO';
       periodForCif = previousYear;
     } else {
-      cifTotal = indiretosPorMes.get(currentPeriodKey) || 0;
+      cifMensalBruto = indiretosPorMes.get(currentPeriodKey) || 0;
       periodForCif = currentPeriodKey;
       cifFonte = 'ATUAL';
     }
   }
+
+  // Proporcionalizar CIF pelo número de dias ativos no mês
+  // Considera 22 dias úteis como base mensal
+  const diasUteisMes = 22;
+  const diasParaRateio = diasAtivos > 0 ? Math.min(diasAtivos, diasUteisMes) : diasUteisMes;
+  cifTotal = (cifMensalBruto / diasUteisMes) * diasParaRateio;
 
   const agregados = new Map();
   (linhas || []).forEach((line) => {

@@ -778,6 +778,33 @@ export default function App() {
     setManutencaoModalOpen(true);
   };
 
+  const handleExcluirOs = async (ordem) => {
+    if (!window.confirm(`Tem certeza que deseja excluir a OS ${ordem.id}?`)) return;
+    try {
+      await deleteDoc(doc(db, 'manutencao_os', ordem.id));
+      setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
+    } catch (err) {
+      console.error('Erro ao excluir OS:', err);
+      alert('Erro ao excluir a ordem de serviço.');
+    }
+  };
+
+  const handleExcluirTodasOs = async () => {
+    if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de serviço? Esta ação não pode ser desfeita!')) return;
+    if (!window.confirm('CONFIRMAÇÃO FINAL: Isso apagará TODAS as ordens. Continuar?')) return;
+    try {
+      const batch = writeBatch(db);
+      manutencaoOrdens.forEach((ordem) => {
+        batch.delete(doc(db, 'manutencao_os', ordem.id));
+      });
+      await batch.commit();
+      setManutencaoOrdens([]);
+    } catch (err) {
+      console.error('Erro ao excluir todas as OS:', err);
+      alert('Erro ao excluir as ordens de serviço.');
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
@@ -4118,6 +4145,27 @@ export default function App() {
     };
   }, [dashboardFaturamentoBase, dashboardFilialAtual, filtroCfops]);
 
+  // Últimos 10 dias de faturamento (independente do mês selecionado)
+  const ultimos10DiasFaturamento = useMemo(() => {
+    if (!faturamentoLinhas || !faturamentoLinhas.length) return [];
+    
+    const diaMap = new Map();
+    faturamentoLinhas.forEach((row) => {
+      const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
+      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      if (emissao && tipoMovimento !== 'devolucao') {
+        const diaISO = emissao.toISOString().slice(0, 10);
+        const valor = obterValorLiquido(row);
+        diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valor);
+      }
+    });
+    
+    return Array.from(diaMap.entries())
+      .map(([dia, valor]) => ({ dia, valor }))
+      .sort((a, b) => a.dia.localeCompare(b.dia))
+      .slice(-10);
+  }, [faturamentoLinhas]);
+
   const dashboardMunicipiosBounds = useMemo(() => {
     if (dashboardFaturamentoFilial.municipiosMapa.length === 0) return null;
     let minLat = 90;
@@ -5262,9 +5310,11 @@ const faturamentoComCustos = useMemo(
       custosDiretosAnoAnterior: custosPrevanoData,
       custosIndiretos: custosIndiretosData,
       mesCustoAtual,
+      diasAtivos: faturamentoAtual.diasAtivos,
     }),
   [
     faturamentoAtual.linhas,
+    faturamentoAtual.diasAtivos,
     produtoDescricaoMap,
     custosData,
     custosPrevanoData,
@@ -6752,11 +6802,11 @@ const custoDetalheTitulo = custoDetalheItem
                         <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Histórico dos últimos dias ativos</p>
                       </div>
                       <span className="px-3 py-1.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">
-                        {faturamentoAtual.porDia.length} dias
+                        {ultimos10DiasFaturamento.length} dias
                       </span>
                     </div>
                     {(() => {
-                      const diasExibidos = faturamentoAtual.porDia.slice(-8);
+                      const diasExibidos = ultimos10DiasFaturamento;
                       if (!diasExibidos.length) {
                         return (
                           <div className="h-40 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
@@ -6765,8 +6815,8 @@ const custoDetalheTitulo = custoDetalheItem
                         );
                       }
                       const maxValor = diasExibidos.reduce((acc, item) => Math.max(acc, item.valor), 1);
-                      const mediaDia =
-                        faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0;
+                      const totalDias = diasExibidos.reduce((acc, item) => acc + item.valor, 0);
+                      const mediaDia = diasExibidos.length > 0 ? totalDias / diasExibidos.length : 0;
                       return (
                         <div className="space-y-4">
                           {diasExibidos.map((item) => {
@@ -10029,7 +10079,18 @@ const custoDetalheTitulo = custoDetalheItem
                 {subAbaManutencao === 'ordens' && (
                   <div className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)] overflow-hidden">
                     <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
+                      <div className="flex items-center gap-4">
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
+                        {manutencaoOrdens.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={handleExcluirTodasOs}
+                            className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold hover:bg-rose-500/40 transition-colors"
+                          >
+                            Excluir Todas ({manutencaoOrdens.length})
+                          </button>
+                        )}
+                      </div>
                       <div className="flex gap-2 text-xs">
                         <button className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 font-bold">Todas</button>
                         <button className="px-3 py-1 rounded-full bg-blue-500/30 text-blue-200 font-bold">Abertas</button>
@@ -10088,6 +10149,13 @@ const custoDetalheTitulo = custoDetalheItem
                                     className="ml-3 text-xs font-bold text-slate-300 hover:text-white"
                                   >
                                     Imprimir
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleExcluirOs(ordem)}
+                                    className="ml-3 text-xs font-bold text-rose-400 hover:text-rose-200"
+                                  >
+                                    Excluir
                                   </button>
                                 </td>
                               </tr>
