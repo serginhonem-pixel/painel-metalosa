@@ -12,6 +12,8 @@ src/Faturamento/faturamento.xlsx
 src/Faturamento/custos.xlsx
 src/data/Perfil Consolidado.xlsx
 src/data/vendedores.xlsx
+src/data/absenteismo.xlsx
+public/data/absenteismo.xlsx
 dist
 dist-ssr
 *.local
