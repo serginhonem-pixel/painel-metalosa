@@ -62,10 +62,10 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'custos', label: 'Custos', icon: Layers },
-  { id: 'portfolio', label: 'Portf√≥lio / Mix', icon: Briefcase },
-  { id: 'gestao', label: 'Opera√ß√£o Di√°ria', icon: Activity },
+  { id: 'portfolio', label: 'PortfÛlio / Mix', icon: Briefcase },
+  { id: 'gestao', label: 'OperaÁ„o Di·ria', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
-  { id: 'configuracao', label: 'Configura√ß√£o Global', icon: Settings },
+  { id: 'configuracao', label: 'ConfiguraÁ„o Global', icon: Settings },
 ];
 
 const MANUTENCAO_KPIS = [];
@@ -75,79 +75,6 @@ const SETORES_BASE = ['Industria', 'Transporte'];
 const SETORES_INICIAIS = [];
 const GESTORES_INICIAIS = ['Thalles'];
 const MAQUINAS_INICIAIS = [];
-
-const GUIA_OPERADOR_PASSOS = [
-  {
-    titulo: 'Abrir uma OS',
-    texto: 'Clique em "Nova OS" no topo da tela, preencha os campos e salve. Isso cria a ordem na fila.',
-  },
-  {
-    titulo: 'Assumir uma OS',
-    texto: 'Na aba "Operador", use o bot√£o "Assumir" na fila para pegar uma OS.',
-  },
-  {
-    titulo: 'Acompanhar a OS',
-    texto: 'Depois de assumir, ela aparece em "Minhas OS" para acompanhamento.',
-  },
-  {
-    titulo: 'Atualizar status',
-    texto: 'Use "Iniciar", "Pausar" ou "Finalizar" para registrar o andamento.',
-  },
-  {
-    titulo: 'Editar detalhes',
-    texto: 'Se precisar ajustar informa√ß√µes, clique em "Editar" dentro da OS.',
-  },
-];
-
-const GUIA_OPERADOR_TOUR = [
-  {
-    id: 'nova-os',
-    selector: '[data-tour="nova-os"]',
-    titulo: 'Abrir uma OS',
-    texto: 'Clique em "Nova OS" para registrar a ordem.',
-    placement: 'bottom',
-  },
-  {
-    id: 'nova-os-ativo',
-    selector: '[data-tour="nova-os-ativo"]',
-    titulo: 'Selecionar ativo',
-    texto: 'Escolha o ativo que precisa de manutencao.',
-    placement: 'right',
-    requiresModal: true,
-  },
-  {
-    id: 'nova-os-prioridade',
-    selector: '[data-tour="nova-os-prioridade"]',
-    titulo: 'Definir prioridade',
-    texto: 'Informe o nivel de prioridade da OS.',
-    placement: 'right',
-    requiresModal: true,
-  },
-  {
-    id: 'nova-os-sintoma',
-    selector: '[data-tour="nova-os-sintoma"]',
-    titulo: 'Sintoma',
-    texto: 'Descreva o sintoma observado na maquina.',
-    placement: 'right',
-    requiresModal: true,
-  },
-  {
-    id: 'nova-os-descricao',
-    selector: '[data-tour="nova-os-descricao"]',
-    titulo: 'Descrever o problema',
-    texto: 'Escreva o que esta acontecendo e o impacto.',
-    placement: 'right',
-    requiresModal: true,
-  },
-  {
-    id: 'nova-os-salvar',
-    selector: '[data-tour="nova-os-salvar"]',
-    titulo: 'Salvar OS',
-    texto: 'Clique em Salvar OS para registrar.',
-    placement: 'top',
-    requiresModal: true,
-  },
-];
 
 // --- Componentes de UI ---
 
@@ -385,69 +312,11 @@ const normalizarTexto = (texto) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const parseNumeroPlanilha = (valor) => {
-  if (typeof valor === 'number') return valor;
-  if (valor === null || valor === undefined) return 0;
-  const texto = String(valor).trim();
-  if (!texto) return 0;
-  const hasComma = texto.includes(',');
-  const hasDot = texto.includes('.');
-  let cleaned = texto;
-  if (hasComma) {
-    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
-  } else if (hasDot) {
-    cleaned = cleaned.replace(/[^0-9.-]/g, '');
-  }
-  cleaned = cleaned.replace(/[^0-9.-]/g, '');
-  const parsed = Number(cleaned);
-  return Number.isNaN(parsed) ? 0 : parsed;
-};
-
-const encontrarCabecalho = (rows, requiredKeys) => {
-  const required = requiredKeys.map((k) => normalizarTexto(k));
-  for (let i = 0; i < rows.length; i += 1) {
-    const row = rows[i] || [];
-    const normalized = row.map((cell) => normalizarTexto(cell));
-    const matches = required.filter((key) => normalized.includes(key));
-    if (matches.length >= Math.min(2, required.length)) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-const rowsToObjects = (rows, headerIndex) => {
-  if (headerIndex < 0) return [];
-  const header = (rows[headerIndex] || []).map((cell) => String(cell ?? '').trim());
-  const dataRows = rows.slice(headerIndex + 1);
-  return dataRows
-    .map((row) => {
-      const obj = {};
-      header.forEach((key, idx) => {
-        if (!key) return;
-        obj[key] = row[idx] ?? '';
-      });
-      return obj;
-    })
-    .filter((row) => Object.values(row).some((val) => String(val ?? '').trim()));
-};
-
-const encontrarSheet = (planilhas, includes) => {
-  const entries = Object.entries(planilhas || {});
-  const includesList = Array.isArray(includes) ? includes : [includes];
-  for (const [name, rows] of entries) {
-    const normal = normalizarTexto(name).replace(/\s+/g, '');
-    const match = includesList.every((item) => normal.includes(normalizarTexto(item).replace(/\s+/g, '')));
-    if (match) return rows;
-  }
-  return null;
-};
-
 const CFOP_SAIDA_TABLE = [
   {
     cfop: '5101',
-    descricaoFiscal: 'Venda de produ√ß√£o do estabelecimento',
-    pratica: 'Venda de produto fabricado pela pr√≥pria empresa, dentro do estado',
+    descricaoFiscal: 'Venda de produÁ„o do estabelecimento',
+    pratica: 'Venda de produto fabricado pela prÛpria empresa, dentro do estado',
     faturamento: '? Sim',
   },
   {
@@ -458,7 +327,7 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6101',
-    descricaoFiscal: 'Venda de produ√ß√£o do estabelecimento (interestadual)',
+    descricaoFiscal: 'Venda de produÁ„o do estabelecimento (interestadual)',
     pratica: 'Venda de produto fabricado, para outro estado',
     faturamento: '? Sim',
   },
@@ -470,13 +339,13 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6107',
-    descricaoFiscal: 'Venda de produ√ß√£o fora do estado sem destaque de ICMS',
-    pratica: 'Venda interestadual com tratamento fiscal espec√≠fico',
-    faturamento: '?? Depende (normalmente n√£o)',
+    descricaoFiscal: 'Venda de produÁ„o fora do estado sem destaque de ICMS',
+    pratica: 'Venda interestadual com tratamento fiscal especÌfico',
+    faturamento: '?? Depende (normalmente n„o)',
   },
   {
     cfop: '5401',
-    descricaoFiscal: 'Venda de produ√ß√£o do estabelecimento com ST',
+    descricaoFiscal: 'Venda de produÁ„o do estabelecimento com ST',
     pratica: 'Venda de produto fabricado com ICMS-ST',
     faturamento: '? Sim (bruto)',
   },
@@ -488,27 +357,27 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6401',
-    descricaoFiscal: 'Venda de produ√ß√£o do estabelecimento com ST (interestadual)',
+    descricaoFiscal: 'Venda de produÁ„o do estabelecimento com ST (interestadual)',
     pratica: 'Venda interestadual com ST',
     faturamento: '? Sim (bruto)',
   },
   {
     cfop: '5152',
-    descricaoFiscal: 'Transfer√™ncia de mercadoria entre estabelecimentos',
+    descricaoFiscal: 'TransferÍncia de mercadoria entre estabelecimentos',
     pratica: 'Envio entre filiais da mesma empresa',
-    faturamento: '? N√£o',
+    faturamento: '? N„o',
   },
   {
     cfop: '5405',
-    descricaoFiscal: 'Transfer√™ncia de produ√ß√£o do estabelecimento com ST',
-    pratica: 'Transfer√™ncia interna com ST',
-    faturamento: '? N√£o',
+    descricaoFiscal: 'TransferÍncia de produÁ„o do estabelecimento com ST',
+    pratica: 'TransferÍncia interna com ST',
+    faturamento: '? N„o',
   },
   {
     cfop: '5409',
-    descricaoFiscal: 'Transfer√™ncia de mercadoria adquirida de terceiros com ST',
-    pratica: 'Transfer√™ncia interna de mercadoria com ST',
-    faturamento: '? N√£o',
+    descricaoFiscal: 'TransferÍncia de mercadoria adquirida de terceiros com ST',
+    pratica: 'TransferÍncia interna de mercadoria com ST',
+    faturamento: '? N„o',
   },
   {
     cfop: '5915',
@@ -519,7 +388,7 @@ const CFOP_SAIDA_TABLE = [
   {
     cfop: '6108',
     descricaoFiscal: 'Venda de mercadoria adquirida de terceiros com ST (interestadual)',
-    pratica: 'Venda interestadual com ST e regra espec√≠fica',
+    pratica: 'Venda interestadual com ST e regra especÌfica',
     faturamento: '?? Depende',
   },
   {
@@ -530,27 +399,27 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '5201',
-    descricaoFiscal: 'Devolu√ß√£o de compra para industrializa√ß√£o',
+    descricaoFiscal: 'DevoluÁ„o de compra para industrializaÁ„o',
     pratica: 'Retorno de mercadoria ao fornecedor',
-    faturamento: '? N√£o',
+    faturamento: '? N„o',
   },
   {
     cfop: '6910',
-    descricaoFiscal: 'Bonifica√ß√£o / doa√ß√£o / brinde',
-    pratica: 'Sa√≠da sem cobran√ßa',
-    faturamento: '? N√£o',
+    descricaoFiscal: 'BonificaÁ„o / doaÁ„o / brinde',
+    pratica: 'SaÌda sem cobranÁa',
+    faturamento: '? N„o',
   },
   {
     cfop: '6915',
-    descricaoFiscal: 'Remessa simb√≥lica / retorno de industrializa√ß√£o',
-    pratica: 'Ajuste fiscal/log√≠stico',
-    faturamento: '? N√£o',
+    descricaoFiscal: 'Remessa simbÛlica / retorno de industrializaÁ„o',
+    pratica: 'Ajuste fiscal/logÌstico',
+    faturamento: '? N„o',
   },
   {
     cfop: '6901',
-    descricaoFiscal: 'Remessa para industrializa√ß√£o fora do estabelecimento',
-    pratica: 'Envio para industrializa√ß√£o em terceiro',
-    faturamento: '? N√£o',
+    descricaoFiscal: 'Remessa para industrializaÁ„o fora do estabelecimento',
+    pratica: 'Envio para industrializaÁ„o em terceiro',
+    faturamento: '? N„o',
   },
 ];
 
@@ -634,7 +503,7 @@ const isDataSemApontamento = (dataISO) =>
 const isDiaDesconsiderado = (dataISO) =>
   isFolgaColetiva(dataISO) || isFinalDeSemana(dataISO);
 
-// --- Aplica√ß√£o Principal ---
+// --- AplicaÁ„o Principal ---
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
@@ -651,11 +520,6 @@ export default function App() {
   const [dashboardFilialIndex, setDashboardFilialIndex] = useState(0);
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
   const [filtroCfops2025, setFiltroCfops2025] = useState([]);
-  const [guiaOperadorOpen, setGuiaOperadorOpen] = useState(false);
-  const [guiaOperadorStep, setGuiaOperadorStep] = useState(0);
-  const [tourOperadorOpen, setTourOperadorOpen] = useState(false);
-  const [tourOperadorStep, setTourOperadorStep] = useState(0);
-  const [tourOperadorPos, setTourOperadorPos] = useState(null);
   const [filtroFilial, setFiltroFilial] = useState('08');
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
@@ -921,13 +785,13 @@ export default function App() {
       setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
     } catch (err) {
       console.error('Erro ao excluir OS:', err);
-      alert('Erro ao excluir a ordem de servi√ßo.');
+      alert('Erro ao excluir a ordem de serviÁo.');
     }
   };
 
   const handleExcluirTodasOs = async () => {
-    if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de servi√ßo? Esta a√ß√£o n√£o pode ser desfeita!')) return;
-    if (!window.confirm('CONFIRMA√á√ÉO FINAL: Isso apagar√° TODAS as ordens. Continuar?')) return;
+    if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de serviÁo? Esta aÁ„o n„o pode ser desfeita!')) return;
+    if (!window.confirm('CONFIRMA«√O FINAL: Isso apagar· TODAS as ordens. Continuar?')) return;
     try {
       const batch = writeBatch(db);
       manutencaoOrdens.forEach((ordem) => {
@@ -937,7 +801,7 @@ export default function App() {
       setManutencaoOrdens([]);
     } catch (err) {
       console.error('Erro ao excluir todas as OS:', err);
-      alert('Erro ao excluir as ordens de servi√ßo.');
+      alert('Erro ao excluir as ordens de serviÁo.');
     }
   };
 
@@ -1245,7 +1109,7 @@ export default function App() {
             </div>
             <div class="card">
               <div class="label">Setor / Processo</div>
-              <div class="value">${escapeHtmlRelatorio(`${ordem?.setor || '-'} ¬ï ${ordem?.processo || '-'}`)}</div>
+              <div class="value">${escapeHtmlRelatorio(`${ordem?.setor || '-'} ï ${ordem?.processo || '-'}`)}</div>
             </div>
             <div class="card">
               <div class="label">Responsavel</div>
@@ -1273,7 +1137,7 @@ export default function App() {
           ${sintomaHtml}
           ${descricaoHtml}
           ${fotoHtml ? `<div class="section">${fotoHtml.replace('<div class="section">', '').replace('</div>', '')}</div>` : ''}
-          <div class="footer">Metalosa ¬∑ Manutencao</div>
+          <div class="footer">Metalosa ∑ Manutencao</div>
         </div>
       </body>
       </html>
@@ -2303,19 +2167,6 @@ export default function App() {
   const [faltasCarregadas, setFaltasCarregadas] = useState(false);
   const [presencaLeandroExcel, setPresencaLeandroExcel] = useState(null);
   const [resumoLeandroExcel, setResumoLeandroExcel] = useState(null);
-  const [absenteismoResumo, setAbsenteismoResumo] = useState({
-    carregando: true,
-    erro: null,
-    periodoLabel: '',
-    totalPrev: 0,
-    totalReal: 0,
-    totalNTrab: 0,
-    absPerc: 0,
-    totalColab: 0,
-    porSetor: [],
-    porEvento: [],
-    porMotivo: [],
-  });
   const funcionariosFonte = useMemo(
     () => (funcionariosFirestore.length ? funcionariosFirestore : funcionariosBase),
     [funcionariosFirestore]
@@ -2454,338 +2305,6 @@ export default function App() {
       ativo = false;
     };
   }, []);
-
-
-  useEffect(() => {
-    let ativo = true;
-    const carregarResumoAbsenteismo = async () => {
-      try {
-        const resp = await fetch('/data/absenteismo.json');
-        if (!resp.ok) throw new Error('Nao foi possivel carregar a planilha.');
-        const json = await resp.json();
-        const planilhas = (json?.sheets || []).reduce((acc, sheet) => {
-          if (sheet?.name) acc[sheet.name] = sheet.rows || [];
-          return acc;
-        }, {});
-
-        const periodosRows =
-          planilhas['1-Per?odos'] ||
-          planilhas['1-Periodos'] ||
-          encontrarSheet(planilhas, ['period']) ||
-          [];
-        const lancamentosRows =
-          planilhas['2-Lan?amentos'] ||
-          planilhas['2-Lancamentos'] ||
-          encontrarSheet(planilhas, ['lanc']) ||
-          [];
-
-        const headerPeriodo = encontrarCabecalho(periodosRows, [
-          'Nome',
-          'Desc. C. Custo',
-          'Hrs. Prev.',
-          'Hrs. Real.',
-        ]);
-        const periodos = rowsToObjects(periodosRows, headerPeriodo);
-
-        const headerLanc = encontrarCabecalho(lancamentosRows, [
-          'Evento',
-          'Horas',
-          'Desc. C. Custo',
-        ]);
-        const lancamentos = rowsToObjects(lancamentosRows, headerLanc);
-
-        const totalPrev = periodos.reduce((acc, row) => acc + parseNumeroPlanilha(row['Hrs. Prev.']), 0);
-        const totalReal = periodos.reduce((acc, row) => acc + parseNumeroPlanilha(row['Hrs. Real.']), 0);
-        const totalNTrab = periodos.reduce((acc, row) => acc + parseNumeroPlanilha(row['Hrs. N. Trab.']), 0);
-        const totalColab = new Set(
-          periodos.map((row) => String(row['Matricula'] || row['Nome'] || '').trim()).filter(Boolean)
-        ).size;
-
-        const absPerc = totalPrev > 0 ? (totalNTrab / totalPrev) * 100 : 0;
-
-        const periodoLabel =
-          periodos.find((row) => String(row['Periodo de Apontamento'] || '').trim())
-            ?.['Periodo de Apontamento'] || '';
-
-        const setorMap = new Map();
-        periodos.forEach((row) => {
-          const setor = String(row['Desc. C. Custo'] || 'Sem setor').trim() || 'Sem setor';
-          if (!setorMap.has(setor)) {
-            setorMap.set(setor, { setor, prev: 0, real: 0, nTrab: 0, colabs: new Set() });
-          }
-          const item = setorMap.get(setor);
-          item.prev += parseNumeroPlanilha(row['Hrs. Prev.']);
-          item.real += parseNumeroPlanilha(row['Hrs. Real.']);
-          item.nTrab += parseNumeroPlanilha(row['Hrs. N. Trab.']);
-          const colab = String(row['Matricula'] || row['Nome'] || '').trim();
-          if (colab) item.colabs.add(colab);
-        });
-
-        const porSetor = Array.from(setorMap.values())
-          .map((item) => ({
-            setor: item.setor,
-            prev: item.prev,
-            real: item.real,
-            nTrab: item.nTrab,
-            absPerc: item.prev > 0 ? (item.nTrab / item.prev) * 100 : 0,
-            colabs: item.colabs.size,
-          }))
-          .sort((a, b) => b.absPerc - a.absPerc);
-
-        const eventoMap = new Map();
-        lancamentos.forEach((row) => {
-          const evento = String(row['Evento'] || 'Sem evento').trim() || 'Sem evento';
-          const horas = parseNumeroPlanilha(row['Horas']);
-          if (!eventoMap.has(evento)) {
-            eventoMap.set(evento, { evento, horas: 0 });
-          }
-          eventoMap.get(evento).horas += horas;
-        });
-        const totalHorasLanc = Array.from(eventoMap.values()).reduce((acc, item) => acc + item.horas, 0);
-        const porEvento = Array.from(eventoMap.values())
-          .map((item) => ({
-            evento: item.evento,
-            horas: item.horas,
-            perc: totalHorasLanc > 0 ? (item.horas / totalHorasLanc) * 100 : 0,
-          }))
-          .sort((a, b) => b.horas - a.horas);
-
-        const motivoMap = new Map();
-        lancamentos.forEach((row) => {
-          const motivo = String(row['Motivo'] || 'Sem motivo').trim() || 'Sem motivo';
-          const horas = parseNumeroPlanilha(row['Horas']);
-          if (!motivoMap.has(motivo)) {
-            motivoMap.set(motivo, { motivo, horas: 0 });
-          }
-          motivoMap.get(motivo).horas += horas;
-        });
-        const porMotivo = Array.from(motivoMap.values())
-          .map((item) => ({
-            motivo: item.motivo,
-            horas: item.horas,
-            perc: totalHorasLanc > 0 ? (item.horas / totalHorasLanc) * 100 : 0,
-          }))
-          .sort((a, b) => b.horas - a.horas);
-
-        if (!ativo) return;
-        setAbsenteismoResumo({
-          carregando: false,
-          erro: null,
-          periodoLabel,
-          totalPrev,
-          totalReal,
-          totalNTrab,
-          absPerc,
-          totalColab,
-          porSetor,
-          porEvento,
-          porMotivo,
-        });
-      } catch (err) {
-        if (!ativo) return;
-        setAbsenteismoResumo((prev) => ({
-          ...prev,
-          carregando: false,
-          erro: err instanceof Error ? err.message : 'Erro ao carregar planilha.',
-        }));
-      }
-    };
-
-    carregarResumoAbsenteismo();
-    return () => {
-      ativo = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!tourOperadorOpen) return;
-    const passo = GUIA_OPERADOR_TOUR[tourOperadorStep];
-    if (!passo) {
-      setTourOperadorOpen(false);
-      setTourOperadorPos(null);
-      if (manutencaoModalOpen && !manutencaoEditId) {
-        setManutencaoModalOpen(false);
-      }
-      return;
-    }
-    if (!passo.requiresModal && manutencaoModalOpen && !manutencaoEditId) {
-      setManutencaoModalOpen(false);
-    }
-    let scrollModal = null;
-    let boundsModal = null;
-    let retryTimer = null;
-    let attempts = 0;
-    let cancelled = false;
-
-    const encontrarProximoPassoValido = () => {
-      for (let i = tourOperadorStep + 1; i < GUIA_OPERADOR_TOUR.length; i += 1) {
-        const step = GUIA_OPERADOR_TOUR[i];
-        if (!step) continue;
-        if (step.requiresModal && !manutencaoModalOpen) {
-          return i;
-        }
-        const nodes = Array.from(document.querySelectorAll(step.selector));
-        const visible = nodes.find((node) => {
-          const r = node.getBoundingClientRect();
-          return r && r.width > 0 && r.height > 0;
-        });
-        if (visible) return i;
-      }
-      return null;
-    };
-
-    const atualizarPosicao = () => {
-      if (cancelled) return;
-      if (passo.requiresModal && !manutencaoModalOpen) {
-        setTourOperadorPos(null);
-        setManutencaoModalOpen(true);
-        if (attempts < 12) {
-          attempts += 1;
-          retryTimer = setTimeout(atualizarPosicao, 200);
-        }
-        return;
-      }
-      scrollModal = passo.requiresModal
-        ? document.querySelector('[data-tour="nova-os-scroll"]')
-        : null;
-      boundsModal = passo.requiresModal
-        ? document.querySelector('[data-tour="nova-os-container"]')
-        : null;
-      if (passo.requiresModal && (!scrollModal || !boundsModal)) {
-        setTourOperadorPos(null);
-        if (attempts < 12) {
-          attempts += 1;
-          retryTimer = setTimeout(atualizarPosicao, 200);
-        }
-        return;
-      }
-      const nodes = Array.from(document.querySelectorAll(passo.selector));
-      const el = nodes.find((node) => {
-        const r = node.getBoundingClientRect();
-        return r && r.width > 0 && r.height > 0;
-      }) || nodes[0];
-      if (!el) {
-        setTourOperadorPos(null);
-        if (attempts < 6) {
-          attempts += 1;
-          retryTimer = setTimeout(atualizarPosicao, 200);
-        } else {
-          const prox = encontrarProximoPassoValido();
-          if (prox !== null) {
-            setTourOperadorStep(prox);
-          } else {
-            setTourOperadorOpen(false);
-          }
-        }
-        return;
-      }
-      if (passo.requiresModal && scrollModal && !scrollModal.contains(el)) {
-        setTourOperadorPos(null);
-        if (attempts < 12) {
-          attempts += 1;
-          retryTimer = setTimeout(atualizarPosicao, 200);
-        }
-        return;
-      }
-      const rect = el.getBoundingClientRect();
-      if (!rect || rect.width === 0 || rect.height === 0) {
-        setTourOperadorPos(null);
-        if (attempts < 12) {
-          attempts += 1;
-          retryTimer = setTimeout(atualizarPosicao, 200);
-        }
-        return;
-      }
-      if (scrollModal) {
-        scrollModal.scrollTo({
-          top: el.offsetTop - scrollModal.clientHeight / 2 + el.clientHeight / 2,
-          behavior: 'smooth',
-        });
-        // Recalcula ap√≥s o scroll animado do modal
-        setTimeout(() => {
-          if (cancelled) return;
-          const rectAfter = el.getBoundingClientRect();
-          if (!rectAfter || rectAfter.width === 0 || rectAfter.height === 0) {
-            setTourOperadorPos(null);
-            return;
-          }
-          const modalRect = boundsModal?.getBoundingClientRect?.();
-          posicionarPopup(rectAfter, modalRect);
-        }, 220);
-        return;
-      } else {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      posicionarPopup(rect, null);
-    };
-
-    const posicionarPopup = (rect, modalRect) => {
-      const offset = 12;
-      let top = rect.top;
-      let left = rect.left;
-      let transform = 'translate(0, 0)';
-      const popupWidth = 360;
-      const popupHeight = 180;
-      const margin = 12;
-
-      if (passo.placement === 'right') {
-        top = rect.top + rect.height / 2;
-        left = rect.right + offset;
-        transform = 'translate(0, -50%)';
-      } else if (passo.placement === 'left') {
-        top = rect.top + rect.height / 2;
-        left = rect.left - offset;
-        transform = 'translate(-100%, -50%)';
-      } else if (passo.placement === 'top') {
-        top = rect.top - offset;
-        left = rect.left + rect.width / 2;
-        transform = 'translate(-50%, -100%)';
-      } else {
-        top = rect.bottom + offset;
-        left = rect.left + rect.width / 2;
-        transform = 'translate(-50%, 0)';
-      }
-
-      const boundsLeft = modalRect ? modalRect.left : 0;
-      const boundsTop = modalRect ? modalRect.top : 0;
-      const boundsRight = modalRect ? modalRect.right : window.innerWidth;
-      const boundsBottom = modalRect ? modalRect.bottom : window.innerHeight;
-
-      const minLeft = boundsLeft + margin;
-      const maxLeft = boundsRight - popupWidth - margin;
-      const minTop = boundsTop + margin;
-      const maxTop = boundsBottom - popupHeight - margin;
-      const clampedLeft = Math.min(Math.max(left, minLeft), Math.max(minLeft, maxLeft));
-      const clampedTop = Math.min(Math.max(top, minTop), Math.max(minTop, maxTop));
-
-      setTourOperadorPos({
-        rect,
-        top: clampedTop,
-        left: clampedLeft,
-        transform,
-      });
-    };
-
-    atualizarPosicao();
-    const onResize = () => atualizarPosicao();
-    const onScroll = () => atualizarPosicao();
-    window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', onScroll, true);
-    if (scrollModal) {
-      scrollModal.addEventListener('scroll', onScroll, true);
-    }
-    return () => {
-      cancelled = true;
-      if (retryTimer) {
-        clearTimeout(retryTimer);
-      }
-      window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', onScroll, true);
-      if (scrollModal) {
-        scrollModal.removeEventListener('scroll', onScroll, true);
-      }
-    };
-  }, [tourOperadorOpen, tourOperadorStep, manutencaoModalOpen]);
 
   useEffect(() => {
     const deveRecarregar = funcionariosFirestore.length > 0 || !colaboradores.length;
@@ -4626,7 +4145,7 @@ export default function App() {
     };
   }, [dashboardFaturamentoBase, dashboardFilialAtual, filtroCfops]);
 
-  // √öltimos 10 dias de faturamento (independente do m√™s selecionado)
+  // ⁄ltimos 10 dias de faturamento (independente do mÍs selecionado)
   const ultimos10DiasFaturamento = useMemo(() => {
     if (!faturamentoLinhas || !faturamentoLinhas.length) return [];
     
@@ -6356,7 +5875,7 @@ const custoDetalheTitulo = custoDetalheItem
                 <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Lancamento de faltas</p>
                 <p className="text-lg font-bold text-slate-800">{modalLancamento.nome}</p>
                 <p className="text-xs text-slate-400 mt-1">
-                  {modalLancamento.setor} ¬ï {modalLancamento.gestor} ¬ï {dataLancamento}
+                  {modalLancamento.setor} ï {modalLancamento.gestor} ï {dataLancamento}
                 </p>
               </div>
               <button
@@ -6584,7 +6103,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-400">Ainda n√£o h√° dados de custos para mostrar.</p>
+                <p className="text-sm text-slate-400">Ainda n„o h· dados de custos para mostrar.</p>
               )}
             </div>
           </div>
@@ -6906,7 +6425,7 @@ const custoDetalheTitulo = custoDetalheItem
                 <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Modo rapido</p>
                 <p className="text-lg font-bold text-slate-800">Lancamento em sequencia</p>
                 <p className="text-xs text-slate-400 mt-1">
-                  {dataLancamento} ¬ï {colaboradoresDiaFiltrados.length} colaboradores filtrados
+                  {dataLancamento} ï {colaboradoresDiaFiltrados.length} colaboradores filtrados
                 </p>
               </div>
               <button
@@ -6932,7 +6451,7 @@ const custoDetalheTitulo = custoDetalheItem
                         <div>
                           <p className="text-lg font-bold text-slate-800">{colab.nome}</p>
                           <p className="text-xs text-slate-500 mt-1">
-                            {colab.setor} ¬ï {colab.gestor}
+                            {colab.setor} ï {colab.gestor}
                           </p>
                         </div>
                         <span className="text-xs font-bold text-slate-400">
@@ -7003,7 +6522,7 @@ const custoDetalheTitulo = custoDetalheItem
         </div>
       )}
       
-      {/* Sidebar Cl√°ssica */}
+      {/* Sidebar Cl·ssica */}
       <aside
         className={`hidden md:flex bg-slate-900 text-white flex-col sticky top-0 h-screen z-20 shadow-2xl transition-[width] duration-300 overflow-hidden shrink-0 ${
           sidebarOpen ? 'w-64' : 'w-0'
@@ -7090,7 +6609,7 @@ const custoDetalheTitulo = custoDetalheItem
         </button>
       )}
 
-      {/* Conte√∫do Principal */}
+      {/* Conte˙do Principal */}
       <main className={`flex-1 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && abaAtiva !== 'dashboard-tv' && (
           <header className="w-full mb-8 flex justify-between items-end">
@@ -7101,7 +6620,7 @@ const custoDetalheTitulo = custoDetalheItem
               </h1>
             )}
             {abaAtiva !== 'custos' && (
-              <p className="text-slate-500 mt-1">Status da opera√ß√£o em {new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="text-slate-500 mt-1">Status da operaÁ„o em {new Date().toLocaleDateString('pt-BR')}</p>
             )}
           </div>
           <div className="flex gap-4" />
@@ -7125,18 +6644,18 @@ const custoDetalheTitulo = custoDetalheItem
                       <div className="flex items-center gap-3 mb-1">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
                         <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">
-                          Opera√ß√£o em tempo real
+                          OperaÁ„o em tempo real
                         </p>
                       </div>
                       <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Painel Executivo</h2>
                       <p className="text-xs md:text-sm text-slate-400 mt-1 font-medium">
-                        Consolidado industrial ¬∑ {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        Consolidado industrial ∑ {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 min-w-[340px]">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Presen√ßa hoje</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">PresenÁa hoje</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-emerald-400">{resumoFaltas.percentualPresenca.toFixed(1)}%</span>
                         <span className="text-[10px] text-slate-500 mb-1">da meta</span>
@@ -7146,11 +6665,11 @@ const custoDetalheTitulo = custoDetalheItem
                       <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Dias ativos</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-blue-300">{faturamentoAtual.diasAtivos}</span>
-                        <span className="text-[10px] text-slate-500 mb-1">dias √∫teis</span>
+                        <span className="text-[10px] text-slate-500 mb-1">dias ˙teis</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Faturamento m√™s</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Faturamento mÍs</p>
                       <div className="flex items-end gap-1">
                         <span className="text-xl font-black text-emerald-300">{formatarMoeda(faturamentoAtual.total)}</span>
                       </div>
@@ -7223,16 +6742,16 @@ const custoDetalheTitulo = custoDetalheItem
                     corFundo: 'bg-blue-500',
                   },
                   {
-                    titulo: 'M√©dia por dia',
+                    titulo: 'MÈdia por dia',
                     valor: formatarMoeda(
                       faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0
                     ),
-                    subtitulo: 'Performance di√°ria',
+                    subtitulo: 'Performance di·ria',
                     icon: TrendingUp,
                     corFundo: 'bg-emerald-500',
                   },
                   {
-                    titulo: 'Ticket m√©dio',
+                    titulo: 'Ticket mÈdio',
                     valor: formatarMoeda(faturamentoAtual.ticketMedio),
                     subtitulo: 'Valor por pedido',
                     icon: ShoppingCart,
@@ -7241,25 +6760,25 @@ const custoDetalheTitulo = custoDetalheItem
                   {
                     titulo: 'Clientes ativos',
                     valor: faturamentoAtual.clientesAtivos,
-                    subtitulo: 'Carteira no m√™s',
+                    subtitulo: 'Carteira no mÍs',
                     icon: Users,
                     corFundo: 'bg-emerald-500',
                   },
                   {
                     titulo: 'Faltas hoje',
                     valor: resumoFaltas.ausentes,
-                    subtitulo: 'Aten√ß√£o operacional',
+                    subtitulo: 'AtenÁ„o operacional',
                     icon: UserX,
                     corFundo: 'bg-blue-500',
                   },
                   {
-                    titulo: 'F√©rias hoje',
+                    titulo: 'FÈrias hoje',
                     valor: resumoFaltas.porTipo['Ferias'] || 0,
                     subtitulo: 'Planejamento RH',
                     icon: CalendarIcon,
                     corFundo: 'bg-emerald-500',
                   },
-                ].filter((kpi) => !['Faltas hoje', 'F√á¬∏rias hoje'].includes(kpi.titulo)).map((kpi) => (
+                ].filter((kpi) => !['Faltas hoje', 'F«∏rias hoje'].includes(kpi.titulo)).map((kpi) => (
                   <CardInformativo
                     key={kpi.titulo}
                     titulo={kpi.titulo}
@@ -7280,7 +6799,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <Activity className="text-blue-600" size={18} />
                           Faturamento por Dia
                         </h3>
-                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Hist√≥rico dos √∫ltimos dias ativos</p>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">HistÛrico dos ˙ltimos dias ativos</p>
                       </div>
                       <span className="px-3 py-1.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">
                         {ultimos10DiasFaturamento.length} dias
@@ -7335,7 +6854,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <div>
                         <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
                           <AlertTriangle className="text-rose-500" size={18} />
-                          Alertas de Absente√≠smo
+                          Alertas de AbsenteÌsmo
                         </h3>
                         <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Impacto por processo produtivo</p>
                       </div>
@@ -7407,11 +6926,11 @@ const custoDetalheTitulo = custoDetalheItem
                         </p>
                       </div>
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                        <p className="text-[10px]">Custo m√©dio / movimento</p>
+                        <p className="text-[10px]">Custo mÈdio / movimento</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioMovimento)}</p>
                       </div>
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                        <p className="text-[10px]">Custo m√©dio / dia</p>
+                        <p className="text-[10px]">Custo mÈdio / dia</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioDia)}</p>
                       </div>
                     </div>
@@ -7431,7 +6950,7 @@ const custoDetalheTitulo = custoDetalheItem
                               </div>
                               <p className="text-[12px] text-slate-500">{item.descricao || 'Sem descricao'}</p>
                               <p className="text-[11px] text-slate-400 mt-1">
-                                Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} ¬∑ Markup{' '}
+                                Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} ∑ Markup{' '}
                                 {Number.isFinite(markupItem) ? `${markupItem.toFixed(1)}%` : '0%'}
                               </p>
                             </div>
@@ -7835,7 +7354,7 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                     {dashboardView === 'faturamento' && dashboardFilialAtual && (
                       <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-emerald-200">
-                        Filial {dashboardFilialAtual} ¬∑ troca 10s
+                        Filial {dashboardFilialAtual} ∑ troca 10s
                       </span>
                     )}
                     <button
@@ -7869,7 +7388,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
-                        Faturamento total {dashboardFilialAtual ? `¬∑ Filial ${dashboardFilialAtual}` : ''}
+                        Faturamento total {dashboardFilialAtual ? `∑ Filial ${dashboardFilialAtual}` : ''}
                       </p>
                       <p className="text-3xl font-black text-blue-300 mt-2">
                         {formatarMoeda(dashboardFaturamentoFilial.total || 0)}
@@ -8301,7 +7820,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="p-6 bg-slate-50 border-b border-slate-200">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div className="font-bold text-slate-700 text-sm uppercase tracking-wider">
-                        Faturamento por M√™s (2025)
+                        Faturamento por MÍs (2025)
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         <span className="mr-1">Filial</span>
@@ -8484,7 +8003,7 @@ const custoDetalheTitulo = custoDetalheItem
                         return (
                           <div className="space-y-3">
                             <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
-                              <span>Intera√ß√£o: passe o mouse para ver detalhes, clique para abrir o ABC.</span>
+                              <span>InteraÁ„o: passe o mouse para ver detalhes, clique para abrir o ABC.</span>
                               {paretoAtivo && (
                                 <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold">
                                   {paretoAtivo.grupo} ??? R$ {paretoAtivo.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ??? {paretoAtivo.percentual.toFixed(1)}%
@@ -8603,13 +8122,13 @@ const custoDetalheTitulo = custoDetalheItem
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe A</div>
                                     <div className="text-2xl font-bold text-slate-100">{abcDados.a}</div>
                                     <div className="text-xs text-slate-400">R$ {abcDados.valorA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div className="text-xs text-slate-500">At√© 80% do faturamento</div>
+                                    <div className="text-xs text-slate-500">AtÈ 80% do faturamento</div>
                                   </div>
                                   <div className="border border-slate-200 rounded-xl p-4 bg-slate-950/30">
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe B</div>
                                     <div className="text-2xl font-bold text-slate-100">{abcDados.b}</div>
                                     <div className="text-xs text-slate-400">R$ {abcDados.valorB.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div className="text-xs text-slate-500">At√© 95% do faturamento</div>
+                                    <div className="text-xs text-slate-500">AtÈ 95% do faturamento</div>
                                   </div>
                                   <div className="border border-slate-200 rounded-xl p-4 bg-slate-950/30">
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe C</div>
@@ -8713,8 +8232,8 @@ const custoDetalheTitulo = custoDetalheItem
                                       <table className="w-full text-left text-xs">
                                         <thead className="sticky top-0 bg-slate-900/90 text-slate-400 uppercase tracking-wider">
                                           <tr>
-                                            <th className="px-5 py-3">C√≥digo</th>
-                                            <th className="px-5 py-3">Descri√ß√£o</th>
+                                            <th className="px-5 py-3">CÛdigo</th>
+                                            <th className="px-5 py-3">DescriÁ„o</th>
                                             <th className="px-5 py-3">Classe</th>
                                             <th className="px-5 py-3 text-right">Valor</th>
                                           </tr>
@@ -8981,7 +8500,7 @@ const custoDetalheTitulo = custoDetalheItem
                             if (!dados.length) {
                               return (
                                 <div className="h-60 flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl">
-                                  <p className="text-slate-400 text-sm italic">Sem dados para o m√™s selecionado.</p>
+                                  <p className="text-slate-400 text-sm italic">Sem dados para o mÍs selecionado.</p>
                                 </div>
                               );
                             }
@@ -9858,127 +9377,173 @@ const custoDetalheTitulo = custoDetalheItem
             </div>
           )}
 
-          {/* ABA DE GEST√ÉO DI√ÅRIA */}
+          {/* ABA DE GEST√O DI¡RIA */}
           {abaAtiva === 'gestao' && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
                <div className="flex gap-6 border-b border-slate-200">
                   <button onClick={() => setSubAbaGestao('lista')} className={`pb-3 text-sm font-bold transition-all ${subAbaGestao === 'lista' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>Quadro de Faltas</button>
-                  <button onClick={() => setSubAbaGestao('calendario')} className={`pb-3 text-sm font-bold transition-all flex items-center gap-2 ${subAbaGestao === 'calendario' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}><CalendarIcon size={16} /> Hist√≥rico Mensal</button>
+                  <button onClick={() => setSubAbaGestao('calendario')} className={`pb-3 text-sm font-bold transition-all flex items-center gap-2 ${subAbaGestao === 'calendario' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}><CalendarIcon size={16} /> HistÛrico Mensal</button>
                </div>
 
                {subAbaGestao === 'lista' ? (
                  <div className="space-y-6">
-                   <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
-                     <div className="absolute top-0 right-0 -mt-16 -mr-20 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
-                     <div className="absolute bottom-0 left-0 -mb-16 -ml-20 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
-                     <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                       <div>
-                         <div className="flex items-center gap-3 mb-2">
-                           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                           <p className="text-[10px] uppercase tracking-[0.35em] text-slate-400 font-bold">Absenteismo consolidado</p>
+                   <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                     <div className="flex flex-wrap items-center gap-4">
+                       <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Filtros</div>
+                       <div className="flex flex-wrap items-center gap-3">
+                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                           <span>Supervisor</span>
+                           <select
+                             value={filtroSupervisor}
+                             onChange={(e) => setFiltroSupervisor(e.target.value)}
+                             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                           >
+                             {supervisoresDisponiveis.map((supervisor) => (
+                               <option key={supervisor} value={supervisor}>
+                                 {supervisor}
+                               </option>
+                             ))}
+                           </select>
                          </div>
-                         <h2 className="text-3xl font-black text-white tracking-tight">Operacao Diaria</h2>
-                         <p className="text-sm text-slate-400 mt-1 font-medium">
-                           {absenteismoResumo.periodoLabel ? `Periodo: ${absenteismoResumo.periodoLabel}` : 'Periodo informado na planilha'}
-                         </p>
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 min-w-[320px]">
-                         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                           <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">% Absenteismo</p>
-                           <div className="flex items-end gap-1">
-                             <span className="text-2xl font-black text-rose-300">{absenteismoResumo.absPerc.toFixed(1)}%</span>
-                           </div>
-                         </div>
-                         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                           <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Hrs N. Trab.</p>
-                           <div className="flex items-end gap-1">
-                             <span className="text-2xl font-black text-amber-300">{absenteismoResumo.totalNTrab.toFixed(1)}</span>
-                             <span className="text-[10px] text-slate-500 mb-1">h</span>
-                           </div>
-                         </div>
-                         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                           <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Hrs Prev.</p>
-                           <div className="flex items-end gap-1">
-                             <span className="text-2xl font-black text-blue-200">{absenteismoResumo.totalPrev.toFixed(1)}</span>
-                             <span className="text-[10px] text-slate-500 mb-1">h</span>
-                           </div>
-                         </div>
-                         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                           <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Colaboradores</p>
-                           <div className="flex items-end gap-1">
-                             <span className="text-2xl font-black text-emerald-200">{absenteismoResumo.totalColab || 0}</span>
-                           </div>
+                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                           <span>Processo</span>
+                           <select
+                             value={filtroSetor}
+                             onChange={(e) => setFiltroSetor(e.target.value)}
+                             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                           >
+                             {setoresDisponiveis.map((setor) => (
+                               <option key={setor} value={setor}>
+                                 {setor}
+                               </option>
+                             ))}
+                           </select>
                          </div>
                        </div>
                      </div>
                    </div>
 
-                   {absenteismoResumo.carregando ? (
-                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                       <p className="text-slate-400 italic">Carregando planilha de absenteismo...</p>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                       <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total</p>
+                       <p className="text-2xl font-bold text-slate-900 mt-1">{resumoFaltas.total}</p>
+                       <p className="text-xs text-slate-400">Colaboradores ativos</p>
                      </div>
-                   ) : absenteismoResumo.erro ? (
-                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                       <p className="text-rose-600 text-sm font-medium">{absenteismoResumo.erro}</p>
+                     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                       <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Presentes</p>
+                       <p className="text-2xl font-bold text-emerald-600 mt-1">{resumoFaltas.presentes}</p>
+                       <p className="text-xs text-slate-400">
+                         {resumoFaltas.percentualPresenca.toFixed(1)}% de presenca
+                       </p>
                      </div>
-                   ) : (
-                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                         <div className="flex items-center justify-between mb-4">
-                           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Absenteismo por setor</h3>
-                           <span className="text-xs text-slate-400">Top 8</span>
-                         </div>
-                         <div className="space-y-3">
-                           {(absenteismoResumo.porSetor || []).slice(0, 8).map((item) => {
-                             const perc = Math.min(item.absPerc || 0, 100);
-                             return (
-                               <div key={item.setor} className="space-y-1">
-                                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                   <span>{item.setor}</span>
-                                   <span>{perc.toFixed(1)}%</span>
-                                 </div>
-                                 <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                   <span>{item.colabs} colabs</span>
-                                   <span>{item.nTrab.toFixed(1)}h nao trabalhadas</span>
-                                 </div>
-                                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                   <div className="h-full bg-rose-500" style={{ width: `${perc}%` }} />
-                                 </div>
-                               </div>
-                             );
-                           })}
-                         </div>
-                       </div>
+                     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                       <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ausentes</p>
+                       <p className="text-2xl font-bold text-rose-600 mt-1">{resumoFaltas.ausentes}</p>
+                       <p className="text-xs text-slate-400">Com faltas registradas</p>
+                     </div>
+                     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                       <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ferias</p>
+                       <p className="text-2xl font-bold text-amber-600 mt-1">{resumoFaltas.porTipo['Ferias'] || 0}</p>
+                       <p className="text-xs text-slate-400">Lancadas no dia</p>
+                     </div>
+                   </div>
 
-                       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                         <div className="flex items-center justify-between mb-4">
-                           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Absenteismo por evento</h3>
-                           <span className="text-xs text-slate-400">Lancamentos</span>
-                         </div>
-                         <div className="space-y-3">
-                           {(absenteismoResumo.porEvento || []).slice(0, 8).map((item) => {
-                             const perc = Math.min(item.perc || 0, 100);
-                             return (
-                               <div key={item.evento} className="space-y-1">
-                                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                   <span>{item.evento}</span>
-                                   <span>{perc.toFixed(1)}%</span>
-                                 </div>
-                                 <div className="flex items-center justify-between text-[10px] text-slate-400">
-                                   <span>{item.horas.toFixed(2)}h</span>
-                                 </div>
-                                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                   <div className="h-full bg-amber-500" style={{ width: `${perc}%` }} />
-                                 </div>
+                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                     <div className="p-6 border-b border-slate-200 bg-slate-900/80 flex flex-wrap justify-between items-center gap-4 text-sm font-bold text-slate-200 uppercase">
+                       <div className="flex flex-wrap items-center gap-4">
+                         <span>Lancamento Diario de Presenca</span>
+                         <div className="flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-1 text-[11px] font-semibold text-amber-200 shadow-[0_0_12px_rgba(251,191,36,0.25)]">
+                           <CalendarIcon size={14} />
+                           <input
+                             type="date"
+                             value={dataLancamento}
+                             onChange={(e) => {
+                               setDataLancamento(e.target.value);
+                               setDiaHistorico(null);
+                             }}
+                            className="rounded-full border border-amber-400/60 bg-slate-950/70 px-3 py-1 text-[11px] font-semibold text-amber-100 outline-none focus:ring-2 focus:ring-amber-400/60"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 text-xs">
+                        <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={14}/> Presente</span>
+                        <span className="text-amber-400 flex items-center gap-1"><AlertTriangle size={14}/> Falta Justificada</span>
+                        <span className="text-rose-400 flex items-center gap-1"><XCircle size={14}/> Falta Injustificada</span>
+                        <span className="text-amber-300 flex items-center gap-1"><AlertTriangle size={14}/> Falta Parcial</span>
+                        <span className="text-blue-400 flex items-center gap-1"><CalendarIcon size={14}/> Ferias</span>
+                        <button
+                          type="button"
+                          onClick={abrirModalFerias}
+                          className="ml-2 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/40 px-3 py-2 text-[10px] font-bold text-slate-200 hover:bg-slate-900"
+                        >
+                          LanÁar fÈrias
+                        </button>
+                        <button
+                          type="button"
+                          onClick={abrirModoRapido}
+                          className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-blue-600/80 px-3 py-2 text-[10px] font-bold text-white hover:bg-blue-500"
+                        >
+                          Modo r·pido
+                        </button>
+                      </div>
+                    </div>
+                     <table className="w-full text-left">
+                       <thead>
+                         <tr className="bg-slate-900/70 text-slate-200 text-xs uppercase font-bold tracking-wider border-b border-slate-700">
+                           <th className="px-6 py-4">Colaborador</th>
+                           <th className="px-6 py-4">Setor / Supervisor</th>
+                           <th className="px-6 py-4 text-center">Lancamento</th>
+                         </tr>
+                       </thead>
+                       <tbody className="divide-y divide-slate-100 font-medium">
+                        {colaboradoresDiaFiltrados.length > 0 ? (
+                        colaboradoresDiaFiltrados.map((colab) => (
+                           <tr key={colab.id} className="hover:bg-slate-800/70 transition-colors">
+                             <td className="px-6 py-4">
+                               <div className="font-bold text-slate-800 text-base">{colab.nome}</div>
+                               <div className="text-xs text-slate-400 font-bold uppercase">{colab.cargo}</div>
+                             </td>
+                             <td className="px-6 py-4">
+                               <span className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold uppercase mr-2">{colab.setor}</span>
+                               <span className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Supervisor: {colab.gestor}</span>
+                             </td>
+                             <td className="px-6 py-4">
+                               <div className="flex flex-wrap items-center justify-end gap-3">
+                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border ${
+                                   colab.tipoFalta === 'Presente'
+                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                                     : colab.tipoFalta === 'Falta Parcial'
+                                       ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                       : colab.tipoFalta === 'Ferias'
+                                         ? 'bg-blue-50 text-blue-600 border-blue-200'
+                                         : 'bg-rose-50 text-rose-600 border-rose-200'
+                                 }`}>
+                                   {colab.tipoFalta === 'Presente' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+                                   {colab.tipoFalta === 'Falta Parcial' && colab.tempoParcial
+                                     ? `Falta Parcial (${colab.tempoParcial})`
+                                     : colab.tipoFalta}
+                                 </span>
+                                 <button
+                                   type="button"
+                                   onClick={() => abrirModalLancamento(colab)}
+                                   className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                                 >
+                                   Lancar
+                                 </button>
                                </div>
-                             );
-                           })}
-                         </div>
-                       </div>
-                     </div>
-                   )}
+                             </td>
+                           </tr>
+                         ))
+                       ) : (
+                         <tr>
+                          <td className="px-6 py-6 text-slate-400 italic" colSpan={3}>Sem dados para os filtros selecionados.</td>
+                         </tr>
+                       )}
+                       </tbody>
+                     </table>
+                  </div>
                  </div>
-                              ) : (
+               ) : (
                  <div className="space-y-6">
                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
                      <div>
@@ -10365,7 +9930,6 @@ const custoDetalheTitulo = custoDetalheItem
                           setManutencaoSaveError('');
                           setManutencaoModalOpen(true);
                         }}
-                        data-tour="nova-os"
                         className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400/90 to-blue-500/90 text-slate-950 text-xs font-bold shadow hover:brightness-110"
                       >
                         Nova OS
@@ -10616,27 +10180,8 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {subAbaManutencao === 'operador' && isManutencaoOperador && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Guia do Operador</h3>
-                        <p className="text-xs text-slate-400">Passo a passo de como abrir, assumir e acompanhar OS.</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTourOperadorStep(0);
-                          setTourOperadorOpen(true);
-                        }}
-                        title="Guia interativo"
-                        className="rounded-full border border-amber-400/60 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/10"
-                      >
-                        Guia interativo
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div data-tour="fila-os" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Fila de OS</h3>
                         <span className="text-[10px] font-bold text-slate-400">
@@ -10650,7 +10195,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
-                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} ¬∑ {os.prioridade || '-'}</p>
+                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} ∑ {os.prioridade || '-'}</p>
                                 </div>
                                 <button
                                   type="button"
@@ -10659,7 +10204,6 @@ const custoDetalheTitulo = custoDetalheItem
                                     setAssumirResponsavel('');
                                     setAssumirErro('');
                                   }}
-                                  data-tour="assumir-os"
                                   className="rounded-full border border-cyan-400/60 px-3 py-1 text-xs font-bold text-cyan-100 hover:bg-cyan-500/10"
                                 >
                                   Assumir
@@ -10675,7 +10219,7 @@ const custoDetalheTitulo = custoDetalheItem
                       )}
                     </div>
 
-                    <div data-tour="minhas-os" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas OS</h3>
                         <span className="text-[10px] font-bold text-slate-400">
@@ -10690,10 +10234,10 @@ const custoDetalheTitulo = custoDetalheItem
                                 <div>
                                   <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
                                   <p className="text-xs text-slate-400">
-                                    {os.status || '-'} ¬∑ {os.statusMaquina || 'Rodando'}
+                                    {os.status || '-'} ∑ {os.statusMaquina || 'Rodando'}
                                   </p>
                                 </div>
-                                <div data-tour="acoes-os" className="flex flex-wrap items-center gap-2 text-xs">
+                                <div className="flex flex-wrap items-center gap-2 text-xs">
                                   <button
                                     type="button"
                                     onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
@@ -10734,12 +10278,11 @@ const custoDetalheTitulo = custoDetalheItem
                       )}
                     </div>
                   </div>
-                  </div>
                 )}
 
                 {manutencaoModalOpen && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 px-4 py-6">
-                    <div data-tour="nova-os-container" className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
+                    <div className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-slate-950 text-slate-100 shadow-2xl border border-slate-800">
                       <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
                         <div>
                           <h3 className="text-lg font-black text-white">
@@ -10751,7 +10294,7 @@ const custoDetalheTitulo = custoDetalheItem
                         </div>
                         <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
                       </div>
-                      <form data-tour="nova-os-scroll" onSubmit={handleNovaOsSubmit} className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
+                      <form onSubmit={handleNovaOsSubmit} className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Ativo</label>
@@ -10759,7 +10302,6 @@ const custoDetalheTitulo = custoDetalheItem
                               name="ativo"
                               value={novaOsForm.ativo}
                               onChange={handleNovaOsChange}
-                              data-tour="nova-os-ativo"
                               className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none md:hidden"
                               required
                             >
@@ -10775,7 +10317,6 @@ const custoDetalheTitulo = custoDetalheItem
                               list="manutencao-ativos"
                               value={novaOsForm.ativo}
                               onChange={handleNovaOsChange}
-                              data-tour="nova-os-ativo"
                               className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none hidden md:block"
                               placeholder="Ex: Injetora 01"
                               required
@@ -10807,7 +10348,7 @@ const custoDetalheTitulo = custoDetalheItem
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Prioridade</label>
-                            <select name="prioridade" value={novaOsForm.prioridade} onChange={handleNovaOsChange} data-tour="nova-os-prioridade" className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                            <select name="prioridade" value={novaOsForm.prioridade} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
                               <option>Baixa</option>
                               <option>Media</option>
                               <option>Alta</option>
@@ -10865,6 +10406,19 @@ const custoDetalheTitulo = custoDetalheItem
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
+                            <label className="text-xs font-bold text-slate-400">Parada</label>
+                            <select name="parada" value={novaOsForm.parada} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+                              <option>Nao</option>
+                              <option>Sim</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Tempo de parada (hh:mm)</label>
+                            <input name="tempoParada" value={novaOsForm.tempoParada} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: 01:30" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
                             <label className="text-xs font-bold text-slate-400">Data/hora da falha</label>
                             <input type="datetime-local" name="dataFalha" value={novaOsForm.dataFalha} onChange={handleNovaOsChange} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none" />
                           </div>
@@ -10914,12 +10468,8 @@ const custoDetalheTitulo = custoDetalheItem
                           </div>
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-slate-400">Sintoma</label>
-                          <input name="sintoma" value={novaOsForm.sintoma} onChange={handleNovaOsChange} data-tour="nova-os-sintoma" className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Ex: Barulho, travando, vazamento" />
-                        </div>
-                        <div>
                           <label className="text-xs font-bold text-slate-400">Descricao</label>
-                          <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} data-tour="nova-os-descricao" className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
+                          <textarea name="descricao" value={novaOsForm.descricao} onChange={handleNovaOsChange} rows={3} className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none" placeholder="Descreva a falha ou solicitacao" required />
                         </div>
                         <div>
                           <label className="text-xs font-bold text-slate-400">Foto do problema ou componente</label>
@@ -10959,164 +10509,12 @@ const custoDetalheTitulo = custoDetalheItem
                           >
                             Cancelar
                           </button>
-                          <button type="submit" data-tour="nova-os-salvar" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">
+                          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">
                             {manutencaoEditId ? 'Salvar alteracoes' : 'Salvar OS'}
                           </button>
                         </div>
                       </form>
                     </div>
-                  </div>
-                )}
-
-                {guiaOperadorOpen && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6">
-                    <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
-                      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Guia do Operador</p>
-                          <h4 className="text-lg font-black text-white">{GUIA_OPERADOR_PASSOS[guiaOperadorStep].titulo}</h4>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setGuiaOperadorOpen(false)}
-                          className="text-slate-400 hover:text-slate-200 text-xs font-bold"
-                        >
-                          Fechar
-                        </button>
-                      </div>
-                      <div className="px-6 py-5 text-sm text-slate-300">
-                        {GUIA_OPERADOR_PASSOS[guiaOperadorStep].texto}
-                      </div>
-                      <div className="flex items-center justify-between border-t border-slate-800 px-6 py-4 text-xs">
-                        <span className="text-slate-400">
-                          Passo {guiaOperadorStep + 1} de {GUIA_OPERADOR_PASSOS.length}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setGuiaOperadorStep((prev) => Math.max(prev - 1, 0))}
-                            disabled={guiaOperadorStep === 0}
-                            className="rounded-full border border-slate-700 px-3 py-1 font-bold text-slate-300 disabled:opacity-40"
-                          >
-                            Voltar
-                          </button>
-                          {guiaOperadorStep < GUIA_OPERADOR_PASSOS.length - 1 ? (
-                            <button
-                              type="button"
-                              onClick={() => setGuiaOperadorStep((prev) => Math.min(prev + 1, GUIA_OPERADOR_PASSOS.length - 1))}
-                              className="rounded-full bg-cyan-500/80 px-4 py-1 font-bold text-slate-950 hover:bg-cyan-400"
-                            >
-                              Proximo
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => setGuiaOperadorOpen(false)}
-                              className="rounded-full bg-emerald-500/80 px-4 py-1 font-bold text-slate-950 hover:bg-emerald-400"
-                            >
-                              Finalizar
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {tourOperadorOpen && (
-                  <div className="fixed inset-0 z-[60] pointer-events-none">
-                    <div className="absolute inset-0 bg-slate-950/60" />
-                    {tourOperadorPos && (!GUIA_OPERADOR_TOUR[tourOperadorStep]?.requiresModal || manutencaoModalOpen) && (
-                      <div
-                        className="fixed rounded-2xl border border-cyan-400/60 shadow-[0_0_0_4px_rgba(34,211,238,0.2)]"
-                        style={{
-                          top: tourOperadorPos.rect.top - 6,
-                          left: tourOperadorPos.rect.left - 6,
-                          width: tourOperadorPos.rect.width + 12,
-                          height: tourOperadorPos.rect.height + 12,
-                          borderRadius: 14,
-                        }}
-                      />
-                    )}
-                    {(tourOperadorPos || (GUIA_OPERADOR_TOUR[tourOperadorStep]?.requiresModal && manutencaoModalOpen)) && (
-                      <div
-                        className="fixed w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl pointer-events-auto"
-                        style={{
-                          top: tourOperadorPos ? tourOperadorPos.top : '50%',
-                          left: tourOperadorPos ? tourOperadorPos.left : '50%',
-                          transform: tourOperadorPos ? tourOperadorPos.transform : 'translate(-50%, -50%)',
-                        }}
-                      >
-                        <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
-                          <div>
-                            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Guia interativo</p>
-                            <h4 className="text-base font-black text-white">
-                              {GUIA_OPERADOR_TOUR[tourOperadorStep]?.titulo}
-                            </h4>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setTourOperadorOpen(false)}
-                            className="text-slate-400 hover:text-slate-200 text-xs font-bold"
-                          >
-                            Fechar
-                          </button>
-                        </div>
-                        <div className="px-5 py-4 text-sm text-slate-300">
-                          {tourOperadorPos
-                            ? GUIA_OPERADOR_TOUR[tourOperadorStep]?.texto
-                            : 'Localizando o campo no formulario...'}
-                        </div>
-                        <div className="flex items-center justify-between border-t border-slate-800 px-5 py-3 text-xs">
-                          <span className="text-slate-400">
-                            Passo {tourOperadorStep + 1} de {GUIA_OPERADOR_TOUR.length}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setTourOperadorOpen(false);
-                                setTourOperadorPos(null);
-                              }}
-                              className="rounded-full border border-slate-700 px-3 py-1 font-bold text-slate-300"
-                            >
-                              Sair
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setTourOperadorStep((prev) => Math.max(prev - 1, 0))}
-                              disabled={tourOperadorStep === 0}
-                              className="rounded-full border border-slate-700 px-3 py-1 font-bold text-slate-300 disabled:opacity-40"
-                            >
-                              Voltar
-                            </button>
-                            {tourOperadorStep < GUIA_OPERADOR_TOUR.length - 1 ? (
-                              <button
-                                type="button"
-                                onClick={() => setTourOperadorStep((prev) => Math.min(prev + 1, GUIA_OPERADOR_TOUR.length - 1))}
-                                className="rounded-full bg-cyan-500/80 px-4 py-1 font-bold text-slate-950 hover:bg-cyan-400"
-                              >
-                                Proximo
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTourOperadorOpen(false);
-                                  setTourOperadorPos(null);
-                                  if (manutencaoModalOpen && !manutencaoEditId) {
-                                    setManutencaoModalOpen(false);
-                                  }
-                                }}
-                                className="rounded-full bg-emerald-500/80 px-4 py-1 font-bold text-slate-950 hover:bg-emerald-400"
-                              >
-                                Finalizar
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -11146,7 +10544,7 @@ const custoDetalheTitulo = custoDetalheItem
                             {assumirModalOs.ativo || assumirModalOs.id}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {assumirModalOs.setor || 'Sem setor'} ¬∑ {assumirModalOs.prioridade || '-'}
+                            {assumirModalOs.setor || 'Sem setor'} ∑ {assumirModalOs.prioridade || '-'}
                           </p>
                         </div>
 
@@ -11207,7 +10605,7 @@ const custoDetalheTitulo = custoDetalheItem
                 </div>
              </div>
           )}
-          {/* ABA DE CONFIGURA√á√ÉO */}
+          {/* ABA DE CONFIGURA«√O */}
           {abaAtiva === 'configuracao' && (
              <div className="space-y-8 animate-in slide-in-from-top duration-500">
                 <div className="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 w-fit">
@@ -11326,7 +10724,7 @@ const custoDetalheTitulo = custoDetalheItem
                       setNovoAtivoCc('');
                       setNovoAtivoProcesso('');
                     }}>
-                       <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da M√°quina" />
+                       <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da M·quina" />
                        <div className="flex flex-col gap-2">
                          <div>
                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
@@ -11436,7 +10834,7 @@ const custoDetalheTitulo = custoDetalheItem
                           </div>
                           <div className="px-6 py-5 space-y-4">
                             <div>
-                              <label className="text-xs font-bold text-slate-500">Processo da ind√∫stria</label>
+                              <label className="text-xs font-bold text-slate-500">Processo da ind˙stria</label>
                               <select
                                 value={processoEditValue}
                                 onChange={(e) => setProcessoEditValue(e.target.value)}
@@ -11507,7 +10905,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                        {colaboradores.map(c => (
                          <div key={c.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center group">
-                            <div><p className="font-bold text-slate-800 text-xs">{c.nome}</p><p className="text-[9px] text-slate-400 font-bold uppercase">{c.cargo} ¬ï {c.setor}</p></div>
+                            <div><p className="font-bold text-slate-800 text-xs">{c.nome}</p><p className="text-[9px] text-slate-400 font-bold uppercase">{c.cargo} ï {c.setor}</p></div>
                             <Trash2 size={14} className="text-slate-200 hover:text-rose-500 cursor-pointer" onClick={() => setColaboradores(colaboradores.filter(x => x.id !== c.id))} />
                          </div>
                        ))}
