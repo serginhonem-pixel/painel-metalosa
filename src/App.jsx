@@ -149,6 +149,110 @@ const GUIA_OPERADOR_TOUR = [
   },
 ];
 
+const GUIA_TREINAMENTO_SLIDES = [
+  {
+    titulo: 'Objetivo do treinamento',
+    pontos: [
+      'Padronizar a abertura de OS e garantir informacoes completas.',
+      'Reduzir tempo de atendimento com dados claros e corretos.',
+      'Facilitar o acompanhamento e a rastreabilidade das ordens.',
+    ],
+  },
+  {
+    titulo: 'Visao geral do fluxo',
+    pontos: [
+      'Acesse Manutencao > Operador.',
+      'Clique em "Nova OS" para abrir o formulario.',
+      'Preencha os campos obrigatorios e salve a OS.',
+      'Acompanhe o andamento nas listas de ordens.',
+    ],
+  },
+  {
+    titulo: 'Passo 1: Abrir Nova OS',
+    pontos: [
+      'No topo da tela, clique em "Nova OS".',
+      'Confirme que o formulario foi aberto antes de preencher.',
+    ],
+  },
+  {
+    titulo: 'Passo 2: Ativo e Setor',
+    pontos: [
+      'Selecione o Ativo (maquina/equipamento) correto.',
+      'Confira o Setor para evitar direcionamento errado.',
+    ],
+  },
+  {
+    titulo: 'Passo 3: Prioridade e Tipo',
+    pontos: [
+      'Defina a Prioridade conforme impacto na producao.',
+      'Escolha o Tipo (Corretiva, Preventiva, etc.).',
+    ],
+  },
+  {
+    titulo: 'Passo 4: Categoria e Impacto',
+    pontos: [
+      'Informe a Categoria do problema quando aplicavel.',
+      'Defina o Impacto para apoiar a programacao.',
+    ],
+  },
+  {
+    titulo: 'Passo 5: Sintoma (obrigatorio)',
+    pontos: [
+      'Descreva o sintoma observado (ruido, falha, travamento, vazamento).',
+      'Seja objetivo: o que esta acontecendo agora?',
+    ],
+  },
+  {
+    titulo: 'Passo 6: Descricao do problema',
+    pontos: [
+      'Detalhe o contexto do problema e o que ocorreu.',
+      'Inclua informacoes de quando iniciou e impacto percebido.',
+    ],
+  },
+  {
+    titulo: 'Passo 7: Status da maquina',
+    pontos: [
+      'Marque se a maquina esta Rodando, Parada ou em Manutencao.',
+      'Isso ajuda a priorizar o atendimento.',
+    ],
+  },
+  {
+    titulo: 'Passo 8: Foto e anexos',
+    pontos: [
+      'Anexe foto do problema/componente se possivel.',
+      'Imagens aceleram o diagnostico e reduzem retrabalho.',
+    ],
+  },
+  {
+    titulo: 'Passo 9: Salvar OS',
+    pontos: [
+      'Revise os dados principais.',
+      'Clique em "Salvar OS" para registrar.',
+    ],
+  },
+  {
+    titulo: 'Boas praticas',
+    pontos: [
+      'Evite termos genericos: descreva o sintoma com clareza.',
+      'Use informacoes objetivas para acelerar o atendimento.',
+      'Sempre anexe foto quando houver componente danificado.',
+    ],
+  },
+  {
+    titulo: 'Checklist rapido',
+    pontos: [
+      'Ativo correto selecionado.',
+      'Prioridade definida.',
+      'Sintoma preenchido.',
+      'Descricao clara do problema.',
+      'Status da maquina correto.',
+      'OS salva com sucesso.',
+    ],
+  },
+];
+
+const GUIA_TREINAMENTO_IMAGENS = [];
+
 // --- Componentes de UI ---
 
 const CardInformativo = ({ titulo, valor, subtitulo, icon: Icon, corFundo, tendencia }) => (
@@ -1274,6 +1378,92 @@ export default function App() {
           ${descricaoHtml}
           ${fotoHtml ? `<div class="section">${fotoHtml.replace('<div class="section">', '').replace('</div>', '')}</div>` : ''}
           <div class="footer">Metalosa · Manutencao</div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    printHtmlRelatorio(html);
+  };
+
+  const handleBaixarGuiaTreinamentoPdf = () => {
+    const hoje = new Date();
+    const dataLabel = hoje.toLocaleDateString('pt-BR');
+    const baseUrl = window.location.origin;
+    const slidesHtml = GUIA_TREINAMENTO_SLIDES.map((slide) => {
+      const pontos = slide.pontos
+        .map((p) => `<li>${escapeHtmlRelatorio(p)}</li>`)
+        .join('');
+      return `
+        <section class="slide">
+          <h2>${escapeHtmlRelatorio(slide.titulo)}</h2>
+          <ul>${pontos}</ul>
+        </section>
+      `;
+    }).join('');
+    const imagensHtml = GUIA_TREINAMENTO_IMAGENS.map((item) => {
+      const anotacoes = (item.anotacoes || [])
+        .map(
+          (a) => `
+            <div class="hotspot" style="left:${a.x}%; top:${a.y}%; width:${a.w}%; height:${a.h}%;">
+              <span class="tag">${escapeHtmlRelatorio(a.label)}</span>
+            </div>
+          `
+        )
+        .join('');
+      return `
+        <section class="slide">
+          <h2>${escapeHtmlRelatorio(item.titulo)}</h2>
+          <div class="image-wrap">
+            <img src="${baseUrl}${escapeHtmlRelatorio(item.src)}" alt="${escapeHtmlRelatorio(item.titulo)}" />
+            ${anotacoes}
+          </div>
+        </section>
+      `;
+    }).join('');
+
+    const html = `
+      <!doctype html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Guia de Treinamento - Manutencao</title>
+        <style>
+          * { box-sizing: border-box; }
+          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f8fafc; }
+          .page { padding: 28px; }
+          .header { background: linear-gradient(120deg, #0f172a, #1e293b); color: #f8fafc; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+          .brand { display: flex; align-items: center; gap: 12px; }
+          .brand img { height: 40px; width: auto; }
+          .brand small { display: block; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; }
+          h1 { font-size: 22px; margin: 0; }
+          h2 { font-size: 14px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.18em; color: #334155; }
+          .meta { font-size: 11px; color: #cbd5f5; }
+          .slide { background: #ffffff; border-radius: 16px; padding: 18px 20px; border: 1px solid #e2e8f0; margin-top: 16px; }
+          .image-wrap { position: relative; margin-top: 10px; }
+          .image-wrap img { width: 100%; height: auto; border-radius: 12px; border: 1px solid #e2e8f0; display: block; }
+          .hotspot { position: absolute; border: 2px solid #22d3ee; border-radius: 10px; box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15); }
+          .tag { position: absolute; top: -14px; left: 8px; background: #0f172a; color: #e2e8f0; font-size: 10px; padding: 2px 8px; border-radius: 999px; border: 1px solid #22d3ee; letter-spacing: 0.08em; text-transform: uppercase; }
+          ul { margin: 0; padding-left: 18px; color: #475569; }
+          li { margin-bottom: 6px; }
+          .footer { margin-top: 18px; font-size: 10px; color: #64748b; text-align: right; }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <div class="brand">
+              <img src="${logoMetalosa}" alt="Logo" />
+              <div>
+                <small>Treinamento</small>
+                <h1>Guia rapido - OS Manutencao</h1>
+              </div>
+            </div>
+            <div class="meta">Atualizado em ${escapeHtmlRelatorio(dataLabel)}</div>
+          </div>
+          ${slidesHtml}
+          ${imagensHtml}
+          <div class="footer">Material interno para treinamento.</div>
         </div>
       </body>
       </html>
@@ -10622,17 +10812,26 @@ const custoDetalheTitulo = custoDetalheItem
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Guia do Operador</h3>
                         <p className="text-xs text-slate-400">Passo a passo de como abrir, assumir e acompanhar OS.</p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTourOperadorStep(0);
-                          setTourOperadorOpen(true);
-                        }}
-                        title="Guia interativo"
-                        className="rounded-full border border-amber-400/60 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/10"
-                      >
-                        Guia interativo
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleBaixarGuiaTreinamentoPdf}
+                          className="rounded-full border border-slate-600 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                        >
+                          Baixar PDF
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTourOperadorStep(0);
+                            setTourOperadorOpen(true);
+                          }}
+                          title="Guia interativo"
+                          className="rounded-full border border-amber-400/60 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/10"
+                        >
+                          Guia interativo
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
