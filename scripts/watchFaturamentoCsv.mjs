@@ -1,11 +1,17 @@
 import fs from 'fs';
 import path from 'path';
+import { execFileSync } from 'child_process';
 
 const INPUT =
   process.env.FATURAMENTO_CSV ?? '\\\\10.10.100.4\\Setor\\PCP\\ARQIMPORT\\met113l.csv';
 const OUTPUT = path.resolve('src', 'data', 'faturamento.json');
 const WATCH_INTERVAL_MS = Number(process.env.FATURAMENTO_WATCH_MS ?? 30000);
 const DEFAULT_ENCODING = process.env.FATURAMENTO_CSV_ENCODING ?? 'latin1';
+const AUTO_GIT = (process.env.FATURAMENTO_AUTO_GIT ?? '1') === '1';
+const AUTO_GIT_PUSH = (process.env.FATURAMENTO_GIT_PUSH ?? '1') === '1';
+const AUTO_GIT_MESSAGE =
+  process.env.FATURAMENTO_GIT_MESSAGE ?? 'chore: atualizar faturamento';
+const REPO_ROOT = path.resolve('.');
 
 const normalizar = (valor) =>
   String(valor || '')
@@ -231,6 +237,39 @@ const gerarJson = () => {
   fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
   fs.writeFileSync(OUTPUT, JSON.stringify(dados, null, 2));
   console.log(`Gerado ${OUTPUT} com ${dados.length} linhas.`);
+
+  if (AUTO_GIT) {
+    try {
+      autoCommitPush();
+    } catch (error) {
+      console.error(`Falha no commit/push automatico: ${error.message}`);
+    }
+  }
+};
+
+const execGit = (args) =>
+  execFileSync('git', args, {
+    cwd: REPO_ROOT,
+    stdio: 'pipe',
+    encoding: 'utf8',
+  }).trim();
+
+const autoCommitPush = () => {
+  const status = execGit(['status', '--porcelain', '--', OUTPUT]);
+  if (!status) {
+    console.log('Sem alteracoes em faturamento.json. Nada a commitar.');
+    return;
+  }
+
+  execGit(['add', OUTPUT]);
+  const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  execGit(['commit', '-m', `${AUTO_GIT_MESSAGE} (${stamp})`]);
+  console.log('Commit automatico criado.');
+
+  if (AUTO_GIT_PUSH) {
+    execGit(['push']);
+    console.log('Push automatico concluido.');
+  }
 };
 
 let running = false;
