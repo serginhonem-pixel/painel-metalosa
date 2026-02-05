@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import faturamentoData from './data/faturamento.json';
 import devolucaoData from './data/devolucao.json';
@@ -777,6 +777,11 @@ export default function App() {
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [faturamentoAtualizadoEm, setFaturamentoAtualizadoEm] = useState(null);
+  const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);
+  const [popupIndex, setPopupIndex] = useState(0);
+  const [ultimoPopupKey, setUltimoPopupKey] = useState(null);
+  const [somAtivo, setSomAtivo] = useState(false);
+  const audioCtxRef = useRef(null);
   const [carregando, setCarregando] = useState(true);
   const [agora, setAgora] = useState(() => new Date());
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -3760,7 +3765,13 @@ export default function App() {
       if (lastModified) return `lm:${lastModified}`;
       return null;
     };
-    const carregarFaturamento = async () => {
+    const obterDataHeader = (headers) => {
+      const lastModified = headers?.get?.('last-modified');
+      if (!lastModified) return null;
+      const parsed = new Date(lastModified);
+      return Number.isNaN(parsed.valueOf()) ? null : parsed;
+    };
+  const carregarFaturamento = async () => {
       if (carregando || !ativo) return;
       carregando = true;
       try {
@@ -3781,6 +3792,8 @@ export default function App() {
               } else if (signature) {
                 lastSignature = signature;
               }
+              const dataHeader = obterDataHeader(headResp.headers);
+              if (dataHeader) setFaturamentoArquivoEm(dataHeader);
             }
           } catch (err) {
             // Se HEAD falhar, tenta GET normal.
@@ -3801,6 +3814,8 @@ export default function App() {
               }
               const signature = obterSignature(respAtual.headers);
               if (signature) lastSignature = signature;
+              const dataHeader = obterDataHeader(respAtual.headers);
+              if (dataHeader) setFaturamentoArquivoEm(dataHeader);
             }
           }
         } catch (err) {
@@ -3923,6 +3938,101 @@ export default function App() {
       clearInterval(intervalo);
     };
   }, []);
+
+  const tocarSomMoeda = (force = false) => {
+    if ((!somAtivo && !force) || typeof window === 'undefined') return;
+    const AudioContextRef = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextRef) return;
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContextRef();
+    }
+    const ctx = audioCtxRef.current;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+    const now = ctx.currentTime;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.35, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(1200, now);
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(900, now + 0.02);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now + 0.02);
+    osc1.stop(now + 0.2);
+    osc2.stop(now + 0.28);
+  };
+
+  const alternarSom = () => {
+    setSomAtivo((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => tocarSomMoeda(true), 0);
+      }
+      return next;
+    });
+  };
+
+  const ultimosFaturadosHoje = useMemo(() => {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const filtrados = [];
+
+    faturamentoLinhas.forEach((row, idx) => {
+      const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
+      if (!emissao) return;
+      const dd = String(emissao.getUTCDate()).padStart(2, '0');
+      const mm = String(emissao.getUTCMonth() + 1).padStart(2, '0');
+      const yyyy = emissao.getUTCFullYear();
+      const dataEmissao = `${dd}/${mm}/${yyyy}`;
+      if (dataEmissao !== hoje) return;
+      if (normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao') return;
+
+      const cliente = row?.Cliente ?? row?.cliente ?? '-';
+      const nf = obterNumeroNota(row);
+      const valor = Math.abs(obterValorLiquido(row));
+      filtrados.push({
+        key: `${nf || 'nf'}|${cliente}|${valor}|${idx}`,
+        cliente,
+        nf,
+        valor,
+      });
+    });
+
+    if (!filtrados.length) return [];
+    return filtrados.slice(-3).reverse();
+  }, [faturamentoLinhas]);
+
+  useEffect(() => {
+    if (!ultimosFaturadosHoje.length) return;
+    setPopupIndex(0);
+    const key = ultimosFaturadosHoje[0]?.key;
+    if (key && key !== ultimoPopupKey) {
+      setUltimoPopupKey(key);
+      if (somAtivo) tocarSomMoeda();
+    }
+  }, [ultimosFaturadosHoje, somAtivo]);
+
+  useEffect(() => {
+    if (!ultimosFaturadosHoje.length) return undefined;
+    const timer = setInterval(() => {
+      setPopupIndex((prev) => (prev + 1) % ultimosFaturadosHoje.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [ultimosFaturadosHoje.length]);
+
+  const popupAtual = ultimosFaturadosHoje[popupIndex] || null;
+  const mostrarPopupFaturamento =
+    (abaAtiva === 'dashboard-tv' || abaAtiva === 'faturamento') && popupAtual;
 
   const metricas = useMemo(() => {
     const faltasTotais = colaboradores.filter(c => c.estaAusente).length;
@@ -8485,11 +8595,31 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                     <h2 className="text-5xl font-black text-white tracking-tight">Dashboard TV</h2>
                     <p className="text-lg text-slate-300 mt-1 font-medium">
-                      Atualizado em {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} -{' '}
-                      {agora.toLocaleDateString('pt-BR')}
+                      Faturamento atualizado em{' '}
+                      {faturamentoArquivoEm
+                        ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}{' '}
+                      {faturamentoArquivoEm ? '' : `- ${agora.toLocaleDateString('pt-BR')}`}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={alternarSom}
+                      className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                        somAtivo
+                          ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40'
+                          : 'border border-slate-700 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      {somAtivo ? 'Som ativo' : 'Ativar som'}
+                    </button>
                     <div className="hidden md:flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-2">
                       <div className="text-right border-r border-slate-700 pr-4">
                         <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Status do sistema</p>
@@ -8739,41 +8869,62 @@ const custoDetalheTitulo = custoDetalheItem
                       </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 min-w-[320px]">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ultima atualizacao</p>
-                      <div className="flex items-end gap-1">
-                        <span className="text-sm font-semibold text-emerald-200">
-                          {faturamentoAtualizadoEm
-                            ? new Date(faturamentoAtualizadoEm).toLocaleString('pt-BR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
-                            : 'Carregando...'}
-                        </span>
+                  <div className="flex flex-col gap-3 min-w-[320px]">
+                    <button
+                      type="button"
+                      onClick={alternarSom}
+                      className={`self-end px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                        somAtivo
+                          ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40'
+                          : 'border border-white/10 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      {somAtivo ? 'Som ativo' : 'Ativar som'}
+                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ultima atualizacao</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-sm font-semibold text-emerald-200">
+                            {faturamentoArquivoEm
+                              ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : faturamentoAtualizadoEm
+                              ? new Date(faturamentoAtualizadoEm).toLocaleString('pt-BR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : 'Carregando...'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Movimentos</p>
-                      <div className="flex items-end gap-1">
-                        <span className="text-2xl font-black text-blue-200">{faturamentoAtual.movimentos || 0}</span>
-                        <span className="text-[10px] text-slate-500 mb-1">no mes</span>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Movimentos</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-2xl font-black text-blue-200">{faturamentoAtual.movimentos || 0}</span>
+                          <span className="text-[10px] text-slate-500 mb-1">no mes</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
-                      <div className="flex items-end gap-1">
-                        <span className="text-2xl font-black text-amber-300">{faturamentoAtual.diasAtivos || 0}</span>
-                        <span className="text-[10px] text-slate-500 mb-1">dias uteis</span>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-2xl font-black text-amber-300">{faturamentoAtual.diasAtivos || 0}</span>
+                          <span className="text-[10px] text-slate-500 mb-1">dias uteis</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mes</p>
-                      <div className="flex items-end gap-1">
-                        <span className="text-xl font-black text-blue-300">{formatarMoeda(faturamentoAtual.total)}</span>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mes</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-xl font-black text-blue-300">{formatarMoeda(faturamentoAtual.total)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -12433,6 +12584,32 @@ const custoDetalheTitulo = custoDetalheItem
              </div>
           )}
         </div>
+        {mostrarPopupFaturamento && (
+          <div className="fixed right-6 top-24 z-50 w-[320px] max-w-[90vw]">
+            <div
+              key={popupAtual.key}
+              className="rounded-2xl border border-emerald-400/40 bg-slate-950/90 p-4 shadow-2xl animate-in slide-in-from-right duration-500"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] uppercase tracking-[0.4em] text-emerald-300 font-bold">
+                  Ultimos faturados hoje
+                </span>
+                <span className="text-[10px] text-slate-500">
+                  {popupIndex + 1}/{ultimosFaturadosHoje.length}
+                </span>
+              </div>
+              <div className="text-sm text-slate-300">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-100">{popupAtual.cliente}</span>
+                  <span className="text-emerald-300 font-bold">{formatarMoeda(popupAtual.valor)}</span>
+                </div>
+                {popupAtual.nf && (
+                  <div className="text-[11px] text-slate-400 mt-1">NF {popupAtual.nf}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Menu Mobile Inferior */}
