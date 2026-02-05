@@ -1116,6 +1116,14 @@ export default function App() {
     if (email === 'industria@metalosa.com.br') return 'Leandro Freitas';
     return authUser?.displayName || authUser?.email || 'Usuario';
   }, [authUser?.displayName, authUser?.email]);
+  const nomeBoasVindas = useMemo(() => {
+    const email = authUser?.email;
+    if (!email) return 'Operador';
+    const user = email.split('@')[0] || '';
+    const first = user.split(/[._-]/)[0] || user;
+    if (!first) return 'Operador';
+    return `${first.charAt(0).toUpperCase()}${first.slice(1)}`;
+  }, [authUser?.email]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -6595,13 +6603,18 @@ const custoDetalheTitulo = custoDetalheItem
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-5">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-blue-500/20 flex items-center justify-center">
-              <Wrench size={22} className="text-blue-200" />
+            <div className="h-12 w-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700">
+              <img src={logoMetalosa} alt="Metalosa" className="h-9 w-9 object-contain" />
             </div>
             <div>
-              <h1 className="text-lg font-black text-white">Bem-vindo ao app de manutencao</h1>
-              <p className="text-xs text-slate-400">Um rapido resumo antes de iniciar.</p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Manutencao</p>
+              <h1 className="text-lg font-black text-white">Bem-vindo, {nomeBoasVindas}</h1>
             </div>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-sm text-slate-300">
+              Vamos fazer um check-in rapido para garantir registros claros e evitar retrabalho.
+            </p>
           </div>
           <div className="space-y-3 text-sm text-slate-300">
             <div className="flex gap-3">
@@ -6610,11 +6623,11 @@ const custoDetalheTitulo = custoDetalheItem
             </div>
             <div className="flex gap-3">
               <span className="text-blue-300 font-bold">2.</span>
-              <span>Registre status, tempo e materiais para evitar retrabalho.</span>
+              <span>Registre status, tempo e materiais em cada etapa.</span>
             </div>
             <div className="flex gap-3">
               <span className="text-blue-300 font-bold">3.</span>
-              <span>Finalize a OS somente quando o equipamento estiver liberado.</span>
+              <span>Finalize apenas quando o equipamento estiver liberado.</span>
             </div>
           </div>
           <button
