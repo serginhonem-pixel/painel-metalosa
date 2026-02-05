@@ -106,6 +106,13 @@ const extrairFaturamento = (sheet) => {
   const idxValorUnitario = localizarIndice(header, ['vlrunitario', 'valorunitario']);
   const idxValorTotal = localizarIndice(header, ['vlrtotal', 'valortotal']);
   const idxEmissao = localizarIndice(header, ['emissao']);
+  const idxVendedor1 = localizarIndice(header, [
+    'vendedor1',
+    'vendedor',
+    'codvendedor',
+    'codvend',
+    'vend1',
+  ]);
   const idxNF = localizarIndice(header, [
     'nf',
     'nfe',
@@ -130,6 +137,7 @@ const extrairFaturamento = (sheet) => {
     const valorUnitario = row?.[idxValorUnitario];
     const valorTotal = row?.[idxValorTotal];
     const emissao = row?.[idxEmissao];
+    const vendedor1 = idxVendedor1 >= 0 ? row?.[idxVendedor1] : '';
     const nf = idxNF >= 0 ? row?.[idxNF] : '';
     const codFiscalRaw = idxCodFiscal >= 0 ? row?.[idxCodFiscal] : '';
     const codFiscal = codFiscalRaw ? normalizarCfop(codFiscalRaw) : '';
@@ -153,6 +161,7 @@ const extrairFaturamento = (sheet) => {
       ValorUnitario: valorUnitario ?? '',
       ValorTotal: valorTotal ?? '',
       Emissao: emissao ?? '',
+      Vendedor1: vendedor1 ?? '',
       NF: nf ?? '',
       CodFiscal: codFiscal,
       MesEmissao: formatMesEmissao(emissao),

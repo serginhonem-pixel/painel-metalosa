@@ -4829,6 +4829,12 @@ export default function App() {
     };
   }, [dashboardFaturamentoBase, dashboardFilialAtual, filtroCfops]);
 
+  const faturamentoHojeDashboard = useMemo(() => {
+    const hojeISO = new Date().toISOString().slice(0, 10);
+    const item = (dashboardFaturamentoFilial.porDia || []).find((dia) => dia.dia === hojeISO);
+    return item?.valor || 0;
+  }, [dashboardFaturamentoFilial.porDia, agora]);
+
   // Últimos 10 dias de faturamento (independente do mês selecionado)
   const ultimos10DiasFaturamento = useMemo(() => {
     if (!faturamentoLinhas || !faturamentoLinhas.length) return [];
@@ -4914,7 +4920,7 @@ export default function App() {
       const infoCliente = clientesPorCodigo.get(codigoCliente);
       const clienteNome = row.clienteNome ?? infoCliente?.nome ?? '';
       const vendedorCodigo = row.vendedorCodigo || infoCliente?.vendedor || '';
-      const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
+      const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || vendedorCodigo || '';
       return { ...row, clienteNome, vendedorNome };
     });
     const totalDia = linhasDia.reduce((acc, row) => acc + row.valorTotal, 0);
@@ -4959,7 +4965,7 @@ export default function App() {
       faturamentoAtual.linhas.map((row) => {
         const codigoCliente = normalizarCodigoCliente(row.cliente);
         const vendedorCodigo = row.vendedorCodigo || clientesPorCodigoVendedor.get(codigoCliente) || '';
-        const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || '';
+        const vendedorNome = vendedoresPorCodigo.get(vendedorCodigo) || vendedorCodigo || '';
         return { ...row, vendedorNome };
       }),
     [faturamentoAtual.linhas, clientesPorCodigoVendedor, vendedoresPorCodigo]
@@ -8068,7 +8074,7 @@ const custoDetalheTitulo = custoDetalheItem
 
               {dashboardView === 'faturamento' ? (
                 <div className="space-y-2">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
                         Faturamento total {dashboardFilialAtual ? `· Filial ${dashboardFilialAtual}` : ''}
@@ -8082,6 +8088,11 @@ const custoDetalheTitulo = custoDetalheItem
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Devolucoes</p>
                       <p className="text-3xl font-black text-rose-300 mt-2">{formatarMoeda(dashboardFaturamentoFilial.totalDevolucao || 0)}</p>
                       <p className="text-base text-slate-400 mt-2">Impacto no mes</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
+                      <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento hoje</p>
+                      <p className="text-3xl font-black text-emerald-300 mt-2">{formatarMoeda(faturamentoHojeDashboard)}</p>
+                      <p className="text-base text-slate-400 mt-2">Dia atual</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
