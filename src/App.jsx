@@ -22,7 +22,8 @@ import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, auth, storage } from './firebase';
+import { getToken, onMessage, isSupported, deleteToken } from 'firebase/messaging';
+import { db, auth, storage, messaging } from './firebase';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -777,6 +778,13 @@ export default function App() {
   const [carregando, setCarregando] = useState(true);
   const [agora, setAgora] = useState(() => new Date());
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [notifSupported, setNotifSupported] = useState(false);
+  const [notifPermission, setNotifPermission] = useState(() =>
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
+  const [notifToken, setNotifToken] = useState('');
+  const [notifError, setNotifError] = useState('');
+  const [notifLoading, setNotifLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') return false;
     if (window.matchMedia) {
@@ -1084,6 +1092,40 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let active = true;
+    isSupported()
+      .then((supported) => {
+        if (active) setNotifSupported(supported);
+      })
+      .catch(() => {
+        if (active) setNotifSupported(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!messaging || !notifSupported) return;
+    const unsubscribe = onMessage(messaging, (payload) => {
+      if (typeof Notification === 'undefined') return;
+      if (Notification.permission !== 'granted') return;
+      const title = payload?.notification?.title || 'Atualizacao de OS';
+      const options = {
+        body: payload?.notification?.body || '',
+        data: payload?.data || {},
+      };
+      try {
+        new Notification(title, options);
+      } catch (err) {
+        // Ignora se o navegador bloquear
+      }
+    });
+    return unsubscribe;
+  }, [notifSupported, messaging]);
+
+  useEffect(() => {
     const timer = setTimeout(() => setCarregando(false), 500);
     return () => clearTimeout(timer);
   }, []);
@@ -1203,6 +1245,121 @@ export default function App() {
     return ITENS_MENU;
   }, [isManutencaoOnly]);
 
+  useEffect(() => {
+    if (!authUser) {
+      setNotifToken('');
+      setNotifError('');
+      return;
+    }
+    const storageKey = `notifToken:${authUser.uid}`;
+    const stored = localStorage.getItem(storageKey) || '';
+    if (stored) {
+      setNotifToken(stored);
+    }
+  }, [authUser?.uid]);
+
+  useEffect(() => {
+    if (!authUser || !notifToken || !isAllowedDomain) return;
+    const nowIso = new Date().toISOString();
+    setDoc(
+      doc(db, 'notification_tokens', notifToken),
+      {
+        token: notifToken,
+        uid: authUser.uid,
+        email: authUser.email || '',
+        displayName: authUser.displayName || authUser.email || 'Usuario',
+        enabled: true,
+        lastSeen: nowIso,
+      },
+      { merge: true }
+    ).catch(() => {});
+  }, [authUser, notifToken, isAllowedDomain]);
+
+  const handleEnableNotifications = async () => {
+    setNotifError('');
+    if (!authUser || !isAllowedDomain) {
+      setNotifError('Sem permissao para ativar notificacoes.');
+      return;
+    }
+    if (!notifSupported || !messaging) {
+      setNotifError('Navegador nao suporta notificacoes.');
+      return;
+    }
+    if (typeof Notification === 'undefined') {
+      setNotifError('Notificacoes indisponiveis neste navegador.');
+      return;
+    }
+    if (!('serviceWorker' in navigator)) {
+      setNotifError('Service Worker nao suportado.');
+      return;
+    }
+    if (!import.meta.env.VITE_FIREBASE_VAPID_KEY) {
+      setNotifError('VAPID key nao configurada.');
+      return;
+    }
+    setNotifLoading(true);
+    try {
+      const permission = await Notification.requestPermission();
+      setNotifPermission(permission);
+      if (permission !== 'granted') {
+        setNotifError('Permissao negada pelo navegador.');
+        return;
+      }
+      const registration = await navigator.serviceWorker.register(
+        '/firebase-messaging-sw.js'
+      );
+      const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: registration,
+      });
+      if (!token) {
+        setNotifError('Nao foi possivel obter o token de notificacao.');
+        return;
+      }
+      const nowIso = new Date().toISOString();
+      await setDoc(
+        doc(db, 'notification_tokens', token),
+        {
+          token,
+          uid: authUser.uid,
+          email: authUser.email || '',
+          displayName: authUser.displayName || authUser.email || 'Usuario',
+          enabled: true,
+          createdAt: nowIso,
+          lastSeen: nowIso,
+          platform: navigator.platform || '',
+          userAgent: navigator.userAgent || '',
+        },
+        { merge: true }
+      );
+      localStorage.setItem(`notifToken:${authUser.uid}`, token);
+      setNotifToken(token);
+    } catch (err) {
+      setNotifError('Falha ao ativar notificacoes.');
+    } finally {
+      setNotifLoading(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    setNotifError('');
+    if (!authUser || !isAllowedDomain) return;
+    if (!notifToken) return;
+    setNotifLoading(true);
+    try {
+      if (messaging) {
+        await deleteToken(messaging).catch(() => {});
+      }
+      await deleteDoc(doc(db, 'notification_tokens', notifToken));
+      localStorage.removeItem(`notifToken:${authUser.uid}`);
+      setNotifToken('');
+    } catch (err) {
+      setNotifError('Falha ao desativar notificacoes.');
+    } finally {
+      setNotifLoading(false);
+    }
+  };
+
   const ativosFiltrados = useMemo(() => {
     if (filtroAtivos === 'Todos') return listaMaquinas;
     const filtroNorm = normalizarTexto(filtroAtivos);
@@ -1264,6 +1421,21 @@ export default function App() {
       ),
     [manutencaoOrdens]
   );
+
+  const backlogPorLider = useMemo(() => {
+    const abertas = manutencaoOrdens.filter(
+      (os) => os.status !== 'Finalizada' && os.status !== 'Cancelada'
+    );
+    const counts = new Map();
+    abertas.forEach((os) => {
+      const lider = os.responsavel || 'Sem responsavel';
+      counts.set(lider, (counts.get(lider) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([lider, total]) => ({ lider, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+  }, [manutencaoOrdens]);
 
   const formatDateTimeRelatorio = (value) => {
     if (!value) return '-';
@@ -7447,6 +7619,52 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="text-[10px] text-slate-500 truncate">{authUser.email}</div>
                 </div>
               </div>
+              {isAllowedDomain && (
+                <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold mb-2">
+                    Notificacoes
+                  </p>
+                  {!notifSupported && (
+                    <p className="text-[10px] text-slate-400">
+                      Navegador nao suporta notificacoes.
+                    </p>
+                  )}
+                  {notifSupported && notifPermission === 'denied' && (
+                    <p className="text-[10px] text-rose-300">
+                      Permissao bloqueada no navegador.
+                    </p>
+                  )}
+                  {notifSupported && notifPermission !== 'denied' && (
+                    <div className="space-y-2">
+                      {notifToken ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-bold text-emerald-300">Ativas</span>
+                          <button
+                            type="button"
+                            onClick={handleDisableNotifications}
+                            disabled={notifLoading}
+                            className="rounded-full border border-slate-700 px-2 py-1 text-[10px] font-bold text-slate-200 hover:border-slate-500 disabled:opacity-60"
+                          >
+                            Desativar
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleEnableNotifications}
+                          disabled={notifLoading}
+                          className="w-full rounded-full border border-amber-400/50 bg-amber-400/10 px-3 py-1 text-[10px] font-bold text-amber-200 hover:bg-amber-400/20 disabled:opacity-60"
+                        >
+                          Ativar notificacoes
+                        </button>
+                      )}
+                      {notifError && (
+                        <div className="text-[10px] text-rose-300">{notifError}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
               <button
                 onClick={handleLogout}
                 className="w-full rounded-lg border border-slate-700 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-white hover:border-slate-500"
@@ -10729,32 +10947,75 @@ const custoDetalheTitulo = custoDetalheItem
              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
                 <div className="pointer-events-none absolute -top-20 -right-10 h-56 w-56 rounded-full bg-blue-500/15 blur-3xl"></div>
                 <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
-                <div className="relative space-y-8 animate-in slide-in-from-top duration-500">
-                <div className="flex flex-wrap items-center gap-3">
-                   <div className="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
-                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
-                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
-                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Minhas</button>
-                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
+                <div className="relative space-y-6 animate-in slide-in-from-top duration-500">
+                  <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900/80 to-slate-950 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-2xl border border-amber-400/40 bg-amber-400/10 flex items-center justify-center">
+                            <Wrench size={22} className="text-amber-300" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.35em] text-amber-200/70">Central de manutencao</p>
+                            <h2 className="text-2xl font-black text-white">Abertura de OS para producao</h2>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-300 max-w-2xl">
+                          Registre as ocorrencias da producao com dados completos. Uma boa abertura acelera o atendimento e reduz paradas.
+                        </p>
+                        {isManutencaoOnly && (
+                          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.3em] text-amber-200">
+                            Perfil de abertura
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-2">
+                          {manutencaoKpis.map((kpi) => (
+                            <div key={kpi.id} className={`rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-2 text-xs font-bold ${kpi.tone}`}>
+                              <span className="text-[10px] uppercase tracking-[0.25em] text-slate-300">{kpi.label}</span>
+                              <div className="mt-1 text-lg font-black text-white">{kpi.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="w-full lg:w-[320px] rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Checklist de abertura</p>
+                          <ul className="mt-3 space-y-2 text-xs text-slate-300">
+                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Ativo e setor corretos</li>
+                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Prioridade real</li>
+                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Descricao objetiva</li>
+                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Foto se necessario</li>
+                          </ul>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setManutencaoEditId(null);
+                            setNovaOsForm(novaOsDefaults);
+                            setNovaOsFotoFile(null);
+                            setNovaOsFotoPreview('');
+                            setManutencaoSaveError('');
+                            setManutencaoModalOpen(true);
+                          }}
+                          data-tour="nova-os"
+                          className="w-full rounded-xl bg-amber-400 text-slate-950 text-xs font-black py-3 shadow-lg shadow-amber-400/30 hover:brightness-110"
+                        >
+                          Abrir nova OS
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
+                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
+                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Minhas</button>
+                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
                       {isManutencaoOperador && (
-                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
+                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
                       )}
-                   </div>
-                   <div className="ml-auto flex gap-2">
-                      <button
-                        onClick={() => {
-                          setManutencaoEditId(null);
-                          setNovaOsForm(novaOsDefaults);
-                          setNovaOsFotoFile(null);
-                          setNovaOsFotoPreview('');
-                          setManutencaoSaveError('');
-                          setManutencaoModalOpen(true);
-                        }}
-                        data-tour="nova-os"
-                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400/90 to-blue-500/90 text-slate-950 text-xs font-bold shadow hover:brightness-110"
-                      >
-                        Nova OS
-                      </button>
+                    </div>
+                    <div className="ml-auto flex gap-2">
                       {!isManutencaoOnly && (
                         <button
                           onClick={handleExportarManutencaoPdf}
@@ -10778,15 +11039,15 @@ const custoDetalheTitulo = custoDetalheItem
                       >
                         Sair
                       </button>
-                   </div>
-                </div>
+                    </div>
+                  </div>
 
                 {subAbaManutencao === 'resumo' && (
                   <div className="space-y-6">
-                    <div className="rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-500/20 via-slate-900/60 to-slate-900/20 p-5 shadow-[0_12px_40px_-20px_rgba(244,63,94,0.6)]">
+                    <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/20 via-slate-900/60 to-slate-900/20 p-5 shadow-[0_12px_40px_-20px_rgba(251,191,36,0.35)]">
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
-                          <p className="text-xs font-bold uppercase tracking-[0.3em] text-rose-200/80">Alerta de parada</p>
+                          <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-200/80">Alerta operacional</p>
                           <h3 className="mt-2 text-lg font-black text-white">
                             {manutencaoParadas.length
                               ? `${manutencaoParadas.length} processo(s) parado(s)`
@@ -10800,12 +11061,12 @@ const custoDetalheTitulo = custoDetalheItem
                           {manutencaoParadas.length ? (
                             <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
                               {manutencaoParadas.slice(0, 4).map((os) => (
-                                <span key={os.id} className="rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-1">
+                                <span key={os.id} className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1">
                                   {os.ativo || os.setor || os.id}
                                 </span>
                               ))}
                               {manutencaoParadas.length > 4 && (
-                                <span className="rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-1">
+                                <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1">
                                   +{manutencaoParadas.length - 4} mais
                                 </span>
                               )}
@@ -10813,13 +11074,13 @@ const custoDetalheTitulo = custoDetalheItem
                           ) : null}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-rose-500/30 px-3 py-1 text-xs font-bold text-rose-100">
+                          <span className="rounded-full bg-amber-500/30 px-3 py-1 text-xs font-bold text-amber-100">
                             {manutencaoParadas.length ? 'Critico' : 'OK'}
                           </span>
                           <button
                             type="button"
                             onClick={() => setSubAbaManutencao('ordens')}
-                            className="rounded-full border border-rose-400/60 px-3 py-1 text-xs font-bold text-rose-100 hover:bg-rose-500/20"
+                            className="rounded-full border border-amber-400/60 px-3 py-1 text-xs font-bold text-amber-100 hover:bg-amber-500/20"
                           >
                             Ver OS
                           </button>
@@ -10886,9 +11147,36 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
 
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Alertas rapidos</h3>
-                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                          Sem alertas cadastrados.
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Acoes rapidas</h3>
+                        <div className="grid grid-cols-1 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setManutencaoEditId(null);
+                              setNovaOsForm(novaOsDefaults);
+                              setNovaOsFotoFile(null);
+                              setNovaOsFotoPreview('');
+                              setManutencaoSaveError('');
+                              setManutencaoModalOpen(true);
+                            }}
+                            className="w-full rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-left text-xs font-bold text-amber-100 hover:bg-amber-400/20"
+                          >
+                            Abrir nova OS
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSubAbaManutencao('minhas')}
+                            className="w-full rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 text-left text-xs font-bold text-slate-200 hover:border-slate-500"
+                          >
+                            Ver minhas solicitacoes
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSubAbaManutencao('ordens')}
+                            className="w-full rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 text-left text-xs font-bold text-slate-200 hover:border-slate-500"
+                          >
+                            Ver ordens abertas
+                          </button>
                         </div>
                       </div>
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
@@ -10925,10 +11213,25 @@ const custoDetalheTitulo = custoDetalheItem
                         )}
                       </div>
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por setor</h3>
-                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                          Sem dados de backlog.
-                        </div>
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por lider</h3>
+                        {backlogPorLider.length ? (
+                          <div className="space-y-3">
+                            {backlogPorLider.map((item) => (
+                              <div key={item.lider} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-semibold text-slate-200">{item.lider}</span>
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">
+                                    {item.total} OS
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                            Sem dados de backlog.
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
