@@ -1071,6 +1071,17 @@ export default function App() {
   const manutencaoRestritaEmails = [
     'manutencao@metalosa.com.br',
     'wilson@metalosa.com.br',
+    'breno.feitosa@metalosa.com.br',
+    'alexandre.mendonca@metalosa.com.br',
+    'carlos.antonio@metalosa.com.br',
+    'ivani.ferreira@metalosa.com.br',
+    'renato.themoteo@metalosa.com.br',
+    'sandro.lima@metalosa.com.br',
+    'sergio.lafaiete@metalosa.com.br',
+    'edneis.souza@metalosa.com.br',
+    'amilton.rufino@metalosa.com.br',
+    'altair.santos@metalosa.com.br',
+    'nilton.pereira@metalosa.com.br',
   ];
   const isManutencaoOnly = manutencaoRestritaEmails.includes(
     authUser?.email?.toLowerCase()
