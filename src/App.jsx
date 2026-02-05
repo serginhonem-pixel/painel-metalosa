@@ -776,6 +776,7 @@ export default function App() {
   );
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
+  const [faturamentoAtualizadoEm, setFaturamentoAtualizadoEm] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [agora, setAgora] = useState(() => new Date());
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -3838,6 +3839,7 @@ export default function App() {
 
         if (!ativo) return;
         setFaturamentoLinhas(linhas);
+        setFaturamentoAtualizadoEm(new Date());
         hasData = true;
         const linhas2025 = linhas.filter((row) => obterMesKey(row)?.key?.startsWith('2025-'));
         const total = linhas2025.reduce((acc, row) => acc + obterValorLiquido(row), 0);
@@ -8737,7 +8739,23 @@ const custoDetalheTitulo = custoDetalheItem
                       </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[320px]">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 min-w-[320px]">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ultima atualizacao</p>
+                      <div className="flex items-end gap-1">
+                        <span className="text-sm font-semibold text-emerald-200">
+                          {faturamentoAtualizadoEm
+                            ? new Date(faturamentoAtualizadoEm).toLocaleString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })
+                            : 'Carregando...'}
+                        </span>
+                      </div>
+                    </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Movimentos</p>
                       <div className="flex items-end gap-1">
