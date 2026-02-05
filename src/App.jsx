@@ -780,6 +780,7 @@ export default function App() {
   const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);
   const [popupIndex, setPopupIndex] = useState(0);
   const [ultimoPopupKey, setUltimoPopupKey] = useState(null);
+  const [popupDestaqueAt, setPopupDestaqueAt] = useState(0);
   const [somAtivo, setSomAtivo] = useState(false);
   const audioCtxRef = useRef(null);
   const [carregando, setCarregando] = useState(true);
@@ -4012,11 +4013,26 @@ export default function App() {
       const cliente = clienteNome || clienteCodigo || '-';
       const nf = obterNumeroNota(row);
       const valor = Math.abs(obterValorLiquido(row));
+      const produtoCodigo = row?.Codigo ?? row?.codigo ?? '';
+      const produtoDescricao = row?.Descricao ?? row?.descricao ?? '';
+      const quantidade = row?.Quantidade ?? row?.quantidade ?? '';
+      const unidade = row?.Unidade ?? row?.unidade ?? '';
+      const filial = row?.Filial ?? row?.filial ?? '';
+      const vendedor = row?.Vendedor1 ?? row?.vendedor1 ?? row?.Vendedor ?? row?.vendedor ?? '';
+      const emissaoData = parseEmissaoData(row?.Emissao ?? row?.emissao);
+
       filtrados.push({
         key: `${nf || 'nf'}|${clienteCodigo || cliente}|${valor}|${idx}`,
         cliente,
         nf,
         valor,
+        produtoCodigo,
+        produtoDescricao,
+        quantidade,
+        unidade,
+        filial,
+        vendedor,
+        emissaoData,
       });
     });
 
@@ -4030,6 +4046,7 @@ export default function App() {
     const key = ultimosFaturadosHoje[0]?.key;
     if (key && key !== ultimoPopupKey) {
       setUltimoPopupKey(key);
+      setPopupDestaqueAt(Date.now());
       if (somAtivo) tocarSomMoeda();
     }
   }, [ultimosFaturadosHoje, somAtivo]);
@@ -4043,6 +4060,10 @@ export default function App() {
   }, [ultimosFaturadosHoje.length]);
 
   const popupAtual = ultimosFaturadosHoje[popupIndex] || null;
+  const popupDestaque =
+    popupAtual &&
+    popupAtual.key === ultimoPopupKey &&
+    Date.now() - popupDestaqueAt < 9000;
   const mostrarPopupFaturamento =
     (abaAtiva === 'dashboard-tv' || abaAtiva === 'faturamento') && popupAtual;
 
@@ -12597,26 +12618,46 @@ const custoDetalheTitulo = custoDetalheItem
           )}
         </div>
         {mostrarPopupFaturamento && (
-          <div className="fixed right-6 top-24 z-50 w-[320px] max-w-[90vw]">
+          <div className="fixed right-6 top-24 z-50 w-[420px] max-w-[92vw]">
             <div
               key={popupAtual.key}
-              className="rounded-2xl border border-emerald-400/40 bg-slate-950/90 p-4 shadow-2xl animate-in slide-in-from-right duration-500"
+              className={`rounded-3xl border border-emerald-400/60 bg-slate-950/95 p-5 shadow-2xl animate-in slide-in-from-right duration-500 ${
+                popupDestaque ? 'animate-pulse ring-2 ring-emerald-400/70 shadow-[0_0_40px_#10b98166]' : ''
+              }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] uppercase tracking-[0.4em] text-emerald-300 font-bold">
+                <span className="text-[10px] uppercase tracking-[0.45em] text-emerald-300 font-bold">
                   Ultimos faturados hoje
                 </span>
                 <span className="text-[10px] text-slate-500">
                   {popupIndex + 1}/{ultimosFaturadosHoje.length}
                 </span>
               </div>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-slate-300 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-100">{popupAtual.cliente}</span>
-                  <span className="text-emerald-300 font-bold">{formatarMoeda(popupAtual.valor)}</span>
+                  <span className="text-base font-semibold text-slate-100">{popupAtual.cliente}</span>
+                  <span className="text-emerald-300 font-bold text-base">{formatarMoeda(popupAtual.valor)}</span>
                 </div>
-                {popupAtual.nf && (
-                  <div className="text-[11px] text-slate-400 mt-1">NF {popupAtual.nf}</div>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                  {popupAtual.nf && <span className="font-semibold text-slate-300">NF {popupAtual.nf}</span>}
+                  {popupAtual.filial && <span>Filial {popupAtual.filial}</span>}
+                  {popupAtual.vendedor && <span>Vend {popupAtual.vendedor}</span>}
+                  {popupAtual.emissaoData && (
+                    <span>
+                      {popupAtual.emissaoData.toLocaleDateString('pt-BR')}
+                    </span>
+                  )}
+                </div>
+                {(popupAtual.produtoCodigo || popupAtual.produtoDescricao) && (
+                  <div className="text-[12px] text-slate-200">
+                    <span className="font-semibold text-slate-100">{popupAtual.produtoCodigo || 'SKU'}</span>
+                    {popupAtual.produtoDescricao ? ` - ${popupAtual.produtoDescricao}` : ''}
+                  </div>
+                )}
+                {(popupAtual.quantidade || popupAtual.unidade) && (
+                  <div className="text-[11px] text-slate-400">
+                    Qtd {popupAtual.quantidade || '-'} {popupAtual.unidade || ''}
+                  </div>
                 )}
               </div>
             </div>
