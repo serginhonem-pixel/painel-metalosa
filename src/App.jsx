@@ -4823,8 +4823,7 @@ export default function App() {
     const diaMap = new Map();
     faturamentoLinhas.forEach((row) => {
       const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
-      const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
-      if (emissao && tipoMovimento !== 'devolucao') {
+      if (emissao) {
         const diaISO = emissao.toISOString().slice(0, 10);
         const valor = obterValorLiquido(row);
         diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valor);
