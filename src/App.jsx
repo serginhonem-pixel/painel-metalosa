@@ -1153,16 +1153,10 @@ export default function App() {
       setShowMobileIntro(false);
       return;
     }
-    const key = `mobileIntroDismissed:${authUser.email?.toLowerCase() || 'anon'}`;
-    const dismissed = localStorage.getItem(key) === '1';
-    setShowMobileIntro(!dismissed);
+    setShowMobileIntro(true);
   }, [authUser, isAllowedDomain, isMobile]);
 
   const handleMobileIntroContinue = () => {
-    if (authUser?.email) {
-      const key = `mobileIntroDismissed:${authUser.email.toLowerCase()}`;
-      localStorage.setItem(key, '1');
-    }
     setShowMobileIntro(false);
   };
 
@@ -10692,18 +10686,22 @@ const custoDetalheTitulo = custoDetalheItem
                       >
                         Nova OS
                       </button>
-                      <button
-                        onClick={handleExportarManutencaoPdf}
-                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
-                      >
-                        Exportar PDF
-                      </button>
-                      <button
-                        onClick={handleExportarManutencaoPpt}
-                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
-                      >
-                        Exportar PPT
-                      </button>
+                      {!isManutencaoOnly && (
+                        <button
+                          onClick={handleExportarManutencaoPdf}
+                          className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                        >
+                          Exportar PDF
+                        </button>
+                      )}
+                      {!isManutencaoOnly && (
+                        <button
+                          onClick={handleExportarManutencaoPpt}
+                          className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                        >
+                          Exportar PPT
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={handleLogout}
