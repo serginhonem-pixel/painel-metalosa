@@ -4350,7 +4350,8 @@ export default function App() {
 
       if (row.emissao) {
         const diaISO = row.emissao.toISOString().slice(0, 10);
-        const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
+        const valorDia =
+          row.tipoMovimento === 'devolucao' ? -Math.abs(row.valorTotal || 0) : row.valorTotal;
         diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
         if (!diaFilialMap.has(diaISO)) {
           diaFilialMap.set(diaISO, new Map());
@@ -4719,7 +4720,8 @@ export default function App() {
     linhasFiltradasDia.forEach((row) => {
       if (!row.emissao) return;
       const diaISO = row.emissao.toISOString().slice(0, 10);
-      const valorDia = row.tipoMovimento === 'devolucao' ? 0 : row.valorTotal;
+      const valorDia =
+        row.tipoMovimento === 'devolucao' ? -Math.abs(row.valorTotal || 0) : row.valorTotal;
       diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
     });
 
