@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const INPUT =
-  process.env.FATURAMENTO_CSV ?? '\\\\10.10.100.4\\PCP\\ARQIMPORT\\met113l.csv';
+  process.env.FATURAMENTO_CSV ?? '\\\\10.10.100.4\\Setor\\PCP\\ARQIMPORT\\met113l.csv';
 const OUTPUT = path.resolve('src', 'data', 'faturamento.json');
 const WATCH_INTERVAL_MS = Number(process.env.FATURAMENTO_WATCH_MS ?? 30000);
 const DEFAULT_ENCODING = process.env.FATURAMENTO_CSV_ENCODING ?? 'latin1';
