@@ -71,6 +71,7 @@ const ITENS_MENU = [
 
 const MANUTENCAO_KPIS = [];
 const MANUTENCAO_PARADAS = [];
+const FATURAMENTO_REFRESH_MS = 10000;
 
 const SETORES_BASE = ['Industria', 'Transporte'];
 const SETORES_INICIAIS = [];
@@ -3747,36 +3748,99 @@ export default function App() {
   }, [registrosPorData, faltasCarregadas]);
 
   useEffect(() => {
+    let ativo = true;
+    let carregando = false;
+    let lastSignature = null;
+    let hasData = false;
+    const obterSignature = (headers) => {
+      const etag = headers?.get?.('etag');
+      if (etag) return `etag:${etag}`;
+      const lastModified = headers?.get?.('last-modified');
+      if (lastModified) return `lm:${lastModified}`;
+      return null;
+    };
     const carregarFaturamento = async () => {
+      if (carregando || !ativo) return;
+      carregando = true;
+      try {
+        let linhas = [];
+        let baseOk = false;
+        const cacheBust = `?t=${Date.now()}`;
         try {
-          let linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
-          const devolucoes = Array.isArray(devolucaoData) ? [...devolucaoData] : [];
+          let precisaAtualizar = true;
           try {
-            const resp = await fetch('/data/faturamento-2025.json');
-            if (resp.ok) {
-              const antigas = await resp.json();
-              if (Array.isArray(antigas)) {
-                linhas = [...antigas, ...linhas];
-              }
-            }
-            const respDevolucao = await fetch('/data/devolucao-2025.json');
-            if (respDevolucao.ok) {
-              const devolucao2025 = await respDevolucao.json();
-              if (Array.isArray(devolucao2025)) {
-                linhas = [...linhas, ...devolucao2025];
+            const headResp = await fetch('/data/faturamento.json', {
+              method: 'HEAD',
+              cache: 'no-store',
+            });
+            if (headResp.ok) {
+              const signature = obterSignature(headResp.headers);
+              if (signature && signature === lastSignature) {
+                precisaAtualizar = false;
+              } else if (signature) {
+                lastSignature = signature;
               }
             }
           } catch (err) {
-            console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
+            // Se HEAD falhar, tenta GET normal.
           }
 
-          if (devolucoes.length) {
-            linhas = [...linhas, ...devolucoes];
+          if (!precisaAtualizar && hasData) {
+            carregando = false;
+            return;
           }
 
-          setFaturamentoLinhas(linhas);
-          const linhas2025 = linhas.filter((row) => obterMesKey(row)?.key?.startsWith('2025-'));
-          const total = linhas2025.reduce((acc, row) => acc + obterValorLiquido(row), 0);
+          if (precisaAtualizar) {
+            const respAtual = await fetch(`/data/faturamento.json${cacheBust}`, { cache: 'no-store' });
+            if (respAtual.ok) {
+              const atuais = await respAtual.json();
+              if (Array.isArray(atuais)) {
+                linhas = [...atuais];
+                baseOk = true;
+              }
+              const signature = obterSignature(respAtual.headers);
+              if (signature) lastSignature = signature;
+            }
+          }
+        } catch (err) {
+          console.warn('Nao foi possivel carregar faturamento.json:', err);
+        }
+
+        if (!baseOk) {
+          linhas = Array.isArray(faturamentoData) ? [...faturamentoData] : [];
+        }
+
+        const devolucoes = Array.isArray(devolucaoData) ? [...devolucaoData] : [];
+        try {
+          const resp = await fetch(`/data/faturamento-2025.json${cacheBust}`, { cache: 'no-store' });
+          if (resp.ok) {
+            const antigas = await resp.json();
+            if (Array.isArray(antigas)) {
+              linhas = [...antigas, ...linhas];
+            }
+          }
+          const respDevolucao = await fetch(`/data/devolucao-2025.json${cacheBust}`, {
+            cache: 'no-store',
+          });
+          if (respDevolucao.ok) {
+            const devolucao2025 = await respDevolucao.json();
+            if (Array.isArray(devolucao2025)) {
+              linhas = [...linhas, ...devolucao2025];
+            }
+          }
+        } catch (err) {
+          console.warn('Nao foi possivel carregar faturamento-2025.json:', err);
+        }
+
+        if (devolucoes.length) {
+          linhas = [...linhas, ...devolucoes];
+        }
+
+        if (!ativo) return;
+        setFaturamentoLinhas(linhas);
+        hasData = true;
+        const linhas2025 = linhas.filter((row) => obterMesKey(row)?.key?.startsWith('2025-'));
+        const total = linhas2025.reduce((acc, row) => acc + obterValorLiquido(row), 0);
 
           const porGrupoMap = linhas2025.reduce((acc, row) => {
             const grupoRaw = row['Grupo'];
@@ -3836,6 +3900,7 @@ export default function App() {
           porMes,
         });
       } catch (err) {
+        if (!ativo) return;
         setFaturamentoLinhas([]);
         setFaturamentoDados({
           carregando: false,
@@ -3844,10 +3909,17 @@ export default function App() {
           porGrupo: [],
           porMes: [],
         });
+      } finally {
+        carregando = false;
       }
     };
 
     carregarFaturamento();
+    const intervalo = setInterval(carregarFaturamento, FATURAMENTO_REFRESH_MS);
+    return () => {
+      ativo = false;
+      clearInterval(intervalo);
+    };
   }, []);
 
   const metricas = useMemo(() => {
