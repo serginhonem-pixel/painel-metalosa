@@ -4,7 +4,8 @@ import { execFileSync } from 'child_process';
 
 const INPUT =
   process.env.FATURAMENTO_CSV ?? '\\\\10.10.100.4\\Setor\\PCP\\ARQIMPORT\\met113l.csv';
-const OUTPUT = path.resolve('src', 'data', 'faturamento.json');
+const OUTPUT_PUBLIC = path.resolve('public', 'data', 'faturamento.json');
+const OUTPUT_SRC = path.resolve('src', 'data', 'faturamento.json');
 const WATCH_INTERVAL_MS = Number(process.env.FATURAMENTO_WATCH_MS ?? 30000);
 const DEFAULT_ENCODING = process.env.FATURAMENTO_CSV_ENCODING ?? 'latin1';
 const AUTO_GIT = (process.env.FATURAMENTO_AUTO_GIT ?? '1') === '1';
@@ -234,9 +235,12 @@ const gerarJson = () => {
   }
 
   const dados = extrairFaturamento(csv);
-  fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
-  fs.writeFileSync(OUTPUT, JSON.stringify(dados, null, 2));
-  console.log(`Gerado ${OUTPUT} com ${dados.length} linhas.`);
+  fs.mkdirSync(path.dirname(OUTPUT_PUBLIC), { recursive: true });
+  fs.mkdirSync(path.dirname(OUTPUT_SRC), { recursive: true });
+  const payload = JSON.stringify(dados, null, 2);
+  fs.writeFileSync(OUTPUT_PUBLIC, payload);
+  fs.writeFileSync(OUTPUT_SRC, payload);
+  console.log(`Gerado ${OUTPUT_PUBLIC} e ${OUTPUT_SRC} com ${dados.length} linhas.`);
 
   if (AUTO_GIT) {
     try {
@@ -255,13 +259,19 @@ const execGit = (args) =>
   }).trim();
 
 const autoCommitPush = () => {
-  const status = execGit(['status', '--porcelain', '--', OUTPUT]);
+  const status = execGit([
+    'status',
+    '--porcelain',
+    '--',
+    OUTPUT_PUBLIC,
+    OUTPUT_SRC,
+  ]);
   if (!status) {
     console.log('Sem alteracoes em faturamento.json. Nada a commitar.');
     return;
   }
 
-  execGit(['add', OUTPUT]);
+  execGit(['add', OUTPUT_PUBLIC, OUTPUT_SRC]);
   const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
   execGit(['commit', '-m', `${AUTO_GIT_MESSAGE} (${stamp})`]);
   console.log('Commit automatico criado.');

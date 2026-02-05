@@ -3983,6 +3983,15 @@ export default function App() {
     });
   };
 
+  const clientesPorCodigo = useMemo(() => {
+    const lista = Array.isArray(clientesData?.clientes) ? clientesData.clientes : [];
+    return lista.reduce((acc, item) => {
+      const codigo = normalizarCodigoCliente(item?.Codigo ?? item?.codigo);
+      if (codigo) acc.set(codigo, item);
+      return acc;
+    }, new Map());
+  }, [clientesData]);
+
   const ultimosFaturadosHoje = useMemo(() => {
     const hoje = new Date().toLocaleDateString('pt-BR');
     const filtrados = [];
@@ -3997,11 +4006,14 @@ export default function App() {
       if (dataEmissao !== hoje) return;
       if (normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao') return;
 
-      const cliente = row?.Cliente ?? row?.cliente ?? '-';
+      const clienteCodigo = normalizarCodigoCliente(row?.Cliente ?? row?.cliente);
+      const clienteInfo = clienteCodigo ? clientesPorCodigo.get(clienteCodigo) : null;
+      const clienteNome = clienteInfo?.Nome ?? clienteInfo?.nome ?? '';
+      const cliente = clienteNome || clienteCodigo || '-';
       const nf = obterNumeroNota(row);
       const valor = Math.abs(obterValorLiquido(row));
       filtrados.push({
-        key: `${nf || 'nf'}|${cliente}|${valor}|${idx}`,
+        key: `${nf || 'nf'}|${clienteCodigo || cliente}|${valor}|${idx}`,
         cliente,
         nf,
         valor,
@@ -4010,7 +4022,7 @@ export default function App() {
 
     if (!filtrados.length) return [];
     return filtrados.slice(-3).reverse();
-  }, [faturamentoLinhas]);
+  }, [faturamentoLinhas, clientesPorCodigo]);
 
   useEffect(() => {
     if (!ultimosFaturadosHoje.length) return;
