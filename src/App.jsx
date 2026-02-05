@@ -845,6 +845,7 @@ export default function App() {
   const [rapidoSupervisorErro, setRapidoSupervisorErro] = useState('');
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
+  const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
   const [manutencaoOrdens, setManutencaoOrdens] = useState([]);
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
@@ -1157,10 +1158,33 @@ export default function App() {
   }, [authUser, isAllowedDomain, isMobile]);
 
   const handleMobileIntroContinue = () => {
+    playTone(587, 200);
     setShowMobileIntro(false);
   };
 
   const canDeleteOs = !isManutencaoOnly;
+
+  const playTone = (frequency = 523, duration = 180) => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      gain.gain.value = 0.05;
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, duration);
+    } catch (err) {
+      // Ignora erro de audio bloqueado pelo navegador
+    }
+  };
 
   const menuItems = useMemo(() => {
     if (isManutencaoOnly) {
@@ -1176,6 +1200,15 @@ export default function App() {
       normalizarTexto(item.setor).includes(filtroNorm)
     );
   }, [filtroAtivos, listaMaquinas]);
+
+  const listaMaquinasMobile = useMemo(() => {
+    const filtro = filtroAtivoMobile.trim();
+    if (!filtro) return listaMaquinas;
+    const filtroNorm = normalizarTexto(filtro);
+    return listaMaquinas.filter((item) =>
+      normalizarTexto(`${item.nome} ${item.setor}`).includes(filtroNorm)
+    );
+  }, [filtroAtivoMobile, listaMaquinas]);
 
   const manutencaoOperadorListas = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
@@ -2247,6 +2280,7 @@ export default function App() {
     setLoginError('');
     try {
       await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      playTone(523, 180);
     } catch (err) {
       setLoginError('Email ou senha invalidos.');
     }
@@ -2276,6 +2310,9 @@ export default function App() {
       setManutencaoOrdens((prev) =>
         prev.map((item) => (item.id === osId ? { ...item, ...patch } : item))
       );
+      if (String(updates?.status || '').toLowerCase() === 'finalizada') {
+        playTone(784, 220);
+      }
     } catch (err) {
       setManutencaoSaveError('Nao foi possivel atualizar a OS.');
     }
@@ -6593,6 +6630,17 @@ const custoDetalheTitulo = custoDetalheItem
   }
 
   if (showMobileIntro) {
+    const introLinhas = isManutencaoOnly
+      ? [
+          'Voce e responsavel por abrir as OS.',
+          'Informe ativo, setor, prioridade e descreva o problema.',
+          'Anexe fotos quando necessario e salve para entrar na fila.',
+        ]
+      : [
+          'Abra ou assuma uma OS e confirme o ativo correto.',
+          'Registre status, tempo e materiais em cada etapa.',
+          'Finalize apenas quando o equipamento estiver liberado.',
+        ];
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-5">
@@ -6607,22 +6655,18 @@ const custoDetalheTitulo = custoDetalheItem
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-sm text-slate-300">
-              Vamos fazer um check-in rapido para garantir registros claros e evitar retrabalho.
+              {isManutencaoOnly
+                ? 'Seu perfil e o ponto de partida do processo. Aqui vai um guia rapido para abrir as OS corretamente.'
+                : 'Vamos fazer um check-in rapido para garantir registros claros e evitar retrabalho.'}
             </p>
           </div>
           <div className="space-y-3 text-sm text-slate-300">
-            <div className="flex gap-3">
-              <span className="text-blue-300 font-bold">1.</span>
-              <span>Abra ou assuma uma OS e confirme o ativo correto.</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-blue-300 font-bold">2.</span>
-              <span>Registre status, tempo e materiais em cada etapa.</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-blue-300 font-bold">3.</span>
-              <span>Finalize apenas quando o equipamento estiver liberado.</span>
-            </div>
+            {introLinhas.map((texto, index) => (
+              <div key={texto} className="flex gap-3">
+                <span className="text-blue-300 font-bold">{index + 1}.</span>
+                <span>{texto}</span>
+              </div>
+            ))}
           </div>
           <button
             type="button"
@@ -11086,6 +11130,14 @@ const custoDetalheTitulo = custoDetalheItem
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Ativo</label>
+                            <div className="md:hidden">
+                              <input
+                                value={filtroAtivoMobile}
+                                onChange={(e) => setFiltroAtivoMobile(e.target.value)}
+                                className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+                                placeholder="Pesquisar ativo"
+                              />
+                            </div>
                             <select
                               name="ativo"
                               value={novaOsForm.ativo}
@@ -11095,7 +11147,7 @@ const custoDetalheTitulo = custoDetalheItem
                               required
                             >
                               <option value="">Selecione...</option>
-                              {listaMaquinas.map((item) => (
+                              {listaMaquinasMobile.map((item) => (
                                 <option key={item.id} value={item.nome}>
                                   {`${item.nome} - ${item.setor}`}
                                 </option>
