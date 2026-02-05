@@ -777,6 +777,14 @@ export default function App() {
   const [carregando, setCarregando] = useState(true);
   const [agora, setAgora] = useState(() => new Date());
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (window.matchMedia) {
+      return window.matchMedia('(max-width: 900px)').matches;
+    }
+    return window.innerWidth < 900;
+  });
+  const [showMobileIntro, setShowMobileIntro] = useState(false);
 
   // --- Estados de Dados ---
   const [listaSetores, setListaSetores] = useState([]);
@@ -1019,6 +1027,10 @@ export default function App() {
   };
 
   const handleExcluirOs = async (ordem) => {
+    if (!canDeleteOs) {
+      alert('Sem permissao para excluir OS.');
+      return;
+    }
     if (!window.confirm(`Tem certeza que deseja excluir a OS ${ordem.id}?`)) return;
     try {
       await deleteDoc(doc(db, 'manutencao_os', ordem.id));
@@ -1030,6 +1042,10 @@ export default function App() {
   };
 
   const handleExcluirTodasOs = async () => {
+    if (!canDeleteOs) {
+      alert('Sem permissao para excluir OS.');
+      return;
+    }
     if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de serviço? Esta ação não pode ser desfeita!')) return;
     if (!window.confirm('CONFIRMAÇÃO FINAL: Isso apagará TODAS as ordens. Continuar?')) return;
     try {
@@ -1101,11 +1117,52 @@ export default function App() {
     return authUser?.displayName || authUser?.email || 'Usuario';
   }, [authUser?.displayName, authUser?.email]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const media = window.matchMedia('(max-width: 900px)');
+    const onChange = (event) => setIsMobile(event.matches);
+    setIsMobile(media.matches);
+    if (media.addEventListener) {
+      media.addEventListener('change', onChange);
+    } else {
+      media.addListener(onChange);
+    }
+    return () => {
+      if (media.removeEventListener) {
+        media.removeEventListener('change', onChange);
+      } else {
+        media.removeListener(onChange);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authUser || !isAllowedDomain) {
+      setShowMobileIntro(false);
+      return;
+    }
+    if (!isMobile) {
+      setShowMobileIntro(false);
+      return;
+    }
+    const key = `mobileIntroDismissed:${authUser.email?.toLowerCase() || 'anon'}`;
+    const dismissed = localStorage.getItem(key) === '1';
+    setShowMobileIntro(!dismissed);
+  }, [authUser, isAllowedDomain, isMobile]);
+
+  const handleMobileIntroContinue = () => {
+    if (authUser?.email) {
+      const key = `mobileIntroDismissed:${authUser.email.toLowerCase()}`;
+      localStorage.setItem(key, '1');
+    }
+    setShowMobileIntro(false);
+  };
+
+  const canDeleteOs = !isManutencaoOnly;
+
   const menuItems = useMemo(() => {
     if (isManutencaoOnly) {
-      return ITENS_MENU.filter((item) =>
-        ['dashboard-tv', 'manutencao'].includes(item.id)
-      );
+      return ITENS_MENU.filter((item) => item.id === 'manutencao');
     }
     return ITENS_MENU;
   }, [isManutencaoOnly]);
@@ -2166,8 +2223,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (isManutencaoOnly && !['dashboard-tv', 'manutencao'].includes(abaAtiva)) {
-      setAbaAtiva('dashboard-tv');
+    if (isManutencaoOnly && abaAtiva !== 'manutencao') {
+      setAbaAtiva('manutencao');
     }
   }, [isManutencaoOnly, abaAtiva]);
 
@@ -6533,6 +6590,45 @@ const custoDetalheTitulo = custoDetalheItem
     );
   }
 
+  if (showMobileIntro) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-5">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-blue-500/20 flex items-center justify-center">
+              <Wrench size={22} className="text-blue-200" />
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white">Bem-vindo ao app de manutencao</h1>
+              <p className="text-xs text-slate-400">Um rapido resumo antes de iniciar.</p>
+            </div>
+          </div>
+          <div className="space-y-3 text-sm text-slate-300">
+            <div className="flex gap-3">
+              <span className="text-blue-300 font-bold">1.</span>
+              <span>Abra ou assuma uma OS e confirme o ativo correto.</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-blue-300 font-bold">2.</span>
+              <span>Registre status, tempo e materiais para evitar retrabalho.</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-blue-300 font-bold">3.</span>
+              <span>Finalize a OS somente quando o equipamento estiver liberado.</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleMobileIntroContinue}
+            className="w-full rounded-lg bg-blue-600 text-white text-xs font-bold py-2 hover:bg-blue-500"
+          >
+            Entrar no app
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-dark flex min-h-screen bg-slate-950 text-slate-100 font-sans">
       {mapModalOpen && (
@@ -10730,7 +10826,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="p-4 border-b border-slate-800 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
-                        {manutencaoOrdens.length > 0 && (
+                        {canDeleteOs && manutencaoOrdens.length > 0 && (
                           <button
                             type="button"
                             onClick={handleExcluirTodasOs}
@@ -10799,13 +10895,15 @@ const custoDetalheTitulo = custoDetalheItem
                                   >
                                     Imprimir
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleExcluirOs(ordem)}
-                                    className="ml-3 text-xs font-bold text-rose-400 hover:text-rose-200"
-                                  >
-                                    Excluir
-                                  </button>
+                                  {canDeleteOs && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleExcluirOs(ordem)}
+                                      className="ml-3 text-xs font-bold text-rose-400 hover:text-rose-200"
+                                    >
+                                      Excluir
+                                    </button>
+                                  )}
                                 </td>
                               </tr>
                             ))
