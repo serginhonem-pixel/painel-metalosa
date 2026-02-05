@@ -885,6 +885,8 @@ export default function App() {
     descricao: '',
     fotoUrl: '',
     fechadaEm: '',
+    createdByEmail: '',
+    createdByName: '',
   };
   const [novaOsForm, setNovaOsForm] = useState(novaOsDefaults);
 
@@ -969,6 +971,12 @@ export default function App() {
       descricao: novaOsForm.descricao,
       fotoUrl,
       responsavel: authUser?.displayName || authUser?.email || 'Usuario',
+      createdByEmail: manutencaoEditId
+        ? novaOsForm.createdByEmail || authUser?.email || ''
+        : authUser?.email || '',
+      createdByName: manutencaoEditId
+        ? novaOsForm.createdByName || authUser?.displayName || authUser?.email || 'Usuario'
+        : authUser?.displayName || authUser?.email || 'Usuario',
       createdAt: manutencaoEditId ? novaOsForm.createdAt : new Date().toISOString(),
       fechadaEm: fechadaEmFinal,
       updatedAt: new Date().toISOString(),
@@ -1019,6 +1027,8 @@ export default function App() {
       descricao: ordem.descricao || '',
       fotoUrl: ordem.fotoUrl || '',
       fechadaEm: ordem.fechadaEm || '',
+      createdByEmail: ordem.createdByEmail || '',
+      createdByName: ordem.createdByName || '',
       createdAt: ordem.createdAt || new Date().toISOString(),
     });
     setNovaOsFotoFile(null);
@@ -1217,6 +1227,18 @@ export default function App() {
     );
     return { abertas, minhas };
   }, [manutencaoOrdens, currentUserLabel]);
+
+  const minhasSolicitacoes = useMemo(() => {
+    const email = authUser?.email?.toLowerCase() || '';
+    return manutencaoOrdens
+      .filter((os) => {
+        const criadoPor = (os.createdByEmail || '').toLowerCase();
+        if (criadoPor && email) return criadoPor === email;
+        return (os.responsavel || '').toLowerCase() === currentUserLabel.toLowerCase();
+      })
+      .slice()
+      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  }, [manutencaoOrdens, authUser?.email, currentUserLabel]);
 
   const manutencaoKpis = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta').length;
@@ -6645,9 +6667,11 @@ const custoDetalheTitulo = custoDetalheItem
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl space-y-5">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-700">
-              <img src={logoMetalosa} alt="Metalosa" className="h-9 w-9 object-contain" />
-            </div>
+            <img
+              src={logoMetalosa}
+              alt="Metalosa"
+              className="h-16 w-16 object-contain brightness-0 invert"
+            />
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Manutencao</p>
               <h1 className="text-lg font-black text-white">Bem-vindo, {nomeBoasVindas}</h1>
@@ -10710,6 +10734,7 @@ const custoDetalheTitulo = custoDetalheItem
                    <div className="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
                       <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
                       <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
+                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Minhas</button>
                       <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
                       {isManutencaoOperador && (
                         <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
@@ -10813,7 +10838,7 @@ const custoDetalheTitulo = custoDetalheItem
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Paradas em andamento</h3>
                         {manutencaoParadas.length ? (
@@ -10865,6 +10890,39 @@ const custoDetalheTitulo = custoDetalheItem
                         <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
                           Sem alertas cadastrados.
                         </div>
+                      </div>
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitacoes</h3>
+                          <button
+                            type="button"
+                            onClick={() => setSubAbaManutencao('minhas')}
+                            className="text-[10px] font-bold text-blue-300 hover:text-blue-200"
+                          >
+                            Ver todas
+                          </button>
+                        </div>
+                        {minhasSolicitacoes.length ? (
+                          <div className="space-y-3">
+                            {minhasSolicitacoes.slice(0, 4).map((os) => (
+                              <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <p className="text-xs font-bold text-slate-100">{os.ativo || os.id}</p>
+                                    <p className="text-[10px] text-slate-400">{os.setor || '-'}</p>
+                                  </div>
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">
+                                    {os.status || 'Aberta'}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
+                            Nenhuma solicitacao registrada.
+                          </div>
+                        )}
                       </div>
                       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                         <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por setor</h3>
@@ -10966,6 +11024,88 @@ const custoDetalheTitulo = custoDetalheItem
                             <tr>
                               <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
                                 Sem ordens registradas.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {subAbaManutencao === 'minhas' && (
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)] overflow-hidden">
+                    <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitacoes</h3>
+                        <p className="text-xs text-slate-400">
+                          Solicitacoes abertas por voce.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-slate-950/70 text-slate-400 uppercase text-[10px] tracking-wider">
+                          <tr>
+                            <th className="px-4 py-3">OS</th>
+                            <th className="px-4 py-3">Ativo</th>
+                            <th className="px-4 py-3">Setor</th>
+                            <th className="px-4 py-3">Prioridade</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3">Criado em</th>
+                            <th className="px-4 py-3">Acoes</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 text-slate-200">
+                          {manutencaoOrdensLoading ? (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
+                                Carregando solicitacoes...
+                              </td>
+                            </tr>
+                          ) : manutencaoOrdensError ? (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={7}>
+                                {manutencaoOrdensError}
+                              </td>
+                            </tr>
+                          ) : minhasSolicitacoes.length ? (
+                            minhasSolicitacoes.map((ordem) => (
+                              <tr key={ordem.id} className="hover:bg-slate-900/60">
+                                <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
+                                <td className="px-4 py-3 text-slate-300">{ordem.ativo || '-'}</td>
+                                <td className="px-4 py-3 text-slate-400">{ordem.setor || '-'}</td>
+                                <td className="px-4 py-3">
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3 text-slate-400">
+                                  {formatDateTimeRelatorio(ordem.createdAt || ordem.dataFalha)}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditarOs(ordem)}
+                                    className="text-xs font-bold text-cyan-200 hover:text-white"
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleImprimirOs(ordem)}
+                                    className="ml-3 text-xs font-bold text-slate-300 hover:text-white"
+                                  >
+                                    Imprimir
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
+                                Nenhuma solicitacao registrada.
                               </td>
                             </tr>
                           )}
