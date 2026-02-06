@@ -5299,6 +5299,7 @@ export default function App() {
 
   const faturamentoHojePorFilial = useMemo(() => {
     const hojeISO = new Date().toISOString().slice(0, 10);
+    const filialFiltro = dashboardFilialAtual && dashboardFilialAtual !== "Todas" ? String(dashboardFilialAtual) : null;
     const clientesMap = new Map(
       (clientesData?.clientes || []).map((cliente) => [
         normalizarCodigoCliente(cliente?.Codigo ?? cliente?.codigo),
@@ -5344,7 +5345,7 @@ export default function App() {
         return { ...item, cliente: topCliente };
       })
       .sort((a, b) => b.valor - a.valor);
-  }, [faturamentoAtual.linhas, clientesData, agora]);
+  }, [faturamentoAtual.linhas, clientesData, agora, dashboardFilialAtual]);
 
   // Últimos 10 dias de faturamento (independente do mês selecionado)
   const faturamentoHojeDashboard = useMemo(() => {
