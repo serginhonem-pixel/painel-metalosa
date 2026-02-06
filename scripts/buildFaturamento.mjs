@@ -327,21 +327,6 @@ const aplicarFilialGrupos = (linhas) =>
   });
 
 const main = () => {
-  if (!fs.existsSync(INPUT)) {
-    throw new Error(`Arquivo nao encontrado: ${INPUT}`);
-  }
-
-  const workbook = XLSX.readFile(INPUT, { cellDates: true });
-  const sheet = workbook.Sheets[SHEET];
-  if (!sheet) {
-    throw new Error(`Aba nao encontrada: ${SHEET}`);
-  }
-
-  const dados = aplicarFilialGrupos(extrairFaturamento(sheet));
-  fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
-  fs.writeFileSync(OUTPUT, JSON.stringify(dados, null, 2));
-  console.log(`Gerado ${OUTPUT} com ${dados.length} linhas.`);
-
   if (fs.existsSync(DEVOLUCAO_INPUT)) {
     const devolucaoWorkbook = XLSX.readFile(DEVOLUCAO_INPUT, { cellDates: true });
     const devolucaoSheet = devolucaoWorkbook.Sheets[DEVOLUCAO_SHEET];
