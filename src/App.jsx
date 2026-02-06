@@ -4927,7 +4927,8 @@ export default function App() {
       .map(([chave, dados]) => {
         const [codigo, descricao] = chave.split('||');
         const codigoNorm = normalizarCodigoProduto(codigo);
-        const descricaoFinal =\r\n          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
+        const descricaoFinal =
+          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
         let unidadePrincipal = '';
         let unidadeQtd = 0;
         dados.unidades.forEach((valor, unidade) => {
@@ -5291,7 +5292,8 @@ export default function App() {
       .map(([chave, dados]) => {
         const [codigo, descricao] = chave.split('||');
         const codigoNorm = normalizarCodigoProduto(codigo);
-        const descricaoFinal =\r\n          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
+        const descricaoFinal =
+          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
         let unidadePrincipal = '';
         let unidadeQtd = 0;
         dados.unidades.forEach((valor, unidade) => {
