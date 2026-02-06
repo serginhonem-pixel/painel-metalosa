@@ -607,6 +607,12 @@ const CFOP_SAIDA_TABLE = [
     faturamento: '? Sim (bruto)',
   },
   {
+    cfop: '5151',
+    descricaoFiscal: 'Transferencia de producao do estabelecimento',
+    pratica: 'Transferencia entre filiais da mesma empresa (producao)',
+    faturamento: '? Sim',
+  },
+  {
     cfop: '5152',
     descricaoFiscal: 'Transferência de mercadoria entre estabelecimentos',
     pratica: 'Envio entre filiais da mesma empresa',
@@ -640,7 +646,7 @@ const CFOP_SAIDA_TABLE = [
     cfop: '6109',
     descricaoFiscal: 'Outras vendas de mercadorias (interestadual)',
     pratica: 'Venda com tratamento fiscal especial',
-    faturamento: '?? Depende',
+    faturamento: '? Sim',
   },
   {
     cfop: '5201',
@@ -669,7 +675,7 @@ const CFOP_SAIDA_TABLE = [
 ];
 
 const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
-const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '6107']);
+const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '6107', '5151', '6109']);
 const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
 
 const CfopFilterSelector = ({
@@ -12703,5 +12709,7 @@ const custoDetalheTitulo = custoDetalheItem
     </div>
   );
 }
+
+
 
 
