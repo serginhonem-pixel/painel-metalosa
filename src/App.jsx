@@ -649,6 +649,12 @@ const CFOP_SAIDA_TABLE = [
     faturamento: '? Sim',
   },
   {
+    cfop: '6110',
+    descricaoFiscal: 'Venda para ZFM/ALC de mercadoria adquirida de terceiros',
+    pratica: 'Venda interestadual para ZFM/ALC (revenda)',
+    faturamento: '? Sim',
+  },
+  {
     cfop: '5201',
     descricaoFiscal: 'Devolução de compra para industrialização',
     pratica: 'Retorno de mercadoria ao fornecedor',
@@ -675,7 +681,7 @@ const CFOP_SAIDA_TABLE = [
 ];
 
 const CFOP_FILTER_OPTIONS = CFOP_SAIDA_TABLE.map((item) => item.cfop);
-const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '6107', '5151', '6109']);
+const CFOP_FATURAMENTO_SET = new Set(['5101', '5102', '6101', '6102', '5401', '5403', '6401', '6107', '5151', '6109', '6110']);
 const CFOP_DEFAULTS = Array.from(CFOP_FATURAMENTO_SET);
 
 const CfopFilterSelector = ({
@@ -770,7 +776,7 @@ export default function App() {
   const [dashboardView, setDashboardView] = useState('faturamento');
   const [dashboardFilialIndex, setDashboardFilialIndex] = useState(0);
   const [filtroFilial2025, setFiltroFilial2025] = useState('Todas');
-  const [filtroCfops2025, setFiltroCfops2025] = useState([]);
+  const [filtroCfops2025, setFiltroCfops2025] = useState(CFOP_DEFAULTS);
   const [guiaOperadorOpen, setGuiaOperadorOpen] = useState(false);
   const [guiaOperadorStep, setGuiaOperadorStep] = useState(0);
   const [tourOperadorOpen, setTourOperadorOpen] = useState(false);
@@ -12709,6 +12715,10 @@ const custoDetalheTitulo = custoDetalheItem
     </div>
   );
 }
+
+
+
+
 
 
 
