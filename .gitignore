@@ -20,6 +20,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+public/app-config.js
 cors.json
 
 # Editor directories and files

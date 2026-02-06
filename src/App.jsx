@@ -73,6 +73,14 @@ const MANUTENCAO_KPIS = [];
 const MANUTENCAO_PARADAS = [];
 const FATURAMENTO_REFRESH_MS = 10000;
 
+const getVapidKey = () => {
+  if (typeof window !== 'undefined') {
+    const fromWindow = window?.__APP_CONFIG__?.FIREBASE_VAPID_KEY;
+    if (fromWindow) return fromWindow;
+  }
+  return import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
+};
+
 const SETORES_BASE = ['Industria', 'Transporte'];
 const SETORES_INICIAIS = [];
 const GESTORES_INICIAIS = ['Thalles'];
@@ -1301,7 +1309,8 @@ export default function App() {
       setNotifError('Service Worker nao suportado.');
       return;
     }
-    if (!import.meta.env.VITE_FIREBASE_VAPID_KEY) {
+    const vapidKey = getVapidKey();
+    if (!vapidKey) {
       setNotifError('VAPID key nao configurada.');
       return;
     }
@@ -1317,7 +1326,7 @@ export default function App() {
         '/firebase-messaging-sw.js'
       );
       const token = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        vapidKey,
         serviceWorkerRegistration: registration,
       });
       if (!token) {
