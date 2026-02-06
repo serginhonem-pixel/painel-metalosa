@@ -441,6 +441,13 @@ const normalizarCodigoProduto = (valor) =>
     .replace(/\s+/g, '')
     .toUpperCase();
 
+const normalizarDescricaoProduto = (valor) => {
+  const texto = String(valor ?? '').trim();
+  if (!texto || texto === '0') return '';
+  if (/^\*+$/.test(texto)) return '';
+  return texto;
+};
+
 const normalizarCodigoVendedor = (valor) => {
   const texto = String(valor ?? '').trim().toUpperCase();
   if (!texto) return '';
@@ -4035,7 +4042,10 @@ export default function App() {
       const nf = obterNumeroNota(row);
       const valor = Math.abs(obterValorLiquido(row));
       const produtoCodigo = row?.Codigo ?? row?.codigo ?? '';
-      const produtoDescricao = row?.Descricao ?? row?.descricao ?? '';
+      const produtoDescricao =
+        normalizarDescricaoProduto(row?.Descricao ?? row?.descricao) ||
+        produtoDescricaoMap.get(normalizarCodigoProduto(produtoCodigo)) ||
+        '';
       const quantidade = row?.Quantidade ?? row?.quantidade ?? '';
       const unidade = row?.Unidade ?? row?.unidade ?? '';
       const filial = row?.Filial ?? row?.filial ?? '';
@@ -4059,7 +4069,7 @@ export default function App() {
 
     if (!filtrados.length) return [];
     return filtrados.slice(-3).reverse();
-  }, [faturamentoLinhas, clientesPorCodigo]);
+  }, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap]);
 
   useEffect(() => {
     if (!ultimosFaturadosHoje.length) return;
@@ -4614,7 +4624,7 @@ export default function App() {
 
     grupos.forEach((grupo) => {
       (grupo.itens || []).forEach((item) => {
-        const key = `${item.codigo ?? ''}||${item.descricao ?? ''}`;
+        const key = `${item.codigo ?? ''}||${normalizarDescricaoProduto(item.descricao)}`;
         total += item.total;
         if (!mapaItens.has(key)) {
           mapaItens.set(key, { ...item, total: 0 });
@@ -4747,7 +4757,7 @@ export default function App() {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
         codigo: row?.Codigo ?? row?.codigo ?? '',
-        descricao: row?.Descricao ?? row?.descricao ?? '',
+        descricao: normalizarDescricaoProduto(row?.Descricao ?? row?.descricao ?? ''),
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: obterNumeroNota(row),
@@ -4870,7 +4880,7 @@ export default function App() {
         clientesLocal.set(chaveCliente, (clientesLocal.get(chaveCliente) || 0) + row.valorTotal);
       }
 
-      const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
+      const chaveProd = `${row.codigo || ''}||${normalizarDescricaoProduto(row.descricao)}`;
       if (!produtosMap.has(chaveProd)) {
         produtosMap.set(chaveProd, { valor: 0, quantidade: 0, unidades: new Map() });
       }
@@ -4917,7 +4927,7 @@ export default function App() {
       .map(([chave, dados]) => {
         const [codigo, descricao] = chave.split('||');
         const codigoNorm = normalizarCodigoProduto(codigo);
-        const descricaoFinal = descricao || produtosPorCodigo.get(codigoNorm) || '';
+        const descricaoFinal =\r\n          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
         let unidadePrincipal = '';
         let unidadeQtd = 0;
         dados.unidades.forEach((valor, unidade) => {
@@ -5092,7 +5102,7 @@ export default function App() {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
         codigo: row?.Codigo ?? row?.codigo ?? '',
-        descricao: row?.Descricao ?? row?.descricao ?? '',
+        descricao: normalizarDescricaoProduto(row?.Descricao ?? row?.descricao ?? ''),
         filial: row?.Filial ?? row?.filial ?? 'Sem filial',
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: obterNumeroNota(row),
@@ -5243,7 +5253,7 @@ export default function App() {
         clientesLocal.set(chaveCliente, (clientesLocal.get(chaveCliente) || 0) + row.valorTotal);
       }
 
-      const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
+      const chaveProd = `${row.codigo || ''}||${normalizarDescricaoProduto(row.descricao)}`;
       if (!produtosMap.has(chaveProd)) {
         produtosMap.set(chaveProd, { valor: 0, quantidade: 0, unidades: new Map() });
       }
@@ -5281,7 +5291,7 @@ export default function App() {
       .map(([chave, dados]) => {
         const [codigo, descricao] = chave.split('||');
         const codigoNorm = normalizarCodigoProduto(codigo);
-        const descricaoFinal = descricao || produtosPorCodigo.get(codigoNorm) || '';
+        const descricaoFinal =\r\n          normalizarDescricaoProduto(descricao) || produtosPorCodigo.get(codigoNorm) || '';
         let unidadePrincipal = '';
         let unidadeQtd = 0;
         dados.unidades.forEach((valor, unidade) => {
@@ -5437,8 +5447,8 @@ export default function App() {
       return a.tipoMovimento.localeCompare(b.tipoMovimento);
     });
     const linhasComDescricao = linhasOrdenadas.map((row) => {
-      const descricaoAtual = row.descricao ?? '';
-      if (descricaoAtual && descricaoAtual !== 0) return row;
+      const descricaoAtual = normalizarDescricaoProduto(row.descricao);
+      if (descricaoAtual) return { ...row, descricao: descricaoAtual };
       const codigoNorm = normalizarCodigoProduto(row.codigo);
       const descricao = produtosPorCodigo.get(codigoNorm) || '';
       return { ...row, descricao };
@@ -6202,7 +6212,10 @@ export default function App() {
       Filial: row.filial || '',
       Grupo: row.grupo || '',
       Codigo: row.codigo || '',
-      Descricao: row.descricao || produtosPorCodigo.get(normalizarCodigoProduto(row.codigo)) || '',
+      Descricao:
+        normalizarDescricaoProduto(row.descricao) ||
+        produtosPorCodigo.get(normalizarCodigoProduto(row.codigo)) ||
+        '',
       Quantidade: row.quantidade ?? 0,
       Unidade: row.unidade || '',
       Valor: row.valorTotal ?? 0,
@@ -6287,7 +6300,9 @@ export default function App() {
       const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
       const codigo = row?.Codigo ?? row?.codigo ?? '';
       const descricao =
-        row?.Descricao ?? row?.descricao ?? produtosPorCodigo.get(normalizarCodigoProduto(codigo)) ?? '';
+        normalizarDescricaoProduto(row?.Descricao ?? row?.descricao) ||
+        produtosPorCodigo.get(normalizarCodigoProduto(codigo)) ||
+        '';
       return {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
@@ -6370,7 +6385,7 @@ export default function App() {
       }
       clientesMap.get(clienteKey).valor += row.valorTotal;
 
-      const prodKey = `${row.codigo || ''}||${row.descricao || ''}`;
+      const prodKey = `${row.codigo || ''}||${normalizarDescricaoProduto(row.descricao)}`;
       if (!produtosMap.has(prodKey)) {
         produtosMap.set(prodKey, {
           codigo: row.codigo || '',
@@ -12715,6 +12730,7 @@ const custoDetalheTitulo = custoDetalheItem
     </div>
   );
 }
+
 
 
 
