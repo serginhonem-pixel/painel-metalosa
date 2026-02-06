@@ -4021,6 +4021,17 @@ export default function App() {
     }, new Map());
   }, [clientesData]);
 
+  const produtoDescricaoMap = useMemo(() => {
+    const map = new Map();
+    (produtosData || []).forEach((produto) => {
+      const codigo = normalizarCodigoProduto(produto.codigo);
+      if (codigo) {
+        map.set(codigo, produto.descricao || '');
+      }
+    });
+    return map;
+  }, [produtosData]);
+
   const ultimosFaturadosHoje = useMemo(() => {
     const hoje = new Date().toLocaleDateString('pt-BR');
     const filtrados = [];
@@ -4269,17 +4280,6 @@ export default function App() {
       percentualPresenca,
     };
   }, [colaboradores, filtroSupervisor, filtroSetor, registrosPorData, mesHistorico, anoHistorico]);
-
-  const produtoDescricaoMap = useMemo(() => {
-    const map = new Map();
-    (produtosData || []).forEach((produto) => {
-      const codigo = normalizarCodigoProduto(produto.codigo);
-      if (codigo) {
-        map.set(codigo, produto.descricao || '');
-      }
-    });
-    return map;
-  }, [produtosData]);
 
   const abrirModalLancamento = (colab) => {
     const registro = registrosPorData[dataLancamento]?.[colab.id];
