@@ -7,6 +7,19 @@ body {
   color: #e6e6e6;
 }
 
+@keyframes marquee-30s {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-30s {
+  animation: marquee-30s 30s linear infinite;
+}
+
 .app-dark .bg-white {
   background: linear-gradient(145deg, #181a1f 0%, #111217 100%);
   box-shadow:

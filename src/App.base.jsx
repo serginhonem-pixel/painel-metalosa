@@ -457,13 +457,6 @@ const normalizarCodigoVendedor = (valor) => {
   return texto;
 };
 
-const abreviarCliente = (nome) => {
-  const texto = String(nome ?? '').trim();
-  if (!texto) return '';
-  const partes = texto.split(/\s+/).filter(Boolean);
-  return partes.slice(0, 3).join(' ');
-};
-
 const UF_CENTROID = {
   AC: [-9.0238, -70.812],
   AL: [-9.5713, -36.7819],
@@ -811,7 +804,11 @@ export default function App() {
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [faturamentoAtualizadoEm, setFaturamentoAtualizadoEm] = useState(null);
-  const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);  const [somAtivo, setSomAtivo] = useState(false);
+  const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);
+  const [popupIndex, setPopupIndex] = useState(0);
+  const [ultimoPopupKey, setUltimoPopupKey] = useState(null);
+  const [popupDestaqueAt, setPopupDestaqueAt] = useState(0);
+  const [somAtivo, setSomAtivo] = useState(false);
   const audioCtxRef = useRef(null);
   const [carregando, setCarregando] = useState(true);
   const [agora, setAgora] = useState(() => new Date());
@@ -4035,7 +4032,84 @@ export default function App() {
     return map;
   }, [produtosData]);
 
-    const metricas = useMemo(() => {
+  const ultimosFaturadosHoje = useMemo(() => {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const filtrados = [];
+
+    faturamentoLinhas.forEach((row, idx) => {
+      const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
+      if (!emissao) return;
+      const dd = String(emissao.getUTCDate()).padStart(2, '0');
+      const mm = String(emissao.getUTCMonth() + 1).padStart(2, '0');
+      const yyyy = emissao.getUTCFullYear();
+      const dataEmissao = `${dd}/${mm}/${yyyy}`;
+      if (dataEmissao !== hoje) return;
+      if (normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao') return;
+
+      const clienteCodigo = normalizarCodigoCliente(row?.Cliente ?? row?.cliente);
+      const clienteInfo = clienteCodigo ? clientesPorCodigo.get(clienteCodigo) : null;
+      const clienteNome = clienteInfo?.Nome ?? clienteInfo?.nome ?? '';
+      const cliente = clienteNome || clienteCodigo || '-';
+      const nf = obterNumeroNota(row);
+      const valor = Math.abs(obterValorLiquido(row));
+      const produtoCodigo = row?.Codigo ?? row?.codigo ?? '';
+      const produtoDescricao =
+        normalizarDescricaoProduto(row?.Descricao ?? row?.descricao) ||
+        produtoDescricaoMap.get(normalizarCodigoProduto(produtoCodigo)) ||
+        '';
+      const quantidade = row?.Quantidade ?? row?.quantidade ?? '';
+      const unidade = row?.Unidade ?? row?.unidade ?? '';
+      const filial = row?.Filial ?? row?.filial ?? '';
+      const vendedor = row?.Vendedor1 ?? row?.vendedor1 ?? row?.Vendedor ?? row?.vendedor ?? '';
+      const emissaoData = parseEmissaoData(row?.Emissao ?? row?.emissao);
+
+      filtrados.push({
+        key: `${nf || 'nf'}|${clienteCodigo || cliente}|${valor}|${idx}`,
+        cliente,
+        nf,
+        valor,
+        produtoCodigo,
+        produtoDescricao,
+        quantidade,
+        unidade,
+        filial,
+        vendedor,
+        emissaoData,
+      });
+    });
+
+    if (!filtrados.length) return [];
+    return filtrados.slice(-3).reverse();
+  }, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap]);
+
+  useEffect(() => {
+    if (!ultimosFaturadosHoje.length) return;
+    setPopupIndex(0);
+    const key = ultimosFaturadosHoje[0]?.key;
+    if (key && key !== ultimoPopupKey) {
+      setUltimoPopupKey(key);
+      setPopupDestaqueAt(Date.now());
+      if (somAtivo) tocarSomMoeda();
+    }
+  }, [ultimosFaturadosHoje, somAtivo]);
+
+  useEffect(() => {
+    if (!ultimosFaturadosHoje.length) return undefined;
+    const timer = setInterval(() => {
+      setPopupIndex((prev) => (prev + 1) % ultimosFaturadosHoje.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [ultimosFaturadosHoje.length]);
+
+  const popupAtual = ultimosFaturadosHoje[popupIndex] || null;
+  const popupDestaque =
+    popupAtual &&
+    popupAtual.key === ultimoPopupKey &&
+    Date.now() - popupDestaqueAt < 9000;
+  const mostrarPopupFaturamento =
+    (abaAtiva === 'dashboard-tv' || abaAtiva === 'faturamento') && popupAtual;
+
+  const metricas = useMemo(() => {
     const faltasTotais = colaboradores.filter(c => c.estaAusente).length;
     const faltasPorSetor = colaboradores.reduce((acc, c) => {
       if (c.estaAusente) acc[c.setor] = (acc[c.setor] || 0) + 1;
@@ -5295,65 +5369,13 @@ export default function App() {
     };
   }, [dashboardFaturamentoBase, dashboardFilialAtual, filtroCfops]);
 
-  
-
-  const faturamentoHojePorFilial = useMemo(() => {
-    const hojeISO = new Date().toISOString().slice(0, 10);
-    const clientesMap = new Map(
-      (clientesData?.clientes || []).map((cliente) => [
-        normalizarCodigoCliente(cliente?.Codigo ?? cliente?.codigo),
-        cliente?.Nome ?? cliente?.nome ?? '',
-      ])
-    );
-    const porFilial = new Map();
-    const clientesPorFilial = new Map();
-
-    faturamentoAtual.linhas.forEach((row) => {
-      if (!row.emissao) return;
-      if (row.emissao.toISOString().slice(0, 10) !== hojeISO) return;
-      if (row.tipoMovimento === 'devolucao') return;
-
-      const filial = row.filial || 'Sem filial';
-      const valor = Math.abs(row.valorTotal || 0);
-      const entrada = porFilial.get(filial) || { filial, valor: 0 };
-      entrada.valor += valor;
-      porFilial.set(filial, entrada);
-
-      const codigoCliente = normalizarCodigoCliente(row.cliente);
-      const clienteNome = clientesMap.get(codigoCliente) || row.cliente || '';
-      if (clienteNome) {
-        const mapa = clientesPorFilial.get(filial) || new Map();
-        mapa.set(clienteNome, (mapa.get(clienteNome) || 0) + valor);
-        clientesPorFilial.set(filial, mapa);
-      }
-    });
-
-    return Array.from(porFilial.values())
-      .map((item) => {
-        const mapa = clientesPorFilial.get(item.filial);
-        let topCliente = '';
-        if (mapa) {
-          let max = -1;
-          for (const [cliente, total] of mapa.entries()) {
-            if (total > max) {
-              max = total;
-              topCliente = cliente;
-            }
-          }
-        }
-        return { ...item, cliente: topCliente };
-      })
-      .sort((a, b) => b.valor - a.valor);
-  }, [faturamentoAtual.linhas, clientesData, agora]);
-
-  // Últimos 10 dias de faturamento (independente do mês selecionado)
   const faturamentoHojeDashboard = useMemo(() => {
     const hojeISO = new Date().toISOString().slice(0, 10);
     const item = (dashboardFaturamentoFilial.porDia || []).find((dia) => dia.dia === hojeISO);
     return item?.valor || 0;
   }, [dashboardFaturamentoFilial.porDia, agora]);
 
-
+  // Últimos 10 dias de faturamento (independente do mês selecionado)
   const ultimos10DiasFaturamento = useMemo(() => {
     if (!faturamentoLinhas || !faturamentoLinhas.length) return [];
     
@@ -7921,7 +7943,7 @@ const custoDetalheTitulo = custoDetalheItem
       )}
 
       {/* Conteúdo Principal */}
-      <main className={`flex-1 px-4 md:px-6 overflow-x-hidden ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
+      <main className={`flex-1 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && abaAtiva !== 'dashboard-tv' && (
           <header className="w-full mb-8 flex justify-between items-end">
           <div>
@@ -8716,30 +8738,6 @@ const custoDetalheTitulo = custoDetalheItem
 
               {dashboardView === 'faturamento' ? (
                 <div className="space-y-2">
-
-                  <div className="rounded-2xl border border-emerald-500/30 bg-slate-950/80 min-w-0 shadow-[0_10px_24px_-20px_rgba(16,185,129,0.6)]">
-                    <div className="flex items-center justify-between px-3 py-2">
-                      <span className="text-[10px] uppercase tracking-[0.35em] text-emerald-300 font-bold">Faturado hoje por filial</span>
-                      <span className="text-[10px] uppercase tracking-widest text-slate-500">{agora.toLocaleDateString('pt-BR')}</span>
-                    </div>
-                    <div className="border-t border-emerald-500/20 overflow-hidden w-full max-w-full min-w-0">
-                      <div className="inline-flex gap-6 whitespace-nowrap animate-marquee-30s text-emerald-300 text-[11px] font-semibold px-3 py-2 w-max">
-                        {faturamentoHojePorFilial.length ? (
-                          [...faturamentoHojePorFilial, ...faturamentoHojePorFilial].map((item, idx) => (
-                            <span key={`${item.filial}-${idx}`} className="flex items-center gap-2">
-                              <span className="text-emerald-200 font-bold">Filial {item.filial}:</span>
-                              <span>{formatarMoeda(item.valor)}</span>
-                              {item.cliente ? (
-                                <span className="text-emerald-400/80">- {abreviarCliente(item.cliente)}</span>
-                              ) : null}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-slate-500">Sem faturamento hoje</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
@@ -12656,7 +12654,54 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
              </div>
           )}
-        </div></main>
+        </div>
+        {mostrarPopupFaturamento && (
+          <div className="fixed right-6 top-24 z-50 w-[420px] max-w-[92vw]">
+            <div
+              key={popupAtual.key}
+              className={`rounded-3xl border border-emerald-400/60 bg-slate-950/95 p-5 shadow-2xl animate-in slide-in-from-right duration-500 ${
+                popupDestaque ? 'animate-pulse ring-2 ring-emerald-400/70 shadow-[0_0_40px_#10b98166]' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] uppercase tracking-[0.45em] text-emerald-300 font-bold">
+                  Ultimos faturados hoje
+                </span>
+                <span className="text-[10px] text-slate-500">
+                  {popupIndex + 1}/{ultimosFaturadosHoje.length}
+                </span>
+              </div>
+              <div className="text-sm text-slate-300 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-semibold text-slate-100">{popupAtual.cliente}</span>
+                  <span className="text-emerald-300 font-bold text-base">{formatarMoeda(popupAtual.valor)}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                  {popupAtual.nf && <span className="font-semibold text-slate-300">NF {popupAtual.nf}</span>}
+                  {popupAtual.filial && <span>Filial {popupAtual.filial}</span>}
+                  {popupAtual.vendedor && <span>Vend {popupAtual.vendedor}</span>}
+                  {popupAtual.emissaoData && (
+                    <span>
+                      {popupAtual.emissaoData.toLocaleDateString('pt-BR')}
+                    </span>
+                  )}
+                </div>
+                {(popupAtual.produtoCodigo || popupAtual.produtoDescricao) && (
+                  <div className="text-[12px] text-slate-200">
+                    <span className="font-semibold text-slate-100">{popupAtual.produtoCodigo || 'SKU'}</span>
+                    {popupAtual.produtoDescricao ? ` - ${popupAtual.produtoDescricao}` : ''}
+                  </div>
+                )}
+                {(popupAtual.quantidade || popupAtual.unidade) && (
+                  <div className="text-[11px] text-slate-400">
+                    Qtd {popupAtual.quantidade || '-'} {popupAtual.unidade || ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
 
       {/* Menu Mobile Inferior */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
@@ -12687,10 +12732,6 @@ const custoDetalheTitulo = custoDetalheItem
     </div>
   );
 }
-
-
-
-
 
 
 
