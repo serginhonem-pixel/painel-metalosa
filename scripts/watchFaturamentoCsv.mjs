@@ -119,6 +119,13 @@ const parseCsv = (text) => {
   return { header, rows };
 };
 
+const ajustarFilialPorVendedor = (filial, vendedor) => {
+  const codigo = String(vendedor || '').trim();
+  if (codigo.startsWith('C')) return '01';
+  if (codigo.startsWith('S')) return '06';
+  return filial ?? '';
+};
+
 const getHeaderIndex = (header) => {
   const required = ['cliente', 'valortotal'];
   const normalizados = header.map((cell) => normalizar(cell));
@@ -206,7 +213,10 @@ const extrairFaturamento = ({ header, rows }) => {
 
     acc.push({
       Cliente: cliente ?? '',
-      Filial: idxFilial >= 0 ? (row?.[idxFilial] ?? '') : '',
+      Filial: ajustarFilialPorVendedor(
+        idxFilial >= 0 ? (row?.[idxFilial] ?? '') : '',
+        idxVendedor >= 0 ? (row?.[idxVendedor] ?? '') : ''
+      ),
       Grupo: grupo ?? '',
       Codigo: codigo ?? '',
       Descricao: idxDescricao >= 0 ? (row?.[idxDescricao] ?? '') : '',
