@@ -122,6 +122,7 @@ const parseCsv = (text) => {
 const ajustarFilialPorVendedor = (filial, vendedor) => {
   const codigo = String(vendedor || '').trim();
   const filialAtual = filial ?? '';
+  if (codigo === 'S19') return '01';
   if (String(filialAtual).trim() === '08') {
     if (codigo.startsWith('C')) return '01';
     if (codigo.startsWith('S')) return '06';
