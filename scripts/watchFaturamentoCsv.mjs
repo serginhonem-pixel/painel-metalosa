@@ -121,9 +121,12 @@ const parseCsv = (text) => {
 
 const ajustarFilialPorVendedor = (filial, vendedor) => {
   const codigo = String(vendedor || '').trim();
-  if (codigo.startsWith('C')) return '01';
-  if (codigo.startsWith('S')) return '06';
-  return filial ?? '';
+  const filialAtual = filial ?? '';
+  if (String(filialAtual).trim() === '08') {
+    if (codigo.startsWith('C')) return '01';
+    if (codigo.startsWith('S')) return '06';
+  }
+  return filialAtual;
 };
 
 const getHeaderIndex = (header) => {
