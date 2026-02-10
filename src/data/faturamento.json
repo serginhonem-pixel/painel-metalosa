@@ -43146,6 +43146,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "049882",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01332E         ",
+    "Descricao": "TUBO RED 7/8X1,90 GALV                           ;10/02/2026;02;338097   ;      36,0000;KG;      328,68;        9,13;N;5101 ;S05   ;ES",
+    "Quantidade": "",
+    "Unidade": "",
+    "ValorUnitario": "",
+    "ValorTotal": "",
+    "Emissao": "",
+    "Vendedor1": "",
+    "NF": "",
+    "CodFiscal": "",
+    "MesEmissao": "",
+    "TipoMovimento": "venda"
+  },
+  {
     "Cliente": "049989",
     "Filial": "01",
     "Grupo": "G140",
@@ -104992,6 +105009,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "C00415",
+    "Filial": "04",
+    "Grupo": "0027",
+    "Codigo": "03193I         ",
+    "Descricao": "****",
+    "Quantidade": 2,
+    "Unidade": "LT",
+    "ValorUnitario": 117.84,
+    "ValorTotal": 235.68,
+    "Emissao": "2026-02-10T00:00:00.000Z",
+    "Vendedor1": "C04   ",
+    "NF": 251924,
+    "CodFiscal": "5102",
+    "MesEmissao": "02/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "C00643",
     "Filial": "04",
     "Grupo": "0038",
@@ -106655,6 +106689,23 @@
     "NF": 250887,
     "CodFiscal": "5102",
     "MesEmissao": "01/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "C02526",
+    "Filial": "04",
+    "Grupo": "0006",
+    "Codigo": "00805          ",
+    "Descricao": "PORTEIRA RURAL GALV 3,00X1,20M                    ",
+    "Quantidade": 15.12,
+    "Unidade": "KG",
+    "ValorUnitario": 6.81,
+    "ValorTotal": 102.96,
+    "Emissao": "2026-02-10T00:00:00.000Z",
+    "Vendedor1": "C13   ",
+    "NF": 251923,
+    "CodFiscal": "5102",
+    "MesEmissao": "02/2026",
     "TipoMovimento": "N"
   },
   {
