@@ -571,7 +571,7 @@ export default function PainelOperacaoDiaria({
     const totalAbonadas = dados.reduce((a, c) => a + c.hrsAbonadas, 0);
     const totalAfast = dados.reduce((a, c) => a + c.hrsAfast, 0);
     const totalColab = dados.length;
-    const absPerc = totalPrev > 0 ? (totalNTrab / totalPrev) * 100 : 0;
+    const absPerc = totalPrev > 0 ? ((totalPrev - totalReal) / totalPrev) * 100 : 0;
     const presPerc = totalPrev > 0 ? (totalReal / totalPrev) * 100 : 0;
     const periodoLabel = dados[0]?.periodo || '';
 
