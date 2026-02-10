@@ -223,7 +223,8 @@ const HistoricoMensal = ({
           <select
             value={filtroSupervisor || 'Todos'}
             onChange={(e) => setFiltroSupervisor?.(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-xs font-semibold text-slate-300"
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 [&>option]:bg-slate-800 [&>option]:text-slate-200"
+            style={{ colorScheme: 'dark' }}
           >
             {(supervisoresDisponiveis || ['Todos']).map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -232,7 +233,8 @@ const HistoricoMensal = ({
           <select
             value={mesBase}
             onChange={(e) => { setMesHistorico?.(Number(e.target.value)); setDiaHistorico?.(null); }}
-            className="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-xs font-semibold text-slate-300"
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 [&>option]:bg-slate-800 [&>option]:text-slate-200"
+            style={{ colorScheme: 'dark' }}
           >
             {MESES.map((mes, index) => (
               <option key={mes} value={index}>{mes}</option>
@@ -241,7 +243,8 @@ const HistoricoMensal = ({
           <select
             value={anoBase}
             onChange={(e) => { setAnoHistorico?.(Number(e.target.value)); setDiaHistorico?.(null); }}
-            className="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-xs font-semibold text-slate-300"
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 [&>option]:bg-slate-800 [&>option]:text-slate-200"
+            style={{ colorScheme: 'dark' }}
           >
             {[2025, 2026].map((ano) => (
               <option key={ano} value={ano}>{ano}</option>
@@ -788,7 +791,8 @@ export default function PainelOperacaoDiaria({
         <select
           value={filtroSetor}
           onChange={(e) => setFiltroSetor(e.target.value)}
-          className="rounded-xl border border-slate-700 bg-slate-900/50 px-3 py-2.5 text-xs font-semibold text-slate-300 focus:border-blue-500 focus:outline-none"
+          className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-semibold text-slate-300 focus:border-blue-500 focus:outline-none [&>option]:bg-slate-800 [&>option]:text-slate-200"
+          style={{ colorScheme: 'dark' }}
         >
           {resumo.setores.map((s) => (
             <option key={s} value={s}>{s}</option>
