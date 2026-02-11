@@ -34,32 +34,140 @@ const num = (v) => {
   return Number.isNaN(n) ? 0 : n;
 };
 
-const HEADER_MAP = {
-  'Períodos': 'filial',
-  'Unnamed: 1': 'matricula',
-  'Unnamed: 2': 'nome',
-  'Unnamed: 3': 'centroCusto',
-  'Unnamed: 4': 'setor',
-  'Unnamed: 5': 'periodo',
-  'Unnamed: 6': 'hrsPrev',
-  'Unnamed: 7': 'hrsReal',
-  'Unnamed: 8': 'percHrsReal',
-  'Unnamed: 9': 'hrsNTrab',
-  'Unnamed: 10': 'percHrsNTrab',
-  'Unnamed: 11': 'hrsAbonadas',
-  'Unnamed: 12': 'percAbonadas',
-  'Unnamed: 13': 'hrsAfast',
-  'Unnamed: 14': 'percAfast',
+const normalizeKey = (value) =>
+  String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase();
+
+const resolveHeaderKey = (key) => {
+  const k = normalizeKey(key);
+  if (!k) return null;
+  if (k === 'periodos' || k === 'filial') return 'filial';
+  if (k === 'matricula') return 'matricula';
+  if (k === 'nome') return 'nome';
+  if (k === 'centrocusto') return 'centroCusto';
+  if ((k.includes('desc') && k.includes('ccusto')) || k === 'descccusto') return 'setor';
+  if (k === 'periododeapontamento') return 'periodo';
+  if (k === 'hrsprev' || k === 'horasprev') return 'hrsPrev';
+  if (k === 'hrsreal' || k === 'horasreal') return 'hrsReal';
+  if (k.includes('perc') && k.includes('hrsreal')) return 'percHrsReal';
+  if (k === 'hrsntrab' || k === 'hrsnaotrab' || k === 'hrsnaotrabalhadas') return 'hrsNTrab';
+  if (k.includes('perc') && k.includes('hrsntrab')) return 'percHrsNTrab';
+  if (k === 'hrsabonadas') return 'hrsAbonadas';
+  if (k.includes('perc') && k.includes('abonadas')) return 'percAbonadas';
+  if (k === 'hrsafast' || k === 'hrsafastados') return 'hrsAfast';
+  if (k.includes('perc') && k.includes('afast')) return 'percAfast';
+  return null;
+};
+
+const findHeaderIndex = (rows) => {
+  const required = ['filial', 'matricula', 'nome', 'setor', 'hrsPrev', 'hrsReal'];
+  for (let i = 0; i < Math.min(rows.length, 10); i += 1) {
+    const row = rows[i] || [];
+    const keys = row.map((cell) => resolveHeaderKey(cell)).filter(Boolean);
+    const hits = required.filter((key) => keys.includes(key));
+    if (hits.length >= 4) return i;
+  }
+  return -1;
+};
+
+const parseRowsFromArray = (rows) => {
+  if (!Array.isArray(rows) || rows.length < 2) return [];
+  const headerIndex = findHeaderIndex(rows);
+  if (headerIndex < 0) return [];
+  const headerRow = rows[headerIndex] || [];
+  const headerMap = headerRow.map((cell) => resolveHeaderKey(cell));
+  return rows
+    .slice(headerIndex + 1)
+    .map((row) => {
+      const o = {};
+      headerMap.forEach((key, idx) => {
+        if (!key) return;
+        o[key] = row?.[idx];
+      });
+      return o;
+    })
+    .filter((r) => r?.nome != null && String(r.nome).trim() !== '')
+    .map((o) => ({
+      ...o,
+      hrsPrev: num(o.hrsPrev),
+      hrsReal: num(o.hrsReal),
+      percHrsReal: num(o.percHrsReal),
+      hrsNTrab: num(o.hrsNTrab),
+      percHrsNTrab: num(o.percHrsNTrab),
+      hrsAbonadas: num(o.hrsAbonadas),
+      percAbonadas: num(o.percAbonadas),
+      hrsAfast: num(o.hrsAfast),
+      percAfast: num(o.percAfast),
+      nome: String(o.nome || '').trim(),
+      setor: String(o.setor || 'SEM SETOR').trim(),
+      matricula: String(o.matricula || '').trim(),
+      periodo: String(o.periodo || '').trim(),
+    }));
 };
 
 const parseRows = (raw) => {
-  if (!Array.isArray(raw) || raw.length < 2) return [];
-  // Primeira row é cabeçalho de nomes, pular
-  return raw
-    .slice(1)
-    .filter((r) => r['Unnamed: 2'] != null && String(r['Unnamed: 2']).trim() !== '')
-    .map((r) => {
-      const o = {};
+  if (!raw) return [];
+
+  if (Array.isArray(raw?.sheets)) {
+    const sheets = raw.sheets;
+    const periodSheet =
+      sheets.find((s) => normalizeKey(s?.name).includes('period')) ||
+      sheets[0];
+    return parseRowsFromArray(periodSheet?.rows || []);
+  }
+
+  if (Array.isArray(raw) && Array.isArray(raw[0])) {
+    return parseRowsFromArray(raw);
+  }
+
+  if (Array.isArray(raw) && raw.length >= 2 && typeof raw[0] === 'object') {
+    const HEADER_MAP = {
+      'Períodos': 'filial',
+      'Unnamed: 1': 'matricula',
+      'Unnamed: 2': 'nome',
+      'Unnamed: 3': 'centroCusto',
+      'Unnamed: 4': 'setor',
+      'Unnamed: 5': 'periodo',
+      'Unnamed: 6': 'hrsPrev',
+      'Unnamed: 7': 'hrsReal',
+      'Unnamed: 8': 'percHrsReal',
+      'Unnamed: 9': 'hrsNTrab',
+      'Unnamed: 10': 'percHrsNTrab',
+      'Unnamed: 11': 'hrsAbonadas',
+      'Unnamed: 12': 'percAbonadas',
+      'Unnamed: 13': 'hrsAfast',
+      'Unnamed: 14': 'percAfast',
+    };
+    return raw
+      .slice(1)
+      .filter((r) => r['Unnamed: 2'] != null && String(r['Unnamed: 2']).trim() !== '')
+      .map((r) => {
+        const o = {};
+        Object.entries(HEADER_MAP).forEach(([key, name]) => {
+          o[name] = r[key];
+        });
+        o.hrsPrev = num(o.hrsPrev);
+        o.hrsReal = num(o.hrsReal);
+        o.percHrsReal = num(o.percHrsReal);
+        o.hrsNTrab = num(o.hrsNTrab);
+        o.percHrsNTrab = num(o.percHrsNTrab);
+        o.hrsAbonadas = num(o.hrsAbonadas);
+        o.percAbonadas = num(o.percAbonadas);
+        o.hrsAfast = num(o.hrsAfast);
+        o.percAfast = num(o.percAfast);
+        o.nome = String(o.nome || '').trim();
+        o.setor = String(o.setor || 'SEM SETOR').trim();
+        o.matricula = String(o.matricula || '').trim();
+        o.periodo = String(o.periodo || '').trim();
+        return o;
+      });
+  }
+
+  return [];
+};
       Object.entries(HEADER_MAP).forEach(([key, name]) => {
         o[name] = r[key];
       });
