@@ -34,12 +34,18 @@ const num = (v) => {
   return Number.isNaN(n) ? 0 : n;
 };
 
-const normalizeKey = (value) =>
-  String(value ?? '')
+const normalizeKey = (value) => {
+  const raw = String(value ?? '');
+  const hasPercent = raw.includes('%');
+  const base = raw
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '')
     .toLowerCase();
+  if (!base) return '';
+  if (hasPercent && !base.includes('perc')) return `perc${base}`;
+  return base;
+};
 
 const resolveHeaderKey = (key) => {
   const k = normalizeKey(key);
