@@ -168,25 +168,6 @@ const parseRows = (raw) => {
 
   return [];
 };
-      Object.entries(HEADER_MAP).forEach(([key, name]) => {
-        o[name] = r[key];
-      });
-      o.hrsPrev = num(o.hrsPrev);
-      o.hrsReal = num(o.hrsReal);
-      o.percHrsReal = num(o.percHrsReal);
-      o.hrsNTrab = num(o.hrsNTrab);
-      o.percHrsNTrab = num(o.percHrsNTrab);
-      o.hrsAbonadas = num(o.hrsAbonadas);
-      o.percAbonadas = num(o.percAbonadas);
-      o.hrsAfast = num(o.hrsAfast);
-      o.percAfast = num(o.percAfast);
-      o.nome = String(o.nome || '').trim();
-      o.setor = String(o.setor || 'SEM SETOR').trim();
-      o.matricula = String(o.matricula || '').trim();
-      o.periodo = String(o.periodo || '').trim();
-      return o;
-    });
-};
 
 // ─── KPI Card ───────────────────────────────────────────────────
 const KpiCard = ({ icon: Icon, label, value, suffix, tone = 'text-white', sub }) => (
