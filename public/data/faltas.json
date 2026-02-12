@@ -1,0 +1,4671 @@
+{
+  "generatedAt": "2026-02-12T17:14:57.236Z",
+  "sourceFile": "public/data/faltas.xlsx",
+  "sheetName": "01-01 - Relatorio de Faltas",
+  "totalRegistros": 347,
+  "byDate": {
+    "2026-01-31": [
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "3",
+        "matriculaRaw": "000003",
+        "nome": "ELIZEU BERNADO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.15,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "38",
+        "matriculaRaw": "000038",
+        "nome": "JOSE FERNANDO DE FREITAS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "58",
+        "matriculaRaw": "000058",
+        "nome": "MARIA APARECIDA B DO CARMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "79",
+        "matriculaRaw": "000079",
+        "nome": "GISLENE BARBOSA DO CARMO MONFA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "84",
+        "matriculaRaw": "000084",
+        "nome": "JOSEMIR DALMASIO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "97",
+        "matriculaRaw": "000097",
+        "nome": "NATALIA NUNES FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "101",
+        "matriculaRaw": "000101",
+        "nome": "IGOR LENON DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "102",
+        "matriculaRaw": "000102",
+        "nome": "ANTONIO JOSE DA SILVA WAICHERT",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "118",
+        "matriculaRaw": "000118",
+        "nome": "LUIZ TADEU DE ALVARENGA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "128",
+        "matriculaRaw": "000128",
+        "nome": "ANTONIO ALVES BEARIS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "130",
+        "matriculaRaw": "000130",
+        "nome": "JOSE PEREIRA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "151",
+        "matriculaRaw": "000151",
+        "nome": "LUCIANO PESCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "156",
+        "matriculaRaw": "000156",
+        "nome": "MARCOS CASSIANO DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "171",
+        "matriculaRaw": "000171",
+        "nome": "PAULO ANECLETO BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "186",
+        "matriculaRaw": "000186",
+        "nome": "MARIA APARECIDA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "208",
+        "matriculaRaw": "000208",
+        "nome": "SEBASTIAO FELIPE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "271",
+        "matriculaRaw": "000271",
+        "nome": "CARLOS ALEXANDRE CASSIANO RAMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "275",
+        "matriculaRaw": "000275",
+        "nome": "MARIA APARECIDA DA SILVA PERES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "291",
+        "matriculaRaw": "000291",
+        "nome": "WANDRA KELY ALVES DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "299",
+        "matriculaRaw": "000299",
+        "nome": "HUDSON TELIS DOS SANTOS MANEA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "356",
+        "matriculaRaw": "000356",
+        "nome": "VALERIA OTT ZANOLE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "391",
+        "matriculaRaw": "000391",
+        "nome": "VANDERLEIA CORREIA SINGER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "403",
+        "matriculaRaw": "000403",
+        "nome": "ROBERT SOUZA SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "405",
+        "matriculaRaw": "000405",
+        "nome": "ODELSO FALLER JUNIOR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.5,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "442",
+        "matriculaRaw": "000442",
+        "nome": "ODAIR JOSE DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "462",
+        "matriculaRaw": "000462",
+        "nome": "BRUNO BARBOSA PEREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "501",
+        "matriculaRaw": "000501",
+        "nome": "SILVIO SANTANA GIMENEZ",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "506",
+        "matriculaRaw": "000506",
+        "nome": "LURDELMA ALVES DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "527",
+        "matriculaRaw": "000527",
+        "nome": "JOAQUIM PEIXOTO FILHO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "533",
+        "matriculaRaw": "000533",
+        "nome": "JACKSON PEREIRA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "553",
+        "matriculaRaw": "000553",
+        "nome": "APARECIDA MARIA DE JESUS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "554",
+        "matriculaRaw": "000554",
+        "nome": "ISMAEL PEREIRA DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "568",
+        "matriculaRaw": "000568",
+        "nome": "JEANDER DE ABREU",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "571",
+        "matriculaRaw": "000571",
+        "nome": "GELSON LOPES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "572",
+        "matriculaRaw": "000572",
+        "nome": "LUIZ CARLOS DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.15,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "580",
+        "matriculaRaw": "000580",
+        "nome": "BERTRAN DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "590",
+        "matriculaRaw": "000590",
+        "nome": "ALICE VITORIA PIM GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "592",
+        "matriculaRaw": "000592",
+        "nome": "FERNANDO GONCALVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "597",
+        "matriculaRaw": "000597",
+        "nome": "HENRY VALERY HUERTA SANCHEZ",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "601",
+        "matriculaRaw": "000601",
+        "nome": "ANA LUCIA DA SILVA BASTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.03,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "603",
+        "matriculaRaw": "000603",
+        "nome": "DANIELA DA SILVA CASSIMIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "604",
+        "matriculaRaw": "000604",
+        "nome": "HALISSON FROIS SANTANA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "609",
+        "matriculaRaw": "000609",
+        "nome": "MARCIA SILVA DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "610",
+        "matriculaRaw": "000610",
+        "nome": "RONALDO BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "613",
+        "matriculaRaw": "000613",
+        "nome": "ELAINE CRISTINA NUNES JACO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "619",
+        "matriculaRaw": "000619",
+        "nome": "NOENNE JOSE PERONI BAYER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "638",
+        "matriculaRaw": "000638",
+        "nome": "JADSON STEVEN BARBOZA DE LAZAR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.03,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "641",
+        "matriculaRaw": "000641",
+        "nome": "WILSON FAGNER SILVA DA CONCEIC",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.03,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "643",
+        "matriculaRaw": "000643",
+        "nome": "LUCAS PEREIRA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "656",
+        "matriculaRaw": "000656",
+        "nome": "LEONARDO CASSIANO BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-31",
+        "matricula": "661",
+        "matriculaRaw": "000661",
+        "nome": "GABRIEL MOTTA ZANI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-04": [
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "13",
+        "matriculaRaw": "000013",
+        "nome": "VALDIR SANTO CHEVER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "102",
+        "matriculaRaw": "000102",
+        "nome": "ANTONIO JOSE DA SILVA WAICHERT",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "158",
+        "matriculaRaw": "000158",
+        "nome": "IVANI FERREIRA LEITE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "356",
+        "matriculaRaw": "000356",
+        "nome": "VALERIA OTT ZANOLE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.18,
+          "abonadas": 5.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "358",
+        "matriculaRaw": "000358",
+        "nome": "JURACI BARBOSA FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "364",
+        "matriculaRaw": "000364",
+        "nome": "LUCAS RODRIGUES DA COSTA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "408",
+        "matriculaRaw": "000408",
+        "nome": "VINICIUS FRAZAO DE LIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "455",
+        "matriculaRaw": "000455",
+        "nome": "VALMIR DOS SANTOS JUNIOR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.18,
+          "abonadas": 5.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "494",
+        "matriculaRaw": "000494",
+        "nome": "DAVY DE JESUS DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "501",
+        "matriculaRaw": "000501",
+        "nome": "SILVIO SANTANA GIMENEZ",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 1,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "649",
+        "matriculaRaw": "000649",
+        "nome": "LUCAS RAMOS VERISSIMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-04",
+        "matricula": "662",
+        "matriculaRaw": "000662",
+        "nome": "ELIZEU ALVES DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-11": [
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "13",
+        "matriculaRaw": "000013",
+        "nome": "VALDIR SANTO CHEVER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "79",
+        "matriculaRaw": "000079",
+        "nome": "GISLENE BARBOSA DO CARMO MONFA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "128",
+        "matriculaRaw": "000128",
+        "nome": "ANTONIO ALVES BEARIS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "202",
+        "matriculaRaw": "000202",
+        "nome": "JOSMAR CORREIA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "364",
+        "matriculaRaw": "000364",
+        "nome": "LUCAS RODRIGUES DA COSTA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "441",
+        "matriculaRaw": "000441",
+        "nome": "JEAN CARLOS AMARO FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "494",
+        "matriculaRaw": "000494",
+        "nome": "DAVY DE JESUS DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "506",
+        "matriculaRaw": "000506",
+        "nome": "LURDELMA ALVES DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "533",
+        "matriculaRaw": "000533",
+        "nome": "JACKSON PEREIRA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 1,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "579",
+        "matriculaRaw": "000579",
+        "nome": "JOCIMAR SODRE DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "603",
+        "matriculaRaw": "000603",
+        "nome": "DANIELA DA SILVA CASSIMIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "604",
+        "matriculaRaw": "000604",
+        "nome": "HALISSON FROIS SANTANA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "610",
+        "matriculaRaw": "000610",
+        "nome": "RONALDO BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "626",
+        "matriculaRaw": "000626",
+        "nome": "CARLOS ALBERTO DUMER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "639",
+        "matriculaRaw": "000639",
+        "nome": "SILVANO DOS SANTOS MIRANDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "654",
+        "matriculaRaw": "000654",
+        "nome": "EDUARDO CUSTODIO DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "656",
+        "matriculaRaw": "000656",
+        "nome": "LEONARDO CASSIANO BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-11",
+        "matricula": "665",
+        "matriculaRaw": "000665",
+        "nome": "MARIA APARECIDA AMBROSIO VENAN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-10": [
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "50",
+        "matriculaRaw": "000050",
+        "nome": "TALITA PATRICIA DIOGO DOS SANT",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 8.45,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "126",
+        "matriculaRaw": "000126",
+        "nome": "JOSE ADELSO DE ALMEIDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "128",
+        "matriculaRaw": "000128",
+        "nome": "ANTONIO ALVES BEARIS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "248",
+        "matriculaRaw": "000248",
+        "nome": "ALAN BARBOSA PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "364",
+        "matriculaRaw": "000364",
+        "nome": "LUCAS RODRIGUES DA COSTA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "391",
+        "matriculaRaw": "000391",
+        "nome": "VANDERLEIA CORREIA SINGER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "436",
+        "matriculaRaw": "000436",
+        "nome": "ZANATO PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "533",
+        "matriculaRaw": "000533",
+        "nome": "JACKSON PEREIRA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "603",
+        "matriculaRaw": "000603",
+        "nome": "DANIELA DA SILVA CASSIMIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "609",
+        "matriculaRaw": "000609",
+        "nome": "MARCIA SILVA DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "610",
+        "matriculaRaw": "000610",
+        "nome": "RONALDO BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.18,
+          "abonadas": 5.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-10",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-01-26": [
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "76",
+        "matriculaRaw": "000076",
+        "nome": "GUILHERME SANDRO COURA ARRUDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "84",
+        "matriculaRaw": "000084",
+        "nome": "JOSEMIR DALMASIO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 0.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "134",
+        "matriculaRaw": "000134",
+        "nome": "LUIZMAR DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "138",
+        "matriculaRaw": "000138",
+        "nome": "CLEUDSON ANGELO LUPPE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "203",
+        "matriculaRaw": "000203",
+        "nome": "ALEXANDRE MENDONCA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "226",
+        "matriculaRaw": "000226",
+        "nome": "JOAO MANOEL DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 0.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "358",
+        "matriculaRaw": "000358",
+        "nome": "JURACI BARBOSA FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "402",
+        "matriculaRaw": "000402",
+        "nome": "CARLOS JOSE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "506",
+        "matriculaRaw": "000506",
+        "nome": "LURDELMA ALVES DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 4.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "624",
+        "matriculaRaw": "000624",
+        "nome": "RAWAN NUNES BABILON",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 4.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "625",
+        "matriculaRaw": "000625",
+        "nome": "JOAO VICTOR SOUTO BRANDAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "631",
+        "matriculaRaw": "000631",
+        "nome": "ROMULO CESAR AZEVEDO DOS SANTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-26",
+        "matricula": "638",
+        "matriculaRaw": "000638",
+        "nome": "JADSON STEVEN BARBOZA DE LAZAR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-01-27": [
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "76",
+        "matriculaRaw": "000076",
+        "nome": "GUILHERME SANDRO COURA ARRUDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "158",
+        "matriculaRaw": "000158",
+        "nome": "IVANI FERREIRA LEITE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "188",
+        "matriculaRaw": "000188",
+        "nome": "JOAO CARLOS MURGIA RODRIGUES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.47,
+          "abonadas": 4.47,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "216",
+        "matriculaRaw": "000216",
+        "nome": "ALEX RIBEIRO DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "248",
+        "matriculaRaw": "000248",
+        "nome": "ALAN BARBOSA PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "271",
+        "matriculaRaw": "000271",
+        "nome": "CARLOS ALEXANDRE CASSIANO RAMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "273",
+        "matriculaRaw": "000273",
+        "nome": "WARLEM PEREIRA GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 3.3,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "279",
+        "matriculaRaw": "000279",
+        "nome": "ALEXANDRA ALTOE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "457",
+        "matriculaRaw": "000457",
+        "nome": "ADRIANA BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "492",
+        "matriculaRaw": "000492",
+        "nome": "MARLON MILIORELLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.57,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "590",
+        "matriculaRaw": "000590",
+        "nome": "ALICE VITORIA PIM GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 3.38,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "618",
+        "matriculaRaw": "000618",
+        "nome": "ELIENE DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.29,
+          "abonadas": 2.29,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-27",
+        "matricula": "337",
+        "matriculaRaw": "00337",
+        "nome": "ALEXSANDRA PEDRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-01-28": [
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "76",
+        "matriculaRaw": "000076",
+        "nome": "GUILHERME SANDRO COURA ARRUDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "102",
+        "matriculaRaw": "000102",
+        "nome": "ANTONIO JOSE DA SILVA WAICHERT",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "124",
+        "matriculaRaw": "000124",
+        "nome": "PAULO ROBERTO DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 4.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "194",
+        "matriculaRaw": "000194",
+        "nome": "CRISTIANA CINELLE DE ALMEIDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 2.13,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "271",
+        "matriculaRaw": "000271",
+        "nome": "CARLOS ALEXANDRE CASSIANO RAMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "279",
+        "matriculaRaw": "000279",
+        "nome": "ALEXANDRA ALTOE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "403",
+        "matriculaRaw": "000403",
+        "nome": "ROBERT SOUZA SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "410",
+        "matriculaRaw": "000410",
+        "nome": "VALDECI GALVAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "457",
+        "matriculaRaw": "000457",
+        "nome": "ADRIANA BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "490",
+        "matriculaRaw": "000490",
+        "nome": "MARCONDES SANTOS DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "492",
+        "matriculaRaw": "000492",
+        "nome": "MARLON MILIORELLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "590",
+        "matriculaRaw": "000590",
+        "nome": "ALICE VITORIA PIM GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 3.38,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "626",
+        "matriculaRaw": "000626",
+        "nome": "CARLOS ALBERTO DUMER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.55,
+          "abonadas": 4.55,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "643",
+        "matriculaRaw": "000643",
+        "nome": "LUCAS PEREIRA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-28",
+        "matricula": "337",
+        "matriculaRaw": "00337",
+        "nome": "ALEXSANDRA PEDRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-02": [
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "76",
+        "matriculaRaw": "000076",
+        "nome": "GUILHERME SANDRO COURA ARRUDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "79",
+        "matriculaRaw": "000079",
+        "nome": "GISLENE BARBOSA DO CARMO MONFA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "97",
+        "matriculaRaw": "000097",
+        "nome": "NATALIA NUNES FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 4.1,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "126",
+        "matriculaRaw": "000126",
+        "nome": "JOSE ADELSO DE ALMEIDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "153",
+        "matriculaRaw": "000153",
+        "nome": "JUDISMAR OTACILIO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.58,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "208",
+        "matriculaRaw": "000208",
+        "nome": "SEBASTIAO FELIPE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "227",
+        "matriculaRaw": "000227",
+        "nome": "CARLOS ANTONIO CANDIDO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "271",
+        "matriculaRaw": "000271",
+        "nome": "CARLOS ALEXANDRE CASSIANO RAMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.3,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "403",
+        "matriculaRaw": "000403",
+        "nome": "ROBERT SOUZA SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.59,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "492",
+        "matriculaRaw": "000492",
+        "nome": "MARLON MILIORELLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "567",
+        "matriculaRaw": "000567",
+        "nome": "KISSYLA VEQUI FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "656",
+        "matriculaRaw": "000656",
+        "nome": "LEONARDO CASSIANO BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-02",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-09": [
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "95",
+        "matriculaRaw": "000095",
+        "nome": "JONATHAN SPERANDIO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "102",
+        "matriculaRaw": "000102",
+        "nome": "ANTONIO JOSE DA SILVA WAICHERT",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "165",
+        "matriculaRaw": "000165",
+        "nome": "AGOSTINHO ELISEU MILOTTI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "364",
+        "matriculaRaw": "000364",
+        "nome": "LUCAS RODRIGUES DA COSTA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "403",
+        "matriculaRaw": "000403",
+        "nome": "ROBERT SOUZA SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "436",
+        "matriculaRaw": "000436",
+        "nome": "ZANATO PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "533",
+        "matriculaRaw": "000533",
+        "nome": "JACKSON PEREIRA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "590",
+        "matriculaRaw": "000590",
+        "nome": "ALICE VITORIA PIM GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "592",
+        "matriculaRaw": "000592",
+        "nome": "FERNANDO GONCALVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "603",
+        "matriculaRaw": "000603",
+        "nome": "DANIELA DA SILVA CASSIMIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "613",
+        "matriculaRaw": "000613",
+        "nome": "ELAINE CRISTINA NUNES JACO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "619",
+        "matriculaRaw": "000619",
+        "nome": "NOENNE JOSE PERONI BAYER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "649",
+        "matriculaRaw": "000649",
+        "nome": "LUCAS RAMOS VERISSIMO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "661",
+        "matriculaRaw": "000661",
+        "nome": "GABRIEL MOTTA ZANI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-09",
+        "matricula": "663",
+        "matriculaRaw": "000663",
+        "nome": "PAULO HENRIQUE FRANCISCO DA SI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-12": [
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "97",
+        "matriculaRaw": "000097",
+        "nome": "NATALIA NUNES FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "135",
+        "matriculaRaw": "000135",
+        "nome": "SERGIO LAFAIETE NEVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "139",
+        "matriculaRaw": "000139",
+        "nome": "NILTON PEREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "144",
+        "matriculaRaw": "000144",
+        "nome": "DARLAN GONCALVES CABRAL",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "238",
+        "matriculaRaw": "000238",
+        "nome": "JOSE RICARDO DE BARROS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "248",
+        "matriculaRaw": "000248",
+        "nome": "ALAN BARBOSA PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "275",
+        "matriculaRaw": "000275",
+        "nome": "MARIA APARECIDA DA SILVA PERES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "356",
+        "matriculaRaw": "000356",
+        "nome": "VALERIA OTT ZANOLE DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "456",
+        "matriculaRaw": "000456",
+        "nome": "WESLLEY REINOSO ENTRINGER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "470",
+        "matriculaRaw": "000470",
+        "nome": "JUAREZ BARBOSA FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "486",
+        "matriculaRaw": "000486",
+        "nome": "GILMARA BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "506",
+        "matriculaRaw": "000506",
+        "nome": "LURDELMA ALVES DO NASCIMENTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "601",
+        "matriculaRaw": "000601",
+        "nome": "ANA LUCIA DA SILVA BASTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "617",
+        "matriculaRaw": "000617",
+        "nome": "SUMAIA LOPES MIRANDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "619",
+        "matriculaRaw": "000619",
+        "nome": "NOENNE JOSE PERONI BAYER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "636",
+        "matriculaRaw": "000636",
+        "nome": "ELIANA NASCIMENTO DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "654",
+        "matriculaRaw": "000654",
+        "nome": "EDUARDO CUSTODIO DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-12",
+        "matricula": "337",
+        "matriculaRaw": "00337",
+        "nome": "ALEXSANDRA PEDRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-01-30": [
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "105",
+        "matriculaRaw": "000105",
+        "nome": "MARCOS VINICIUS DE O SILVA SEL",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "242",
+        "matriculaRaw": "000242",
+        "nome": "HEITOR DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 3.38,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "279",
+        "matriculaRaw": "000279",
+        "nome": "ALEXANDRA ALTOE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 1,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "457",
+        "matriculaRaw": "000457",
+        "nome": "ADRIANA BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "474",
+        "matriculaRaw": "000474",
+        "nome": "BRENO FEITOSA FERREIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "486",
+        "matriculaRaw": "000486",
+        "nome": "GILMARA BARBOSA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "533",
+        "matriculaRaw": "000533",
+        "nome": "JACKSON PEREIRA DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "578",
+        "matriculaRaw": "000578",
+        "nome": "ALVARO DE JESUS FREITAS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "580",
+        "matriculaRaw": "000580",
+        "nome": "BERTRAN DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-30",
+        "matricula": "337",
+        "matriculaRaw": "00337",
+        "nome": "ALEXSANDRA PEDRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-01-29": [
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "279",
+        "matriculaRaw": "000279",
+        "nome": "ALEXANDRA ALTOE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "398",
+        "matriculaRaw": "000398",
+        "nome": "SILVANO ALVES SANTIAGO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.26,
+          "abonadas": 5.26,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "406",
+        "matriculaRaw": "000406",
+        "nome": "JOCARLY ALVARENGA FRAGA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "451",
+        "matriculaRaw": "000451",
+        "nome": "RENATO RODRIGUES DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "457",
+        "matriculaRaw": "000457",
+        "nome": "ADRIANA BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "501",
+        "matriculaRaw": "000501",
+        "nome": "SILVIO SANTANA GIMENEZ",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "604",
+        "matriculaRaw": "000604",
+        "nome": "HALISSON FROIS SANTANA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.33,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "612",
+        "matriculaRaw": "000612",
+        "nome": "JULIANO CARLOS LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 4.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "638",
+        "matriculaRaw": "000638",
+        "nome": "JADSON STEVEN BARBOZA DE LAZAR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.55,
+          "abonadas": 4.55,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-01-29",
+        "matricula": "337",
+        "matriculaRaw": "00337",
+        "nome": "ALEXSANDRA PEDRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-03": [
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "194",
+        "matriculaRaw": "000194",
+        "nome": "CRISTIANA CINELLE DE ALMEIDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "198",
+        "matriculaRaw": "000198",
+        "nome": "WESLEY CORREA FROILICH",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "248",
+        "matriculaRaw": "000248",
+        "nome": "ALAN BARBOSA PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "405",
+        "matriculaRaw": "000405",
+        "nome": "ODELSO FALLER JUNIOR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "471",
+        "matriculaRaw": "000471",
+        "nome": "ANTONIO HIDROLANDIO R SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "570",
+        "matriculaRaw": "000570",
+        "nome": "DAIANI CRISTINA MENEGASSI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 3.15,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "597",
+        "matriculaRaw": "000597",
+        "nome": "HENRY VALERY HUERTA SANCHEZ",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.55,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "603",
+        "matriculaRaw": "000603",
+        "nome": "DANIELA DA SILVA CASSIMIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "621",
+        "matriculaRaw": "000621",
+        "nome": "DEBORA DE OLIVEIRA FERNANDES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-03",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-05": [
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "144",
+        "matriculaRaw": "000144",
+        "nome": "DARLAN GONCALVES CABRAL",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "158",
+        "matriculaRaw": "000158",
+        "nome": "IVANI FERREIRA LEITE",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "161",
+        "matriculaRaw": "000161",
+        "nome": "EDIMAR TADEU RONCONI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.26,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "162",
+        "matriculaRaw": "000162",
+        "nome": "IZALTINO DE BARROS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "226",
+        "matriculaRaw": "000226",
+        "nome": "JOAO MANOEL DE SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "238",
+        "matriculaRaw": "000238",
+        "nome": "JOSE RICARDO DE BARROS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 4.18,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "333",
+        "matriculaRaw": "000333",
+        "nome": "ALEXSANDRO COZER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.26,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "443",
+        "matriculaRaw": "000443",
+        "nome": "ADEMARIO LEMOS DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "494",
+        "matriculaRaw": "000494",
+        "nome": "DAVY DE JESUS DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "590",
+        "matriculaRaw": "000590",
+        "nome": "ALICE VITORIA PIM GOMES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "592",
+        "matriculaRaw": "000592",
+        "nome": "FERNANDO GONCALVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "611",
+        "matriculaRaw": "000611",
+        "nome": "SUELEN LOPES DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "617",
+        "matriculaRaw": "000617",
+        "nome": "SUMAIA LOPES MIRANDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "631",
+        "matriculaRaw": "000631",
+        "nome": "ROMULO CESAR AZEVEDO DOS SANTO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "638",
+        "matriculaRaw": "000638",
+        "nome": "JADSON STEVEN BARBOZA DE LAZAR",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.55,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "639",
+        "matriculaRaw": "000639",
+        "nome": "SILVANO DOS SANTOS MIRANDA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 4.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "648",
+        "matriculaRaw": "000648",
+        "nome": "MARIA APARECIDA DE MOURA ALVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-05",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ],
+    "2026-02-06": [
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "115",
+        "matriculaRaw": "000115",
+        "nome": "VALTER JOSE TOFOLI",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "144",
+        "matriculaRaw": "000144",
+        "nome": "DARLAN GONCALVES CABRAL",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 8.48,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "244",
+        "matriculaRaw": "000244",
+        "nome": "LUIZ DIAS CHAVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "250",
+        "matriculaRaw": "000250",
+        "nome": "ELIANA DA CONCEICAO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 1.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "333",
+        "matriculaRaw": "000333",
+        "nome": "ALEXSANDRO COZER",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 7.45,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "364",
+        "matriculaRaw": "000364",
+        "nome": "LUCAS RODRIGUES DA COSTA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "394",
+        "matriculaRaw": "000394",
+        "nome": "DANIEL VINICIUS OLIVEIRA NUNES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "404",
+        "matriculaRaw": "000404",
+        "nome": "LILIAN GABRIELLI SILVA SOARES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 1.44,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "436",
+        "matriculaRaw": "000436",
+        "nome": "ZANATO PINHEIRO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.18,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "439",
+        "matriculaRaw": "000439",
+        "nome": "REINALDO PINTO DE OLIV. NETO",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "464",
+        "matriculaRaw": "000464",
+        "nome": "LEANDRO SILVA SOUZA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 3.38,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "494",
+        "matriculaRaw": "000494",
+        "nome": "DAVY DE JESUS DE OLIVEIRA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.15,
+          "abonadas": 3.3,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "574",
+        "matriculaRaw": "000574",
+        "nome": "HIGOR GRAMMELISKI DE LIMA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 4.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "592",
+        "matriculaRaw": "000592",
+        "nome": "FERNANDO GONCALVES",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 5.26,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "604",
+        "matriculaRaw": "000604",
+        "nome": "HALISSON FROIS SANTANA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 2.33,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "610",
+        "matriculaRaw": "000610",
+        "nome": "RONALDO BARBOSA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "635",
+        "matriculaRaw": "000635",
+        "nome": "JAQUELINE CORREA IANSEN",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "654",
+        "matriculaRaw": "000654",
+        "nome": "EDUARDO CUSTODIO DOS SANTOS",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 1,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "659",
+        "matriculaRaw": "000659",
+        "nome": "HENRY MOTTA DA SILVA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      },
+      {
+        "dataISO": "2026-02-06",
+        "matricula": "660",
+        "matriculaRaw": "000660",
+        "nome": "JOEL ENEDINO DE FRANCA",
+        "tipoFalta": "Falta Justificada",
+        "horas": {
+          "naoAutorizadas": 0,
+          "autorizadas": 8.48,
+          "abonadas": 0,
+          "suspensao": 0
+        }
+      }
+    ]
+  },
+  "summaryByDate": {
+    "2026-01-31": {
+      "total": 58,
+      "tipos": {
+        "Falta Justificada": 58,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-04": {
+      "total": 21,
+      "tipos": {
+        "Falta Justificada": 21,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-11": {
+      "total": 29,
+      "tipos": {
+        "Falta Justificada": 29,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-10": {
+      "total": 20,
+      "tipos": {
+        "Falta Justificada": 20,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-01-26": {
+      "total": 17,
+      "tipos": {
+        "Falta Justificada": 17,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-01-27": {
+      "total": 19,
+      "tipos": {
+        "Falta Justificada": 19,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-01-28": {
+      "total": 21,
+      "tipos": {
+        "Falta Justificada": 21,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-02": {
+      "total": 19,
+      "tipos": {
+        "Falta Justificada": 19,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-09": {
+      "total": 24,
+      "tipos": {
+        "Falta Justificada": 24,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-12": {
+      "total": 19,
+      "tipos": {
+        "Falta Justificada": 19,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-01-30": {
+      "total": 19,
+      "tipos": {
+        "Falta Justificada": 19,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-01-29": {
+      "total": 17,
+      "tipos": {
+        "Falta Justificada": 17,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-03": {
+      "total": 18,
+      "tipos": {
+        "Falta Justificada": 18,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-05": {
+      "total": 26,
+      "tipos": {
+        "Falta Justificada": 26,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    },
+    "2026-02-06": {
+      "total": 20,
+      "tipos": {
+        "Falta Justificada": 20,
+        "Falta Injustificada": 0,
+        "Ferias": 0
+      }
+    }
+  }
+}

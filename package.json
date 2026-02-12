@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "faturamento:build": "node scripts/buildFaturamento.mjs && node scripts/buildAbsenteismo.mjs",
+    "faltas:build": "node scripts/buildFaltas.mjs",
     "faturamento:watch": "node scripts/watchFaturamentoCsv.mjs",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -284,6 +284,7 @@ const HistoricoMensal = ({
   diaHistorico, setDiaHistorico, totalColaboradoresFiltrados,
   obterResumoDia, isFolgaColetiva, isDataSemApontamento, isDiaDesconsiderado,
   resumoHistorico,
+  faltasPlanilhaPorData = {},
 }) => {
   const MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
@@ -478,6 +479,27 @@ const HistoricoMensal = ({
             const resumoDoExcel = resumoDia?.fonte === 'excel';
             const desconsiderado = (isDataSemApontamento ? isDataSemApontamento(diaHistorico) : false) || (isDiaDesconsiderado ? isDiaDesconsiderado(diaHistorico) : false);
             const registros = desconsiderado ? {} : (registrosPorData[diaHistorico] || {});
+            const normalizarNome = (valor) =>
+              String(valor || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toLowerCase();
+            const mapaPorNome = new Map(
+              (colaboradores || []).map((c) => [normalizarNome(c.nome), c])
+            );
+            const faltasPlanilha = ((faltasPlanilhaPorData?.[diaHistorico]) || [])
+              .map((item, index) => {
+                const colab = mapaPorNome.get(normalizarNome(item.nome));
+                return {
+                  id: `xlsx-${item.matriculaRaw || item.matricula || index}`,
+                  nome: item.nome || 'Nao encontrado',
+                  setor: colab?.setor || '-',
+                  gestor: colab?.gestor || '-',
+                  tipo: item.tipoFalta || 'Falta Injustificada',
+                  tempoParcial: '',
+                };
+              });
             const faltas = Object.entries(registros)
               .map(([id, registro]) => {
                 const colaborador = colaboradores.find((c) => String(c.id) === String(id));
@@ -503,6 +525,19 @@ const HistoricoMensal = ({
                     : item.tipo !== 'Ferias';
                 return supervisorOk && setorOk && tipoOk;
               });
+            const faltasExibidas = resumoDoExcel
+              ? faltasPlanilha.filter((item) => {
+                const supervisorOk = !filtroSupervisor || filtroSupervisor === 'Todos' || item.gestor === filtroSupervisor;
+                const setorOk = !filtroSetor || filtroSetor === 'Todos' || item.setor === filtroSetor;
+                const tipoFiltro = filtroTipoDia || 'Todos';
+                const tipoOk = tipoFiltro === 'Todos'
+                  ? true
+                  : tipoFiltro === 'Ferias'
+                    ? item.tipo === 'Ferias'
+                    : item.tipo !== 'Ferias';
+                return supervisorOk && setorOk && tipoOk;
+              })
+              : faltas;
             return (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -528,24 +563,56 @@ const HistoricoMensal = ({
                       ))}
                     </div>
                     <span className="text-xs text-slate-500">
-                      {resumoDoExcel ? resumoDia.total : faltas.length} registros
+                      {faltasExibidas.length} registros
                     </span>
                   </div>
                 </div>
                 {resumoDoExcel ? (
-                  <div className="rounded-xl border border-slate-700 p-4 text-sm text-slate-400">
-                    <div className="font-bold text-slate-300 mb-2">Resumo do dia (planilha)</div>
-                    {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Ferias') && (
-                      <div>Ferias: {resumoDia.tipos?.Ferias || 0}</div>
+                  <>
+                    <div className="rounded-xl border border-slate-700 p-4 text-sm text-slate-400">
+                      <div className="font-bold text-slate-300 mb-2">Resumo do dia (planilha)</div>
+                      {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Ferias') && (
+                        <div>Ferias: {resumoDia.tipos?.Ferias || 0}</div>
+                      )}
+                      {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Faltas') && (
+                        <div>Falta Justificada: {resumoDia.tipos?.['Falta Justificada'] || 0}</div>
+                      )}
+                      {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Faltas') && (
+                        <div>Falta Injustificada: {resumoDia.tipos?.['Falta Injustificada'] || 0}</div>
+                      )}
+                    </div>
+                    {faltasExibidas.length === 0 ? (
+                      <p className="text-slate-500 italic">Nenhuma falta registrada neste dia.</p>
+                    ) : (
+                      <div className="max-h-72 overflow-auto rounded-xl border border-slate-800">
+                        <table className="w-full text-left text-xs">
+                          <thead className="sticky top-0 bg-slate-900 text-slate-500 uppercase tracking-wider">
+                            <tr>
+                              <th className="px-5 py-3">Colaborador</th>
+                              <th className="px-5 py-3">Setor</th>
+                              <th className="px-5 py-3">Supervisor</th>
+                              <th className="px-5 py-3">Tipo</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800">
+                            {faltasExibidas.map((item) => (
+                              <tr key={item.id} className="text-slate-300">
+                                <td className="px-5 py-3 font-semibold">{item.nome}</td>
+                                <td className="px-5 py-3 text-slate-500">{item.setor}</td>
+                                <td className="px-5 py-3 text-slate-500">{item.gestor}</td>
+                                <td className="px-5 py-3">
+                                  <span className="rounded-full px-2 py-1 text-[10px] font-bold bg-rose-500/20 text-rose-300">
+                                    {item.tipo}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
-                    {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Faltas') && (
-                      <div>Falta Justificada: {resumoDia.tipos?.['Falta Justificada'] || 0}</div>
-                    )}
-                    {((filtroTipoDia || 'Todos') === 'Todos' || filtroTipoDia === 'Faltas') && (
-                      <div>Falta Injustificada: {resumoDia.tipos?.['Falta Injustificada'] || 0}</div>
-                    )}
-                  </div>
-                ) : faltas.length === 0 ? (
+                  </>
+                ) : faltasExibidas.length === 0 ? (
                   <p className="text-slate-500 italic">Nenhuma falta registrada neste dia.</p>
                 ) : (
                   <div className="max-h-72 overflow-auto rounded-xl border border-slate-800">
@@ -559,7 +626,7 @@ const HistoricoMensal = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
-                        {faltas.map((item) => (
+                        {faltasExibidas.map((item) => (
                           <tr key={item.id} className="text-slate-300">
                             <td className="px-5 py-3 font-semibold">{item.nome}</td>
                             <td className="px-5 py-3 text-slate-500">{item.setor}</td>
@@ -620,6 +687,7 @@ export default function PainelOperacaoDiaria({
   isDiaDesconsiderado,
   resumoHistorico: propResumoHistorico,
   resumoLeandroExcel,
+  faltasPlanilhaPorData = {},
 }) {
   const [dados, setDados] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -1184,6 +1252,7 @@ export default function PainelOperacaoDiaria({
           isDataSemApontamento={isDataSemApontamento}
           isDiaDesconsiderado={isDiaDesconsiderado}
           resumoHistorico={propResumoHistorico}
+          faltasPlanilhaPorData={faltasPlanilhaPorData}
         />
       )}
     </div>

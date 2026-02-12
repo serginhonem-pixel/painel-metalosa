@@ -2844,6 +2844,8 @@ export default function App() {
   const [faltasCarregadas, setFaltasCarregadas] = useState(false);
   const [presencaLeandroExcel, setPresencaLeandroExcel] = useState(null);
   const [resumoLeandroExcel, setResumoLeandroExcel] = useState(null);
+  const [faltasResumoPlanilha, setFaltasResumoPlanilha] = useState({});
+  const [faltasRegistrosPlanilha, setFaltasRegistrosPlanilha] = useState({});
   const [absenteismoResumo, setAbsenteismoResumo] = useState({
     carregando: true,
     erro: null,
@@ -3133,6 +3135,32 @@ export default function App() {
     };
 
     carregarResumoAbsenteismo();
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarFaltasPlanilha = async () => {
+      try {
+        const resp = await fetch('/data/faltas.json');
+        if (!resp.ok) return;
+        const json = await resp.json();
+        if (!ativo) return;
+        const resumo = json?.summaryByDate;
+        const registros = json?.byDate;
+        if (resumo && typeof resumo === 'object') {
+          setFaltasResumoPlanilha(resumo);
+        }
+        if (registros && typeof registros === 'object') {
+          setFaltasRegistrosPlanilha(registros);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar faltas.json:', err);
+      }
+    };
+    carregarFaltasPlanilha();
     return () => {
       ativo = false;
     };
@@ -4259,23 +4287,46 @@ export default function App() {
     const feriasColaboradores = new Set();
     const diasComFalta = new Set();
 
-    Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
-      if (!dataISO.startsWith(mesStr)) return;
-      if (isDiaDesconsiderado(dataISO)) return;
-      if (isDataSemApontamento(dataISO)) return;
-      Object.entries(registros || {}).forEach(([id, registro]) => {
-        if (!idsFiltrados.has(String(id))) return;
-        faltasTotal += 1;
-        diasComFalta.add(dataISO);
-        const tipo = registro?.tipoFalta || 'Falta Injustificada';
-        if (tipo === 'Falta Justificada') faltasJust += 1;
-        else if (tipo === 'Falta Injustificada') faltasInjust += 1;
-        else if (tipo === 'Ferias') {
-          feriasOcorrencias += 1;
-          feriasColaboradores.add(String(id));
+    const usarResumoPlanilha =
+      filtroSupervisor === 'Todos' &&
+      filtroSetor === 'Todos' &&
+      faltasResumoPlanilha &&
+      Object.keys(faltasResumoPlanilha).length > 0;
+
+    if (usarResumoPlanilha) {
+      Object.entries(faltasResumoPlanilha).forEach(([dataISO, resumo]) => {
+        if (!dataISO.startsWith(mesStr)) return;
+        if (isDiaDesconsiderado(dataISO)) return;
+        if (isDataSemApontamento(dataISO)) return;
+        const totalDia = Number(resumo?.total || 0);
+        const tipos = resumo?.tipos || {};
+        if (totalDia > 0) {
+          diasComFalta.add(dataISO);
         }
+        faltasTotal += totalDia;
+        faltasJust += Number(tipos['Falta Justificada'] || 0);
+        faltasInjust += Number(tipos['Falta Injustificada'] || 0);
+        feriasOcorrencias += Number(tipos.Ferias || 0);
       });
-    });
+    } else {
+      Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
+        if (!dataISO.startsWith(mesStr)) return;
+        if (isDiaDesconsiderado(dataISO)) return;
+        if (isDataSemApontamento(dataISO)) return;
+        Object.entries(registros || {}).forEach(([id, registro]) => {
+          if (!idsFiltrados.has(String(id))) return;
+          faltasTotal += 1;
+          diasComFalta.add(dataISO);
+          const tipo = registro?.tipoFalta || 'Falta Injustificada';
+          if (tipo === 'Falta Justificada') faltasJust += 1;
+          else if (tipo === 'Falta Injustificada') faltasInjust += 1;
+          else if (tipo === 'Ferias') {
+            feriasOcorrencias += 1;
+            feriasColaboradores.add(String(id));
+          }
+        });
+      });
+    }
 
     const diasUteis = Math.max(diasNoMes - diasDesconsideradosNoMes, 0);
     const totalPossivel = totalColab * diasUteis;
@@ -4289,11 +4340,19 @@ export default function App() {
       faltasJust,
       faltasInjust,
       feriasOcorrencias,
-      feriasColaboradores: feriasColaboradores.size,
+      feriasColaboradores: usarResumoPlanilha ? 0 : feriasColaboradores.size,
       diasComFalta: diasComFalta.size,
       percentualPresenca,
     };
-  }, [colaboradores, filtroSupervisor, filtroSetor, registrosPorData, mesHistorico, anoHistorico]);
+  }, [
+    colaboradores,
+    filtroSupervisor,
+    filtroSetor,
+    registrosPorData,
+    mesHistorico,
+    anoHistorico,
+    faltasResumoPlanilha,
+  ]);
 
   const abrirModalLancamento = (colab) => {
     const registro = registrosPorData[dataLancamento]?.[colab.id];
@@ -4473,6 +4532,18 @@ export default function App() {
   const obterResumoDia = (dataISO) => {
     if (isDiaDesconsiderado(dataISO)) return { total: 0, tipos: {} };
     if (isDataSemApontamento(dataISO)) return { total: 0, tipos: {} };
+    if (
+      filtroSupervisor === 'Todos' &&
+      filtroSetor === 'Todos' &&
+      faltasResumoPlanilha?.[dataISO]
+    ) {
+      const resumoPlanilha = faltasResumoPlanilha[dataISO];
+      return {
+        total: Number(resumoPlanilha?.total || 0),
+        tipos: resumoPlanilha?.tipos || {},
+        fonte: 'excel',
+      };
+    }
     if (
       resumoLeandroExcel?.meses &&
       filtroSupervisor === 'Leandro Souza' &&
@@ -11010,6 +11081,7 @@ const custoDetalheTitulo = custoDetalheItem
                    isDiaDesconsiderado={isDiaDesconsiderado}
                    resumoHistorico={resumoHistorico}
                    resumoLeandroExcel={resumoLeandroExcel}
+                   faltasPlanilhaPorData={faltasRegistrosPlanilha}
                  />
             </div>
           )}
