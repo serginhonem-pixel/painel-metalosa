@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, Clock, LayoutDashboard, Wrench, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, LayoutDashboard, Pause, Play, Settings, Shield, Users, Wrench, XCircle, Zap } from 'lucide-react';
 
 const formatarTempoCronometro = (segundos) => {
   const total = Math.max(Math.round(segundos || 0), 0);
@@ -551,18 +551,27 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
   const cards = listaRotativa.itens.length ? listaRotativa.itens : [];
   const placeholders = Math.max(0, 4 - cards.length);
 
+  const tabs = [
+    { idx: 0, label: 'Paradas', icon: Pause, count: totalPorTipo.paradas, color: 'red' },
+    { idx: 1, label: 'Andamento', icon: Play, count: totalPorTipo.andamento, color: 'blue' },
+    { idx: 2, label: 'Liberadas', icon: CheckCircle2, count: totalPorTipo.liberadas, color: 'emerald' },
+  ];
+
+  const disponiveis = equipeStatus.filter((c) => c.tone === 'emerald').length;
+  const ocupados = equipeStatus.length - disponiveis;
+
   return (
     <div className="relative h-full w-full overflow-hidden text-white" style={{ fontFamily: "'Inter', ui-sans-serif, system-ui" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
-        .font-mono {
-          font-family: 'JetBrains Mono', ui-monospace, monospace;
-        }
-        .card-shadow {
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
+        .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+        .card-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04); }
+        .card-glow-red { box-shadow: 0 0 40px rgba(239,68,68,0.12), 0 4px 24px rgba(0,0,0,0.35); }
+        .card-glow-blue { box-shadow: 0 0 40px rgba(59,130,246,0.12), 0 4px 24px rgba(0,0,0,0.35); }
+        .card-glow-emerald { box-shadow: 0 0 40px rgba(16,185,129,0.12), 0 4px 24px rgba(0,0,0,0.35); }
+
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-10px); }
@@ -582,331 +591,514 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
           to { width: 0%; }
         }
         @keyframes glowPulse {
-          0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0); }
-          50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
-          100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0); }
+          0% { box-shadow: 0 0 5px rgba(239,68,68,0); }
+          50% { box-shadow: 0 0 30px rgba(239,68,68,0.4); }
+          100% { box-shadow: 0 0 5px rgba(239,68,68,0); }
+        }
+        @keyframes breathe {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes scanline {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
         }
         .notification-in {
-          animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+          animation: slideIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards,
                      shake 0.4s ease-in-out 0.5s,
                      glowPulse 2s infinite ease-in-out;
         }
-        .notification-out {
-          animation: slideOut 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        .progress-bar-fill {
-          animation: progress 8s linear forwards;
-        }
+        .notification-out { animation: slideOut 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+        .progress-bar-fill { animation: progress 8s linear forwards; }
         .glass {
-          background: rgba(24, 24, 27, 0.9);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          background: rgba(15,17,23,0.92);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+        }
+        .glass-card {
+          background: linear-gradient(135deg, rgba(30,32,44,0.7) 0%, rgba(20,22,30,0.9) 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+        }
+        .animate-breathe { animation: breathe 3s ease-in-out infinite; }
+        .animate-fade-up { animation: fadeSlideUp 0.5s ease-out both; }
+        .tab-active { background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%); }
+        .gradient-bg {
+          background: linear-gradient(-45deg, #0f1117, #151822, #111827, #0c0f15);
+          background-size: 400% 400%;
+          animation: gradientShift 15s ease infinite;
         }
       `}</style>
 
+      {/* ──── TELA DE INÍCIO ──── */}
       {!systemStarted && (
         <button
           type="button"
           onClick={startSystem}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#0f1117]/95"
+          className="absolute inset-0 z-50 flex flex-col items-center justify-center gradient-bg"
         >
-          <div className="mb-6 rounded-2xl bg-white/5 px-6 py-4 border border-white/10 shadow-2xl">
-            {logoSrc ? (
-              <img src={logoSrc} alt="Metalosa" className="h-12 w-auto object-contain" />
-            ) : (
-              <LayoutDashboard size={48} className="text-white" />
-            )}
+          {/* Scanline decorativo */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
+            <div className="w-full h-px bg-white" style={{ animation: 'scanline 4s linear infinite' }} />
           </div>
-          <h2 className="text-2xl font-black tracking-tight mb-2">METALOSA</h2>
-          <p className="text-zinc-400 font-bold uppercase tracking-widest animate-bounce">
-            Clique para iniciar monitorização
-          </p>
+          {/* Grade decorativa sutil */}
+          <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+
+          <div className="relative mb-8">
+            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-blue-500/20 via-transparent to-emerald-500/20 blur-xl opacity-60" />
+            <div className="relative rounded-2xl bg-white/[0.06] px-8 py-5 border border-white/10 shadow-2xl backdrop-blur-sm">
+              {logoSrc ? (
+                <img src={logoSrc} alt="Metalosa" className="h-14 w-auto object-contain" />
+              ) : (
+                <Shield size={52} className="text-white/80" />
+              )}
+            </div>
+          </div>
+          <h2 className="text-3xl font-black tracking-[-0.02em] mb-1 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            GESTÃO DE MANUTENÇÃO
+          </h2>
+          <p className="text-zinc-500 text-sm font-medium mb-8">Monitoramento industrial em tempo real</p>
+          <div className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white/[0.06] border border-white/10 hover:bg-white/[0.1] transition-all duration-300 group">
+            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-sm font-bold text-zinc-300 uppercase tracking-widest group-hover:text-white transition-colors">
+              Iniciar monitorização
+            </span>
+          </div>
+          <div className="mt-10 flex gap-6 text-[10px] text-zinc-600 font-medium uppercase tracking-widest">
+            <span className="flex items-center gap-1.5"><Wrench size={12} /> Manutenção</span>
+            <span className="flex items-center gap-1.5"><Zap size={12} /> Tempo real</span>
+            <span className="flex items-center gap-1.5"><Users size={12} /> Equipe</span>
+          </div>
         </button>
       )}
 
-      <div className={`h-full w-full p-6 lg:p-7 flex flex-col gap-6 transition-opacity duration-700 ${systemStarted ? 'opacity-100' : 'opacity-20'}`}>
-        <main className="flex flex-1 gap-6 min-h-0 overflow-hidden">
-          <div className="flex-[1.8] flex flex-col min-h-0">
-            <div className="flex justify-between items-center mb-4 shrink-0">
-              <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">
-                {listaRotativa.titulo}
-              </h2>
-              <div className="px-3 py-1 bg-zinc-800 rounded text-xs font-bold text-zinc-400 border border-white/5">
-                DISPOSITIVOS: <span className="text-white">{listaRotativa.itens.length}</span>
+      {/* ──── PAINEL PRINCIPAL ──── */}
+      <div className={`h-full w-full flex flex-col transition-opacity duration-700 ${systemStarted ? 'opacity-100' : 'opacity-20'}`}>
+
+        {/* ── HEADER ── */}
+        <header className="shrink-0 flex items-center justify-between px-7 py-3 border-b border-white/[0.06] bg-[#0f1117]/80 backdrop-blur-md z-10">
+          <div className="flex items-center gap-4">
+            {logoSrc ? (
+              <img src={logoSrc} alt="Logo" className="h-8 w-auto object-contain opacity-80" />
+            ) : (
+              <Shield size={24} className="text-zinc-400" />
+            )}
+            <div className="h-5 w-px bg-white/10" />
+            <div>
+              <h1 className="text-sm font-bold tracking-tight text-white/90">Gestão de Manutenção</h1>
+              <p className="text-[10px] text-zinc-500 font-medium">Painel de monitoramento industrial</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-5">
+            {/* Status badges */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/20">
+                <Pause size={11} className="text-red-400" />
+                <span className="text-[11px] font-bold text-red-400">{totalPorTipo.paradas}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <Play size={11} className="text-blue-400" />
+                <span className="text-[11px] font-bold text-blue-400">{totalPorTipo.andamento}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <CheckCircle2 size={11} className="text-emerald-400" />
+                <span className="text-[11px] font-bold text-emerald-400">{totalPorTipo.liberadas}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 auto-rows-[220px] flex-1 min-h-0">
-              {cards.map((os) => {
+            <div className="h-5 w-px bg-white/10" />
+
+            {/* Relógio */}
+            <div className="text-right">
+              <p className="text-lg font-bold font-mono tabular-nums text-white/90 leading-none">
+                {clockNow.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </p>
+              <p className="text-[10px] text-zinc-500 font-medium mt-0.5">
+                {clockNow.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
+              </p>
+            </div>
+
+            {/* Status do sistema */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Online</span>
+            </div>
+          </div>
+        </header>
+
+        {/* ── CONTEÚDO ── */}
+        <main className="flex flex-1 gap-5 min-h-0 overflow-hidden p-5">
+
+          {/* ─── COLUNA ESQUERDA ─── */}
+          <div className="flex-[1.8] flex flex-col min-h-0 gap-4">
+
+            {/* Tabs de navegação */}
+            <div className="flex items-center gap-2 shrink-0">
+              {tabs.map((tab) => {
+                const isActive = listaAtivaIndex === tab.idx;
+                const Icon = tab.icon;
+                const colorClasses = {
+                  red: isActive ? 'border-red-500/50 text-red-400 tab-active' : 'border-transparent text-zinc-500 hover:text-zinc-300',
+                  blue: isActive ? 'border-blue-500/50 text-blue-400 tab-active' : 'border-transparent text-zinc-500 hover:text-zinc-300',
+                  emerald: isActive ? 'border-emerald-500/50 text-emerald-400 tab-active' : 'border-transparent text-zinc-500 hover:text-zinc-300',
+                };
+                return (
+                  <button
+                    key={tab.idx}
+                    type="button"
+                    onClick={() => setListaAtivaIndex(tab.idx)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all duration-300 ${colorClasses[tab.color]}`}
+                  >
+                    <Icon size={13} />
+                    {tab.label}
+                    <span className={`ml-1 min-w-[20px] text-center px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+                      isActive
+                        ? tab.color === 'red' ? 'bg-red-500/20' : tab.color === 'blue' ? 'bg-blue-500/20' : 'bg-emerald-500/20'
+                        : 'bg-white/5'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+              <div className="flex-1" />
+              <div className="px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                exibindo {listaRotativa.itens.length} de {tabs[listaAtivaIndex].count}
+              </div>
+            </div>
+
+            {/* Grid de equipamentos */}
+            <div className="grid grid-cols-2 gap-4 flex-1 min-h-0" style={{ gridAutoRows: 'minmax(200px, 1fr)' }}>
+              {cards.map((os, cardIdx) => {
                 const prioridade = (os?.prioridade || '').toLowerCase();
                 const tipo = (os?.tipo || '').toLowerCase();
                 const isCritico = prioridade.includes('crit') || prioridade.includes('alta');
                 const isPreventiva = tipo.includes('preventiva');
-                const badge = isPreventiva ? 'PREVENTIVA' : isCritico ? 'CRITICO' : 'CORRETIVA';
+                const badge = isPreventiva ? 'PREVENTIVA' : isCritico ? 'CRÍTICO' : 'CORRETIVA';
                 const isLiberada = listaRotativa.tipo === 'liberadas';
                 const isAndamento = listaRotativa.tipo === 'andamento';
-                const badgeClass = isLiberada
-                  ? 'bg-emerald-500'
+
+                const palette = isLiberada
+                  ? { accent: 'emerald', badge: 'bg-emerald-500', glow: 'card-glow-emerald', border: 'border-emerald-500/30', timerColor: 'text-emerald-400', bg: 'from-emerald-500/[0.06] to-transparent', dot: 'bg-emerald-400', stripBg: 'bg-emerald-500' }
                   : isAndamento
-                    ? 'bg-blue-500'
+                    ? { accent: 'blue', badge: 'bg-blue-500', glow: 'card-glow-blue', border: 'border-blue-500/30', timerColor: 'text-blue-400', bg: 'from-blue-500/[0.06] to-transparent', dot: 'bg-blue-400', stripBg: 'bg-blue-500' }
                     : isPreventiva
-                      ? 'bg-amber-500'
-                      : 'bg-red-500';
-                const borderClass = isLiberada
-                  ? 'border-emerald-500/40 bg-emerald-500/5'
-                  : isAndamento
-                    ? 'border-blue-500/40 bg-blue-500/5'
-                    : isPreventiva
-                      ? 'border-amber-500/40 bg-amber-500/5'
-                      : 'border-red-500/40 bg-red-500/5';
+                      ? { accent: 'amber', badge: 'bg-amber-500', glow: '', border: 'border-amber-500/30', timerColor: 'text-amber-400', bg: 'from-amber-500/[0.06] to-transparent', dot: 'bg-amber-500', stripBg: 'bg-amber-500' }
+                      : { accent: 'red', badge: 'bg-red-500', glow: isCritico ? 'card-glow-red' : '', border: 'border-red-500/30', timerColor: 'text-red-400', bg: 'from-red-500/[0.06] to-transparent', dot: 'bg-red-500', stripBg: 'bg-red-500' };
+
                 const tempo = isLiberada
                   ? formatarTempoCronometro(getFinalizadaMin(os, agora) * 60)
                   : formatarTempoCronometro(getParadaAtivaSeconds(os, clockNow));
+
                 return (
                   <div
                     key={os.id}
-                    className={`flex flex-col border rounded-2xl p-5 card-shadow ${borderClass} h-[220px] justify-between`}
+                    className={`glass-card relative flex flex-col border rounded-2xl overflow-hidden ${palette.border} ${palette.glow} animate-fade-up`}
+                    style={{ animationDelay: `${cardIdx * 80}ms` }}
                   >
-                    <div className="flex justify-between items-start">
-                      <span className={`text-[11px] font-black px-2 py-0.5 rounded text-white uppercase ${badgeClass}`}>{badge}</span>
-                      <span className={`text-4xl font-bold font-mono tabular-nums leading-none ${isLiberada ? 'text-emerald-400' : isAndamento ? 'text-blue-400' : isPreventiva ? 'text-amber-500' : 'text-red-500'}`}>
-                        {tempo}
-                      </span>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-[13px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Maquina</p>
-                      <h3 className="text-3xl font-extrabold text-white leading-tight mb-1 truncate">
-                        {os?.ativo || os?.processo || os?.setor || 'Equipamento'}
-                      </h3>
-                      <p className="text-[13px] uppercase tracking-widest text-zinc-500 font-bold mt-2">Responsavel</p>
-                      <p className="text-base text-zinc-100 font-semibold truncate">
-                        {formatarResponsavel(os?.responsavel || os?.solicitante)}
-                      </p>
-                      <p className="text-zinc-300 text-base italic flex items-center gap-2 mt-2">
-                        <span className={`w-1.5 h-1.5 rounded-full ${isLiberada ? 'bg-emerald-400' : isAndamento ? 'bg-blue-400' : isPreventiva ? 'bg-amber-500' : 'bg-red-500'} ${isLiberada ? '' : 'animate-pulse'}`}></span>
-                        {os?.sintoma || os?.descricao || os?.acaoImediata || 'Sem detalhes'}
-                      </p>
+                    {/* Faixa lateral colorida */}
+                    <div className={`absolute top-0 left-0 w-1 h-full ${palette.stripBg} rounded-l-2xl`} />
+                    {/* Gradiente sutil de fundo */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${palette.bg} pointer-events-none`} />
+
+                    <div className="relative flex flex-col justify-between p-5 h-full">
+                      {/* Topo: badge + timer */}
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md text-white uppercase tracking-wider ${palette.badge}`}>
+                            {badge}
+                          </span>
+                          {isCritico && !isLiberada && (
+                            <AlertTriangle size={14} className="text-red-400 animate-breathe" />
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-3xl font-bold font-mono tabular-nums leading-none ${palette.timerColor}`}>
+                            {tempo}
+                          </span>
+                          <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5 tracking-wider">
+                            {isLiberada ? 'Tempo total' : 'Tempo parado'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Corpo: máquina + info */}
+                      <div className="mt-3 flex-1 flex flex-col justify-end">
+                        <h3 className="text-2xl font-extrabold text-white leading-tight mb-1.5 truncate tracking-tight">
+                          {os?.ativo || os?.processo || os?.setor || 'Equipamento'}
+                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-md bg-white/[0.06] flex items-center justify-center">
+                              <Users size={10} className="text-zinc-400" />
+                            </div>
+                            <span className="text-sm text-zinc-200 font-semibold truncate">
+                              {formatarResponsavel(os?.responsavel || os?.solicitante)}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-zinc-400 text-xs flex items-center gap-2 leading-relaxed truncate">
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${palette.dot} ${isLiberada ? '' : 'animate-pulse'}`} />
+                          {os?.sintoma || os?.descricao || os?.acaoImediata || 'Sem detalhes'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 );
               })}
               {Array.from({ length: placeholders }).map((_, idx) => (
-                <div key={`placeholder-${idx}`} className="flex flex-col border border-white/5 rounded-2xl p-5 bg-zinc-900/40 h-[220px] justify-center text-zinc-500 text-xs">
-                  Nenhum equipamento nesta posicao.
+                <div key={`placeholder-${idx}`} className="glass-card flex flex-col border border-white/[0.04] rounded-2xl justify-center items-center text-zinc-600 text-xs">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.02] flex items-center justify-center mb-2">
+                    <Wrench size={18} className="text-zinc-700" />
+                  </div>
+                  Sem ocorrência
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 shrink-0 mt-4">
-              <div className="bg-zinc-900/40 border border-white/5 rounded-2xl p-7 flex items-center justify-between h-60">
-                <div>
-                  <p className="text-zinc-400 font-bold uppercase text-[14px] tracking-widest mb-1">OS abertas hoje</p>
-                  <span className="text-7xl font-black italic text-blue-300">
-                    {historico7Dias[historico7Dias.length - 1]?.abertas || 0}
-                  </span>
+            {/* Rodapé esquerdo: KPIs do dia + gráfico */}
+            <div className="shrink-0 flex gap-4">
+              {/* KPIs de hoje */}
+              <div className="flex flex-col gap-4 w-[260px] shrink-0">
+                <div className="glass-card border border-blue-500/15 rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 rounded-l-2xl" />
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <AlertTriangle size={22} className="text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-0.5">Abertas hoje</p>
+                    <span className="text-4xl font-black text-blue-300 leading-none">
+                      {historico7Dias[historico7Dias.length - 1]?.abertas || 0}
+                    </span>
+                  </div>
                 </div>
-                <div className="w-16 h-16 rounded-2xl bg-blue-600/10 flex items-center justify-center shrink-0">
-                  <LayoutDashboard size={32} className="text-blue-400" />
+                <div className="glass-card border border-emerald-500/15 rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 rounded-l-2xl" />
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={22} className="text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-0.5">Finalizadas hoje</p>
+                    <span className="text-4xl font-black text-emerald-300 leading-none">
+                      {historico7Dias[historico7Dias.length - 1]?.finalizadas || 0}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-zinc-900/40 border border-white/5 rounded-2xl p-7 flex items-center justify-between h-60">
-                <div>
-                  <p className="text-zinc-400 font-bold uppercase text-[14px] tracking-widest mb-1">OS finalizadas hoje</p>
-                  <span className="text-7xl font-black italic text-emerald-300">
-                    {historico7Dias[historico7Dias.length - 1]?.finalizadas || 0}
-                  </span>
+              {/* Gráfico 7 dias */}
+              <div className="glass-card border border-white/[0.04] rounded-2xl p-5 flex flex-col flex-1 min-w-0">
+                <div className="flex justify-between items-center mb-3 shrink-0">
+                  <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Histórico 7 dias</h3>
+                  <div className="flex gap-4 text-[9px] font-bold uppercase text-zinc-500">
+                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-blue-500" /> Abertas</span>
+                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-emerald-500" /> Finalizadas</span>
+                  </div>
                 </div>
-                <div className="w-16 h-16 rounded-2xl bg-emerald-600/10 flex items-center justify-center shrink-0">
-                  <LayoutDashboard size={32} className="text-emerald-300" />
+                <div className="flex items-end gap-2 flex-1 min-h-[100px]">
+                  {historico7Dias.map((dia) => {
+                    const maxValor = Math.max(1, ...historico7Dias.map((item) => Math.max(item.abertas, item.finalizadas)));
+                    const abertoH = Math.max((dia.abertas / maxValor) * 100, 4);
+                    const finalH = Math.max((dia.finalizadas / maxValor) * 100, 4);
+                    return (
+                      <div key={dia.key} className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-full flex items-end gap-1.5 flex-1">
+                          <div className="flex-1 flex flex-col items-center">
+                            {dia.abertas > 0 && (
+                              <span className="text-[9px] font-bold text-blue-400 mb-0.5">{dia.abertas}</span>
+                            )}
+                            <div
+                              className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-sm transition-all duration-500"
+                              style={{ height: `${abertoH}%`, minHeight: '4px' }}
+                            />
+                          </div>
+                          <div className="flex-1 flex flex-col items-center">
+                            {dia.finalizadas > 0 && (
+                              <span className="text-[9px] font-bold text-emerald-400 mb-0.5">{dia.finalizadas}</span>
+                            )}
+                            <div
+                              className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-sm transition-all duration-500"
+                              style={{ height: `${finalH}%`, minHeight: '4px' }}
+                            />
+                          </div>
+                        </div>
+                        <span className="text-[9px] text-zinc-600 font-bold uppercase">{dia.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── COLUNA DIREITA ─── */}
+          <div className="flex-[1.1] flex flex-col gap-4 shrink-0">
+
+            {/* KPI Principal */}
+            <div className={`relative overflow-hidden rounded-2xl p-6 card-shadow shrink-0 ${
+              kpiConfig.cor === 'emerald' ? 'card-glow-emerald' : kpiConfig.cor === 'blue' ? 'card-glow-blue' : 'card-glow-red'
+            }`} style={{ background: 'linear-gradient(135deg, rgba(30,32,44,0.8) 0%, rgba(15,17,23,0.95) 100%)' }}>
+              {/* Gradiente decorativo */}
+              <div className={`absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl pointer-events-none ${
+                kpiConfig.cor === 'emerald' ? 'bg-emerald-500/10' : kpiConfig.cor === 'blue' ? 'bg-blue-500/10' : 'bg-red-500/10'
+              }`} />
+              <div className={`absolute top-0 left-0 w-1 h-full rounded-l-2xl ${
+                kpiConfig.cor === 'emerald' ? 'bg-emerald-500' : kpiConfig.cor === 'blue' ? 'bg-blue-500' : 'bg-red-500'
+              }`} />
+              <div className="relative">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">{kpiConfig.titulo}</span>
+                  {kpiConfig.cor === 'emerald'
+                    ? <CheckCircle2 size={22} className="text-emerald-500" />
+                    : kpiConfig.cor === 'blue'
+                      ? <Play size={22} className="text-blue-500" />
+                      : <AlertTriangle size={22} className="text-red-500 animate-breathe" />
+                  }
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-6xl font-black leading-none tracking-tighter">
+                    {kpiConfig.total.toString().padStart(2, '0')}
+                  </span>
+                  <div>
+                    <span className="text-zinc-400 font-bold text-base uppercase leading-tight block">Equipamentos</span>
+                    <span className={`font-bold text-sm uppercase ${
+                      kpiConfig.cor === 'emerald' ? 'text-emerald-400' : kpiConfig.cor === 'blue' ? 'text-blue-400' : 'text-red-400'
+                    }`}>
+                      {kpiConfig.destaque}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 flex flex-col shrink-0 mt-4">
-              <div className="flex justify-between items-center mb-4 shrink-0">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Histórico de OS (7 dias)</h3>
-                <div className="flex gap-4 text-[10px] font-bold uppercase">
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Abertas</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Finalizadas</span>
+            {/* KPIs secundários */}
+            <div className="grid grid-cols-3 gap-3 shrink-0">
+              <div className="glass-card border border-white/[0.04] rounded-xl p-3.5 text-center">
+                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Pendentes</p>
+                <span className="text-2xl font-black text-white">{pendentes}</span>
+              </div>
+              <div className="glass-card border border-amber-500/15 rounded-xl p-3.5 text-center">
+                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-1">TMR médio</p>
+                <span className="text-lg font-bold font-mono text-amber-400">{formatarTempoCronometro(mediaReparo * 60)}</span>
+              </div>
+              <div className="glass-card border border-white/[0.04] rounded-xl p-3.5 text-center">
+                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Críticas</p>
+                <span className="text-2xl font-black text-red-400">{paradasCriticas}</span>
+              </div>
+            </div>
+
+            {/* Equipe de manutenção */}
+            <div className="glass-card border border-white/[0.04] rounded-2xl p-5 flex flex-col gap-3 flex-1 min-h-0 overflow-auto">
+              <div className="flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2">
+                  <Users size={14} className="text-zinc-400" />
+                  <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Equipe de manutenção</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />{disponiveis} livres
+                  </span>
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-blue-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />{ocupados} alocados
+                  </span>
                 </div>
               </div>
-              <div className="flex items-end gap-3 h-32">
-                {historico7Dias.map((dia) => {
-                  const maxValor = Math.max(
-                    1,
-                    ...historico7Dias.map((item) => Math.max(item.abertas, item.finalizadas))
-                  );
-                  const abertoH = (dia.abertas / maxValor) * 100;
-                  const finalH = (dia.finalizadas / maxValor) * 100;
+              <div className="grid grid-cols-2 gap-2.5">
+                {equipeStatus.map((colab) => {
+                  const toneColors = {
+                    emerald: { bg: 'bg-emerald-500/[0.06]', border: 'border-emerald-500/20', badge: 'bg-emerald-500/15 text-emerald-300', avatar: 'bg-emerald-500/20 text-emerald-300', dot: 'bg-emerald-400' },
+                    blue: { bg: 'bg-blue-500/[0.06]', border: 'border-blue-500/20', badge: 'bg-blue-500/15 text-blue-300', avatar: 'bg-blue-500/20 text-blue-300', dot: 'bg-blue-400' },
+                    amber: { bg: 'bg-amber-500/[0.06]', border: 'border-amber-500/20', badge: 'bg-amber-500/15 text-amber-300', avatar: 'bg-amber-500/20 text-amber-300', dot: 'bg-amber-400' },
+                    red: { bg: 'bg-red-500/[0.06]', border: 'border-red-500/20', badge: 'bg-red-500/15 text-red-300', avatar: 'bg-red-500/20 text-red-300', dot: 'bg-red-400' },
+                  };
+                  const tc = toneColors[colab.tone] || toneColors.emerald;
                   return (
-                    <div key={dia.key} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full flex items-end gap-2 h-32">
-                        <div className="flex-1 bg-blue-500/80 rounded-md" style={{ height: `${abertoH}%` }}></div>
-                        <div className="flex-1 bg-emerald-500/80 rounded-md" style={{ height: `${finalH}%` }}></div>
+                    <div key={colab.nome} className={`rounded-xl border ${tc.border} ${tc.bg} p-3 transition-all duration-300 hover:scale-[1.02]`}>
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-lg ${tc.avatar} flex items-center justify-center text-[10px] font-black uppercase shrink-0`}>
+                          {colab.nome.substring(0, 2)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-bold text-white truncate">{colab.nome}</p>
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${tc.dot} ${colab.tone !== 'emerald' ? 'animate-pulse' : ''}`} />
+                          </div>
+                          <p className="text-[10px] text-zinc-500 font-semibold">{colab.area}</p>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-zinc-500 font-bold uppercase -mt-1">{dia.label}</span>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${tc.badge}`}>
+                          {colab.status}
+                        </span>
+                        <span className="text-[10px] text-zinc-400 truncate max-w-[100px]" title={colab.maquina}>
+                          {colab.maquina}
+                        </span>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
           </div>
-
-          <div className="flex-[1.2] flex flex-col gap-6 shrink-0">
-            <div className="bg-zinc-900/80 border border-white/10 rounded-3xl p-6 card-shadow relative overflow-hidden flex flex-col justify-center shrink-0 h-[160px]">
-              <div
-                className={`absolute top-0 left-0 w-2 h-full ${
-                  kpiConfig.cor === 'emerald'
-                    ? 'bg-emerald-500'
-                    : kpiConfig.cor === 'blue'
-                      ? 'bg-blue-500'
-                      : 'bg-red-600'
-                }`}
-              ></div>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-zinc-500 font-bold uppercase text-xs tracking-widest">{kpiConfig.titulo}</span>
-                <AlertTriangle
-                  size={28}
-                  className={
-                    kpiConfig.cor === 'emerald'
-                      ? 'text-emerald-500'
-                      : kpiConfig.cor === 'blue'
-                        ? 'text-blue-500'
-                        : 'text-red-600'
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-7xl font-black leading-none tracking-tighter">
-                  {kpiConfig.total.toString().padStart(2, '0')}
-                </span>
-                <span className="text-zinc-400 font-bold text-lg uppercase leading-none">
-                  Equipamentos<br />
-                  <span
-                    className={
-                      kpiConfig.cor === 'emerald'
-                        ? 'text-emerald-400'
-                        : kpiConfig.cor === 'blue'
-                          ? 'text-blue-400'
-                          : 'text-red-500'
-                    }
-                  >
-                    {kpiConfig.destaque}
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 shrink-0">
-              <div className="bg-zinc-900/40 border border-white/5 rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-500 font-bold uppercase text-[9px] tracking-widest mb-1">Pendente</p>
-                  <span className="text-3xl font-bold italic">{pendentes}</span>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0">
-                  <LayoutDashboard size={20} className="text-blue-600" />
-                </div>
-              </div>
-
-              <div className="bg-zinc-900/40 border border-white/5 rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-500 font-bold uppercase text-[9px] tracking-widest mb-1">TMR médio</p>
-                  <span className="text-3xl font-bold italic text-amber-500">
-                    {formatarTempoCronometro(mediaReparo * 60)}
-                  </span>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center shrink-0">
-                  <Clock size={20} className="text-amber-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/5 bg-zinc-900/40 p-5 flex flex-col gap-4 shrink-0">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Equipe de manutencao</h3>
-                <span className="text-[10px] font-bold text-zinc-400">{equipeStatus.length} pessoas</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {equipeStatus.map((colab) => (
-                  <div key={colab.nome} className="rounded-xl border border-white/5 bg-zinc-950/40 p-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-base font-bold text-white truncate">{colab.nome}</p>
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
-                          colab.tone === 'emerald'
-                            ? 'bg-emerald-500/20 text-emerald-200'
-                            : colab.tone === 'blue'
-                              ? 'bg-blue-500/20 text-blue-200'
-                              : colab.tone === 'amber'
-                                ? 'bg-amber-500/20 text-amber-200'
-                                : 'bg-red-500/20 text-red-200'
-                        }`}
-                      >
-                        {colab.status}
-                      </span>
-                    </div>
-                    <p className="text-[11px] uppercase tracking-widest text-zinc-500 font-bold mt-2">{colab.area}</p>
-                    <p className="text-base text-zinc-300 mt-1 truncate">{colab.maquina}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </main>
+      </div>
 
-        <div className="fixed top-8 right-8 z-50 flex flex-col gap-4 pointer-events-none">
-          {notifications.map((notif) => {
-            const colors = {
-              red: { bg: 'bg-red-600', text: 'text-red-400', border: 'border-red-600/50', label: 'URGENTE' },
-              amber: { bg: 'bg-amber-600', text: 'text-amber-400', border: 'border-amber-600/50', label: 'AVISO' },
-              blue: { bg: 'bg-blue-600', text: 'text-blue-400', border: 'border-blue-600/50', label: 'INFO' },
-            };
-            const c = colors[notif.severity] || colors.red;
-            return (
-              <div
-                key={notif.id}
-                className={`${notif.closing ? 'notification-out' : 'notification-in'} glass border-2 ${c.border} p-6 rounded-2xl shadow-2xl w-[420px] pointer-events-auto relative overflow-hidden`}
-              >
-                <div className="absolute bottom-0 left-0 h-1.5 bg-white/10 w-full">
-                  <div className={`progress-bar-fill h-full ${c.bg}`}></div>
-                </div>
-                <div className="flex gap-5">
-                  <div className="shrink-0">
-                    <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center border border-white/20`}>
-                      <Wrench size={30} className="text-white" />
-                    </div>
+      {/* ──── NOTIFICAÇÕES ──── */}
+      <div className="fixed top-16 right-6 z-50 flex flex-col gap-3 pointer-events-none">
+        {notifications.map((notif) => {
+          const colors = {
+            red: { bg: 'bg-red-500', text: 'text-red-400', border: 'border-red-500/40', label: 'URGENTE', iconBg: 'bg-red-500/20' },
+            amber: { bg: 'bg-amber-500', text: 'text-amber-400', border: 'border-amber-500/40', label: 'AVISO', iconBg: 'bg-amber-500/20' },
+            blue: { bg: 'bg-blue-500', text: 'text-blue-400', border: 'border-blue-500/40', label: 'INFO', iconBg: 'bg-blue-500/20' },
+          };
+          const c = colors[notif.severity] || colors.red;
+          return (
+            <div
+              key={notif.id}
+              className={`${notif.closing ? 'notification-out' : 'notification-in'} glass border ${c.border} p-5 rounded-2xl shadow-2xl w-[380px] pointer-events-auto relative overflow-hidden`}
+            >
+              <div className="absolute bottom-0 left-0 h-1 bg-white/5 w-full">
+                <div className={`progress-bar-fill h-full ${c.bg}`} />
+              </div>
+              <div className="flex gap-4">
+                <div className="shrink-0">
+                  <div className={`w-11 h-11 rounded-xl ${c.iconBg} flex items-center justify-center border border-white/10`}>
+                    <Wrench size={20} className={c.text} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className={`text-[11px] font-black ${c.text} uppercase tracking-[0.2em]`}>{c.label}</span>
-                      <button
-                        type="button"
-                        onClick={() => closeNotification(notif.id)}
-                        className="text-zinc-500 hover:text-white"
-                      >
-                        <XCircle size={20} />
-                      </button>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className={`text-[10px] font-black ${c.text} uppercase tracking-[0.15em]`}>{c.label}</span>
+                    <button type="button" onClick={() => closeNotification(notif.id)} className="text-zinc-500 hover:text-white transition-colors">
+                      <XCircle size={16} />
+                    </button>
+                  </div>
+                  <h4 className="text-white font-bold text-base mb-0.5 truncate">{notif.machine}</h4>
+                  <p className="text-zinc-400 text-xs font-medium mb-3">{notif.reason}</p>
+                  <div className="flex items-center gap-2.5 bg-white/[0.03] rounded-lg p-2 border border-white/5">
+                    <div className="w-6 h-6 rounded-md bg-zinc-700 flex items-center justify-center text-[8px] font-black text-white uppercase">
+                      {notif.tech.substring(0, 2)}
                     </div>
-                    <h4 className="text-white font-black text-xl mb-1 truncate">{notif.machine}</h4>
-                    <p className="text-zinc-300 text-sm font-semibold italic mb-4">{notif.reason}</p>
-                    <div className="flex items-center justify-between bg-zinc-800/50 rounded-xl p-3 border border-white/5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-black text-white uppercase">
-                          {notif.tech.substring(0, 2)}
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-zinc-500 font-bold leading-none mb-0.5 uppercase">Técnico</p>
-                          <span className="text-white text-xs font-bold uppercase">{notif.tech}</span>
-                        </div>
-                      </div>
+                    <div>
+                      <p className="text-[8px] text-zinc-500 font-bold leading-none mb-0.5 uppercase">Técnico</p>
+                      <span className="text-white text-[11px] font-bold">{notif.tech}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

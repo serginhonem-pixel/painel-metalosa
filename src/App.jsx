@@ -54,7 +54,8 @@ import {
   UserCog,
   Briefcase,
   Target,
-  ShoppingCart
+  ShoppingCart,
+  Zap
 } from 'lucide-react';
 
 // --- Constantes e Dados Iniciais ---
@@ -1008,7 +1009,7 @@ export default function App() {
     const payload = {
       ativo: novaOsForm.ativo,
       setor: novaOsForm.setor,
-      processo: novaOsForm.processo,
+      processo: novaOsForm.processo || '',
       prioridade: novaOsForm.prioridade,
       tipo: novaOsForm.tipo,
       categoria: novaOsForm.categoria,
@@ -1065,6 +1066,7 @@ export default function App() {
     setNovaOsForm({
       ativo: ordem.ativo || '',
       setor: ordem.setor || '',
+      processo: ordem.processo || '',
       prioridade: ordem.prioridade || 'Media',
       tipo: ordem.tipo || 'Corretiva',
       categoria: ordem.categoria || '',
@@ -1208,6 +1210,12 @@ export default function App() {
     'manutencao@metalosa.com.br',
     'pcp@metalosa.com.br',
     'wilson@metalosa.com.br',
+    'engenharia@metalosa.com.br',
+  ].includes(authUser?.email?.toLowerCase());
+  const canViewEquipeStatus = [
+    'pcp@metalosa.com.br',
+    'wilson@metalosa.com.br',
+    'engenharia@metalosa.com.br',
   ].includes(authUser?.email?.toLowerCase());
   const isPortfolioDisabled = true;
   const currentUserLabel = useMemo(() => {
@@ -1427,6 +1435,21 @@ export default function App() {
     );
   }, [filtroAtivoMobile, listaMaquinas]);
 
+  const manutencaoColaboradores = useMemo(() => {
+    return [
+      { nome: 'Judismar', setor: 'Manutencao - Mecanico' },
+      { nome: 'Marlon', setor: 'Manutencao - Mecanico' },
+      { nome: 'Alex', setor: 'Manutencao - Mecanico' },
+      { nome: 'Guilherme', setor: 'Manutencao - Mecanico' },
+      { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
+      { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
+      { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
+      { nome: 'Juliano', setor: 'Manutencao - Eletricista' },
+      { nome: 'Rogerio', setor: 'Manutencao - Eletricista' },
+      { nome: 'Matheus', setor: 'Manutencao - Eletricista' },
+    ];
+  }, []);
+
   const manutencaoOperadorListas = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
     const minhas = manutencaoOrdens.filter((os) =>
@@ -1472,13 +1495,71 @@ export default function App() {
     [manutencaoOrdens]
   );
 
+  const manutencaoEquipeEmAndamento = useMemo(() => {
+    const counts = new Map();
+    manutencaoOrdens
+      .filter((os) => os.status === 'Em andamento')
+      .forEach((os) => {
+        const responsavel = os.responsavel || 'Sem responsavel';
+        const atual = counts.get(responsavel) || {
+          responsavel,
+          total: 0,
+          ativos: [],
+        };
+        atual.total += 1;
+        const ativoRef = os.ativo || os.setor || os.id;
+        if (ativoRef && !atual.ativos.includes(ativoRef) && atual.ativos.length < 2) {
+          atual.ativos.push(ativoRef);
+        }
+        counts.set(responsavel, atual);
+      });
+    return Array.from(counts.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+  }, [manutencaoOrdens]);
+
+  const manutencaoStatusEquipe = useMemo(() => {
+    const emAndamentoPorResponsavel = new Map();
+    manutencaoOrdens
+      .filter((os) => os.status === 'Em andamento')
+      .forEach((os) => {
+        const chave = normalizarTexto(os.responsavel || '');
+        if (!chave) return;
+        const atual = emAndamentoPorResponsavel.get(chave) || {
+          total: 0,
+          ativos: [],
+        };
+        atual.total += 1;
+        const ativoRef = os.ativo || os.setor || os.id;
+        if (ativoRef && !atual.ativos.includes(ativoRef) && atual.ativos.length < 2) {
+          atual.ativos.push(ativoRef);
+        }
+        emAndamentoPorResponsavel.set(chave, atual);
+      });
+
+    return manutencaoColaboradores
+      .map((colab) => {
+        const nome = colab.nome || 'Sem nome';
+        const carga = emAndamentoPorResponsavel.get(normalizarTexto(nome));
+        return {
+          nome,
+          setor: colab.setor || 'Manutencao',
+          ocupado: Boolean(carga?.total),
+          total: carga?.total || 0,
+          ativos: carga?.ativos || [],
+        };
+      })
+      .sort((a, b) => {
+        if (a.ocupado !== b.ocupado) return a.ocupado ? -1 : 1;
+        return a.nome.localeCompare(b.nome);
+      });
+  }, [manutencaoOrdens, manutencaoColaboradores]);
+
   const backlogPorLider = useMemo(() => {
-    const abertas = manutencaoOrdens.filter(
-      (os) => os.status !== 'Finalizada' && os.status !== 'Cancelada'
-    );
+    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
     const counts = new Map();
     abertas.forEach((os) => {
-      const lider = os.responsavel || 'Sem responsavel';
+      const lider = os.solicitante || os.createdByName || 'Sem lider';
       counts.set(lider, (counts.get(lider) || 0) + 1);
     });
     return Array.from(counts.entries())
@@ -2863,20 +2944,6 @@ export default function App() {
     () => (funcionariosFirestore.length ? funcionariosFirestore : funcionariosBase),
     [funcionariosFirestore]
   );
-  const manutencaoColaboradores = useMemo(() => {
-    return [
-      { nome: 'Judismar', setor: 'Manutencao - Mecanico' },
-      { nome: 'Marlon', setor: 'Manutencao - Mecanico' },
-      { nome: 'Alex', setor: 'Manutencao - Mecanico' },
-      { nome: 'Guilherme', setor: 'Manutencao - Mecanico' },
-      { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
-      { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
-      { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
-      { nome: 'Juliano', setor: 'Manutencao - Eletricista' },
-      { nome: 'Rogerio', setor: 'Manutencao - Eletricista' },
-      { nome: 'Matheus', setor: 'Manutencao - Eletricista' },
-    ];
-  }, []);
   const legacyIdMap = useMemo(() => {
     const map = new Map();
     colaboradores.forEach((colab) => {
@@ -8890,19 +8957,25 @@ const custoDetalheTitulo = custoDetalheItem
                       <span className="text-[10px] uppercase tracking-[0.4em] text-emerald-200 font-bold">Live KPI</span>
                     </div>
                     <h2 className="text-5xl font-black text-white tracking-tight">Dashboard TV</h2>
-                    <p className="text-lg text-slate-300 mt-1 font-medium">
-                      Faturamento atualizado em{' '}
-                      {faturamentoArquivoEm
-                        ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}{' '}
-                      {faturamentoArquivoEm ? '' : `- ${agora.toLocaleDateString('pt-BR')}`}
-                    </p>
+                    {dashboardView === 'manutencao' ? (
+                      <p className="text-lg text-slate-300 mt-1 font-medium">
+                        Manutenção · Monitoramento em tempo real
+                      </p>
+                    ) : (
+                      <p className="text-lg text-slate-300 mt-1 font-medium">
+                        Faturamento atualizado em{' '}
+                        {faturamentoArquivoEm
+                          ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}{' '}
+                        {faturamentoArquivoEm ? '' : `- ${agora.toLocaleDateString('pt-BR')}`}
+                      </p>
+                    )}
                     <div className="mt-3 flex flex-wrap items-center gap-2 opacity-80">
                       <button
                         type="button"
@@ -8951,14 +9024,18 @@ const custoDetalheTitulo = custoDetalheItem
                           {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </p>
                       </div>
-                      <div className="h-[58px] rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 min-w-[170px] flex flex-col justify-center">
-                        <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">Total geral</p>
-                        <p className="text-4xl font-black text-blue-200 leading-none mt-0.5">{formatarMoeda(faturamentoAtual.total || 0)}</p>
-                      </div>
-                      <div className="h-[58px] rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 min-w-[170px] flex flex-col justify-center">
-                        <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">Faturamento hoje</p>
-                        <p className="text-4xl font-black text-emerald-300 leading-none mt-0.5">{formatarMoeda(faturamentoHojeTodasFiliais)}</p>
-                      </div>
+                      {dashboardView !== 'manutencao' && (
+                        <>
+                          <div className="h-[58px] rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 min-w-[170px] flex flex-col justify-center">
+                            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">Total geral</p>
+                            <p className="text-4xl font-black text-blue-200 leading-none mt-0.5">{formatarMoeda(faturamentoAtual.total || 0)}</p>
+                          </div>
+                          <div className="h-[58px] rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 min-w-[170px] flex flex-col justify-center">
+                            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">Faturamento hoje</p>
+                            <p className="text-4xl font-black text-emerald-300 leading-none mt-0.5">{formatarMoeda(faturamentoHojeTodasFiliais)}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -11090,82 +11167,111 @@ const custoDetalheTitulo = custoDetalheItem
           
           {/* ABA DE MANUTENCAO */}
           {abaAtiva === 'manutencao' && (
-             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
-                <div className="pointer-events-none absolute -top-20 -right-10 h-56 w-56 rounded-full bg-blue-500/15 blur-3xl"></div>
-                <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
-                <div className="relative space-y-6 animate-in slide-in-from-top duration-500">
-                  <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900/80 to-slate-950 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-2xl border border-amber-400/40 bg-amber-400/10 flex items-center justify-center">
-                            <Wrench size={22} className="text-amber-300" />
+             <div className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-gradient-to-br from-slate-950/90 via-slate-900/70 to-slate-950/90 p-0 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
+                {/* Decorative blurs */}
+                <div className="pointer-events-none absolute -top-32 -right-20 h-72 w-72 rounded-full bg-amber-500/[0.07] blur-[80px]"></div>
+                <div className="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-blue-500/[0.06] blur-[80px]"></div>
+                <div className="pointer-events-none absolute top-1/2 right-1/4 h-48 w-48 rounded-full bg-emerald-500/[0.04] blur-[60px]"></div>
+                
+                <div className="relative animate-in slide-in-from-top duration-500">
+                  
+                  {/* ── HEADER PRINCIPAL ── */}
+                  <div className="relative border-b border-slate-800/60 bg-gradient-to-r from-slate-900/80 via-slate-900/60 to-slate-950/80 px-8 py-7">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="space-y-4 flex-1">
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-amber-400/30 to-orange-500/20 blur-md"></div>
+                            <div className="relative h-14 w-14 rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/15 to-amber-500/5 flex items-center justify-center shadow-lg">
+                              <Wrench size={24} className="text-amber-300" />
+                            </div>
                           </div>
                           <div>
-                            <p className="text-[10px] uppercase tracking-[0.35em] text-amber-200/70">Central de manutencao</p>
-                            <h2 className="text-2xl font-black text-white">Abertura de OS para producao</h2>
+                            <p className="text-[10px] uppercase tracking-[0.35em] text-amber-300/60 font-semibold">Central de manutenção</p>
+                            <h2 className="text-2xl font-black text-white tracking-tight">Abertura de OS para produção</h2>
                           </div>
                         </div>
-                        <p className="text-sm text-slate-300 max-w-2xl">
-                          Registre as ocorrencias da producao com dados completos. Uma boa abertura acelera o atendimento e reduz paradas.
+                        <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+                          Registre as ocorrências da produção com dados completos. Uma boa abertura acelera o atendimento e reduz paradas.
                         </p>
                         {isManutencaoOnly && (
-                          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.3em] text-amber-200">
+                          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/[0.06] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-amber-200/80">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                             Perfil de abertura
                           </div>
                         )}
-                        <div className="flex flex-wrap gap-2">
+                        {/* KPIs inline */}
+                        <div className="flex flex-wrap gap-3 pt-1">
                           {manutencaoKpis.map((kpi) => (
-                            <div key={kpi.id} className={`rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-2 text-xs font-bold ${kpi.tone}`}>
-                              <span className="text-[10px] uppercase tracking-[0.25em] text-slate-300">{kpi.label}</span>
-                              <div className="mt-1 text-lg font-black text-white">{kpi.value}</div>
+                            <div key={kpi.id} className="group rounded-xl border border-slate-700/50 bg-slate-900/50 hover:bg-slate-800/50 px-4 py-2.5 text-xs font-bold transition-all duration-200 hover:border-slate-600/60">
+                              <span className="text-[9px] uppercase tracking-[0.2em] text-slate-500 group-hover:text-slate-400 transition-colors">{kpi.label}</span>
+                              <div className={`mt-1 text-lg font-black text-white ${kpi.tone}`}>{kpi.value}</div>
                             </div>
                           ))}
                         </div>
                       </div>
-                      <div className="w-full lg:w-[320px] rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-4">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Checklist de abertura</p>
-                          <ul className="mt-3 space-y-2 text-xs text-slate-300">
-                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Ativo e setor corretos</li>
-                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Prioridade real</li>
-                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Descricao objetiva</li>
-                            <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-amber-300"></span>Foto se necessario</li>
-                          </ul>
+                      
+                      {/* Painel lateral: Checklist + Botão */}
+                      <div className="w-full lg:w-[300px] shrink-0">
+                        <div className="rounded-2xl border border-slate-700/40 bg-slate-900/40 backdrop-blur-sm p-5 space-y-4">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold flex items-center gap-1.5">
+                              <span className="w-1 h-1 rounded-full bg-amber-400"></span>
+                              Checklist de abertura
+                            </p>
+                            <ul className="mt-3 space-y-2.5 text-xs text-slate-400">
+                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Ativo e setor corretos</li>
+                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Prioridade real</li>
+                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Descrição objetiva</li>
+                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Foto se necessário</li>
+                            </ul>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setManutencaoEditId(null);
+                              setNovaOsForm(novaOsDefaults);
+                              setNovaOsFotoFile(null);
+                              setNovaOsFotoPreview('');
+                              setManutencaoSaveError('');
+                              setManutencaoModalOpen(true);
+                            }}
+                            data-tour="nova-os"
+                            className="w-full rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs font-black py-3 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2"
+                          >
+                            <Plus size={14} />
+                            Abrir nova OS
+                          </button>
                         </div>
-                        <button
-                          onClick={() => {
-                            setManutencaoEditId(null);
-                            setNovaOsForm(novaOsDefaults);
-                            setNovaOsFotoFile(null);
-                            setNovaOsFotoPreview('');
-                            setManutencaoSaveError('');
-                            setManutencaoModalOpen(true);
-                          }}
-                          data-tour="nova-os"
-                          className="w-full rounded-xl bg-amber-400 text-slate-950 text-xs font-black py-3 shadow-lg shadow-amber-400/30 hover:brightness-110"
-                        >
-                          Abrir nova OS
-                        </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800">
-                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Resumo</button>
-                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Ordens</button>
-                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Minhas</button>
-                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Agenda</button>
+                  {/* ── BARRA DE NAVEGAÇÃO ── */}
+                  <div className="flex flex-wrap items-center gap-3 px-8 py-4 border-b border-slate-800/40 bg-slate-950/30">
+                    <div className="flex bg-slate-900/60 p-1 rounded-xl border border-slate-800/60 backdrop-blur-sm">
+                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <LayoutDashboard size={13} />Resumo
+                      </button>
+                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <Layers size={13} />Ordens
+                      </button>
+                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <Users size={13} />Minhas
+                      </button>
+                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <CalendarIcon size={13} />Agenda
+                      </button>
                       {isManutencaoOperador && (
-                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md' : 'text-slate-400 hover:text-slate-200'}`}>Operador</button>
+                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                          <UserCog size={13} />Operador
+                        </button>
                       )}
                     </div>
                     <div className="ml-auto flex gap-2">
                       {!isManutencaoOnly && (
                         <button
                           onClick={handleExportarManutencaoPdf}
-                          className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                          className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
                         >
                           Exportar PDF
                         </button>
@@ -11173,7 +11279,7 @@ const custoDetalheTitulo = custoDetalheItem
                       {!isManutencaoOnly && (
                         <button
                           onClick={handleExportarManutencaoPpt}
-                          className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white"
+                          className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
                         >
                           Exportar PPT
                         </button>
@@ -11181,119 +11287,184 @@ const custoDetalheTitulo = custoDetalheItem
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="px-4 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-200 hover:border-slate-500 hover:text-white md:hidden"
+                        className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200 md:hidden"
                       >
                         Sair
                       </button>
                     </div>
                   </div>
 
+                  {/* ── CONTEÚDO DAS SUB-ABAS ── */}
+                  <div className="p-6 lg:p-8">
+
                 {subAbaManutencao === 'resumo' && (
                   <div className="space-y-6">
-                    <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/20 via-slate-900/60 to-slate-900/20 p-5 shadow-[0_12px_40px_-20px_rgba(251,191,36,0.35)]">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-200/80">Alerta operacional</p>
-                          <h3 className="mt-2 text-lg font-black text-white">
-                            {manutencaoParadas.length
-                              ? `${manutencaoParadas.length} processo(s) parado(s)`
-                              : 'Nenhuma parada registrada'}
-                          </h3>
-                          <p className="mt-1 text-xs text-slate-300">
-                            {manutencaoParadas.length
-                              ? 'Processos dependentes de manutencao.'
-                              : 'Sem processos parados no momento.'}
-                          </p>
-                          {manutencaoParadas.length ? (
-                            <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
-                              {manutencaoParadas.slice(0, 4).map((os) => (
-                                <span key={os.id} className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1">
-                                  {os.ativo || os.setor || os.id}
-                                </span>
-                              ))}
-                              {manutencaoParadas.length > 4 && (
-                                <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1">
-                                  +{manutencaoParadas.length - 4} mais
-                                </span>
-                              )}
-                            </div>
-                          ) : null}
+                    {/* Alerta Operacional */}
+                    <div className={`relative overflow-hidden rounded-2xl border p-6 shadow-lg ${manutencaoParadas.length ? 'border-amber-500/30 bg-gradient-to-r from-amber-500/[0.08] via-amber-500/[0.04] to-transparent' : 'border-emerald-500/20 bg-gradient-to-r from-emerald-500/[0.06] via-emerald-500/[0.03] to-transparent'}`}>
+                      <div className={`absolute top-0 left-0 w-1 h-full rounded-l-2xl ${manutencaoParadas.length ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
+                      <div className={`pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl ${manutencaoParadas.length ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`}></div>
+                      <div className="relative flex flex-wrap items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${manutencaoParadas.length ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'}`}>
+                            <AlertTriangle size={22} className={manutencaoParadas.length ? 'text-amber-400' : 'text-emerald-400'} />
+                          </div>
+                          <div>
+                            <p className={`text-[10px] font-bold uppercase tracking-[0.25em] ${manutencaoParadas.length ? 'text-amber-300/70' : 'text-emerald-300/70'}`}>Alerta operacional</p>
+                            <h3 className="mt-1.5 text-lg font-black text-white">
+                              {manutencaoParadas.length
+                                ? `${manutencaoParadas.length} processo(s) parado(s)`
+                                : 'Nenhuma parada registrada'}
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-400">
+                              {manutencaoParadas.length
+                                ? 'Processos dependentes de manutenção.'
+                                : 'Sem processos parados no momento.'}
+                            </p>
+                            {manutencaoParadas.length ? (
+                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
+                                {manutencaoParadas.slice(0, 4).map((os) => (
+                                  <span key={os.id} className="rounded-lg border border-amber-400/30 bg-amber-500/[0.08] px-3 py-1 font-semibold">
+                                    {os.ativo || os.setor || os.id}
+                                  </span>
+                                ))}
+                                {manutencaoParadas.length > 4 && (
+                                  <span className="rounded-lg border border-amber-400/30 bg-amber-500/[0.08] px-3 py-1 font-semibold">
+                                    +{manutencaoParadas.length - 4} mais
+                                  </span>
+                                )}
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-amber-500/30 px-3 py-1 text-xs font-bold text-amber-100">
-                            {manutencaoParadas.length ? 'Critico' : 'OK'}
+                          <span className={`rounded-lg px-3 py-1.5 text-xs font-bold ${manutencaoParadas.length ? 'bg-amber-500/15 text-amber-200 border border-amber-400/20' : 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20'}`}>
+                            {manutencaoParadas.length ? 'Crítico' : 'OK'}
                           </span>
                           <button
                             type="button"
                             onClick={() => setSubAbaManutencao('ordens')}
-                            className="rounded-full border border-amber-400/60 px-3 py-1 text-xs font-bold text-amber-100 hover:bg-amber-500/20"
+                            className="rounded-lg border border-slate-600/60 bg-slate-800/30 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-700/40 hover:border-slate-500 transition-all duration-200"
                           >
-                            Ver OS
+                            Ver OS →
                           </button>
                         </div>
                       </div>
                     </div>
+
+                    {/* KPIs */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       {manutencaoKpis.map((kpi) => (
-                        <div key={kpi.id} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{kpi.label}</p>
+                        <div key={kpi.id} className="group relative overflow-hidden rounded-2xl border border-slate-800/50 bg-gradient-to-br from-slate-900/70 to-slate-900/40 p-5 shadow-md hover:border-slate-700/60 transition-all duration-200">
+                          <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-slate-700/[0.06] blur-xl pointer-events-none group-hover:bg-slate-600/[0.1] transition-all"></div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{kpi.label}</p>
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-2xl font-black text-white">{kpi.value}</span>
-                            <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${kpi.tone}`}>Hoje</span>
+                            <span className="text-3xl font-black text-white">{kpi.value}</span>
+                            <span className={`text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-700/40 bg-slate-800/40 text-slate-300 ${kpi.tone}`}>Hoje</span>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Paradas em andamento</h3>
+                    {/* Grid principal: paradas, acoes, solicitacoes, backlog */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                      
+                      {/* Paradas em andamento */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/15 flex items-center justify-center">
+                            <AlertTriangle size={14} className="text-red-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Paradas</h3>
+                        </div>
                         {manutencaoParadas.length ? (
                           <div className="space-y-3">
                             {manutencaoParadas.map((item) => {
                               const prioridade = String(item.prioridade || 'Media').toLowerCase();
-                              const impactoTone =
-                                prioridade === 'alta'
-                                  ? 'border-rose-400/80 bg-rose-500/10 text-rose-200'
-                                  : prioridade === 'media'
-                                    ? 'border-amber-400/80 bg-amber-500/10 text-amber-200'
-                                    : 'border-emerald-400/80 bg-emerald-500/10 text-emerald-200';
+                              const toneMap = {
+                                alta: 'border-l-rose-500 bg-rose-500/[0.04]',
+                                critica: 'border-l-rose-500 bg-rose-500/[0.04]',
+                                media: 'border-l-amber-500 bg-amber-500/[0.04]',
+                              };
+                              const itemTone = toneMap[prioridade] || 'border-l-emerald-500 bg-emerald-500/[0.04]';
                               return (
-                                <div key={item.id} className={`flex items-center justify-between rounded-xl border border-slate-800 p-4 border-l-4 ${impactoTone}`}>
-                                  <div>
-                                    <p className="text-sm font-bold text-white">{item.ativo || item.setor || item.id}</p>
-                                    <p className="text-xs text-slate-400">
-                                      {item.statusMaquina || 'Parada'} - {item.descricao || 'Aguardando detalhes'}
-                                    </p>
-                                    {item.responsavel && (
-                                      <p className="mt-1 text-xs font-semibold text-emerald-300">
-                                        Em atendimento: {item.responsavel}
+                                <div key={item.id} className={`rounded-xl border border-slate-800/50 p-4 border-l-[3px] ${itemTone} hover:bg-slate-800/20 transition-all duration-200`}>
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-bold text-white truncate">{item.ativo || item.setor || item.id}</p>
+                                      <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                                        {item.statusMaquina || 'Parada'} — {item.descricao || 'Aguardando detalhes'}
                                       </p>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col items-end gap-2">
-                                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-900/80 text-slate-200">
-                                      {item.prioridade || 'Media'}
-                                    </span>
-                                    {item.responsavel && (
-                                      <span className="text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-emerald-200">
-                                        Em atendimento
+                                      {item.responsavel && (
+                                        <p className="mt-1.5 text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                                          <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
+                                          {item.responsavel}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-300 border border-slate-700/30">
+                                        {item.prioridade || 'Media'}
                                       </span>
-                                    )}
+                                      {item.responsavel && (
+                                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-emerald-400/30 bg-emerald-500/[0.08] text-emerald-300">
+                                          Atendendo
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               );
                             })}
                           </div>
                         ) : (
-                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                            Sem paradas registradas.
+                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
+                            Sem paradas registradas
                           </div>
                         )}
+                        <div className="mt-5 border-t border-slate-800/30 pt-4">
+                          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 flex items-center gap-1.5">
+                            <Users size={10} className="text-slate-500" />
+                            Equipe em atendimento
+                          </h4>
+                          {manutencaoEquipeEmAndamento.length ? (
+                            <div className="mt-3 space-y-2">
+                              {manutencaoEquipeEmAndamento.map((item) => (
+                                <div key={item.responsavel} className="rounded-lg border border-slate-800/30 bg-slate-900/30 px-3 py-2">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-[8px] font-black text-cyan-300">
+                                        {item.responsavel.substring(0, 2).toUpperCase()}
+                                      </div>
+                                      <span className="text-xs font-semibold text-slate-200">{item.responsavel}</span>
+                                    </div>
+                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-cyan-400/25 bg-cyan-500/[0.07] text-cyan-300">
+                                      {item.total} OS
+                                    </span>
+                                  </div>
+                                  {item.ativos.length ? (
+                                    <p className="mt-1.5 text-[10px] text-slate-500 truncate">
+                                      {item.ativos.join(' · ')}
+                                    </p>
+                                  ) : null}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-3 rounded-lg border border-slate-800/30 bg-slate-950/20 p-3 text-xs text-slate-500 text-center">
+                              Nenhum responsável alocado
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Acoes rapidas</h3>
+                      {/* Ações rápidas */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/15 flex items-center justify-center">
+                            <Zap size={14} className="text-amber-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ações rápidas</h3>
+                        </div>
                         <div className="grid grid-cols-1 gap-3">
                           <button
                             type="button"
@@ -11305,47 +11476,63 @@ const custoDetalheTitulo = custoDetalheItem
                               setManutencaoSaveError('');
                               setManutencaoModalOpen(true);
                             }}
-                            className="w-full rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-left text-xs font-bold text-amber-100 hover:bg-amber-400/20"
+                            className="w-full rounded-xl border border-amber-400/30 bg-gradient-to-r from-amber-400/[0.08] to-transparent px-4 py-3.5 text-left text-xs font-bold text-amber-100 hover:bg-amber-400/15 hover:border-amber-400/40 transition-all duration-200 flex items-center gap-3"
                           >
+                            <div className="w-8 h-8 rounded-lg bg-amber-400/15 flex items-center justify-center shrink-0">
+                              <Plus size={14} className="text-amber-300" />
+                            </div>
                             Abrir nova OS
                           </button>
                           <button
                             type="button"
                             onClick={() => setSubAbaManutencao('minhas')}
-                            className="w-full rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 text-left text-xs font-bold text-slate-200 hover:border-slate-500"
+                            className="w-full rounded-xl border border-slate-700/40 bg-slate-800/20 px-4 py-3.5 text-left text-xs font-bold text-slate-200 hover:border-slate-600 hover:bg-slate-800/40 transition-all duration-200 flex items-center gap-3"
                           >
-                            Ver minhas solicitacoes
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                              <Users size={14} className="text-blue-400" />
+                            </div>
+                            Ver minhas solicitações
                           </button>
                           <button
                             type="button"
                             onClick={() => setSubAbaManutencao('ordens')}
-                            className="w-full rounded-xl border border-slate-700 bg-slate-950/40 px-4 py-3 text-left text-xs font-bold text-slate-200 hover:border-slate-500"
+                            className="w-full rounded-xl border border-slate-700/40 bg-slate-800/20 px-4 py-3.5 text-left text-xs font-bold text-slate-200 hover:border-slate-600 hover:bg-slate-800/40 transition-all duration-200 flex items-center gap-3"
                           >
+                            <div className="w-8 h-8 rounded-lg bg-slate-600/20 flex items-center justify-center shrink-0">
+                              <Layers size={14} className="text-slate-400" />
+                            </div>
                             Ver ordens abertas
                           </button>
                         </div>
                       </div>
-                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                      
+                      {/* Minhas solicitações */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitacoes</h3>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
+                              <Users size={14} className="text-blue-400" />
+                            </div>
+                            <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas</h3>
+                          </div>
                           <button
                             type="button"
                             onClick={() => setSubAbaManutencao('minhas')}
-                            className="text-[10px] font-bold text-blue-300 hover:text-blue-200"
+                            className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors"
                           >
-                            Ver todas
+                            Ver todas →
                           </button>
                         </div>
                         {minhasSolicitacoes.length ? (
-                          <div className="space-y-3">
+                          <div className="space-y-2.5">
                             {minhasSolicitacoes.slice(0, 4).map((os) => (
-                              <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                              <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-3 hover:bg-slate-800/30 transition-all duration-200">
                                 <div className="flex items-center justify-between gap-3">
-                                  <div>
-                                    <p className="text-xs font-bold text-slate-100">{os.ativo || os.id}</p>
-                                    <p className="text-[10px] text-slate-400">{os.setor || '-'}</p>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-bold text-slate-100 truncate">{os.ativo || os.id}</p>
+                                    <p className="text-[10px] text-slate-500">{os.setor || '-'}</p>
                                   </div>
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-500/[0.12] text-blue-300 border border-blue-400/20 shrink-0">
                                     {os.status || 'Aberta'}
                                   </span>
                                 </div>
@@ -11353,20 +11540,32 @@ const custoDetalheTitulo = custoDetalheItem
                             ))}
                           </div>
                         ) : (
-                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                            Nenhuma solicitacao registrada.
+                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
+                            Nenhuma solicitação
                           </div>
                         )}
                       </div>
-                      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Backlog por lider</h3>
+                      
+                      {/* Backlog por líder */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/15 flex items-center justify-center">
+                            <Target size={14} className="text-purple-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Backlog</h3>
+                        </div>
                         {backlogPorLider.length ? (
-                          <div className="space-y-3">
+                          <div className="space-y-2.5">
                             {backlogPorLider.map((item) => (
-                              <div key={item.lider} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                              <div key={item.lider} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-3 hover:bg-slate-800/30 transition-all duration-200">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-xs font-semibold text-slate-200">{item.lider}</span>
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-md bg-slate-700/40 flex items-center justify-center text-[8px] font-black text-slate-300">
+                                      {item.lider.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <span className="text-xs font-semibold text-slate-200">{item.lider}</span>
+                                  </div>
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-slate-800/50 text-slate-300 border border-slate-700/30">
                                     {item.total} OS
                                   </span>
                                 </div>
@@ -11374,8 +11573,8 @@ const custoDetalheTitulo = custoDetalheItem
                             ))}
                           </div>
                         ) : (
-                          <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                            Sem dados de backlog.
+                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
+                            Sem dados de backlog
                           </div>
                         )}
                       </div>
@@ -11384,95 +11583,128 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {subAbaManutencao === 'ordens' && (
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)] overflow-hidden">
-                    <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
+                  <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
+                    <div className="p-5 border-b border-slate-800/40 flex items-center justify-between bg-slate-900/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
+                          <Layers size={14} className="text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
+                          <p className="text-[10px] text-slate-500 mt-0.5">Todas as ordens de serviço registradas</p>
+                        </div>
                         {canDeleteOs && manutencaoOrdens.length > 0 && (
                           <button
                             type="button"
                             onClick={handleExcluirTodasOs}
-                            className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold hover:bg-rose-500/40 transition-colors"
+                            className="ml-4 px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 text-[10px] font-bold hover:bg-rose-500/20 border border-rose-500/20 hover:border-rose-500/30 transition-all duration-200"
                           >
                             Excluir Todas ({manutencaoOrdens.length})
                           </button>
                         )}
                       </div>
                       <div className="flex gap-2 text-xs">
-                        <button className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 font-bold">Todas</button>
-                        <button className="px-3 py-1 rounded-full bg-blue-500/30 text-blue-200 font-bold">Abertas</button>
+                        <button className="px-3 py-1.5 rounded-lg bg-slate-800/50 text-slate-300 font-bold border border-slate-700/30 hover:border-slate-600 transition-all">Todas</button>
+                        <button className="px-3 py-1.5 rounded-lg bg-blue-500/[0.12] text-blue-300 font-bold border border-blue-400/20 hover:bg-blue-500/20 transition-all">Abertas</button>
                       </div>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-950/70 text-slate-400 uppercase text-[10px] tracking-wider">
+                        <thead className="bg-slate-950/50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-4 py-3">OS</th>
-                            <th className="px-4 py-3">Ativo</th>
-                            <th className="px-4 py-3">Setor</th>
-                            <th className="px-4 py-3">Prioridade</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3">Responsavel</th>
-                            <th className="px-4 py-3">Acoes</th>
+                            <th className="px-5 py-3.5 font-bold">OS</th>
+                            <th className="px-5 py-3.5 font-bold">Ativo</th>
+                            <th className="px-5 py-3.5 font-bold">Setor</th>
+                            <th className="px-5 py-3.5 font-bold">Prioridade</th>
+                            <th className="px-5 py-3.5 font-bold">Status</th>
+                            <th className="px-5 py-3.5 font-bold">Responsável</th>
+                            <th className="px-5 py-3.5 font-bold">Ações</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800 text-slate-200">
+                        <tbody className="divide-y divide-slate-800/30 text-slate-200">
                           {manutencaoOrdensLoading ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
-                                Carregando ordens...
+                              <td className="px-5 py-8 text-sm text-slate-500 text-center" colSpan={7}>
+                                <div className="flex items-center justify-center gap-2">
+                                  <div className="w-4 h-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin"></div>
+                                  Carregando ordens...
+                                </div>
                               </td>
                             </tr>
                           ) : manutencaoOrdensError ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={7}>
+                              <td className="px-5 py-6 text-sm text-rose-400" colSpan={7}>
                                 {manutencaoOrdensError}
                               </td>
                             </tr>
                           ) : manutencaoOrdens.length ? (
-                            manutencaoOrdens.map((ordem) => (
-                              <tr key={ordem.id} className="hover:bg-slate-900/60">
-                                <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
-                                <td className="px-4 py-3 text-slate-300">{ordem.ativo || '-'}</td>
-                                <td className="px-4 py-3 text-slate-400">{ordem.setor || '-'}</td>
-                                <td className="px-4 py-3">
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade || '-'}</span>
-                                </td>
-                                <td className="px-4 py-3">
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status || '-'}</span>
-                                </td>
-                                <td className="px-4 py-3 text-slate-300">{ordem.responsavel || '-'}</td>
-                                <td className="px-4 py-3">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleEditarOs(ordem)}
-                                    className="text-xs font-bold text-cyan-200 hover:text-white"
-                                  >
-                                    Editar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleImprimirOs(ordem)}
-                                    className="ml-3 text-xs font-bold text-slate-300 hover:text-white"
-                                  >
-                                    Imprimir
-                                  </button>
-                                  {canDeleteOs && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleExcluirOs(ordem)}
-                                      className="ml-3 text-xs font-bold text-rose-400 hover:text-rose-200"
-                                    >
-                                      Excluir
-                                    </button>
-                                  )}
-                                </td>
-                              </tr>
-                            ))
+                            manutencaoOrdens.map((ordem) => {
+                              const prioridadeMap = {
+                                'critica': 'bg-rose-500/15 text-rose-300 border-rose-400/20',
+                                'alta': 'bg-amber-500/15 text-amber-300 border-amber-400/20',
+                                'media': 'bg-blue-500/10 text-blue-300 border-blue-400/15',
+                                'baixa': 'bg-slate-700/30 text-slate-300 border-slate-600/20',
+                              };
+                              const prioridadeStr = (ordem.prioridade || '-').toLowerCase();
+                              const prioridadeClass = prioridadeMap[prioridadeStr] || 'bg-slate-700/30 text-slate-300 border-slate-600/20';
+                              const statusMap = {
+                                'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
+                                'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
+                                'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
+                                'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
+                                'aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/20',
+                              };
+                              const statusStr = (ordem.status || '-').toLowerCase();
+                              const statusClass = statusMap[statusStr] || 'bg-blue-500/12 text-blue-300 border-blue-400/20';
+                              return (
+                                <tr key={ordem.id} className="hover:bg-slate-800/20 transition-colors duration-150">
+                                  <td className="px-5 py-3.5 font-bold text-white text-xs">{ordem.id}</td>
+                                  <td className="px-5 py-3.5 text-slate-200 text-xs font-medium">{ordem.ativo || '-'}</td>
+                                  <td className="px-5 py-3.5 text-slate-400 text-xs">{ordem.setor || '-'}</td>
+                                  <td className="px-5 py-3.5">
+                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${prioridadeClass}`}>{ordem.prioridade || '-'}</span>
+                                  </td>
+                                  <td className="px-5 py-3.5">
+                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${statusClass}`}>{ordem.status || '-'}</span>
+                                  </td>
+                                  <td className="px-5 py-3.5 text-slate-300 text-xs">{ordem.responsavel || '-'}</td>
+                                  <td className="px-5 py-3.5">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleEditarOs(ordem)}
+                                        className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200 px-2 py-1 rounded-md hover:bg-cyan-500/10 transition-all"
+                                      >
+                                        Editar
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleImprimirOs(ordem)}
+                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md hover:bg-slate-700/30 transition-all"
+                                      >
+                                        Imprimir
+                                      </button>
+                                      {canDeleteOs && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleExcluirOs(ordem)}
+                                          className="text-[10px] font-bold text-rose-400 hover:text-rose-300 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
+                                        >
+                                          Excluir
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
                           ) : (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
-                                Sem ordens registradas.
+                              <td className="px-5 py-10 text-sm text-slate-500 text-center" colSpan={7}>
+                                <div className="flex flex-col items-center gap-2">
+                                  <Layers size={24} className="text-slate-600" />
+                                  Sem ordens registradas
+                                </div>
                               </td>
                             </tr>
                           )}
@@ -11483,78 +11715,100 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {subAbaManutencao === 'minhas' && (
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)] overflow-hidden">
-                    <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitacoes</h3>
-                        <p className="text-xs text-slate-400">
-                          Solicitacoes abertas por voce.
-                        </p>
+                  <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
+                    <div className="p-5 border-b border-slate-800/40 bg-slate-900/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
+                          <Users size={14} className="text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitações</h3>
+                          <p className="text-[10px] text-slate-500 mt-0.5">Solicitações abertas por você</p>
+                        </div>
                       </div>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-950/70 text-slate-400 uppercase text-[10px] tracking-wider">
+                        <thead className="bg-slate-950/50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-4 py-3">OS</th>
-                            <th className="px-4 py-3">Ativo</th>
-                            <th className="px-4 py-3">Setor</th>
-                            <th className="px-4 py-3">Prioridade</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3">Criado em</th>
-                            <th className="px-4 py-3">Acoes</th>
+                            <th className="px-5 py-3.5 font-bold">OS</th>
+                            <th className="px-5 py-3.5 font-bold">Ativo</th>
+                            <th className="px-5 py-3.5 font-bold">Setor</th>
+                            <th className="px-5 py-3.5 font-bold">Prioridade</th>
+                            <th className="px-5 py-3.5 font-bold">Status</th>
+                            <th className="px-5 py-3.5 font-bold">Criado em</th>
+                            <th className="px-5 py-3.5 font-bold">Ações</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800 text-slate-200">
+                        <tbody className="divide-y divide-slate-800/30 text-slate-200">
                           {manutencaoOrdensLoading ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
-                                Carregando solicitacoes...
+                              <td className="px-5 py-8 text-sm text-slate-500 text-center" colSpan={7}>
+                                <div className="flex items-center justify-center gap-2">
+                                  <div className="w-4 h-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin"></div>
+                                  Carregando solicitações...
+                                </div>
                               </td>
                             </tr>
                           ) : manutencaoOrdensError ? (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-rose-300" colSpan={7}>
+                              <td className="px-5 py-6 text-sm text-rose-400" colSpan={7}>
                                 {manutencaoOrdensError}
                               </td>
                             </tr>
                           ) : minhasSolicitacoes.length ? (
-                            minhasSolicitacoes.map((ordem) => (
-                              <tr key={ordem.id} className="hover:bg-slate-900/60">
-                                <td className="px-4 py-3 font-semibold text-white">{ordem.id}</td>
-                                <td className="px-4 py-3 text-slate-300">{ordem.ativo || '-'}</td>
-                                <td className="px-4 py-3 text-slate-400">{ordem.setor || '-'}</td>
-                                <td className="px-4 py-3">
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-800 text-slate-200">{ordem.prioridade || '-'}</span>
-                                </td>
-                                <td className="px-4 py-3">
-                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/20 text-blue-200">{ordem.status || '-'}</span>
-                                </td>
-                                <td className="px-4 py-3 text-slate-400">
-                                  {formatDateTimeRelatorio(ordem.createdAt || ordem.dataFalha)}
-                                </td>
-                                <td className="px-4 py-3">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleEditarOs(ordem)}
-                                    className="text-xs font-bold text-cyan-200 hover:text-white"
-                                  >
-                                    Editar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleImprimirOs(ordem)}
-                                    className="ml-3 text-xs font-bold text-slate-300 hover:text-white"
-                                  >
-                                    Imprimir
-                                  </button>
-                                </td>
-                              </tr>
-                            ))
+                            minhasSolicitacoes.map((ordem) => {
+                              const statusMap = {
+                                'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
+                                'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
+                                'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
+                                'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
+                                'aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/20',
+                              };
+                              const statusStr = (ordem.status || '-').toLowerCase();
+                              const statusClass = statusMap[statusStr] || 'bg-blue-500/12 text-blue-300 border-blue-400/20';
+                              return (
+                                <tr key={ordem.id} className="hover:bg-slate-800/20 transition-colors duration-150">
+                                  <td className="px-5 py-3.5 font-bold text-white text-xs">{ordem.id}</td>
+                                  <td className="px-5 py-3.5 text-slate-200 text-xs font-medium">{ordem.ativo || '-'}</td>
+                                  <td className="px-5 py-3.5 text-slate-400 text-xs">{ordem.setor || '-'}</td>
+                                  <td className="px-5 py-3.5">
+                                    <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-slate-800/50 text-slate-300 border border-slate-700/30">{ordem.prioridade || '-'}</span>
+                                  </td>
+                                  <td className="px-5 py-3.5">
+                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${statusClass}`}>{ordem.status || '-'}</span>
+                                  </td>
+                                  <td className="px-5 py-3.5 text-slate-400 text-xs">
+                                    {formatDateTimeRelatorio(ordem.createdAt || ordem.dataFalha)}
+                                  </td>
+                                  <td className="px-5 py-3.5">
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleEditarOs(ordem)}
+                                        className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200 px-2 py-1 rounded-md hover:bg-cyan-500/10 transition-all"
+                                      >
+                                        Editar
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleImprimirOs(ordem)}
+                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md hover:bg-slate-700/30 transition-all"
+                                      >
+                                        Imprimir
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
                           ) : (
                             <tr>
-                              <td className="px-4 py-6 text-sm text-slate-400" colSpan={7}>
-                                Nenhuma solicitacao registrada.
+                              <td className="px-5 py-10 text-sm text-slate-500 text-center" colSpan={7}>
+                                <div className="flex flex-col items-center gap-2">
+                                  <Users size={24} className="text-slate-600" />
+                                  Nenhuma solicitação registrada
+                                </div>
                               </td>
                             </tr>
                           )}
@@ -11565,23 +11819,34 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {subAbaManutencao === 'agenda' && (
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
-                    Agenda sem dados no momento.
+                  <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-10 shadow-md text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-slate-800/30 border border-slate-700/30 flex items-center justify-center">
+                        <CalendarIcon size={22} className="text-slate-500" />
+                      </div>
+                      <p className="text-sm text-slate-500 font-medium">Agenda sem dados no momento</p>
+                      <p className="text-xs text-slate-600">Funcionalidade em desenvolvimento</p>
+                    </div>
                   </div>
                 )}
 
                 {subAbaManutencao === 'operador' && isManutencaoOperador && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Guia do Operador</h3>
-                        <p className="text-xs text-slate-400">Passo a passo de como abrir, assumir e acompanhar OS.</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/15 flex items-center justify-center">
+                          <UserCog size={14} className="text-cyan-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Guia do Operador</h3>
+                          <p className="text-[10px] text-slate-500">Passo a passo de como abrir, assumir e acompanhar OS</p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={handleBaixarGuiaTreinamentoPdf}
-                          className="rounded-full border border-slate-600 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                          className="rounded-lg border border-slate-600/50 bg-slate-800/30 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700/40 hover:border-slate-500 transition-all duration-200"
                         >
                           Baixar PDF
                         </button>
@@ -11592,29 +11857,35 @@ const custoDetalheTitulo = custoDetalheItem
                             setTourOperadorOpen(true);
                           }}
                           title="Guia interativo"
-                          className="rounded-full border border-amber-400/60 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/10"
+                          className="rounded-lg border border-amber-400/30 bg-amber-400/[0.06] px-4 py-2 text-xs font-bold text-amber-200 hover:bg-amber-400/[0.12] hover:border-amber-400/40 transition-all duration-200"
                         >
                           Guia interativo
                         </button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div data-tour="fila-os" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* Fila de OS */}
+                    <div data-tour="fila-os" className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Fila de OS</h3>
-                        <span className="text-[10px] font-bold text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
+                            <Layers size={12} className="text-blue-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Fila de OS</h3>
+                        </div>
+                        <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-blue-500/[0.08] text-blue-300 border border-blue-400/15">
                           {manutencaoOperadorListas.abertas.length} abertas
                         </span>
                       </div>
                       {manutencaoOperadorListas.abertas.length ? (
                         <div className="space-y-3">
                           {manutencaoOperadorListas.abertas.map((os) => (
-                            <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-4 hover:bg-slate-800/30 transition-all duration-200">
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
-                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} · {os.prioridade || '-'}</p>
+                                  <p className="text-[11px] text-slate-500">{os.setor || 'Sem setor'} · {os.prioridade || '-'}</p>
                                 </div>
                                 <button
                                   type="button"
@@ -11624,7 +11895,7 @@ const custoDetalheTitulo = custoDetalheItem
                                     setAssumirErro('');
                                   }}
                                   data-tour="assumir-os"
-                                  className="rounded-full border border-cyan-400/60 px-3 py-1 text-xs font-bold text-cyan-100 hover:bg-cyan-500/10"
+                                  className="rounded-lg border border-cyan-400/30 bg-cyan-500/[0.07] px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/15 hover:border-cyan-400/40 transition-all duration-200"
                                 >
                                   Assumir
                                 </button>
@@ -11633,56 +11904,63 @@ const custoDetalheTitulo = custoDetalheItem
                           ))}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                          Nenhuma OS aguardando atendimento.
+                        <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-6 text-sm text-slate-500 text-center">
+                          <Layers size={20} className="text-slate-600 mx-auto mb-2" />
+                          Nenhuma OS aguardando atendimento
                         </div>
                       )}
                     </div>
 
-                    <div data-tour="minhas-os" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                    {/* Minhas OS */}
+                    <div data-tour="minhas-os" className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas OS</h3>
-                        <span className="text-[10px] font-bold text-slate-400">
-                          {manutencaoOperadorListas.minhas.length} atribuida(s)
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center">
+                            <Wrench size={12} className="text-emerald-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas OS</h3>
+                        </div>
+                        <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/[0.08] text-emerald-300 border border-emerald-400/15">
+                          {manutencaoOperadorListas.minhas.length} atribuída(s)
                         </span>
                       </div>
                       {manutencaoOperadorListas.minhas.length ? (
                         <div className="space-y-3">
                           {manutencaoOperadorListas.minhas.map((os) => (
-                            <div key={os.id} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                            <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-4 hover:bg-slate-800/30 transition-all duration-200">
                               <div className="flex items-center justify-between gap-3">
-                                <div>
-                                  <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
-                                  <p className="text-xs text-slate-400">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-bold text-white truncate">{os.ativo || os.id}</p>
+                                  <p className="text-[11px] text-slate-500">
                                     {os.status || '-'} · {os.statusMaquina || 'Rodando'}
                                   </p>
                                 </div>
-                                <div data-tour="acoes-os" className="flex flex-wrap items-center gap-2 text-xs">
+                                <div data-tour="acoes-os" className="flex flex-wrap items-center gap-1.5 text-xs shrink-0">
                                   <button
                                     type="button"
                                     onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
-                                    className="rounded-full border border-blue-400/60 px-3 py-1 font-bold text-blue-100 hover:bg-blue-500/10"
+                                    className="rounded-lg border border-blue-400/25 bg-blue-500/[0.06] px-2.5 py-1 font-bold text-blue-300 hover:bg-blue-500/15 transition-all"
                                   >
                                     Iniciar
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => atualizarOs(os.id, { status: 'Aguardando peca' })}
-                                    className="rounded-full border border-amber-400/60 px-3 py-1 font-bold text-amber-100 hover:bg-amber-500/10"
+                                    className="rounded-lg border border-amber-400/25 bg-amber-500/[0.06] px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/15 transition-all"
                                   >
                                     Pausar
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => atualizarOs(os.id, { status: 'Finalizada' })}
-                                    className="rounded-full border border-emerald-400/60 px-3 py-1 font-bold text-emerald-100 hover:bg-emerald-500/10"
+                                    className="rounded-lg border border-emerald-400/25 bg-emerald-500/[0.06] px-2.5 py-1 font-bold text-emerald-300 hover:bg-emerald-500/15 transition-all"
                                   >
                                     Finalizar
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleEditarOs(os)}
-                                    className="rounded-full border border-slate-600 px-3 py-1 font-bold text-slate-200 hover:bg-slate-800"
+                                    className="rounded-lg border border-slate-600/30 bg-slate-800/20 px-2.5 py-1 font-bold text-slate-300 hover:bg-slate-700/30 transition-all"
                                   >
                                     Editar
                                   </button>
@@ -11692,12 +11970,60 @@ const custoDetalheTitulo = custoDetalheItem
                           ))}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-400">
-                          Nenhuma OS atribuida a voce.
+                        <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-6 text-sm text-slate-500 text-center">
+                          <Wrench size={20} className="text-slate-600 mx-auto mb-2" />
+                          Nenhuma OS atribuída a você
                         </div>
                       )}
                     </div>
                   </div>
+                  {canViewEquipeStatus && (
+                    <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                      <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/15 flex items-center justify-center">
+                            <Users size={14} className="text-cyan-400" />
+                          </div>
+                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Equipe</h3>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1.5 text-[9px] font-bold text-amber-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            {manutencaoStatusEquipe.filter((item) => item.ocupado).length} ocupado(s)
+                          </span>
+                          <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            {manutencaoStatusEquipe.filter((item) => !item.ocupado).length} disponível(is)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        {manutencaoStatusEquipe.map((item) => (
+                          <div key={item.nome} className={`rounded-xl border p-3 transition-all duration-200 hover:scale-[1.01] ${item.ocupado ? 'border-amber-500/15 bg-amber-500/[0.03]' : 'border-emerald-500/15 bg-emerald-500/[0.03]'}`}>
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${item.ocupado ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300'}`}>
+                                  {item.nome.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold text-slate-100 truncate">{item.nome}</p>
+                                  <p className="text-[10px] text-slate-500">{item.setor}</p>
+                                </div>
+                              </div>
+                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 ${item.ocupado ? 'border border-amber-400/20 bg-amber-500/[0.08] text-amber-300' : 'border border-emerald-400/20 bg-emerald-500/[0.08] text-emerald-300'}`}>
+                                {item.ocupado ? 'Ocupado' : 'Disponível'}
+                              </span>
+                            </div>
+                            {item.ocupado && (
+                              <p className="mt-2 text-[10px] text-slate-500 truncate">
+                                {item.total} OS · {item.ativos.join(' · ')}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   </div>
                 )}
 
@@ -12176,6 +12502,7 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                   </div>
                 )}
+                </div>
                 </div>
              </div>
           )}
