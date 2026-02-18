@@ -909,6 +909,10 @@ export default function App() {
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
+  const [manutencaoFiltroStatus, setManutencaoFiltroStatus] = useState('Todas');
+  const [manutencaoFiltroPrioridade, setManutencaoFiltroPrioridade] = useState('Todas');
+  const [manutencaoFiltroSetor, setManutencaoFiltroSetor] = useState('Todos');
+  const [manutencaoBusca, setManutencaoBusca] = useState('');
   const [manutencaoEditId, setManutencaoEditId] = useState(null);
   const [assumirModalOs, setAssumirModalOs] = useState(null);
   const [assumirResponsavel, setAssumirResponsavel] = useState('');
@@ -1470,18 +1474,128 @@ export default function App() {
       .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
   }, [manutencaoOrdens, authUser?.email, currentUserLabel]);
 
+  // Função de tempo decorrido
+  const tempoDecorrido = (dataStr) => {
+    if (!dataStr) return '-';
+    const d = new Date(dataStr);
+    if (Number.isNaN(d.getTime())) return '-';
+    const agr = new Date();
+    const diffMs = agr - d;
+    if (diffMs < 0) return 'agora';
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ${mins % 60}min`;
+    const dias = Math.floor(hrs / 24);
+    return `${dias}d ${hrs % 24}h`;
+  };
+
   const manutencaoKpis = useMemo(() => {
     const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta').length;
     const emAndamento = manutencaoOrdens.filter((os) => os.status === 'Em andamento').length;
     const finalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
+    const criticas = manutencaoOrdens.filter((os) => (os.prioridade || '').toLowerCase() === 'critica' && os.status !== 'Finalizada' && os.status !== 'Cancelada').length;
     const total = manutencaoOrdens.length;
+    const pctResolvidas = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+    // Tempo médio de resolução (finalizadas com createdAt e fechadaEm/updatedAt)
+    const finalizadasComTempo = manutencaoOrdens.filter((os) => os.status === 'Finalizada' && (os.createdAt || os.dataFalha) && (os.fechadaEm || os.updatedAt));
+    let tempoMedioStr = '-';
+    if (finalizadasComTempo.length > 0) {
+      const somaHoras = finalizadasComTempo.reduce((acc, os) => {
+        const inicio = new Date(os.createdAt || os.dataFalha);
+        const fim = new Date(os.fechadaEm || os.updatedAt);
+        return acc + Math.max(0, fim - inicio);
+      }, 0);
+      const mediaMs = somaHoras / finalizadasComTempo.length;
+      const mediaH = Math.round(mediaMs / 3600000);
+      tempoMedioStr = mediaH < 24 ? `${mediaH}h` : `${Math.round(mediaH / 24)}d`;
+    }
     return [
-      { id: 'abertas', label: 'OS Abertas', value: abertas, tone: 'bg-amber-500/20 text-amber-200' },
-      { id: 'andamento', label: 'Em andamento', value: emAndamento, tone: 'bg-blue-500/20 text-blue-200' },
-      { id: 'finalizadas', label: 'Finalizadas', value: finalizadas, tone: 'bg-emerald-500/20 text-emerald-200' },
-      { id: 'total', label: 'Total de OS', value: total, tone: 'bg-slate-500/20 text-slate-200' },
+      { id: 'abertas', label: 'OS Abertas', value: abertas, tone: 'text-amber-300' },
+      { id: 'andamento', label: 'Em andamento', value: emAndamento, tone: 'text-blue-300' },
+      { id: 'finalizadas', label: 'Finalizadas', value: finalizadas, tone: 'text-emerald-300' },
+      { id: 'criticas', label: 'Críticas pendentes', value: criticas, tone: 'text-rose-300' },
+      { id: 'pct', label: '% Resolvidas', value: `${pctResolvidas}%`, tone: 'text-cyan-300' },
+      { id: 'tmedio', label: 'Tempo médio', value: tempoMedioStr, tone: 'text-purple-300' },
     ];
   }, [manutencaoOrdens]);
+
+  // Ordens filtradas para a tabela
+  const manutencaoOrdensFiltradas = useMemo(() => {
+    let lista = [...manutencaoOrdens];
+    if (manutencaoFiltroStatus !== 'Todas') {
+      lista = lista.filter((os) => os.status === manutencaoFiltroStatus);
+    }
+    if (manutencaoFiltroPrioridade !== 'Todas') {
+      lista = lista.filter((os) => os.prioridade === manutencaoFiltroPrioridade);
+    }
+    if (manutencaoFiltroSetor !== 'Todos') {
+      lista = lista.filter((os) => os.setor === manutencaoFiltroSetor);
+    }
+    if (manutencaoBusca.trim()) {
+      const q = manutencaoBusca.trim().toLowerCase();
+      lista = lista.filter((os) =>
+        (os.id || '').toLowerCase().includes(q) ||
+        (os.ativo || '').toLowerCase().includes(q) ||
+        (os.setor || '').toLowerCase().includes(q) ||
+        (os.responsavel || '').toLowerCase().includes(q) ||
+        (os.descricao || '').toLowerCase().includes(q)
+      );
+    }
+    return lista;
+  }, [manutencaoOrdens, manutencaoFiltroStatus, manutencaoFiltroPrioridade, manutencaoFiltroSetor, manutencaoBusca]);
+
+  // Setores únicos para filtro
+  const manutencaoSetoresUnicos = useMemo(() => {
+    const set = new Set();
+    manutencaoOrdens.forEach((os) => { if (os.setor) set.add(os.setor); });
+    return Array.from(set).sort();
+  }, [manutencaoOrdens]);
+
+  // Dados para mini gráfico de tendência (últimos 7 dias)
+  const manutencaoTendencia7d = useMemo(() => {
+    const hoje = new Date();
+    const dias = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(hoje);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const abertas = manutencaoOrdens.filter((os) => {
+        const dt = (os.createdAt || os.dataFalha || '');
+        return dt && dt.slice(0, 10) === key;
+      }).length;
+      const finalizadas = manutencaoOrdens.filter((os) => {
+        const dt = (os.fechadaEm || os.updatedAt || '');
+        return os.status === 'Finalizada' && dt && dt.slice(0, 10) === key;
+      }).length;
+      dias.push({ label, abertas, finalizadas });
+    }
+    return dias;
+  }, [manutencaoOrdens]);
+
+  // Performance da equipe
+  const manutencaoPerformanceEquipe = useMemo(() => {
+    const hoje = new Date().toISOString().slice(0, 10);
+    return manutencaoColaboradores.map((colab) => {
+      const nome = colab.nome;
+      const nomeN = normalizarTexto(nome);
+      const minhasOs = manutencaoOrdens.filter((os) => normalizarTexto(os.responsavel || '') === nomeN);
+      const finalizadasHoje = minhasOs.filter((os) => os.status === 'Finalizada' && ((os.fechadaEm || os.updatedAt || '').slice(0, 10) === hoje)).length;
+      const totalFinalizadas = minhasOs.filter((os) => os.status === 'Finalizada').length;
+      const emAndamento = minhasOs.filter((os) => os.status === 'Em andamento').length;
+      // Tempo médio
+      const finComTempo = minhasOs.filter((os) => os.status === 'Finalizada' && (os.createdAt || os.dataFalha) && (os.fechadaEm || os.updatedAt));
+      let tmedio = '-';
+      if (finComTempo.length > 0) {
+        const soma = finComTempo.reduce((acc, os) => acc + Math.max(0, new Date(os.fechadaEm || os.updatedAt) - new Date(os.createdAt || os.dataFalha)), 0);
+        const mH = Math.round(soma / finComTempo.length / 3600000);
+        tmedio = mH < 24 ? `${mH}h` : `${Math.round(mH / 24)}d`;
+      }
+      return { nome, setor: colab.setor, finalizadasHoje, totalFinalizadas, emAndamento, tmedio };
+    }).sort((a, b) => b.finalizadasHoje - a.finalizadasHoje || b.totalFinalizadas - a.totalFinalizadas);
+  }, [manutencaoOrdens, manutencaoColaboradores]);
 
   const manutencaoParadas = useMemo(
     () =>
