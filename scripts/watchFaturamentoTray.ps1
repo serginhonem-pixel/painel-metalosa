@@ -24,6 +24,7 @@ if (-not (Test-Path $nodeExe)) {
 $logPath = Join-Path $repoRoot 'watcher-faturamento.log'
 $outputPublic = Join-Path $repoRoot 'public\data\faturamento.json'
 $outputSrc = Join-Path $repoRoot 'src\data\faturamento.json'
+$logoPath = Join-Path $repoRoot 'src\data\logo.png'
 $gitBin = if ($env:FATURAMENTO_GIT_BIN) { $env:FATURAMENTO_GIT_BIN } else { 'git' }
 
 function Write-WatcherLog {
@@ -86,6 +87,58 @@ $($script:lastMessage)
 "@
 }
 
+function Get-TrayIcon {
+  if (Test-Path $logoPath) {
+    try {
+      $bmp = New-Object System.Drawing.Bitmap($logoPath)
+      $monoBmp = New-Object System.Drawing.Bitmap(16, 16)
+      $g = [System.Drawing.Graphics]::FromImage($monoBmp)
+      $g.Clear([System.Drawing.Color]::Transparent)
+
+      $minX = $bmp.Width
+      $minY = $bmp.Height
+      $maxX = -1
+      $maxY = -1
+
+      for ($x = 0; $x -lt $bmp.Width; $x++) {
+        for ($y = 0; $y -lt $bmp.Height; $y++) {
+          $px = $bmp.GetPixel($x, $y)
+          if ($px.A -gt 20) {
+            if ($x -lt $minX) { $minX = $x }
+            if ($y -lt $minY) { $minY = $y }
+            if ($x -gt $maxX) { $maxX = $x }
+            if ($y -gt $maxY) { $maxY = $y }
+          }
+        }
+      }
+
+      if ($maxX -ge 0 -and $maxY -ge 0) {
+        $srcRect = New-Object System.Drawing.Rectangle($minX, $minY, ($maxX - $minX + 1), ($maxY - $minY + 1))
+        $dstRect = New-Object System.Drawing.Rectangle(0, 0, 16, 16)
+        $g.DrawImage($bmp, $dstRect, $srcRect, [System.Drawing.GraphicsUnit]::Pixel)
+      }
+      $g.Dispose()
+
+      for ($x = 0; $x -lt 16; $x++) {
+        for ($y = 0; $y -lt 16; $y++) {
+          $px = $monoBmp.GetPixel($x, $y)
+          if ($px.A -gt 20) {
+            $monoBmp.SetPixel($x, $y, [System.Drawing.Color]::FromArgb($px.A, 255, 255, 255))
+          } else {
+            $monoBmp.SetPixel($x, $y, [System.Drawing.Color]::FromArgb(0, 0, 0, 0))
+          }
+        }
+      }
+
+      $hIcon = $monoBmp.GetHicon()
+      $icon = [System.Drawing.Icon]::FromHandle($hIcon)
+      return $icon
+    } catch {
+    }
+  }
+  return [System.Drawing.SystemIcons]::Application
+}
+
 function Start-Watcher {
   if ($script:watcherProcess -and -not $script:watcherProcess.HasExited) {
     return
@@ -122,9 +175,9 @@ function Stop-Watcher {
 }
 
 $global:notifyIcon = New-Object System.Windows.Forms.NotifyIcon
-$global:notifyIcon.Icon = [System.Drawing.SystemIcons]::Application
+$global:notifyIcon.Icon = Get-TrayIcon
 $global:notifyIcon.Visible = $true
-$global:notifyIcon.Text = 'Watcher de faturamento'
+$global:notifyIcon.Text = 'Metalosa - watcher de faturamento'
 
 $menu = New-Object System.Windows.Forms.ContextMenuStrip
 $global:menuStatus = $menu.Items.Add('Status: Inicializando')
