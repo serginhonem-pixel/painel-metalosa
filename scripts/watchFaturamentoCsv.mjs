@@ -3,13 +3,14 @@ import path from 'path';
 import { execFileSync } from 'child_process';
 
 const INPUT =
-  process.env.FATURAMENTO_CSV ?? '\\\\10.10.100.4\\Setor\\PCP\\ARQIMPORT\\met113l.csv';
+  process.env.FATURAMENTO_CSV ??
+  'G:\\.shortcut-targets-by-id\\1TyTzui--9Dzn32hfPiGA00Gk0DsXcP5i\\PCP\\ARQIMPORT\\met113l.csv';
 const OUTPUT_PUBLIC = path.resolve('public', 'data', 'faturamento.json');
 const OUTPUT_SRC = path.resolve('src', 'data', 'faturamento.json');
 const WATCH_INTERVAL_MS = Number(process.env.FATURAMENTO_WATCH_MS ?? 30000);
 const DEFAULT_ENCODING = process.env.FATURAMENTO_CSV_ENCODING ?? 'latin1';
-const AUTO_GIT = (process.env.FATURAMENTO_AUTO_GIT ?? '1') === '1';
-const AUTO_GIT_PUSH = (process.env.FATURAMENTO_GIT_PUSH ?? '1') === '1';
+const AUTO_GIT = (process.env.FATURAMENTO_AUTO_GIT ?? '0') === '1';
+const AUTO_GIT_PUSH = (process.env.FATURAMENTO_GIT_PUSH ?? '0') === '1';
 const AUTO_GIT_MESSAGE =
   process.env.FATURAMENTO_GIT_MESSAGE ?? 'chore: atualizar faturamento';
 const REPO_ROOT = path.resolve('.');
