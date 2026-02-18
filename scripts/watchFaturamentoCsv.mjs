@@ -321,6 +321,9 @@ const executar = () => {
 
 console.log(`Observando ${INPUT} a cada ${WATCH_INTERVAL_MS} ms...`);
 executar();
+setInterval(() => {
+  executar();
+}, WATCH_INTERVAL_MS);
 fs.watchFile(INPUT, { interval: WATCH_INTERVAL_MS }, (curr, prev) => {
   if (curr.mtimeMs !== prev.mtimeMs) {
     console.log('Arquivo alterado. Regerando faturamento.json...');
