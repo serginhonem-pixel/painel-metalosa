@@ -808,7 +808,7 @@ export default function App() {
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
-  const [diaFaturamentoSelecionado, setDiaFaturamentoSelecionado] = useState(null);
+  const [diasFaturamentoSelecionados, setDiasFaturamentoSelecionados] = useState([]);
   const [faturamentoTabelaView, setFaturamentoTabelaView] = useState('dia');
   const [faturamentoAno, setFaturamentoAno] = useState(() =>
     String(new Date().getFullYear())
@@ -5783,7 +5783,9 @@ export default function App() {
   }, [dashboardFaturamentoFilial.municipiosMapa]);
 
   const detalhesDiaFaturamento = useMemo(() => {
-    if (!diaFaturamentoSelecionado) return null;
+    if (!diasFaturamentoSelecionados.length) return null;
+    const diasSelecionados = [...diasFaturamentoSelecionados].sort();
+    const diasSelecionadosSet = new Set(diasSelecionados);
     const produtosPorCodigo = new Map(
       (produtosData || []).map((produto) => [
         normalizarCodigoProduto(produto.codigo),
@@ -5807,7 +5809,7 @@ export default function App() {
     );
     const linhasDia = faturamentoAtual.linhas.filter((row) => {
       if (!row.emissao) return false;
-      return row.emissao.toISOString().slice(0, 10) === diaFaturamentoSelecionado;
+      return diasSelecionadosSet.has(row.emissao.toISOString().slice(0, 10));
     });
     if (!linhasDia.length) return null;
     const linhasOrdenadas = [...linhasDia].sort((a, b) => {
@@ -5843,8 +5845,9 @@ export default function App() {
       totalDia,
       totalBrutoDia,
       totalDevolucaoDia,
+      diasSelecionados,
     };
-  }, [diaFaturamentoSelecionado, faturamentoAtual.linhas]);
+  }, [diasFaturamentoSelecionados, faturamentoAtual.linhas]);
 
   const abrirConfigMetaFilial = () => {
     const draft = {};
@@ -5974,7 +5977,7 @@ export default function App() {
     const fim = new Date(Date.UTC(Number(ano), Number(mes), 0));
     setFaturamentoInicio(inicio.toISOString().slice(0, 10));
     setFaturamentoFim(fim.toISOString().slice(0, 10));
-    setDiaFaturamentoSelecionado(null);
+    setDiasFaturamentoSelecionados([]);
   };
 
   const faturamentoPorVendedor = useMemo(() => {
@@ -6592,8 +6595,9 @@ export default function App() {
       : faturamentoLinhasFiltradas.length > 0;
 
   const handleExportarFaturamentoExcel = () => {
+    const diasSelecionados = [...diasFaturamentoSelecionados].sort();
     const linhasBase =
-      faturamentoTabelaView === 'dia' && diaFaturamentoSelecionado
+      faturamentoTabelaView === 'dia' && diasSelecionados.length > 0
         ? detalhesDiaFaturamento?.linhas || []
         : faturamentoLinhasFiltradas;
 
@@ -6612,7 +6616,7 @@ export default function App() {
     };
 
     const linhasExport = linhasBase.map((row) => ({
-      Data: formatarData(row.emissao) || diaFaturamentoSelecionado || '',
+      Data: formatarData(row.emissao) || diasSelecionados[0] || '',
       Tipo: row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda',
       Cliente: row.cliente || '',
       Nome: row.clienteNome || '',
@@ -6635,20 +6639,24 @@ export default function App() {
     const ws = XLSX.utils.json_to_sheet(linhasExport);
     XLSX.utils.book_append_sheet(wb, ws, 'Faturamento');
 
-    const periodo = diaFaturamentoSelecionado
-      ? diaFaturamentoSelecionado
-      : [faturamentoInicio, faturamentoFim].filter(Boolean).join('_') || 'completo';
+    const periodo =
+      diasSelecionados.length === 1
+        ? diasSelecionados[0]
+        : diasSelecionados.length > 1
+        ? `${diasSelecionados[0]}_a_${diasSelecionados[diasSelecionados.length - 1]}`
+        : [faturamentoInicio, faturamentoFim].filter(Boolean).join('_') || 'completo';
     const nomeArquivo = `faturamento_${periodo}.xlsx`;
     XLSX.writeFile(wb, nomeArquivo);
   };
 
   useEffect(() => {
-    if (!diaFaturamentoSelecionado) return;
-    const existeDia = faturamentoAtual.porDia.some((item) => item.dia === diaFaturamentoSelecionado);
-    if (!existeDia) {
-      setDiaFaturamentoSelecionado(null);
-    }
-  }, [diaFaturamentoSelecionado, faturamentoAtual.porDia]);
+    if (!diasFaturamentoSelecionados.length) return;
+    const diasDisponiveis = new Set((faturamentoAtual.porDia || []).map((item) => item.dia));
+    setDiasFaturamentoSelecionados((prev) => {
+      const filtrados = prev.filter((dia) => diasDisponiveis.has(dia));
+      return filtrados.length === prev.length ? prev : filtrados;
+    });
+  }, [diasFaturamentoSelecionados, faturamentoAtual.porDia]);
 
   useEffect(() => {
     if (filtroFilial === 'Todas') return;
@@ -10394,9 +10402,25 @@ const custoDetalheTitulo = custoDetalheItem
                               return ((item.valor - anterior) / anterior) * 100;
                             });
 
-                            const handleDiaClick = (dia) => {
-                              setDiaFaturamentoSelecionado((prev) => (prev === dia ? null : dia));
+                            const handleDiaClick = (dia, event) => {
+                              const multiselect = event?.ctrlKey || event?.metaKey;
+                              setDiasFaturamentoSelecionados((prev) => {
+                                const existe = prev.includes(dia);
+                                if (multiselect) {
+                                  if (existe) return prev.filter((item) => item !== dia);
+                                  return [...prev, dia].sort();
+                                }
+                                if (existe && prev.length === 1) return [];
+                                return [dia];
+                              });
                             };
+                            const diasSelecionadosOrdenados = [...diasFaturamentoSelecionados].sort();
+                            const periodoSelecionadoTitulo =
+                              diasSelecionadosOrdenados.length === 1
+                                ? new Date(`${diasSelecionadosOrdenados[0]}T00:00:00`).toLocaleDateString('pt-BR')
+                                : diasSelecionadosOrdenados.length > 1
+                                ? `${new Date(`${diasSelecionadosOrdenados[0]}T00:00:00`).toLocaleDateString('pt-BR')} a ${new Date(`${diasSelecionadosOrdenados[diasSelecionadosOrdenados.length - 1]}T00:00:00`).toLocaleDateString('pt-BR')} (${diasSelecionadosOrdenados.length} dias)`
+                                : '';
 
                             return (
                               <div className="space-y-4">
@@ -10427,7 +10451,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   const xBase = margin.left + i * barW + barGap / 2;
                                   const barH = (Math.abs(item.valor) / maxValor) * chartH;
                                   const y = margin.top + chartH - barH;
-                                  const isSelecionado = diaFaturamentoSelecionado === item.dia;
+                                  const isSelecionado = diasFaturamentoSelecionados.includes(item.dia);
                                   const variacao = variacoes[i];
                                   const variacaoTexto =
                                     variacao === null || !Number.isFinite(variacao)
@@ -10439,7 +10463,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   const xVariacao = xBase + barWidth / 2;
                                   const yVariacao = Math.min(y + 14, margin.top + chartH - 10);
                                   return (
-                                    <g key={item.dia} className="cursor-pointer" onClick={() => handleDiaClick(item.dia)}>
+                                    <g key={item.dia} className="cursor-pointer" onClick={(event) => handleDiaClick(item.dia, event)}>
                                       <rect
                                         x={xBase}
                                         y={y}
@@ -10500,16 +10524,20 @@ const custoDetalheTitulo = custoDetalheItem
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                   <div>
                                     <p className="text-xs uppercase tracking-widest text-slate-400 font-bold">
-                                      {faturamentoTabelaView === 'dia' ? 'Detalhe do dia' : 'Visao por vendedor'}
+                                      {faturamentoTabelaView === 'dia'
+                                        ? diasFaturamentoSelecionados.length > 1
+                                          ? 'Detalhe do periodo'
+                                          : 'Detalhe do dia'
+                                        : 'Visao por vendedor'}
                                     </p>
                                     {faturamentoTabelaView === 'dia' ? (
-                                      diaFaturamentoSelecionado ? (
+                                      diasFaturamentoSelecionados.length > 0 ? (
                                         <p className="text-lg font-black text-white">
-                                          {new Date(`${diaFaturamentoSelecionado}T00:00:00`).toLocaleDateString('pt-BR')}
+                                          {periodoSelecionadoTitulo}
                                         </p>
                                       ) : (
                                         <p className="text-sm text-slate-400">
-                                          Selecione um dia no grafico para ver as linhas.
+                                          Selecione no grafico. Use Ctrl + clique para varios dias.
                                         </p>
                                       )
                                     ) : (
@@ -10580,23 +10608,27 @@ const custoDetalheTitulo = custoDetalheItem
                                     >
                                       Baixar Excel
                                     </button>
-                                    {faturamentoTabelaView === 'dia' && diaFaturamentoSelecionado && (
+                                    {faturamentoTabelaView === 'dia' && diasFaturamentoSelecionados.length > 0 && (
                                       <button
                                         type="button"
-                                        onClick={() => setDiaFaturamentoSelecionado(null)}
+                                        onClick={() => setDiasFaturamentoSelecionados([])}
                                         className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white"
                                       >
-                                        Limpar dia
+                                        Limpar selecao
                                       </button>
                                     )}
                                   </div>
                                 </div>
                                 {faturamentoTabelaView === 'dia' ? (
-                                  diaFaturamentoSelecionado ? (
+                                  diasFaturamentoSelecionados.length > 0 ? (
                                     <>
                                       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
                                         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                                          <p>Total do dia</p>
+                                          <p>
+                                            {detalhesDiaFaturamento?.diasSelecionados?.length > 1
+                                              ? 'Total do periodo'
+                                              : 'Total do dia'}
+                                          </p>
                                           <p className="text-base font-black text-white mt-1">
                                             {formatarMoeda(detalhesDiaFaturamento?.totalDia || 0)}
                                           </p>
@@ -10671,7 +10703,7 @@ const custoDetalheTitulo = custoDetalheItem
                                     </>
                                   ) : (
                                     <p className="text-xs text-slate-400 text-center mt-4">
-                                      Clique em um dia no grafico para abrir a tabela com faturamento e devolucoes.
+                                      Clique em um dia no grafico. Use Ctrl + clique para montar um periodo.
                                     </p>
                                   )
                                 ) : (
