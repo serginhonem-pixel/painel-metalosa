@@ -8,4 +8,4 @@ set FATURAMENTO_AUTO_GIT=1
 set FATURAMENTO_GIT_PUSH=1
 set FATURAMENTO_GIT_MESSAGE=chore: atualizar faturamento
 set FATURAMENTO_GIT_BIN=C:\Program Files\Git\cmd\git.exe
-"C:\Program Files\nodejs\node.exe" "scripts\watchFaturamentoCsv.mjs"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "scripts\watchFaturamentoTray.ps1"
