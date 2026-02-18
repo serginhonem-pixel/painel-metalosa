@@ -5849,6 +5849,39 @@ export default function App() {
     };
   }, [diasFaturamentoSelecionados, faturamentoAtual.linhas]);
 
+  const insightsPeriodoFaturamento = useMemo(() => {
+    const linhas = detalhesDiaFaturamento?.linhas || [];
+    if (!linhas.length) return null;
+    const dias = new Set();
+    const clientes = new Set();
+    let vendas = 0;
+    let devolucoes = 0;
+
+    linhas.forEach((row) => {
+      if (row.emissao) dias.add(row.emissao.toISOString().slice(0, 10));
+      if (row.cliente) clientes.add(String(row.cliente).trim());
+      if (row.tipoMovimento === 'devolucao') {
+        devolucoes += Math.abs(row.valorTotal || 0);
+      } else {
+        vendas += row.valorTotal || 0;
+      }
+    });
+
+    const movimentos = linhas.length;
+    const ticketMedio = movimentos > 0 ? (vendas - devolucoes) / movimentos : 0;
+    const faturamentoMedioDia = dias.size > 0 ? (vendas - devolucoes) / dias.size : 0;
+
+    return {
+      dias: dias.size,
+      movimentos,
+      clientesAtivos: clientes.size,
+      ticketMedio,
+      faturamentoMedioDia,
+      faturamentoBruto: vendas,
+      devolucoes,
+    };
+  }, [detalhesDiaFaturamento]);
+
   const abrirConfigMetaFilial = () => {
     const draft = {};
     (dashboardFiliais || []).forEach((filial) => {
@@ -10643,6 +10676,50 @@ const custoDetalheTitulo = custoDetalheItem
                                           <p>Devolucoes</p>
                                           <p className="text-base font-black text-rose-300 mt-1">
                                             {formatarMoeda(detalhesDiaFaturamento?.totalDevolucaoDia || 0)}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <div className="mt-3 grid grid-cols-2 lg:grid-cols-7 gap-3 text-[11px] uppercase tracking-wider text-slate-400">
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Dias</p>
+                                          <p className="text-base font-black text-white mt-1">
+                                            {insightsPeriodoFaturamento?.dias || 0}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Movimentos</p>
+                                          <p className="text-base font-black text-white mt-1">
+                                            {insightsPeriodoFaturamento?.movimentos || 0}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Clientes</p>
+                                          <p className="text-base font-black text-white mt-1">
+                                            {insightsPeriodoFaturamento?.clientesAtivos || 0}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Ticket medio</p>
+                                          <p className="text-base font-black text-blue-200 mt-1">
+                                            {formatarMoeda(insightsPeriodoFaturamento?.ticketMedio || 0)}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Fat. medio/dia</p>
+                                          <p className="text-base font-black text-cyan-200 mt-1">
+                                            {formatarMoeda(insightsPeriodoFaturamento?.faturamentoMedioDia || 0)}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Bruto</p>
+                                          <p className="text-base font-black text-emerald-300 mt-1">
+                                            {formatarMoeda(insightsPeriodoFaturamento?.faturamentoBruto || 0)}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                                          <p>Devolucoes</p>
+                                          <p className="text-base font-black text-rose-300 mt-1">
+                                            {formatarMoeda(insightsPeriodoFaturamento?.devolucoes || 0)}
                                           </p>
                                         </div>
                                       </div>
