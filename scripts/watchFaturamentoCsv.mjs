@@ -13,6 +13,7 @@ const AUTO_GIT = (process.env.FATURAMENTO_AUTO_GIT ?? '0') === '1';
 const AUTO_GIT_PUSH = (process.env.FATURAMENTO_GIT_PUSH ?? '0') === '1';
 const AUTO_GIT_MESSAGE =
   process.env.FATURAMENTO_GIT_MESSAGE ?? 'chore: atualizar faturamento';
+const GIT_BIN = process.env.FATURAMENTO_GIT_BIN ?? 'git';
 const REPO_ROOT = path.resolve('.');
 
 const normalizar = (valor) =>
@@ -267,7 +268,7 @@ const gerarJson = () => {
 };
 
 const execGit = (args) =>
-  execFileSync('git', args, {
+  execFileSync(GIT_BIN, args, {
     cwd: REPO_ROOT,
     stdio: 'pipe',
     encoding: 'utf8',
