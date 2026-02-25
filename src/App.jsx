@@ -4481,13 +4481,15 @@ export default function App() {
         if (isDataSemApontamento(dataISO)) return;
         const totalDia = Number(resumo?.total || 0);
         const tipos = resumo?.tipos || {};
-        if (totalDia > 0) {
+        const feriasDia = Number(tipos.Ferias || 0);
+        const faltasSemFeriasDia = Math.max(totalDia - feriasDia, 0);
+        if (faltasSemFeriasDia > 0) {
           diasComFalta.add(dataISO);
         }
-        faltasTotal += totalDia;
+        faltasTotal += faltasSemFeriasDia;
         faltasJust += Number(tipos['Falta Justificada'] || 0);
         faltasInjust += Number(tipos['Falta Injustificada'] || 0);
-        feriasOcorrencias += Number(tipos.Ferias || 0);
+        feriasOcorrencias += feriasDia;
       });
     } else {
       Object.entries(registrosPorData).forEach(([dataISO, registros]) => {
@@ -4496,15 +4498,16 @@ export default function App() {
         if (isDataSemApontamento(dataISO)) return;
         Object.entries(registros || {}).forEach(([id, registro]) => {
           if (!idsFiltrados.has(String(id))) return;
-          faltasTotal += 1;
-          diasComFalta.add(dataISO);
           const tipo = registro?.tipoFalta || 'Falta Injustificada';
-          if (tipo === 'Falta Justificada') faltasJust += 1;
-          else if (tipo === 'Falta Injustificada') faltasInjust += 1;
-          else if (tipo === 'Ferias') {
+          if (tipo === 'Ferias') {
             feriasOcorrencias += 1;
             feriasColaboradores.add(String(id));
+            return;
           }
+          faltasTotal += 1;
+          diasComFalta.add(dataISO);
+          if (tipo === 'Falta Justificada') faltasJust += 1;
+          else if (tipo === 'Falta Injustificada') faltasInjust += 1;
         });
       });
     }

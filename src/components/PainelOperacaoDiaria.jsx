@@ -414,7 +414,7 @@ const HistoricoMensal = ({
                 const faltasSemFerias = Math.max(faltas - ferias, 0);
                 const semLancamento = (isWeekend || isFolga) && resumoDia.total === 0;
                 const mostraPercentual = !isWeekend && !isFolga;
-                const percentualPresenca = base > 0 ? ((base - faltas) / base) * 100 : 0;
+                const percentualPresenca = base > 0 ? ((base - faltasSemFerias) / base) * 100 : 0;
 
                 return (
                   <button
