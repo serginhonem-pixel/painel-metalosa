@@ -450,6 +450,19 @@ const normalizarDescricaoProduto = (valor) => {
   return texto;
 };
 
+const obterFilialFaturamento = (row, opcoes = {}) => {
+  const { descricaoOverride = '', padrao = 'Sem filial' } = opcoes;
+  const descricao = normalizarDescricaoProduto(
+    row?.Descricao ?? row?.descricao ?? descricaoOverride
+  );
+  if (/\bDW\b/i.test(descricao)) return '04';
+  const filial = row?.Filial ?? row?.filial;
+  if (filial === null || filial === undefined || String(filial).trim() === '') {
+    return padrao;
+  }
+  return String(filial);
+};
+
 const normalizarCodigoVendedor = (valor) => {
   const texto = String(valor ?? '').trim().toUpperCase();
   if (!texto) return '';
@@ -4282,7 +4295,7 @@ export default function App() {
         '';
       const quantidade = row?.Quantidade ?? row?.quantidade ?? '';
       const unidade = row?.Unidade ?? row?.unidade ?? '';
-      const filial = row?.Filial ?? row?.filial ?? '';
+      const filial = obterFilialFaturamento(row, { padrao: '' });
       const vendedor = row?.Vendedor1 ?? row?.vendedor1 ?? row?.Vendedor ?? row?.vendedor ?? '';
       const emissaoData = parseEmissaoData(row?.Emissao ?? row?.emissao);
 
@@ -5027,7 +5040,7 @@ export default function App() {
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
         codigo: row?.Codigo ?? row?.codigo ?? '',
         descricao: normalizarDescricaoProduto(row?.Descricao ?? row?.descricao ?? ''),
-        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        filial: obterFilialFaturamento(row),
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: obterNumeroNota(row),
         quantidade: obterQuantidadeLiquida(row),
@@ -5373,7 +5386,7 @@ export default function App() {
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
         codigo: row?.Codigo ?? row?.codigo ?? '',
         descricao: normalizarDescricaoProduto(row?.Descricao ?? row?.descricao ?? ''),
-        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        filial: obterFilialFaturamento(row),
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: obterNumeroNota(row),
         quantidade: obterQuantidadeLiquida(row),
@@ -6760,7 +6773,7 @@ export default function App() {
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
         codigo,
         descricao,
-        filial: row?.Filial ?? row?.filial ?? 'Sem filial',
+        filial: obterFilialFaturamento(row, { descricaoOverride: descricao }),
         unidade: row?.Unidade ?? row?.unidade ?? '',
         nf: obterNumeroNota(row),
         quantidade: obterQuantidadeLiquida(row),
@@ -6925,7 +6938,7 @@ export default function App() {
     faturamentoLinhas.forEach((row) => {
       const mesInfo = obterMesKey(row);
       if (!mesInfo?.key?.startsWith('2025-')) return;
-      const filial = row?.Filial ?? row?.filial ?? '';
+      const filial = obterFilialFaturamento(row, { padrao: '' });
       if (filial) {
         filiais.add(String(filial));
       }
@@ -6958,7 +6971,7 @@ export default function App() {
       const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
       if (tipoMovimento !== 'devolucao' && cfop && !CFOP_FATURAMENTO_SET.has(cfop)) return;
 
-      const filial = row?.Filial ?? row?.filial ?? 'Sem filial';
+      const filial = obterFilialFaturamento(row);
       if (filtroFilial2025 !== 'Todas' && filial !== filtroFilial2025) return;
 
       if (filtroCfops2025.length) {
