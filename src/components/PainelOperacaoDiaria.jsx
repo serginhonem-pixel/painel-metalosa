@@ -700,8 +700,6 @@ export default function PainelOperacaoDiaria({
   const [expandirAfastados, setExpandirAfastados] = useState(false);
   const [subAba, setSubAba] = useState('quadro');
 
-  // Verifica se temos as props do calendário
-  const temCalendario = typeof obterResumoDia === 'function';
 
   // ─── Fetch data ───────────────────────────────────────────────
   useEffect(() => {
@@ -886,14 +884,6 @@ export default function PainelOperacaoDiaria({
         >
           Quadro de Faltas
         </button>
-        {temCalendario && (
-          <button
-            onClick={() => setSubAba('calendario')}
-            className={`pb-3 text-sm font-bold transition-all flex items-center gap-2 ${subAba === 'calendario' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            <CalendarIcon size={16} /> Historico Mensal
-          </button>
-        )}
       </div>
 
       {subAba === 'quadro' ? (
