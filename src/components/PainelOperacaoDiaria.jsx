@@ -34,6 +34,10 @@ const num = (v) => {
   return Number.isNaN(n) ? 0 : n;
 };
 
+const HORAS_DIA_UTIL = 8 + (48 / 60); // 8h48
+const LIMITE_FALTA_JUSTIFICADA_HORAS = 15 * HORAS_DIA_UTIL; // 15 dias
+const getHorasAfastamento = (colaborador) => (num(colaborador?.hrsAfast) > LIMITE_FALTA_JUSTIFICADA_HORAS ? num(colaborador?.hrsAfast) : 0);
+
 const normalizeKey = (value) => {
   const raw = String(value ?? '');
   const hasPercent = raw.includes('%');
@@ -264,7 +268,7 @@ const ModalSetor = ({ setor, colaboradores, onClose }) => {
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-right text-blue-300">{c.hrsAbonadas > 0 ? c.hrsAbonadas.toFixed(1) : '-'}</td>
-                  <td className="px-4 py-2.5 text-right text-purple-300">{c.hrsAfast > 0 ? c.hrsAfast.toFixed(1) : '-'}</td>
+                  <td className="px-4 py-2.5 text-right text-purple-300">{getHorasAfastamento(c) > 0 ? getHorasAfastamento(c).toFixed(1) : '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -730,7 +734,7 @@ export default function PainelOperacaoDiaria({
     const totalReal = dados.reduce((a, c) => a + c.hrsReal, 0);
     const totalNTrab = dados.reduce((a, c) => a + c.hrsNTrab, 0);
     const totalAbonadas = dados.reduce((a, c) => a + c.hrsAbonadas, 0);
-    const totalAfast = dados.reduce((a, c) => a + c.hrsAfast, 0);
+    const totalAfast = dados.reduce((a, c) => a + getHorasAfastamento(c), 0);
     const totalColab = dados.length;
     const absPerc = totalPrev > 0 ? (totalNTrab / totalPrev) * 100 : 0;
     const presPerc = totalPrev > 0 ? ((totalPrev - totalNTrab) / totalPrev) * 100 : 0;
@@ -747,7 +751,7 @@ export default function PainelOperacaoDiaria({
       s.real += c.hrsReal;
       s.nTrab += c.hrsNTrab;
       s.abonadas += c.hrsAbonadas;
-      s.afast += c.hrsAfast;
+      s.afast += getHorasAfastamento(c);
       s.colabs += 1;
     });
     const porSetor = Array.from(setorMap.values())
@@ -763,7 +767,9 @@ export default function PainelOperacaoDiaria({
     const presencaTotal = dados.filter((c) => c.hrsNTrab === 0 && c.hrsAfast === 0 && c.hrsReal > 0);
 
     // Afastados
-    const afastados = dados.filter((c) => c.hrsAfast > 0).sort((a, b) => b.hrsAfast - a.hrsAfast);
+    const afastados = dados
+      .filter((c) => getHorasAfastamento(c) > 0)
+      .sort((a, b) => getHorasAfastamento(b) - getHorasAfastamento(a));
 
     // Com abono
     const comAbono = dados.filter((c) => c.hrsAbonadas > 0).sort((a, b) => b.hrsAbonadas - a.hrsAbonadas);
@@ -1066,7 +1072,7 @@ export default function PainelOperacaoDiaria({
                     <p className="text-[10px] text-slate-500">{c.setor}</p>
                   </div>
                   <div className="text-right shrink-0 ml-2">
-                    <p className="text-xs font-bold text-purple-300">{c.hrsAfast.toFixed(1)}h</p>
+                    <p className="text-xs font-bold text-purple-300">{getHorasAfastamento(c).toFixed(1)}h</p>
                     <p className="text-[10px] text-slate-500">{c.percAfast.toFixed(1)}%</p>
                   </div>
                 </div>
@@ -1204,7 +1210,7 @@ export default function PainelOperacaoDiaria({
                     </span>
                   </td>
                   <td className="px-3 py-2 text-right text-cyan-300">{c.hrsAbonadas > 0 ? c.hrsAbonadas.toFixed(1) : '-'}</td>
-                  <td className="px-3 py-2 text-right text-purple-300">{c.hrsAfast > 0 ? c.hrsAfast.toFixed(1) : '-'}</td>
+                  <td className="px-3 py-2 text-right text-purple-300">{getHorasAfastamento(c) > 0 ? getHorasAfastamento(c).toFixed(1) : '-'}</td>
                 </tr>
               ))}
             </tbody>
