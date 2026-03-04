@@ -2,8 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import XLSX from 'xlsx';
 
-const INPUT = path.resolve('public', 'data', 'absenteismo.xlsx');
-const OUTPUT = path.resolve('public', 'data', 'absenteismo.json');
+const resolveArgPath = (flag, fallback) => {
+  const index = process.argv.indexOf(flag);
+  if (index >= 0 && process.argv[index + 1]) {
+    return path.resolve(process.argv[index + 1]);
+  }
+  return fallback;
+};
+
+const INPUT = resolveArgPath('--input', path.resolve('public', 'data', 'absenteismo.xlsx'));
+const OUTPUT = resolveArgPath('--output', path.resolve('public', 'data', 'absenteismo.json'));
 
 const main = () => {
   if (!fs.existsSync(INPUT)) {

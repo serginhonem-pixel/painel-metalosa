@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-03-04T00:00:00.000Z",
+  "meses": [
+    {
+      "id": "2026-02",
+      "label": "Fevereiro/2026",
+      "file": "/data/absenteismo-2026-02.json"
+    },
+    {
+      "id": "2026-01",
+      "label": "Janeiro/2026",
+      "file": "/data/absenteismo-2026-01.json"
+    }
+  ]
+}

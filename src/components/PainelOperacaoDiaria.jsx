@@ -37,6 +37,7 @@ const num = (v) => {
 const HORAS_DIA_UTIL = 8 + (48 / 60); // 8h48
 const LIMITE_FALTA_JUSTIFICADA_HORAS = 15 * HORAS_DIA_UTIL; // 15 dias
 const getHorasAfastamento = (colaborador) => (num(colaborador?.hrsAfast) > LIMITE_FALTA_JUSTIFICADA_HORAS ? num(colaborador?.hrsAfast) : 0);
+const getHorasAbsenteismo = (colaborador) => num(colaborador?.hrsNTrab) + num(colaborador?.hrsAbonadas);
 
 const normalizeKey = (value) => {
   const raw = String(value ?? '');
@@ -111,6 +112,7 @@ const parseRowsFromArray = (rows) => {
       percAbonadas: num(o.percAbonadas),
       hrsAfast: num(o.hrsAfast),
       percAfast: num(o.percAfast),
+      percAbs: num(o.hrsPrev) > 0 ? ((num(o.hrsNTrab) + num(o.hrsAbonadas)) / num(o.hrsPrev)) * 100 : 0,
       nome: String(o.nome || '').trim(),
       setor: String(o.setor || 'SEM SETOR').trim(),
       matricula: String(o.matricula || '').trim(),
@@ -168,6 +170,7 @@ const parseRows = (raw) => {
         o.percAbonadas = num(o.percAbonadas);
         o.hrsAfast = num(o.hrsAfast);
         o.percAfast = num(o.percAfast);
+        o.percAbs = o.hrsPrev > 0 ? ((o.hrsNTrab + o.hrsAbonadas) / o.hrsPrev) * 100 : 0;
         o.nome = String(o.nome || '').trim();
         o.setor = String(o.setor || 'SEM SETOR').trim();
         o.matricula = String(o.matricula || '').trim();
@@ -178,6 +181,10 @@ const parseRows = (raw) => {
 
   return [];
 };
+
+const ABSENTEISMO_MESES_FALLBACK = [
+  { id: 'atual', label: 'Atual', file: '/data/absenteismo.json' },
+];
 
 // ─── KPI Card ───────────────────────────────────────────────────
 const KpiCard = ({ icon: Icon, label, value, suffix, tone = 'text-white', sub }) => (
@@ -227,7 +234,7 @@ const ModalSetor = ({ setor, colaboradores, onClose }) => {
   if (!setor) return null;
   const colabs = colaboradores
     .filter((c) => c.setor === setor.setor)
-    .sort((a, b) => b.percHrsNTrab - a.percHrsNTrab);
+    .sort((a, b) => (b.percAbs ?? b.percHrsNTrab) - (a.percAbs ?? a.percHrsNTrab));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
@@ -263,8 +270,8 @@ const ModalSetor = ({ setor, colaboradores, onClose }) => {
                   <td className="px-4 py-2.5 text-right">{c.hrsReal.toFixed(1)}</td>
                   <td className="px-4 py-2.5 text-right font-bold text-amber-300">{c.hrsNTrab.toFixed(1)}</td>
                   <td className="px-4 py-2.5 text-right">
-                    <span className={`font-bold ${c.percHrsNTrab > 10 ? 'text-rose-400' : c.percHrsNTrab > 5 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                      {c.percHrsNTrab.toFixed(1)}%
+                    <span className={`font-bold ${(c.percAbs ?? c.percHrsNTrab) > 10 ? 'text-rose-400' : (c.percAbs ?? c.percHrsNTrab) > 5 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {(c.percAbs ?? c.percHrsNTrab).toFixed(1)}%
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-right text-blue-300">{c.hrsAbonadas > 0 ? c.hrsAbonadas.toFixed(1) : '-'}</td>
@@ -703,15 +710,61 @@ export default function PainelOperacaoDiaria({
   const [expandirPresentes, setExpandirPresentes] = useState(false);
   const [expandirAfastados, setExpandirAfastados] = useState(false);
   const [subAba, setSubAba] = useState('quadro');
+  const [mesesAbsenteismo, setMesesAbsenteismo] = useState(ABSENTEISMO_MESES_FALLBACK);
+  const [mesAbsenteismo, setMesAbsenteismo] = useState(ABSENTEISMO_MESES_FALLBACK[0].id);
 
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarCatalogo = async () => {
+      try {
+        const resp = await fetch('/data/absenteismo-meses.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('catalogo ausente');
+        const raw = await resp.json();
+        if (!ativo) return;
+        const meses = Array.isArray(raw?.meses)
+          ? raw.meses
+            .filter((item) => item?.id && item?.file)
+            .map((item) => ({
+              id: String(item.id),
+              label: String(item.label || item.id),
+              file: String(item.file),
+            }))
+          : [];
+        if (meses.length > 0) {
+          setMesesAbsenteismo(meses);
+          setMesAbsenteismo((prev) => (meses.some((m) => m.id === prev) ? prev : meses[0].id));
+          return;
+        }
+      } catch {
+        // Fallback para compatibilidade com instalacoes antigas.
+      }
+      if (!ativo) return;
+      setMesesAbsenteismo(ABSENTEISMO_MESES_FALLBACK);
+      setMesAbsenteismo((prev) => prev || ABSENTEISMO_MESES_FALLBACK[0].id);
+    };
+    carregarCatalogo();
+    return () => { ativo = false; };
+  }, []);
+
+  const mesAbsenteismoAtual = useMemo(() => (
+    mesesAbsenteismo.find((item) => item.id === mesAbsenteismo) ||
+    mesesAbsenteismo[0] ||
+    ABSENTEISMO_MESES_FALLBACK[0]
+  ), [mesesAbsenteismo, mesAbsenteismo]);
 
   // ─── Fetch data ───────────────────────────────────────────────
   useEffect(() => {
     let ativo = true;
     const carregar = async () => {
+      if (!mesAbsenteismoAtual?.file) return;
+      if (ativo) {
+        setCarregando(true);
+        setErro(null);
+      }
       try {
-        const resp = await fetch('/data/absenteismo.json');
-        if (!resp.ok) throw new Error('Falha ao carregar absenteismo.json');
+        const resp = await fetch(mesAbsenteismoAtual.file, { cache: 'no-store' });
+        if (!resp.ok) throw new Error(`Falha ao carregar ${mesAbsenteismoAtual.file}`);
         const raw = await resp.json();
         if (!ativo) return;
         const parsed = parseRows(raw);
@@ -724,7 +777,7 @@ export default function PainelOperacaoDiaria({
     };
     carregar();
     return () => { ativo = false; };
-  }, []);
+  }, [mesAbsenteismoAtual]);
 
   // ─── Derived data ─────────────────────────────────────────────
   const resumo = useMemo(() => {
@@ -736,8 +789,9 @@ export default function PainelOperacaoDiaria({
     const totalAbonadas = dados.reduce((a, c) => a + c.hrsAbonadas, 0);
     const totalAfast = dados.reduce((a, c) => a + getHorasAfastamento(c), 0);
     const totalColab = dados.length;
-    const absPerc = totalPrev > 0 ? (totalNTrab / totalPrev) * 100 : 0;
-    const presPerc = totalPrev > 0 ? ((totalPrev - totalNTrab) / totalPrev) * 100 : 0;
+    const totalAbsenteismo = dados.reduce((a, c) => a + getHorasAbsenteismo(c), 0);
+    const absPerc = totalPrev > 0 ? (totalAbsenteismo / totalPrev) * 100 : 0;
+    const presPerc = totalPrev > 0 ? ((totalPrev - totalAbsenteismo) / totalPrev) * 100 : 0;
     const periodoLabel = dados[0]?.periodo || '';
 
     // Por setor
@@ -755,16 +809,16 @@ export default function PainelOperacaoDiaria({
       s.colabs += 1;
     });
     const porSetor = Array.from(setorMap.values())
-      .map((s) => ({ ...s, absPerc: s.prev > 0 ? (s.nTrab / s.prev) * 100 : 0 }))
+      .map((s) => ({ ...s, absPerc: s.prev > 0 ? ((s.nTrab + s.abonadas) / s.prev) * 100 : 0 }))
       .sort((a, b) => b.absPerc - a.absPerc);
 
     // Top ausentes
     const topAusentes = [...dados]
-      .filter((c) => c.hrsNTrab > 0)
-      .sort((a, b) => b.percHrsNTrab - a.percHrsNTrab);
+      .filter((c) => getHorasAbsenteismo(c) > 0)
+      .sort((a, b) => (b.percAbs ?? b.percHrsNTrab) - (a.percAbs ?? a.percHrsNTrab));
 
     // Presença total
-    const presencaTotal = dados.filter((c) => c.hrsNTrab === 0 && c.hrsAfast === 0 && c.hrsReal > 0);
+    const presencaTotal = dados.filter((c) => c.hrsNTrab === 0 && c.hrsAbonadas === 0 && c.hrsAfast === 0 && c.hrsReal > 0);
 
     // Afastados
     const afastados = dados
@@ -911,6 +965,19 @@ export default function PainelOperacaoDiaria({
                 {resumo.periodoLabel ? `Período: ${resumo.periodoLabel}` : 'Período não informado'}
               </p>
             </div>
+            <div className="w-full lg:w-auto">
+              <label className="block text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold mb-1">Mes de referencia</label>
+              <select
+                value={mesAbsenteismoAtual?.id || mesAbsenteismo}
+                onChange={(e) => setMesAbsenteismo(e.target.value)}
+                className="w-full lg:w-56 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-semibold text-slate-300 focus:border-blue-500 focus:outline-none [&>option]:bg-slate-800 [&>option]:text-slate-200"
+                style={{ colorScheme: 'dark' }}
+              >
+                {mesesAbsenteismo.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* KPI Grid */}
@@ -1036,8 +1103,8 @@ export default function PainelOperacaoDiaria({
                     <td className="px-3 py-2 text-slate-500 truncate max-w-[100px]">{c.setor}</td>
                     <td className="px-3 py-2 text-right font-bold text-amber-300">{c.hrsNTrab.toFixed(1)}</td>
                     <td className="px-3 py-2 text-right">
-                      <span className={`font-bold ${c.percHrsNTrab > 20 ? 'text-rose-400' : c.percHrsNTrab > 10 ? 'text-amber-400' : 'text-yellow-400'}`}>
-                        {c.percHrsNTrab.toFixed(1)}%
+                      <span className={`font-bold ${(c.percAbs ?? c.percHrsNTrab) > 20 ? 'text-rose-400' : (c.percAbs ?? c.percHrsNTrab) > 10 ? 'text-amber-400' : 'text-yellow-400'}`}>
+                        {(c.percAbs ?? c.percHrsNTrab).toFixed(1)}%
                       </span>
                     </td>
                   </tr>
@@ -1205,8 +1272,8 @@ export default function PainelOperacaoDiaria({
                   <td className="px-3 py-2 text-right">{c.hrsReal.toFixed(1)}</td>
                   <td className="px-3 py-2 text-right font-bold text-amber-300">{c.hrsNTrab > 0 ? c.hrsNTrab.toFixed(1) : '-'}</td>
                   <td className="px-3 py-2 text-right">
-                    <span className={`font-bold ${c.percHrsNTrab > 20 ? 'text-rose-400' : c.percHrsNTrab > 10 ? 'text-amber-400' : c.percHrsNTrab > 0 ? 'text-yellow-400' : 'text-emerald-400'}`}>
-                      {c.percHrsNTrab > 0 ? `${c.percHrsNTrab.toFixed(1)}%` : '0%'}
+                    <span className={`font-bold ${(c.percAbs ?? c.percHrsNTrab) > 20 ? 'text-rose-400' : (c.percAbs ?? c.percHrsNTrab) > 10 ? 'text-amber-400' : (c.percAbs ?? c.percHrsNTrab) > 0 ? 'text-yellow-400' : 'text-emerald-400'}`}>
+                      {(c.percAbs ?? c.percHrsNTrab) > 0 ? `${(c.percAbs ?? c.percHrsNTrab).toFixed(1)}%` : '0%'}
                     </span>
                   </td>
                   <td className="px-3 py-2 text-right text-cyan-300">{c.hrsAbonadas > 0 ? c.hrsAbonadas.toFixed(1) : '-'}</td>
