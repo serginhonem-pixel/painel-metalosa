@@ -186,6 +186,13 @@ const ABSENTEISMO_MESES_FALLBACK = [
   { id: 'atual', label: 'Atual', file: '/data/absenteismo.json' },
 ];
 
+const ABSENTEISMO_EVOLUCAO_MANUAL = {
+  '2026-01': 8.7,
+  '2026-02': 8.4,
+};
+
+const MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
 // ─── KPI Card ───────────────────────────────────────────────────
 const KpiCard = ({ icon: Icon, label, value, suffix, tone = 'text-white', sub }) => (
   <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 flex flex-col gap-1 min-w-0">
@@ -734,8 +741,11 @@ export default function PainelOperacaoDiaria({
             }))
           : [];
         if (meses.length > 0) {
+          const agora = new Date();
+          const mesAtualId = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
+          const mesInicial = meses.some((m) => m.id === mesAtualId) ? mesAtualId : meses[0].id;
           setMesesAbsenteismo(meses);
-          setMesAbsenteismo((prev) => (meses.some((m) => m.id === prev) ? prev : meses[0].id));
+          setMesAbsenteismo(mesInicial);
           return;
         }
       } catch {
@@ -812,6 +822,12 @@ export default function PainelOperacaoDiaria({
         if (!ativo) return;
         const validos = resultados
           .filter(Boolean)
+          .map((item) => ({
+            ...item,
+            absPerc: Object.prototype.hasOwnProperty.call(ABSENTEISMO_EVOLUCAO_MANUAL, item.id)
+              ? ABSENTEISMO_EVOLUCAO_MANUAL[item.id]
+              : item.absPerc,
+          }))
           .sort((a, b) => a.id.localeCompare(b.id));
         setEvolucaoAbsenteismo(validos);
       } finally {
@@ -833,8 +849,12 @@ export default function PainelOperacaoDiaria({
     const totalAfast = dados.reduce((a, c) => a + getHorasAfastamento(c), 0);
     const totalColab = dados.length;
     const totalAbsenteismo = dados.reduce((a, c) => a + getHorasAbsenteismo(c), 0);
-    const absPerc = totalPrev > 0 ? (totalAbsenteismo / totalPrev) * 100 : 0;
-    const presPerc = totalPrev > 0 ? ((totalPrev - totalAbsenteismo) / totalPrev) * 100 : 0;
+    const absPercCalculado = totalPrev > 0 ? (totalAbsenteismo / totalPrev) * 100 : 0;
+    const absPercFixo = Object.prototype.hasOwnProperty.call(ABSENTEISMO_EVOLUCAO_MANUAL, mesAbsenteismoAtual?.id)
+      ? ABSENTEISMO_EVOLUCAO_MANUAL[mesAbsenteismoAtual.id]
+      : null;
+    const absPerc = absPercFixo ?? absPercCalculado;
+    const presPerc = 100 - absPerc;
     const periodoLabel = dados[0]?.periodo || '';
 
     // Por setor
@@ -979,14 +999,40 @@ export default function PainelOperacaoDiaria({
   const anoSelecionado = String(mesAbsenteismoAtual?.id || '').split('-')[0];
   const evolucaoNoAno = evolucaoAbsenteismo.filter((item) => item.id.startsWith(`${anoSelecionado}-`));
   const evolucaoSerie = evolucaoNoAno.length > 0 ? evolucaoNoAno : evolucaoAbsenteismo;
-  const maxAbsEvolucao = Math.max(...evolucaoSerie.map((item) => item.absPerc), 1);
-  const pontosEvolucao = evolucaoSerie
-    .map((item, idx) => {
-      const x = evolucaoSerie.length === 1 ? 50 : (idx / (evolucaoSerie.length - 1)) * 100;
-      const y = 100 - ((item.absPerc / maxAbsEvolucao) * 100);
-      return `${x},${y}`;
-    })
-    .join(' ');
+  const evolucaoMap = new Map(evolucaoSerie.map((item) => [item.id, item]));
+  const evolucaoLinha = MESES_CURTOS.map((label, idx) => {
+    const mes = String(idx + 1).padStart(2, '0');
+    const id = `${anoSelecionado}-${mes}`;
+    const dado = evolucaoMap.get(id);
+    return {
+      id,
+      label,
+      absPerc: dado ? dado.absPerc : null,
+      hasData: Boolean(dado),
+    };
+  });
+  const valoresEvolucao = evolucaoLinha.filter((item) => item.hasData).map((item) => item.absPerc);
+  const maxAbsEvolucao = valoresEvolucao.length > 0 ? Math.max(...valoresEvolucao, 1) : 1;
+  const limiteEscalaEvolucao = Math.max(maxAbsEvolucao * 1.15, 10);
+  const preenchidosEvolucao = evolucaoLinha.filter((item) => item.hasData);
+  const primeiroMesEvolucao = preenchidosEvolucao[0] || null;
+  const ultimoMesEvolucao = preenchidosEvolucao[preenchidosEvolucao.length - 1] || null;
+  const variacaoEvolucao = primeiroMesEvolucao && ultimoMesEvolucao
+    ? ultimoMesEvolucao.absPerc - primeiroMesEvolucao.absPerc
+    : 0;
+  const segmentosLinhaEvolucao = [];
+  let segmentoAtual = [];
+  evolucaoLinha.forEach((item, idx) => {
+    const x = (idx / 11) * 100;
+    if (!item.hasData) {
+      if (segmentoAtual.length >= 2) segmentosLinhaEvolucao.push(segmentoAtual.join(' '));
+      segmentoAtual = [];
+      return;
+    }
+    const y = 100 - ((item.absPerc / limiteEscalaEvolucao) * 100);
+    segmentoAtual.push(`${x},${y}`);
+  });
+  if (segmentoAtual.length >= 2) segmentosLinhaEvolucao.push(segmentoAtual.join(' '));
 
   return (
     <div className="space-y-6">
@@ -1045,55 +1091,80 @@ export default function PainelOperacaoDiaria({
             <KpiCard icon={Award} label="Hrs Abonadas" value={resumo.totalAbonadas.toFixed(1)} suffix="h" tone="text-cyan-300" sub={`${resumo.comAbono.length} colab.`} />
           </div>
 
+          {false && (
           <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold">
                 Evolucao no ano {anoSelecionado || 'atual'}
               </p>
-              {!carregandoEvolucaoAbsenteismo && evolucaoSerie.length > 0 && (
-                <p className="text-[10px] font-bold text-slate-400">
-                  Ultimo: {evolucaoSerie[evolucaoSerie.length - 1].absPerc.toFixed(1)}%
-                </p>
+              {!carregandoEvolucaoAbsenteismo && preenchidosEvolucao.length > 0 && (
+                <div className="text-right">
+                  <p className="text-[10px] font-bold text-slate-400">
+                    Ultimo: {ultimoMesEvolucao.absPerc.toFixed(1)}%
+                  </p>
+                  <p className={`text-[10px] font-bold ${variacaoEvolucao > 0 ? 'text-rose-300' : variacaoEvolucao < 0 ? 'text-emerald-300' : 'text-slate-500'}`}>
+                    {variacaoEvolucao > 0 ? '+' : ''}{variacaoEvolucao.toFixed(1)} p.p. no ano
+                  </p>
+                </div>
               )}
             </div>
             {carregandoEvolucaoAbsenteismo ? (
               <p className="text-xs text-slate-500 italic">Carregando evolucao mensal...</p>
-            ) : evolucaoSerie.length === 0 ? (
+            ) : preenchidosEvolucao.length === 0 ? (
               <p className="text-xs text-slate-500 italic">Sem historico mensal para exibir.</p>
             ) : (
               <div className="space-y-3">
-                <div className="h-28 w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2">
-                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-                    <polyline
-                      fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="2.5"
-                      points={pontosEvolucao}
-                    />
-                    {evolucaoSerie.map((item, idx) => {
-                      const x = evolucaoSerie.length === 1 ? 50 : (idx / (evolucaoSerie.length - 1)) * 100;
-                      const y = 100 - ((item.absPerc / maxAbsEvolucao) * 100);
-                      return (
-                        <circle
-                          key={item.id}
-                          cx={x}
-                          cy={y}
-                          r="2.8"
-                          fill={item.id === mesAbsenteismoAtual?.id ? '#f43f5e' : '#22d3ee'}
+                <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-3">
+                  <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-wide text-slate-500 font-bold">
+                    <span>Meses do ano completo</span>
+                    <span>{preenchidosEvolucao.length}/12 preenchidos</span>
+                  </div>
+                  <div className="relative h-44 rounded-lg border border-slate-800 bg-slate-900/70 p-3">
+                    <div className="absolute inset-x-3 top-3 bottom-8 pointer-events-none">
+                      {[0, 25, 50, 75, 100].map((mark) => (
+                        <div
+                          key={mark}
+                          className="absolute left-0 right-0 border-t border-dashed border-slate-800/80"
+                          style={{ top: `${mark}%` }}
                         />
-                      );
-                    })}
-                  </svg>
+                      ))}
+                    </div>
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-x-3 top-3 bottom-8 h-[calc(100%-2.75rem)] w-[calc(100%-1.5rem)]">
+                      {segmentosLinhaEvolucao.map((segmento) => (
+                        <polyline
+                          key={segmento}
+                          fill="none"
+                          stroke="#22d3ee"
+                          strokeWidth="2.2"
+                          points={segmento}
+                        />
+                      ))}
+                      {evolucaoLinha.map((item, idx) => {
+                        const x = (idx / 11) * 100;
+                        if (!item.hasData) {
+                          return <circle key={item.id} cx={x} cy={94} r="1.8" fill="#334155" />;
+                        }
+                        const y = 100 - ((item.absPerc / limiteEscalaEvolucao) * 100);
+                        const ativo = item.id === mesAbsenteismoAtual?.id;
+                        return <circle key={item.id} cx={x} cy={y} r={ativo ? 3.3 : 2.5} fill={ativo ? '#fb7185' : '#22d3ee'} />;
+                      })}
+                    </svg>
+                    <div className="absolute left-3 right-3 bottom-2 grid grid-cols-12 gap-1 text-[9px] uppercase tracking-wide text-slate-500 font-bold">
+                      {evolucaoLinha.map((item) => (
+                        <span key={item.id} className={`text-center ${item.id === mesAbsenteismoAtual?.id ? 'text-rose-300' : ''}`}>{item.label}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-2">
-                  {evolucaoSerie.map((item) => (
+                <div className="grid grid-cols-3 md:grid-cols-6 xl:grid-cols-12 gap-1.5">
+                  {evolucaoLinha.map((item) => (
                     <div
                       key={item.id}
-                      className={`rounded-lg border px-2.5 py-2 ${item.id === mesAbsenteismoAtual?.id ? 'border-rose-500/60 bg-rose-500/10' : 'border-slate-800 bg-slate-950/50'}`}
+                      className={`rounded-md border px-2 py-1.5 text-center ${item.id === mesAbsenteismoAtual?.id ? 'border-rose-500/60 bg-rose-500/10' : 'border-slate-800 bg-slate-950/50'}`}
                     >
-                      <p className="text-[10px] uppercase tracking-wide text-slate-400 font-bold">{item.label}</p>
-                      <p className={`text-sm font-black ${item.id === mesAbsenteismoAtual?.id ? 'text-rose-300' : 'text-cyan-300'}`}>
-                        {item.absPerc.toFixed(1)}%
+                      <p className="text-[9px] uppercase tracking-wide text-slate-500 font-bold">{item.label}</p>
+                      <p className={`text-xs font-black ${item.hasData ? (item.id === mesAbsenteismoAtual?.id ? 'text-rose-300' : 'text-cyan-300') : 'text-slate-600'}`}>
+                        {item.hasData ? `${item.absPerc.toFixed(1)}%` : '--'}
                       </p>
                     </div>
                   ))}
@@ -1101,6 +1172,7 @@ export default function PainelOperacaoDiaria({
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
 
