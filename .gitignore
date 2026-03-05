@@ -34,3 +34,4 @@ cors.json
 *.njsproj
 *.sln
 *.sw?
+*.xlsx
