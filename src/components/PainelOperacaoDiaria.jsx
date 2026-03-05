@@ -712,6 +712,8 @@ export default function PainelOperacaoDiaria({
   const [subAba, setSubAba] = useState('quadro');
   const [mesesAbsenteismo, setMesesAbsenteismo] = useState(ABSENTEISMO_MESES_FALLBACK);
   const [mesAbsenteismo, setMesAbsenteismo] = useState(ABSENTEISMO_MESES_FALLBACK[0].id);
+  const [evolucaoAbsenteismo, setEvolucaoAbsenteismo] = useState([]);
+  const [carregandoEvolucaoAbsenteismo, setCarregandoEvolucaoAbsenteismo] = useState(false);
 
 
   useEffect(() => {
@@ -778,6 +780,47 @@ export default function PainelOperacaoDiaria({
     carregar();
     return () => { ativo = false; };
   }, [mesAbsenteismoAtual]);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregarEvolucao = async () => {
+      if (!Array.isArray(mesesAbsenteismo) || mesesAbsenteismo.length === 0) {
+        if (ativo) setEvolucaoAbsenteismo([]);
+        return;
+      }
+      if (ativo) setCarregandoEvolucaoAbsenteismo(true);
+      try {
+        const resultados = await Promise.all(
+          mesesAbsenteismo.map(async (mes) => {
+            try {
+              const resp = await fetch(mes.file, { cache: 'no-store' });
+              if (!resp.ok) throw new Error('erro');
+              const raw = await resp.json();
+              const dadosMes = parseRows(raw);
+              const totalPrev = dadosMes.reduce((acc, item) => acc + num(item?.hrsPrev), 0);
+              const totalAbs = dadosMes.reduce((acc, item) => acc + getHorasAbsenteismo(item), 0);
+              return {
+                id: String(mes.id),
+                label: String(mes.label || mes.id),
+                absPerc: totalPrev > 0 ? (totalAbs / totalPrev) * 100 : 0,
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
+        if (!ativo) return;
+        const validos = resultados
+          .filter(Boolean)
+          .sort((a, b) => a.id.localeCompare(b.id));
+        setEvolucaoAbsenteismo(validos);
+      } finally {
+        if (ativo) setCarregandoEvolucaoAbsenteismo(false);
+      }
+    };
+    carregarEvolucao();
+    return () => { ativo = false; };
+  }, [mesesAbsenteismo]);
 
   // ─── Derived data ─────────────────────────────────────────────
   const resumo = useMemo(() => {
@@ -933,6 +976,17 @@ export default function PainelOperacaoDiaria({
   }
 
   const maxAbsSetor = Math.max(...resumo.porSetor.map((s) => s.absPerc), 1);
+  const anoSelecionado = String(mesAbsenteismoAtual?.id || '').split('-')[0];
+  const evolucaoNoAno = evolucaoAbsenteismo.filter((item) => item.id.startsWith(`${anoSelecionado}-`));
+  const evolucaoSerie = evolucaoNoAno.length > 0 ? evolucaoNoAno : evolucaoAbsenteismo;
+  const maxAbsEvolucao = Math.max(...evolucaoSerie.map((item) => item.absPerc), 1);
+  const pontosEvolucao = evolucaoSerie
+    .map((item, idx) => {
+      const x = evolucaoSerie.length === 1 ? 50 : (idx / (evolucaoSerie.length - 1)) * 100;
+      const y = 100 - ((item.absPerc / maxAbsEvolucao) * 100);
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <div className="space-y-6">
@@ -989,6 +1043,63 @@ export default function PainelOperacaoDiaria({
             <KpiCard icon={Users} label="Colaboradores" value={resumo.totalColab} tone="text-emerald-200" />
             <KpiCard icon={ShieldAlert} label="Hrs Afastam." value={resumo.totalAfast.toFixed(1)} suffix="h" tone="text-purple-300" sub={`${resumo.afastados.length} afastados`} />
             <KpiCard icon={Award} label="Hrs Abonadas" value={resumo.totalAbonadas.toFixed(1)} suffix="h" tone="text-cyan-300" sub={`${resumo.comAbono.length} colab.`} />
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold">
+                Evolucao no ano {anoSelecionado || 'atual'}
+              </p>
+              {!carregandoEvolucaoAbsenteismo && evolucaoSerie.length > 0 && (
+                <p className="text-[10px] font-bold text-slate-400">
+                  Ultimo: {evolucaoSerie[evolucaoSerie.length - 1].absPerc.toFixed(1)}%
+                </p>
+              )}
+            </div>
+            {carregandoEvolucaoAbsenteismo ? (
+              <p className="text-xs text-slate-500 italic">Carregando evolucao mensal...</p>
+            ) : evolucaoSerie.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">Sem historico mensal para exibir.</p>
+            ) : (
+              <div className="space-y-3">
+                <div className="h-28 w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+                    <polyline
+                      fill="none"
+                      stroke="#38bdf8"
+                      strokeWidth="2.5"
+                      points={pontosEvolucao}
+                    />
+                    {evolucaoSerie.map((item, idx) => {
+                      const x = evolucaoSerie.length === 1 ? 50 : (idx / (evolucaoSerie.length - 1)) * 100;
+                      const y = 100 - ((item.absPerc / maxAbsEvolucao) * 100);
+                      return (
+                        <circle
+                          key={item.id}
+                          cx={x}
+                          cy={y}
+                          r="2.8"
+                          fill={item.id === mesAbsenteismoAtual?.id ? '#f43f5e' : '#22d3ee'}
+                        />
+                      );
+                    })}
+                  </svg>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-2">
+                  {evolucaoSerie.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`rounded-lg border px-2.5 py-2 ${item.id === mesAbsenteismoAtual?.id ? 'border-rose-500/60 bg-rose-500/10' : 'border-slate-800 bg-slate-950/50'}`}
+                    >
+                      <p className="text-[10px] uppercase tracking-wide text-slate-400 font-bold">{item.label}</p>
+                      <p className={`text-sm font-black ${item.id === mesAbsenteismoAtual?.id ? 'text-rose-300' : 'text-cyan-300'}`}>
+                        {item.absPerc.toFixed(1)}%
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
