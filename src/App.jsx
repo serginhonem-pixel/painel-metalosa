@@ -396,6 +396,22 @@ const parseEmissaoData = (valor) => {
   return null;
 };
 
+const obterDataIsoUtc = (valor) => {
+  const data = valor instanceof Date ? valor : parseEmissaoData(valor);
+  if (!data || Number.isNaN(data.valueOf())) return '';
+  const yyyy = data.getUTCFullYear();
+  const mm = String(data.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(data.getUTCDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const formatarDataUtcPtBr = (valor) => {
+  const iso = obterDataIsoUtc(valor);
+  if (!iso) return '';
+  const [yyyy, mm, dd] = iso.split('-');
+  return `${dd}/${mm}/${yyyy}`;
+};
+
 const obterNumeroNota = (row) => {
   const valor =
     row?.['Num. da Nota'] ??
@@ -5070,7 +5086,7 @@ export default function App() {
       faturamentoInicio || faturamentoFim
         ? normalizadas.filter((row) => {
             if (!row.emissao) return false;
-            const dataISO = row.emissao.toISOString().slice(0, 10);
+            const dataISO = obterDataIsoUtc(row.emissao);
             if (faturamentoInicio && dataISO < faturamentoInicio) return false;
             if (faturamentoFim && dataISO > faturamentoFim) return false;
             return true;
@@ -5132,7 +5148,7 @@ export default function App() {
         estadoMap.set(infoCliente.estado, (estadoMap.get(infoCliente.estado) || 0) + row.valorTotal);
         const pedidoKey = row.nf
           ? String(row.nf).trim()
-          : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${chaveCliente}||${row.valorTotal}`;
+          : `${obterDataIsoUtc(row.emissao) || 'semdata'}||${chaveCliente}||${row.valorTotal}`;
         if (!estadoPedidosMap.has(infoCliente.estado)) {
           estadoPedidosMap.set(infoCliente.estado, new Set());
         }
@@ -5150,7 +5166,7 @@ export default function App() {
         municipioMap.get(municipioKey).valor += row.valorTotal;
         const pedidoKey = row.nf
           ? String(row.nf).trim()
-          : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${chaveCliente}||${row.valorTotal}`;
+          : `${obterDataIsoUtc(row.emissao) || 'semdata'}||${chaveCliente}||${row.valorTotal}`;
         if (!municipioPedidosMap.has(municipioKey)) {
           municipioPedidosMap.set(municipioKey, new Set());
         }
@@ -5180,7 +5196,7 @@ export default function App() {
       unidadeMap.set(unidade, (unidadeMap.get(unidade) || 0) + row.quantidade);
 
       if (row.emissao) {
-        const diaISO = row.emissao.toISOString().slice(0, 10);
+        const diaISO = obterDataIsoUtc(row.emissao);
         const valorDia =
           row.tipoMovimento === 'devolucao' ? -Math.abs(row.valorTotal || 0) : row.valorTotal;
         diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
@@ -5586,7 +5602,7 @@ export default function App() {
 
     linhasFiltradasDia.forEach((row) => {
       if (!row.emissao) return;
-      const diaISO = row.emissao.toISOString().slice(0, 10);
+      const diaISO = obterDataIsoUtc(row.emissao);
       const valorDia =
         row.tipoMovimento === 'devolucao' ? -Math.abs(row.valorTotal || 0) : row.valorTotal;
       diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valorDia);
@@ -5696,7 +5712,7 @@ export default function App() {
     const hojeISO = new Date().toISOString().slice(0, 10);
     const linhasHoje = (dashboardFaturamentoBase.linhasMes || []).filter((row) => {
       if (!row.emissao) return false;
-      return row.emissao.toISOString().slice(0, 10) === hojeISO;
+      return obterDataIsoUtc(row.emissao) === hojeISO;
     });
     const linhasFiltradas =
       filtroCfops.length === 0
@@ -5715,7 +5731,7 @@ export default function App() {
     const linhasHoje = (linhasMes || []).filter((row) => {
       if (!row.emissao) return false;
       if (dashboardFilialAtual && row.filial !== dashboardFilialAtual) return false;
-      return row.emissao.toISOString().slice(0, 10) === hojeISO;
+      return obterDataIsoUtc(row.emissao) === hojeISO;
     });
     const linhasFiltradas =
       filtroCfops.length === 0
@@ -5767,7 +5783,7 @@ export default function App() {
     faturamentoLinhas.forEach((row) => {
       const emissao = parseEmissaoData(row?.Emissao ?? row?.emissao);
       if (emissao) {
-        const diaISO = emissao.toISOString().slice(0, 10);
+        const diaISO = obterDataIsoUtc(emissao);
         const valor = obterValorLiquido(row);
         diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + valor);
       }
@@ -5825,7 +5841,7 @@ export default function App() {
     );
     const linhasDia = faturamentoAtual.linhas.filter((row) => {
       if (!row.emissao) return false;
-      return diasSelecionadosSet.has(row.emissao.toISOString().slice(0, 10));
+      return diasSelecionadosSet.has(obterDataIsoUtc(row.emissao));
     });
     if (!linhasDia.length) return null;
     const linhasOrdenadas = [...linhasDia].sort((a, b) => {
@@ -5874,7 +5890,7 @@ export default function App() {
     let devolucoes = 0;
 
     linhas.forEach((row) => {
-      if (row.emissao) dias.add(row.emissao.toISOString().slice(0, 10));
+      if (row.emissao) dias.add(obterDataIsoUtc(row.emissao));
       if (row.cliente) clientes.add(String(row.cliente).trim());
       if (row.tipoMovimento === 'devolucao') {
         devolucoes += Math.abs(row.valorTotal || 0);
@@ -5974,7 +5990,7 @@ export default function App() {
     return faturamentoLinhasComVendedor.filter((row) => {
       const emissao = row.emissao instanceof Date ? row.emissao : parseEmissaoData(row.emissao);
       if (!emissao) return false;
-      const dataISO = emissao.toISOString().slice(0, 10);
+      const dataISO = obterDataIsoUtc(emissao);
       if (faturamentoInicio && dataISO < faturamentoInicio) return false;
       if (faturamentoFim && dataISO > faturamentoFim) return false;
       return true;
@@ -6660,8 +6676,7 @@ export default function App() {
     );
 
     const formatarData = (valor) => {
-      const data = valor instanceof Date ? valor : parseEmissaoData(valor);
-      return data ? data.toLocaleDateString('pt-BR') : '';
+      return formatarDataUtcPtBr(valor);
     };
 
     const linhasExport = linhasBase.map((row) => ({
@@ -6825,12 +6840,12 @@ export default function App() {
       quantidadeTotal += qtd;
 
       if (row.emissao instanceof Date) {
-        diasSet.add(row.emissao.toISOString().slice(0, 10));
+        diasSet.add(obterDataIsoUtc(row.emissao));
       }
 
       const pedidoKey = row.nf
         ? String(row.nf).trim()
-        : `${row.emissao ? row.emissao.toISOString().slice(0, 10) : 'semdata'}||${row.cliente}||${row.valorTotal}`;
+        : `${obterDataIsoUtc(row.emissao) || 'semdata'}||${row.cliente}||${row.valorTotal}`;
       pedidosSet.add(pedidoKey);
 
       if (row.mesKey) {
