@@ -411842,6 +411842,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "041393",
+    "Filial": "08",
+    "Grupo": "G230",
+    "Codigo": "03002          ",
+    "Descricao": "SUCATA DE ACO CARBONO                             ",
+    "Quantidade": 570,
+    "Unidade": "KG",
+    "ValorUnitario": 1.25,
+    "ValorTotal": 712.5,
+    "Emissao": "2026-03-11T00:00:00.000Z",
+    "Vendedor1": "019   ",
+    "NF": 76710,
+    "CodFiscal": "5101",
+    "MesEmissao": "03/2026",
+    "TipoMovimento": "C"
+  },
+  {
     "Cliente": "041424",
     "Filial": "06",
     "Grupo": "G110",
