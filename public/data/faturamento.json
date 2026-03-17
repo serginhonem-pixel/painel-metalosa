@@ -446029,6 +446029,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "039548",
+    "Filial": "01",
+    "Grupo": "G100",
+    "Codigo": "02025B         ",
+    "Descricao": "PERFIL LAMBRI BZ 0,75 2000X1100MM                 ",
+    "Quantidade": 10,
+    "Unidade": "PC",
+    "ValorUnitario": 109.17,
+    "ValorTotal": 1091.7,
+    "Emissao": "2026-03-17T00:00:00.000Z",
+    "Vendedor1": "C07   ",
+    "NF": 76991,
+    "CodFiscal": "5101",
+    "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "039564",
     "Filial": "08",
     "Grupo": "G000",
@@ -484432,6 +484449,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "050861",
+    "Filial": "01",
+    "Grupo": "G100",
+    "Codigo": "02025C         ",
+    "Descricao": "PERFIL LAMBRI BZ 0,75 2400X1000MM                 ",
+    "Quantidade": 6,
+    "Unidade": "PC",
+    "ValorUnitario": 122.92,
+    "ValorTotal": 737.52,
+    "Emissao": "2026-03-17T00:00:00.000Z",
+    "Vendedor1": "C07   ",
+    "NF": 76992,
+    "CodFiscal": "5101",
+    "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "050869",
     "Filial": "06",
     "Grupo": "G150",
@@ -499134,6 +499168,23 @@
     "NF": 75721,
     "CodFiscal": "5101",
     "MesEmissao": "02/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "053680",
+    "Filial": "01",
+    "Grupo": "G150",
+    "Codigo": "02057C         ",
+    "Descricao": "CH ACO BF 1,20 2,00X1,20                          ",
+    "Quantidade": 4,
+    "Unidade": "PC",
+    "ValorUnitario": 148.5,
+    "ValorTotal": 594,
+    "Emissao": "2026-03-17T00:00:00.000Z",
+    "Vendedor1": "C07   ",
+    "NF": 76993,
+    "CodFiscal": "5101",
+    "MesEmissao": "03/2026",
     "TipoMovimento": "N"
   },
   {
@@ -519617,6 +519668,23 @@
     "Emissao": "2026-03-06T00:00:00.000Z",
     "Vendedor1": "C07   ",
     "NF": 76424,
+    "CodFiscal": "5101",
+    "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "058818",
+    "Filial": "01",
+    "Grupo": "G150",
+    "Codigo": "02057A         ",
+    "Descricao": "CH ACO BF 1,20 2,00X1,00                          ",
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 126.44,
+    "ValorTotal": 252.88,
+    "Emissao": "2026-03-17T00:00:00.000Z",
+    "Vendedor1": "C07   ",
+    "NF": 76994,
     "CodFiscal": "5101",
     "MesEmissao": "03/2026",
     "TipoMovimento": "N"
