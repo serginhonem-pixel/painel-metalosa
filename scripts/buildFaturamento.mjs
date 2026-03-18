@@ -4,6 +4,7 @@ import XLSX from 'xlsx';
 
 const INPUT = path.resolve('src', 'Faturamento', 'faturamento.xlsx');
 const OUTPUT = path.resolve('src', 'data', 'faturamento.json');
+const OUTPUT_PUBLIC = path.resolve('public', 'data', 'faturamento.json');
 const SHEET = 'SCAF2020';
 const DEVOLUCAO_INPUT = path.resolve('src', 'Faturamento', 'devolução.xlsx');
 const DEVOLUCAO_OUTPUT = path.resolve('src', 'data', 'devolucao.json');
@@ -327,6 +328,24 @@ const aplicarFilialGrupos = (linhas) =>
   });
 
 const main = () => {
+  if (fs.existsSync(INPUT)) {
+    const workbook = XLSX.readFile(INPUT, { cellDates: true });
+    const sheet = workbook.Sheets[SHEET];
+    if (!sheet) {
+      throw new Error(`Aba nao encontrada: ${SHEET}`);
+    }
+
+    const faturamento = aplicarFilialGrupos(extrairFaturamento(sheet));
+    const payload = JSON.stringify(faturamento, null, 2);
+    fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
+    fs.mkdirSync(path.dirname(OUTPUT_PUBLIC), { recursive: true });
+    fs.writeFileSync(OUTPUT, payload);
+    fs.writeFileSync(OUTPUT_PUBLIC, payload);
+    console.log(`Gerado ${OUTPUT} e ${OUTPUT_PUBLIC} com ${faturamento.length} linhas.`);
+  } else {
+    console.warn(`Arquivo de faturamento nao encontrado: ${INPUT}`);
+  }
+
   if (fs.existsSync(DEVOLUCAO_INPUT)) {
     const devolucaoWorkbook = XLSX.readFile(DEVOLUCAO_INPUT, { cellDates: true });
     const devolucaoSheet = devolucaoWorkbook.Sheets[DEVOLUCAO_SHEET];
