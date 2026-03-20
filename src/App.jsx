@@ -934,6 +934,7 @@ export default function App() {
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
   const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
+  const [statusMaquinaPromptOpen, setStatusMaquinaPromptOpen] = useState(false);
   const [manutencaoOrdens, setManutencaoOrdens] = useState([]);
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
@@ -980,6 +981,24 @@ export default function App() {
     createdByName: '',
   };
   const [novaOsForm, setNovaOsForm] = useState(novaOsDefaults);
+
+  const abrirNovaOs = () => {
+    setManutencaoEditId(null);
+    setNovaOsForm(novaOsDefaults);
+    setNovaOsFotoFile(null);
+    setNovaOsFotoPreview('');
+    setManutencaoSaveError('');
+    setStatusMaquinaPromptOpen(true);
+  };
+
+  const handleSelecionarStatusMaquinaNovaOs = (statusMaquina) => {
+    setNovaOsForm({
+      ...novaOsDefaults,
+      statusMaquina,
+    });
+    setStatusMaquinaPromptOpen(false);
+    setManutencaoModalOpen(true);
+  };
 
   const handleNovaOsChange = (e) => {
     const { name, value } = e.target;
@@ -11629,14 +11648,7 @@ const custoDetalheTitulo = custoDetalheItem
                             </ul>
                           </div>
                           <button
-                            onClick={() => {
-                              setManutencaoEditId(null);
-                              setNovaOsForm(novaOsDefaults);
-                              setNovaOsFotoFile(null);
-                              setNovaOsFotoPreview('');
-                              setManutencaoSaveError('');
-                              setManutencaoModalOpen(true);
-                            }}
+                            onClick={abrirNovaOs}
                             data-tour="nova-os"
                             className="w-full rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs font-black py-3 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2"
                           >
@@ -11870,14 +11882,7 @@ const custoDetalheTitulo = custoDetalheItem
                         <div className="grid grid-cols-1 gap-3">
                           <button
                             type="button"
-                            onClick={() => {
-                              setManutencaoEditId(null);
-                              setNovaOsForm(novaOsDefaults);
-                              setNovaOsFotoFile(null);
-                              setNovaOsFotoPreview('');
-                              setManutencaoSaveError('');
-                              setManutencaoModalOpen(true);
-                            }}
+                            onClick={abrirNovaOs}
                             className="w-full rounded-xl border border-amber-400/30 bg-gradient-to-r from-amber-400/[0.08] to-transparent px-4 py-3.5 text-left text-xs font-bold text-amber-100 hover:bg-amber-400/15 hover:border-amber-400/40 transition-all duration-200 flex items-center gap-3"
                           >
                             <div className="w-8 h-8 rounded-lg bg-amber-400/15 flex items-center justify-center shrink-0">
@@ -12426,6 +12431,55 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                     </div>
                   )}
+                  </div>
+                )}
+
+                {statusMaquinaPromptOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 px-4 py-6">
+                    <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+                      <div className="border-b border-slate-800 px-6 py-5">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Nova OS</p>
+                        <h3 className="mt-2 text-lg font-black text-white">Qual o status da maquina?</h3>
+                        <p className="mt-1 text-xs text-slate-400">
+                          Selecione antes de abrir a ordem para preencher esse campo automaticamente.
+                        </p>
+                      </div>
+                      <div className="space-y-3 px-6 py-5">
+                        <button
+                          type="button"
+                          onClick={() => handleSelecionarStatusMaquinaNovaOs('Parada')}
+                          className="flex w-full items-center justify-between rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-left text-sm font-bold text-rose-100 transition hover:border-rose-400/50 hover:bg-rose-500/15"
+                        >
+                          <span>Parada</span>
+                          <span className="text-[10px] uppercase tracking-[0.18em] text-rose-200/80">Critico</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelecionarStatusMaquinaNovaOs('Rodando')}
+                          className="flex w-full items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-left text-sm font-bold text-emerald-100 transition hover:border-emerald-400/50 hover:bg-emerald-500/15"
+                        >
+                          <span>Rodando</span>
+                          <span className="text-[10px] uppercase tracking-[0.18em] text-emerald-200/80">Operando</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelecionarStatusMaquinaNovaOs('Em manutencao')}
+                          className="flex w-full items-center justify-between rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-left text-sm font-bold text-amber-100 transition hover:border-amber-400/50 hover:bg-amber-500/15"
+                        >
+                          <span>Em manutencao</span>
+                          <span className="text-[10px] uppercase tracking-[0.18em] text-amber-200/80">Equipe atuando</span>
+                        </button>
+                      </div>
+                      <div className="border-t border-slate-800 px-6 py-4">
+                        <button
+                          type="button"
+                          onClick={() => setStatusMaquinaPromptOpen(false)}
+                          className="w-full rounded-lg border border-slate-700 px-4 py-2 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
