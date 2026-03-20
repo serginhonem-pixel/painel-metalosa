@@ -1015,20 +1015,43 @@ export default function App() {
     setNovaOsFotoPreview(file ? URL.createObjectURL(file) : '');
   };
 
+  const getFirebaseSaveErrorMessage = (err) => {
+    const code = err?.code || '';
+    const rawMessage = err?.message || '';
+    if (
+      code === 'permission-denied' ||
+      code === 'storage/unauthorized' ||
+      rawMessage.toLowerCase().includes('missing or insufficient permissions')
+    ) {
+      return 'Sem permissao no Firebase para concluir esta acao. Se a OS estiver com foto, verifique as regras do Storage.';
+    }
+    return rawMessage || code || 'Nao foi possivel salvar a OS.';
+  };
+
   const handleNovaOsSubmit = async (e) => {
     e.preventDefault();
     setManutencaoSaveError('');
+    if (!authUser) {
+      setManutencaoSaveError('Faca login para salvar a OS.');
+      return;
+    }
     if (!isAllowedDomain) {
       setManutencaoSaveError('Sem permissao para salvar.');
       return;
     }
     const osId = manutencaoEditId || `os-${Date.now()}`;
     let fotoUrl = novaOsForm.fotoUrl || '';
+    let fotoUploadFalhou = false;
     if (novaOsFotoFile) {
-      const safeName = `${Date.now()}-${novaOsFotoFile.name}`;
-      const storageRef = ref(storage, `manutencao_os/${osId}/${safeName}`);
-      await uploadBytes(storageRef, novaOsFotoFile);
-      fotoUrl = await getDownloadURL(storageRef);
+      try {
+        const safeName = `${Date.now()}-${novaOsFotoFile.name}`;
+        const storageRef = ref(storage, `manutencao_os/${osId}/${safeName}`);
+        await uploadBytes(storageRef, novaOsFotoFile);
+        fotoUrl = await getDownloadURL(storageRef);
+      } catch (uploadErr) {
+        fotoUploadFalhou = true;
+        console.error('Erro ao enviar foto da OS:', uploadErr);
+      }
     }
     let statusMaquinaFinal = novaOsForm.statusMaquina;
     let fechadaEmFinal =
@@ -1084,13 +1107,12 @@ export default function App() {
       setNovaOsFotoFile(null);
       setNovaOsFotoPreview('');
       setNovaOsForm(novaOsDefaults);
+      if (fotoUploadFalhou) {
+        window.alert('A OS foi salva sem a foto. O Firebase Storage recusou o upload por permissao.');
+      }
     } catch (err) {
       console.error('Erro ao salvar OS:', err);
-      const message =
-        err?.message ||
-        err?.code ||
-        'Nao foi possivel salvar a OS.';
-      setManutencaoSaveError(message);
+      setManutencaoSaveError(getFirebaseSaveErrorMessage(err));
     }
   };
 
