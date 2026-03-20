@@ -935,6 +935,7 @@ export default function App() {
   const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
   const [statusMaquinaPromptOpen, setStatusMaquinaPromptOpen] = useState(false);
+  const [manutencaoDetalheModal, setManutencaoDetalheModal] = useState(null);
   const [manutencaoOrdens, setManutencaoOrdens] = useState([]);
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
@@ -1168,6 +1169,10 @@ export default function App() {
     setNovaOsFotoPreview('');
     setManutencaoSaveError('');
     setManutencaoModalOpen(true);
+  };
+
+  const handleVisualizarOs = (ordem) => {
+    setManutencaoDetalheModal(ordem);
   };
 
   const handleExcluirOs = async (ordem) => {
@@ -12079,6 +12084,13 @@ const custoDetalheTitulo = custoDetalheItem
                                     <div className="flex items-center gap-2">
                                       <button
                                         type="button"
+                                        onClick={() => handleVisualizarOs(ordem)}
+                                        className="text-[10px] font-bold text-amber-300 hover:text-amber-200 px-2 py-1 rounded-md hover:bg-amber-500/10 transition-all"
+                                      >
+                                        Ver
+                                      </button>
+                                      <button
+                                        type="button"
                                         onClick={() => handleEditarOs(ordem)}
                                         className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200 px-2 py-1 rounded-md hover:bg-cyan-500/10 transition-all"
                                       >
@@ -12190,6 +12202,13 @@ const custoDetalheTitulo = custoDetalheItem
                                   </td>
                                   <td className="px-5 py-3.5">
                                     <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleVisualizarOs(ordem)}
+                                        className="text-[10px] font-bold text-amber-300 hover:text-amber-200 px-2 py-1 rounded-md hover:bg-amber-500/10 transition-all"
+                                      >
+                                        Ver
+                                      </button>
                                       <button
                                         type="button"
                                         onClick={() => handleEditarOs(ordem)}
@@ -12431,6 +12450,101 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                     </div>
                   )}
+                  </div>
+                )}
+
+                {manutencaoDetalheModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 px-4 py-6">
+                    <div className="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+                      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Detalhes da OS</p>
+                          <h3 className="mt-1 text-lg font-black text-white">
+                            {manutencaoDetalheModal.ativo || manutencaoDetalheModal.id}
+                          </h3>
+                          <p className="text-xs text-slate-400">
+                            {manutencaoDetalheModal.id} · {manutencaoDetalheModal.status || '-'} · {manutencaoDetalheModal.statusMaquina || '-'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setManutencaoDetalheModal(null)}
+                          className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white"
+                        >
+                          Fechar
+                        </button>
+                      </div>
+
+                      <div className="grid max-h-[calc(92vh-88px)] grid-cols-1 gap-0 overflow-y-auto lg:grid-cols-[1.2fr_0.8fr]">
+                        <div className="space-y-6 px-6 py-5">
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                            {[
+                              ['OS', manutencaoDetalheModal.id],
+                              ['Ativo', manutencaoDetalheModal.ativo],
+                              ['Setor', manutencaoDetalheModal.setor],
+                              ['Processo', manutencaoDetalheModal.processo],
+                              ['Prioridade', manutencaoDetalheModal.prioridade],
+                              ['Tipo', manutencaoDetalheModal.tipo],
+                              ['Categoria', manutencaoDetalheModal.categoria],
+                              ['Status da OS', manutencaoDetalheModal.status],
+                              ['Status da maquina', manutencaoDetalheModal.statusMaquina],
+                              ['Responsavel', manutencaoDetalheModal.responsavel],
+                              ['Solicitante', manutencaoDetalheModal.solicitante],
+                              ['Impacto', manutencaoDetalheModal.impacto],
+                              ['Componente', manutencaoDetalheModal.componente],
+                              ['Sintoma', manutencaoDetalheModal.sintoma],
+                              ['Causa provavel', manutencaoDetalheModal.causaProvavel],
+                              ['Acao imediata', manutencaoDetalheModal.acaoImediata],
+                              ['Tempo estimado', manutencaoDetalheModal.tempoEstimado],
+                              ['Tempo parada', manutencaoDetalheModal.tempoParada],
+                              ['Custo estimado', manutencaoDetalheModal.custoEstimado],
+                              ['Data falha', formatDateTimeRelatorio(manutencaoDetalheModal.dataFalha)],
+                              ['Criado em', formatDateTimeRelatorio(manutencaoDetalheModal.createdAt)],
+                              ['Atualizado em', formatDateTimeRelatorio(manutencaoDetalheModal.updatedAt)],
+                            ].map(([label, value]) => (
+                              <div key={label} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+                                <p className="mt-2 text-sm font-semibold text-slate-100 break-words">{value || '-'}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Descricao</p>
+                            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-200">
+                              {manutencaoDetalheModal.descricao || 'Sem descricao informada.'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-slate-800 px-6 py-5 lg:border-l lg:border-t-0">
+                          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Foto anexada</p>
+                            {manutencaoDetalheModal.fotoUrl ? (
+                              <div className="mt-4 space-y-3">
+                                <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+                                  <img
+                                    src={manutencaoDetalheModal.fotoUrl}
+                                    alt={`Foto da OS ${manutencaoDetalheModal.id}`}
+                                    className="max-h-[60vh] w-full object-contain"
+                                  />
+                                </div>
+                                <a
+                                  href={manutencaoDetalheModal.fotoUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-200 hover:bg-blue-500/15"
+                                >
+                                  Abrir foto em tamanho real
+                                </a>
+                              </div>
+                            ) : (
+                              <p className="mt-3 text-sm text-slate-500">Sem foto anexada.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
