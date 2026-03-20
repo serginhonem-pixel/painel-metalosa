@@ -2747,6 +2747,123 @@ export default function App() {
     printHtmlRelatorio(html);
   };
 
+  const handleExportarUsuariosPdf = () => {
+    const usuarios = [...(colaboradores || [])]
+      .filter((item) => item?.nome)
+      .sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
+    const now = new Date();
+    const totalUsuarios = usuarios.length;
+    const totalSetores = new Set(usuarios.map((item) => item.setor).filter(Boolean)).size;
+    const totalGestores = new Set(usuarios.map((item) => item.gestor).filter(Boolean)).size;
+
+    const rowsHtml = usuarios.length
+      ? usuarios
+          .map(
+            (usuario, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${escapeHtmlRelatorio(usuario.nome || '-')}</td>
+                <td>${escapeHtmlRelatorio(usuario.cargo || '-')}</td>
+                <td>${escapeHtmlRelatorio(usuario.setor || '-')}</td>
+                <td>${escapeHtmlRelatorio(usuario.gestor || '-')}</td>
+                <td>${escapeHtmlRelatorio(usuario.matricula || usuario.id || '-')}</td>
+                <td>${escapeHtmlRelatorio(usuario.email || '-')}</td>
+              </tr>`
+          )
+          .join('')
+      : '<tr><td colspan="7" class="muted">Nenhum usuario cadastrado para exportar.</td></tr>';
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Relatorio de Usuarios</title>
+        <style>
+          * { box-sizing: border-box; }
+          body { margin: 0; padding: 24px; background: #f8fafc; color: #0f172a; font-family: Arial, sans-serif; }
+          .page { max-width: 1100px; margin: 0 auto; }
+          .header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+          .brand { display: flex; align-items: center; gap: 14px; }
+          .brand img { width: 52px; height: 52px; object-fit: contain; }
+          .title { font-size: 22px; font-weight: 700; }
+          .subtitle { margin-top: 4px; font-size: 12px; color: #475569; }
+          .meta { font-size: 12px; color: #475569; text-align: right; }
+          .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+          .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px 16px; }
+          .card small { display: block; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
+          .card strong { font-size: 24px; }
+          .notice { margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; font-size: 12px; }
+          table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+          thead th { padding: 10px 12px; background: #0f172a; color: #f8fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; text-align: left; }
+          tbody td { padding: 10px 12px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #1e293b; vertical-align: top; }
+          tbody tr:nth-child(even) { background: #f8fafc; }
+          .muted { color: #64748b; text-align: center; }
+          @media print {
+            body { padding: 0; background: #fff; }
+            .page { max-width: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <div class="brand">
+              <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
+              <div>
+                <div class="title">Relatorio de Usuarios</div>
+                <div class="subtitle">Base atual de colaboradores carregada no sistema</div>
+              </div>
+            </div>
+            <div class="meta">
+              <div>Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+              <div>Total listado: ${escapeHtmlRelatorio(totalUsuarios)}</div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <small>Usuarios</small>
+              <strong>${escapeHtmlRelatorio(totalUsuarios)}</strong>
+            </div>
+            <div class="card">
+              <small>Setores</small>
+              <strong>${escapeHtmlRelatorio(totalSetores)}</strong>
+            </div>
+            <div class="card">
+              <small>Gestores</small>
+              <strong>${escapeHtmlRelatorio(totalGestores)}</strong>
+            </div>
+          </div>
+
+          <div class="notice">
+            Este relatorio nao inclui senhas nem credenciais. O aplicativo exporta apenas os dados de usuarios disponiveis no frontend.
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Cargo</th>
+                <th>Setor</th>
+                <th>Gestor</th>
+                <th>Matricula/ID</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </body>
+      </html>
+    `;
+
+    printHtmlRelatorio(html);
+  };
+
   useEffect(() => {
     if (isManutencaoOnly && abaAtiva !== 'manutencao') {
       setAbaAtiva('manutencao');
@@ -11410,6 +11527,15 @@ const custoDetalheTitulo = custoDetalheItem
           {/* ABA DE GESTÃO DIÁRIA */}
           {abaAtiva === 'gestao' && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
+                 <div className="flex items-center justify-end">
+                   <button
+                     type="button"
+                     onClick={handleExportarUsuariosPdf}
+                     className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-slate-500 hover:text-white"
+                   >
+                     Exportar usuarios PDF
+                   </button>
+                 </div>
                  <PainelOperacaoDiaria
                    registrosPorData={registrosPorData}
                    colaboradores={colaboradores}
