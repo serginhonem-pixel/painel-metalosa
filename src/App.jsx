@@ -9001,7 +9001,7 @@ const custoDetalheTitulo = custoDetalheItem
                       
                       <h2 className="text-3xl font-black text-white tracking-tight">Custos</h2>
                       <p className="text-sm text-slate-400 mt-1 font-medium">
-                        Base {mesCustoAtual || 'planilha atual'} - {faturamentoAtual.movimentos || 0} movimentos
+                        {faturamentoAtual.movimentos || 0} movimentos
                       </p>
                     </div>
                   </div>
