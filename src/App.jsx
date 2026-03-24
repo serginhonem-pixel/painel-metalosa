@@ -7324,6 +7324,166 @@ const confiabilidadeCustos = useMemo(() => {
   };
 }, [faturamentoComCustos.summary]);
 
+const exportCustosDisponivel = itensCustosOrdenados.length > 0;
+
+const handleExportarCustosExcel = () => {
+  if (!itensCustosOrdenados.length) return;
+
+  const linhasExport = itensCustosOrdenados.map((item) => ({
+    SKU: item.codigo || '',
+    Descricao: item.descricao || '',
+    Quantidade: item.quantidade ?? 0,
+    Receita: item.receita ?? 0,
+    PrecoMedio: item.quantidade ? item.receita / item.quantidade : 0,
+    CustoTotal: item.custo ?? 0,
+    CustoUnitario: item.quantidade ? item.custo / item.quantidade : 0,
+    CustoDireto: item.custoDireto ?? 0,
+    CifTotal: item.cifRateado ?? 0,
+    FonteDireto: item.fonteDireto || '',
+    MargemPercentual: Number.isFinite(item.margem) ? Number(item.margem.toFixed(2)) : 0,
+    MarkupPercentual: Number.isFinite(item.markup) ? Number(item.markup.toFixed(2)) : 0,
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(linhasExport);
+  XLSX.utils.book_append_sheet(wb, ws, 'Custos por SKU');
+
+  const periodo = String(mesCustoAtual || 'atual')
+    .trim()
+    .replace(/\s+/g, '_')
+    .toLowerCase();
+  XLSX.writeFile(wb, `custos_por_sku_${periodo}.xlsx`);
+};
+
+const handleExportarCustosPdf = () => {
+  if (!itensCustosOrdenados.length) return;
+
+  const now = new Date();
+  const periodo = mesCustoAtual || 'Planilha atual';
+  const linhasHtml = itensCustosOrdenados
+    .map(
+      (item) => `
+        <tr>
+          <td>${escapeHtmlRelatorio(item.codigo || '-')}</td>
+          <td>${escapeHtmlRelatorio(item.descricao || 'Sem descricao')}</td>
+          <td class="num">${escapeHtmlRelatorio(item.quantidade ? Math.round(item.quantidade) : 0)}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.receita))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.quantidade ? item.receita / item.quantidade : 0))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custo))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.quantidade ? item.custo / item.quantidade : 0))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custoDireto))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.cifRateado))}</td>
+          <td>${escapeHtmlRelatorio(item.fonteDireto || '-')}</td>
+          <td class="num">${escapeHtmlRelatorio(Number.isFinite(item.margem) ? `${item.margem.toFixed(1)}%` : '-')}</td>
+          <td class="num">${escapeHtmlRelatorio(Number.isFinite(item.markup) ? `${item.markup.toFixed(1)}%` : '-')}</td>
+        </tr>
+      `
+    )
+    .join('');
+
+  const html = `
+    <!doctype html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <title>Custos por SKU</title>
+      <style>
+        * { box-sizing: border-box; }
+        body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f8fafc; }
+        .page { padding: 24px; }
+        .header { background: linear-gradient(120deg, #0f172a, #1e293b); color: #f8fafc; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { height: 40px; width: auto; }
+        .brand small { display: block; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; }
+        h1 { font-size: 22px; margin: 0; }
+        .meta { font-size: 11px; color: #cbd5e1; text-align: right; }
+        .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+        .card { background: #ffffff; border-radius: 14px; padding: 12px 14px; border: 1px solid #e2e8f0; }
+        .card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: #64748b; }
+        .card .value { margin-top: 6px; font-size: 15px; font-weight: 700; color: #0f172a; }
+        .table-wrap { margin-top: 18px; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #ffffff; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+        th { background: #e2e8f0; color: #334155; text-transform: uppercase; letter-spacing: 0.14em; font-size: 9px; }
+        td.num, th.num { text-align: right; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        tr:last-child td { border-bottom: none; }
+        .footer { margin-top: 14px; text-align: right; font-size: 10px; color: #64748b; }
+        @page { size: A4 landscape; margin: 10mm; }
+        @media print {
+          body { background: #fff; }
+          .page { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="page">
+        <div class="header">
+          <div class="brand">
+            <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
+            <div>
+              <small>Relatorio de custos</small>
+              <h1>Custos por SKU</h1>
+            </div>
+          </div>
+          <div class="meta">
+            <div>Base ${escapeHtmlRelatorio(periodo)}</div>
+            <div>Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="card">
+            <div class="label">SKUs listados</div>
+            <div class="value">${escapeHtmlRelatorio(itensCustosOrdenados.length)}</div>
+          </div>
+          <div class="card">
+            <div class="label">Total de custos</div>
+            <div class="value">${escapeHtmlRelatorio(formatarMoeda(totalCustosMes))}</div>
+          </div>
+          <div class="card">
+            <div class="label">Custo / movimento</div>
+            <div class="value">${escapeHtmlRelatorio(formatarMoeda(custoMedioMovimento))}</div>
+          </div>
+          <div class="card">
+            <div class="label">% custo faturamento</div>
+            <div class="value">${escapeHtmlRelatorio(`${percentualCustoSobreFaturamento.toFixed(1)}%`)}</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Descricao</th>
+                <th class="num">Qtd</th>
+                <th class="num">Receita</th>
+                <th class="num">Preco medio</th>
+                <th class="num">Custo</th>
+                <th class="num">Custo unit.</th>
+                <th class="num">Direto</th>
+                <th class="num">CIF total</th>
+                <th>Fonte</th>
+                <th class="num">Margem</th>
+                <th class="num">Markup</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${linhasHtml}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="footer">Metalosa · Custos</div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  printHtmlRelatorio(html);
+};
+
 const clientesLookup = useMemo(() => {
   const map = new Map();
   (clientesData?.clientes || []).forEach((cliente) => {
@@ -7977,13 +8137,39 @@ const custoDetalheTitulo = custoDetalheItem
                 <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Detalhamento</p>
                 <p className="text-lg font-bold text-white">Custos por SKU</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setModalTabelaCustosOpen(false)}
-                className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
-              >
-                Fechar
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleExportarCustosExcel}
+                  disabled={!exportCustosDisponivel}
+                  className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
+                    exportCustosDisponivel
+                      ? 'border-emerald-500/70 bg-emerald-500/10 text-emerald-200 hover:border-emerald-400 hover:text-white'
+                      : 'border-slate-800 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  Baixar Excel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExportarCustosPdf}
+                  disabled={!exportCustosDisponivel}
+                  className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
+                    exportCustosDisponivel
+                      ? 'border-sky-500/70 bg-sky-500/10 text-sky-200 hover:border-sky-400 hover:text-white'
+                      : 'border-slate-800 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  Baixar PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalTabelaCustosOpen(false)}
+                  className="rounded-full border border-slate-800 px-3 py-1 text-xs font-semibold text-slate-400 hover:text-white"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
             <div className="p-6">
               {itensCustosOrdenados.length ? (
