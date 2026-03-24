@@ -925,6 +925,13 @@ export default function App() {
   const [custoDetalheItem, setCustoDetalheItem] = useState(null);
   const [custoDetalhePedidoModalOpen, setCustoDetalhePedidoModalOpen] = useState(false);
   const [custoDetalhePedidoSelecionado, setCustoDetalhePedidoSelecionado] = useState(null);
+  const [custoPeriodoInicio, setCustoPeriodoInicio] = useState('');
+  const [custoPeriodoFim, setCustoPeriodoFim] = useState('');
+  const [custoFiltroFilial, setCustoFiltroFilial] = useState('Todas');
+  const [custoFiltroGrupo, setCustoFiltroGrupo] = useState('Todos');
+  const [custoFiltroFonte, setCustoFiltroFonte] = useState('Todas');
+  const [custoFiltroSku, setCustoFiltroSku] = useState('');
+  const [custoFiltroCliente, setCustoFiltroCliente] = useState('');
   const [bensSeedLoading, setBensSeedLoading] = useState(false);
   const [bensSeedError, setBensSeedError] = useState('');
   const [bensSeedDone, setBensSeedDone] = useState(false);
@@ -7268,6 +7275,367 @@ const variacaoDiretoPlanilha = useMemo(() => {
   return ((totalDiretoPlanilhaAtual - totalDiretoPlanilhaPrev) / totalDiretoPlanilhaPrev) * 100;
 }, [totalDiretoPlanilhaAtual, totalDiretoPlanilhaPrev]);
 
+const custosBaseFiltravel = useMemo(() => {
+  const normalizadas = (faturamentoLinhas || []).map((row) => {
+    const mesInfo = obterMesKey(row);
+    const codigo = row?.Codigo ?? row?.codigo ?? '';
+    const cliente = row?.Cliente ?? row?.cliente ?? 'Sem cliente';
+    const clienteCodigo = normalizarCodigoCliente(cliente);
+    const clienteInfo = clienteCodigo ? clientesPorCodigo.get(clienteCodigo) : null;
+    const descricao =
+      normalizarDescricaoProduto(row?.Descricao ?? row?.descricao ?? '') ||
+      produtoDescricaoMap.get(normalizarCodigoProduto(codigo)) ||
+      '';
+    return {
+      cliente,
+      clienteCodigo,
+      clienteNome: clienteInfo?.Nome ?? clienteInfo?.nome ?? cliente,
+      grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
+      codigo,
+      descricao,
+      filial: obterFilialFaturamento(row),
+      unidade: row?.Unidade ?? row?.unidade ?? '',
+      nf: obterNumeroNota(row),
+      quantidade: obterQuantidadeLiquida(row),
+      valorTotal: obterValorLiquido(row),
+      emissao: parseEmissaoData(row?.Emissao ?? row?.emissao),
+      mesKey: mesInfo?.key || '',
+      mesDisplay: mesInfo?.display || '',
+      tipoMovimento: normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento),
+      cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
+    };
+  });
+
+  const meses = Array.from(new Set(normalizadas.map((row) => row.mesKey).filter(Boolean))).sort();
+  const mesAtualKey = meses.length ? meses[meses.length - 1] : '';
+  const mesAtualDisplay = normalizadas.find((row) => row.mesKey === mesAtualKey)?.mesDisplay || '';
+  const linhasMesAtual = mesAtualKey ? normalizadas.filter((row) => row.mesKey === mesAtualKey) : normalizadas;
+
+  return {
+    linhasTodas: normalizadas,
+    linhasMesAtual,
+    mesAtualKey,
+    mesAtualDisplay,
+  };
+}, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap]);
+
+const custosPeriodoLabel = useMemo(() => {
+  if (custoPeriodoInicio || custoPeriodoFim) {
+    return [custoPeriodoInicio || 'inicio', custoPeriodoFim || 'fim'].join(' a ');
+  }
+  return custosBaseFiltravel.mesAtualDisplay || mesCustoAtual || 'Planilha atual';
+}, [custoPeriodoInicio, custoPeriodoFim, custosBaseFiltravel.mesAtualDisplay, mesCustoAtual]);
+
+const custosLinhasPeriodo = useMemo(() => {
+  const linhasBase =
+    custoPeriodoInicio || custoPeriodoFim
+      ? custosBaseFiltravel.linhasTodas
+      : custosBaseFiltravel.linhasMesAtual;
+
+  return linhasBase.filter((row) => {
+    if (!row.emissao) return false;
+    const dataISO = obterDataIsoUtc(row.emissao);
+    if (custoPeriodoInicio && dataISO < custoPeriodoInicio) return false;
+    if (custoPeriodoFim && dataISO > custoPeriodoFim) return false;
+    return true;
+  });
+}, [custosBaseFiltravel, custoPeriodoInicio, custoPeriodoFim]);
+
+const custosFiliaisDisponiveis = useMemo(
+  () =>
+    Array.from(
+      new Set(custosLinhasPeriodo.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
+    ).sort((a, b) => String(a).localeCompare(String(b))),
+  [custosLinhasPeriodo]
+);
+
+const custosGruposDisponiveis = useMemo(
+  () =>
+    Array.from(new Set(custosLinhasPeriodo.map((row) => row.grupo).filter(Boolean))).sort((a, b) =>
+      String(a).localeCompare(String(b))
+    ),
+  [custosLinhasPeriodo]
+);
+
+useEffect(() => {
+  if (custoFiltroFilial === 'Todas') return;
+  if (custosFiliaisDisponiveis.includes(custoFiltroFilial)) return;
+  setCustoFiltroFilial('Todas');
+}, [custoFiltroFilial, custosFiliaisDisponiveis]);
+
+useEffect(() => {
+  if (custoFiltroGrupo === 'Todos') return;
+  if (custosGruposDisponiveis.includes(custoFiltroGrupo)) return;
+  setCustoFiltroGrupo('Todos');
+}, [custoFiltroGrupo, custosGruposDisponiveis]);
+
+const custosLinhasSemFiltroFonte = useMemo(() => {
+  const skuBusca = normalizarTexto(custoFiltroSku);
+  const clienteBusca = normalizarTexto(custoFiltroCliente);
+
+  return custosLinhasPeriodo.filter((row) => {
+    if (custoFiltroFilial !== 'Todas' && row.filial !== custoFiltroFilial) return false;
+    if (custoFiltroGrupo !== 'Todos' && row.grupo !== custoFiltroGrupo) return false;
+    if (
+      skuBusca &&
+      !normalizarTexto(`${row.codigo || ''} ${row.descricao || ''}`).includes(skuBusca)
+    ) {
+      return false;
+    }
+    if (
+      clienteBusca &&
+      !normalizarTexto(`${row.clienteNome || ''} ${row.cliente || ''}`).includes(clienteBusca)
+    ) {
+      return false;
+    }
+    return true;
+  });
+}, [
+  custosLinhasPeriodo,
+  custoFiltroFilial,
+  custoFiltroGrupo,
+  custoFiltroSku,
+  custoFiltroCliente,
+]);
+
+const custosDiasAtivos = useMemo(
+  () => new Set(custosLinhasSemFiltroFonte.map((row) => obterDataIsoUtc(row.emissao)).filter(Boolean)).size,
+  [custosLinhasSemFiltroFonte]
+);
+
+const custosBreakdownBase = useMemo(
+  () =>
+    computeCostBreakdown({
+      linhas: custosLinhasSemFiltroFonte,
+      produtoDescricaoMap,
+      custosDiretos: custosData,
+      custosDiretosAnoAnterior: custosPrevanoData,
+      custosIndiretos: custosIndiretosData,
+      mesCustoAtual,
+      diasAtivos: custosDiasAtivos,
+    }),
+  [
+    custosLinhasSemFiltroFonte,
+    produtoDescricaoMap,
+    custosData,
+    custosPrevanoData,
+    custosIndiretosData,
+    mesCustoAtual,
+    custosDiasAtivos,
+  ]
+);
+
+const custosItensFiltrados = useMemo(() => {
+  if (custoFiltroFonte === 'Todas') return custosBreakdownBase.itens || [];
+  return (custosBreakdownBase.itens || []).filter((item) => item.fonteDireto === custoFiltroFonte);
+}, [custosBreakdownBase.itens, custoFiltroFonte]);
+
+const custosSkuSelecionados = useMemo(
+  () => new Set(custosItensFiltrados.map((item) => item.skuNormalized || normalizarCodigoProduto(item.codigo))),
+  [custosItensFiltrados]
+);
+
+const custosLinhasFiltradas = useMemo(() => {
+  if (custoFiltroFonte === 'Todas') return custosLinhasSemFiltroFonte;
+  return custosLinhasSemFiltroFonte.filter((row) =>
+    custosSkuSelecionados.has(normalizarCodigoProduto(row.codigo || ''))
+  );
+}, [custosLinhasSemFiltroFonte, custoFiltroFonte, custosSkuSelecionados]);
+
+const custosItensOrdenados = useMemo(
+  () =>
+    [...custosItensFiltrados].sort((a, b) => {
+      const resultadoA = (a.receita || 0) - (a.custo || 0);
+      const resultadoB = (b.receita || 0) - (b.custo || 0);
+      return resultadoB - resultadoA;
+    }),
+  [custosItensFiltrados]
+);
+
+const custosTotal = useMemo(
+  () => custosItensFiltrados.reduce((acc, item) => acc + (item.custo || 0), 0),
+  [custosItensFiltrados]
+);
+
+const custosReceitaTotal = useMemo(
+  () => custosItensFiltrados.reduce((acc, item) => acc + (item.receita || 0), 0),
+  [custosItensFiltrados]
+);
+
+const custosMargemPercentual = useMemo(() => {
+  if (custosReceitaTotal <= 0) return 0;
+  return ((custosReceitaTotal - custosTotal) / custosReceitaTotal) * 100;
+}, [custosReceitaTotal, custosTotal]);
+
+const custosMarkupPercentual = useMemo(() => {
+  if (custosTotal <= 0) return 0;
+  return ((custosReceitaTotal - custosTotal) / custosTotal) * 100;
+}, [custosReceitaTotal, custosTotal]);
+
+const custosPercentualSobreFaturamento = useMemo(() => {
+  if (custosReceitaTotal <= 0) return 0;
+  return (custosTotal / custosReceitaTotal) * 100;
+}, [custosReceitaTotal, custosTotal]);
+
+const custosMovimentos = custosLinhasFiltradas.length;
+
+const custosCustoMedioMovimento = useMemo(
+  () => (custosMovimentos > 0 ? custosTotal / custosMovimentos : 0),
+  [custosMovimentos, custosTotal]
+);
+
+const custosCustoMedioDia = useMemo(
+  () => (custosDiasAtivos > 0 ? custosTotal / custosDiasAtivos : 0),
+  [custosDiasAtivos, custosTotal]
+);
+
+const custosTopItens = useMemo(
+  () => [...custosItensFiltrados].sort((a, b) => (b.custo || 0) - (a.custo || 0)).slice(0, 10),
+  [custosItensFiltrados]
+);
+
+const custosPioresMargens = useMemo(
+  () =>
+    custosItensFiltrados
+      .filter((item) => (item.margem || 0) < 0)
+      .sort((a, b) => (a.margem || 0) - (b.margem || 0))
+      .slice(0, 10),
+  [custosItensFiltrados]
+);
+
+const custosConfiabilidade = useMemo(() => {
+  const counts = custosItensFiltrados.reduce(
+    (acc, item) => {
+      acc[item.fonteDireto] = (acc[item.fonteDireto] || 0) + 1;
+      return acc;
+    },
+    { ATUAL: 0, FALLBACK_ANO_PASSADO: 0, TEORICO_PROXY: 0, SEM_CUSTO: 0 }
+  );
+  const total =
+    counts.ATUAL + counts.FALLBACK_ANO_PASSADO + counts.TEORICO_PROXY + counts.SEM_CUSTO;
+  if (!total) {
+    return { total: 0, atual: 0, fallback: 0, proxy: 0, semCusto: 0 };
+  }
+  return {
+    total,
+    atual: (counts.ATUAL / total) * 100,
+    fallback: (counts.FALLBACK_ANO_PASSADO / total) * 100,
+    proxy: (counts.TEORICO_PROXY / total) * 100,
+    semCusto: (counts.SEM_CUSTO / total) * 100,
+  };
+}, [custosItensFiltrados]);
+
+const custosTotalDireto = useMemo(
+  () => custosItensFiltrados.reduce((acc, item) => acc + (item.custoDireto || 0), 0),
+  [custosItensFiltrados]
+);
+
+const custosTotalIndireto = useMemo(
+  () => custosItensFiltrados.reduce((acc, item) => acc + (item.cifRateado || 0), 0),
+  [custosItensFiltrados]
+);
+
+const custosPercentualDireto = useMemo(
+  () => (custosTotal > 0 ? (custosTotalDireto / custosTotal) * 100 : 0),
+  [custosTotalDireto, custosTotal]
+);
+
+const custosPercentualIndireto = useMemo(
+  () => (custosTotal > 0 ? (custosTotalIndireto / custosTotal) * 100 : 0),
+  [custosTotalIndireto, custosTotal]
+);
+
+const custosDiretoAtualSelecionado = useMemo(
+  () =>
+    custosItensFiltrados.reduce(
+      (acc, item) => acc + ((item.custoDiretoAtualValor || 0) * (item.quantidade || 0)),
+      0
+    ),
+  [custosItensFiltrados]
+);
+
+const custosDiretoPrevSelecionado = useMemo(
+  () =>
+    custosItensFiltrados.reduce(
+      (acc, item) => acc + ((item.custoDiretoPrevValor || 0) * (item.quantidade || 0)),
+      0
+    ),
+  [custosItensFiltrados]
+);
+
+const custosVariacaoDiretoSelecionado = useMemo(() => {
+  if (!custosDiretoPrevSelecionado) return 0;
+  return ((custosDiretoAtualSelecionado - custosDiretoPrevSelecionado) / custosDiretoPrevSelecionado) * 100;
+}, [custosDiretoAtualSelecionado, custosDiretoPrevSelecionado]);
+
+const custosImpactoResultado = useMemo(
+  () =>
+    [...custosItensFiltrados]
+      .map((item) => ({
+        ...item,
+        impactoResultado: (item.receita || 0) - (item.custo || 0),
+        impactoAbsoluto: Math.abs((item.receita || 0) - (item.custo || 0)),
+      }))
+      .sort((a, b) => b.impactoAbsoluto - a.impactoAbsoluto)
+      .slice(0, 10),
+  [custosItensFiltrados]
+);
+
+const custosCurvaAbc = useMemo(() => {
+  const ordenados = [...custosItensFiltrados].sort((a, b) => (b.custo || 0) - (a.custo || 0));
+  if (!ordenados.length || custosTotal <= 0) {
+    return {
+      itens: [],
+      resumo: {
+        A: { total: 0, quantidade: 0, percentual: 0 },
+        B: { total: 0, quantidade: 0, percentual: 0 },
+        C: { total: 0, quantidade: 0, percentual: 0 },
+      },
+    };
+  }
+
+  let acumulado = 0;
+  const resumo = {
+    A: { total: 0, quantidade: 0, percentual: 0 },
+    B: { total: 0, quantidade: 0, percentual: 0 },
+    C: { total: 0, quantidade: 0, percentual: 0 },
+  };
+
+  const itens = ordenados.map((item) => {
+    acumulado += item.custo || 0;
+    const percentualAcumulado = (acumulado / custosTotal) * 100;
+    const classe = percentualAcumulado <= 80 ? 'A' : percentualAcumulado <= 95 ? 'B' : 'C';
+    resumo[classe].total += item.custo || 0;
+    resumo[classe].quantidade += 1;
+    return {
+      ...item,
+      classeAbc: classe,
+      percentualCusto: custosTotal > 0 ? ((item.custo || 0) / custosTotal) * 100 : 0,
+      percentualAcumulado,
+    };
+  });
+
+  Object.keys(resumo).forEach((classe) => {
+    resumo[classe].percentual = custosTotal > 0 ? (resumo[classe].total / custosTotal) * 100 : 0;
+  });
+
+  return { itens, resumo };
+}, [custosItensFiltrados, custosTotal]);
+
+const custosSemCustoTop = useMemo(
+  () =>
+    custosItensFiltrados
+      .filter((item) => item.fonteDireto === 'SEM_CUSTO')
+      .sort((a, b) => (b.receita || 0) - (a.receita || 0))
+      .slice(0, 20)
+      .map((item) => ({
+        codigo: item.codigo || item.skuNormalized,
+        descricao: item.descricao,
+        receita: item.receita,
+      })),
+  [custosItensFiltrados]
+);
+
 const totalDiretoMes = faturamentoComCustos.summary?.totalDirect || 0;
 const totalIndiretoMes = faturamentoComCustos.summary?.cifTotal || 0;
 
@@ -7324,12 +7692,12 @@ const confiabilidadeCustos = useMemo(() => {
   };
 }, [faturamentoComCustos.summary]);
 
-const exportCustosDisponivel = itensCustosOrdenados.length > 0;
+const exportCustosDisponivel = custosItensOrdenados.length > 0;
 
 const handleExportarCustosExcel = () => {
-  if (!itensCustosOrdenados.length) return;
+  if (!custosItensOrdenados.length) return;
 
-  const linhasExport = itensCustosOrdenados.map((item) => ({
+  const linhasExport = custosItensOrdenados.map((item) => ({
     SKU: item.codigo || '',
     Descricao: item.descricao || '',
     Quantidade: item.quantidade ?? 0,
@@ -7348,7 +7716,7 @@ const handleExportarCustosExcel = () => {
   const ws = XLSX.utils.json_to_sheet(linhasExport);
   XLSX.utils.book_append_sheet(wb, ws, 'Custos por SKU');
 
-  const periodo = String(mesCustoAtual || 'atual')
+  const periodo = String(custosPeriodoLabel || 'atual')
     .trim()
     .replace(/\s+/g, '_')
     .toLowerCase();
@@ -7356,11 +7724,11 @@ const handleExportarCustosExcel = () => {
 };
 
 const handleExportarCustosPdf = () => {
-  if (!itensCustosOrdenados.length) return;
+  if (!custosItensOrdenados.length) return;
 
   const now = new Date();
-  const periodo = mesCustoAtual || 'Planilha atual';
-  const linhasHtml = itensCustosOrdenados
+  const periodo = custosPeriodoLabel || 'Planilha atual';
+  const linhasHtml = custosItensOrdenados
     .map(
       (item) => `
         <tr>
@@ -7435,19 +7803,19 @@ const handleExportarCustosPdf = () => {
         <div class="summary">
           <div class="card">
             <div class="label">SKUs listados</div>
-            <div class="value">${escapeHtmlRelatorio(itensCustosOrdenados.length)}</div>
+            <div class="value">${escapeHtmlRelatorio(custosItensOrdenados.length)}</div>
           </div>
           <div class="card">
             <div class="label">Total de custos</div>
-            <div class="value">${escapeHtmlRelatorio(formatarMoeda(totalCustosMes))}</div>
+            <div class="value">${escapeHtmlRelatorio(formatarMoeda(custosTotal))}</div>
           </div>
           <div class="card">
             <div class="label">Custo / movimento</div>
-            <div class="value">${escapeHtmlRelatorio(formatarMoeda(custoMedioMovimento))}</div>
+            <div class="value">${escapeHtmlRelatorio(formatarMoeda(custosCustoMedioMovimento))}</div>
           </div>
           <div class="card">
             <div class="label">% custo faturamento</div>
-            <div class="value">${escapeHtmlRelatorio(`${percentualCustoSobreFaturamento.toFixed(1)}%`)}</div>
+            <div class="value">${escapeHtmlRelatorio(`${custosPercentualSobreFaturamento.toFixed(1)}%`)}</div>
           </div>
         </div>
 
@@ -7510,10 +7878,10 @@ const custoDetalheLinhas = useMemo(() => {
   if (!custoDetalheItem) return [];
   const alvo = normalizarCodigoProduto(custoDetalheItem.codigo || custoDetalheItem.skuNormalized || '');
   if (!alvo) return [];
-  return faturamentoAtual.linhas.filter(
+  return custosLinhasFiltradas.filter(
     (row) => normalizarCodigoProduto(row.codigo || '') === alvo
   );
-}, [custoDetalheItem, faturamentoAtual.linhas]);
+}, [custoDetalheItem, custosLinhasFiltradas]);
 
 const custoDetalhePedidos = useMemo(() => {
   if (!custoDetalheLinhas.length) return [];
@@ -7554,7 +7922,7 @@ const custoDetalhePedidosLinhas = useMemo(() => {
 
 const custosPorSkuMap = useMemo(() => {
   const map = new Map();
-  itensCustosOrdenados.forEach((item) => {
+  custosItensOrdenados.forEach((item) => {
     const codigo = normalizarCodigoProduto(item.codigo || item.skuNormalized || '');
     if (!codigo) return;
     map.set(codigo, {
@@ -7563,7 +7931,7 @@ const custosPorSkuMap = useMemo(() => {
     });
   });
   return map;
-}, [itensCustosOrdenados]);
+}, [custosItensOrdenados]);
 
 const handleSeedBensFirestore = async () => {
   if (!isAllowedDomain || !authUser) {
@@ -8172,7 +8540,7 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
             </div>
             <div className="p-6">
-              {itensCustosOrdenados.length ? (
+              {custosItensOrdenados.length ? (
                 <div className="max-h-[60vh] overflow-auto rounded-xl border border-slate-800 bg-slate-950/60">
                   <div className="min-w-[1100px]">
                     <div className="sticky top-0 z-10 grid grid-cols-[90px_1fr_60px_90px_80px_80px_80px_80px_80px_90px_70px_70px] items-center border-b border-slate-800 bg-slate-950/90 px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-slate-500 backdrop-blur">
@@ -8190,7 +8558,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <span className="text-right">Markup</span>
                     </div>
                     <div className="space-y-3 px-3 py-3">
-                      {itensCustosOrdenados.map((item) => (
+                      {custosItensOrdenados.map((item) => (
                         <div
                           key={`${item.codigo}-${item.descricao}`}
                           className="grid grid-cols-[90px_1fr_60px_90px_80px_80px_80px_80px_80px_90px_70px_70px] items-center text-[11px] text-slate-200"
@@ -9187,7 +9555,7 @@ const custoDetalheTitulo = custoDetalheItem
                       
                       <h2 className="text-3xl font-black text-white tracking-tight">Custos</h2>
                       <p className="text-sm text-slate-400 mt-1 font-medium">
-                        {faturamentoAtual.movimentos || 0} movimentos
+                        {custosMovimentos || 0} movimentos · {custosPeriodoLabel}
                       </p>
                     </div>
                   </div>
@@ -9195,20 +9563,20 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Total de custos</p>
                       <div className="flex items-end gap-1">
-                        <span className="text-2xl font-black text-emerald-300">{formatarMoeda(totalCustosMes)}</span>
+                        <span className="text-2xl font-black text-emerald-300">{formatarMoeda(custosTotal)}</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Custo / movimento</p>
                       <div className="flex items-end gap-1">
-                        <span className="text-2xl font-black text-blue-200">{formatarMoeda(custoMedioMovimento)}</span>
+                        <span className="text-2xl font-black text-blue-200">{formatarMoeda(custosCustoMedioMovimento)}</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
                       <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">% custo no faturamento</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-amber-200">
-                          {Number.isFinite(percentualCustoSobreFaturamento) ? `${percentualCustoSobreFaturamento.toFixed(1)}%` : '-'}
+                          {Number.isFinite(custosPercentualSobreFaturamento) ? `${custosPercentualSobreFaturamento.toFixed(1)}%` : '-'}
                         </span>
                       </div>
                     </div>
@@ -9217,104 +9585,190 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  <span className="mr-2">Filiais</span>
-                  {['Todas', ...(faturamentoAtual.filiais || [])].map((filial) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Data inicio
+                    <input
+                      type="date"
+                      value={custoPeriodoInicio}
+                      onChange={(e) => setCustoPeriodoInicio(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    />
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Data fim
+                    <input
+                      type="date"
+                      value={custoPeriodoFim}
+                      onChange={(e) => setCustoPeriodoFim(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    />
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Filial
+                    <select
+                      value={custoFiltroFilial}
+                      onChange={(e) => setCustoFiltroFilial(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    >
+                      {['Todas', ...custosFiliaisDisponiveis].map((filial) => (
+                        <option key={filial} value={filial}>
+                          {filial}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Grupo
+                    <select
+                      value={custoFiltroGrupo}
+                      onChange={(e) => setCustoFiltroGrupo(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    >
+                      {['Todos', ...custosGruposDisponiveis].map((grupo) => (
+                        <option key={grupo} value={grupo}>
+                          {grupo}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    SKU
+                    <input
+                      type="text"
+                      value={custoFiltroSku}
+                      onChange={(e) => setCustoFiltroSku(e.target.value)}
+                      placeholder="Codigo ou descricao"
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200 placeholder:text-slate-500"
+                    />
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Cliente
+                    <input
+                      type="text"
+                      value={custoFiltroCliente}
+                      onChange={(e) => setCustoFiltroCliente(e.target.value)}
+                      placeholder="Nome ou codigo"
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200 placeholder:text-slate-500"
+                    />
+                  </label>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <span className="mr-1">Fonte do custo</span>
+                  {[
+                    ['Todas', 'Todas'],
+                    ['ATUAL', 'Atual'],
+                    ['FALLBACK_ANO_PASSADO', 'Ano anterior'],
+                    ['TEORICO_PROXY', 'Proxy'],
+                    ['SEM_CUSTO', 'Sem custo'],
+                  ].map(([valor, label]) => (
                     <button
-                      key={filial}
+                      key={valor}
                       type="button"
-                      onClick={() => setFiltroFilial(filial)}
+                      onClick={() => setCustoFiltroFonte(valor)}
                       className={`rounded-full px-3 py-1.5 transition-all ${
-                        filtroFilial === filial
+                        custoFiltroFonte === valor
                           ? 'bg-emerald-500 text-slate-950 shadow'
                           : 'bg-slate-800 text-slate-300 hover:text-white'
                       }`}
                     >
-                      {filial}
+                      {label}
                     </button>
                   ))}
-                  {faturamentoAtual.filiais?.length === 0 && (
-                    <span className="text-[10px] text-slate-500">Sem filiais cadastradas.</span>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustoPeriodoInicio('');
+                      setCustoPeriodoFim('');
+                      setCustoFiltroFilial('Todas');
+                      setCustoFiltroGrupo('Todos');
+                      setCustoFiltroFonte('Todas');
+                      setCustoFiltroSku('');
+                      setCustoFiltroCliente('');
+                    }}
+                    className="ml-auto rounded-full border border-slate-700 px-3 py-1.5 text-slate-300 hover:border-slate-500 hover:text-white"
+                  >
+                    Limpar filtros
+                  </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                   <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Indicadores</h3>
-                  <div className="grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-400">
-                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                      <p className="text-[10px]">Margem sobre faturamento</p>
-                      <p className="text-2xl font-bold text-emerald-400 mt-1">
-                        {Number.isFinite(margemPercentual) ? `${margemPercentual.toFixed(1)}%` : '-'}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                      <p className="text-[10px]">Markup sobre custo</p>
-                      <p className="text-2xl font-bold text-blue-300 mt-1">
-                        {Number.isFinite(markupPercentual) ? `${markupPercentual.toFixed(1)}%` : '-'}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                      <p className="text-[10px]">Custo medio / dia</p>
-                      <p className="text-2xl font-bold text-slate-100 mt-1">{formatarMoeda(custoMedioDia)}</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                      <p className="text-[10px]">Qtd SKUs com custo</p>
-                      <p className="text-2xl font-bold text-slate-100 mt-1">{faturamentoComCustos.itens.length || 0}</p>
+                    <div className="grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-400">
+                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                        <p className="text-[10px]">Margem sobre faturamento</p>
+                        <p className="text-2xl font-bold text-emerald-400 mt-1">
+                          {Number.isFinite(custosMargemPercentual) ? `${custosMargemPercentual.toFixed(1)}%` : '-'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                        <p className="text-[10px]">Markup sobre custo</p>
+                        <p className="text-2xl font-bold text-blue-300 mt-1">
+                          {Number.isFinite(custosMarkupPercentual) ? `${custosMarkupPercentual.toFixed(1)}%` : '-'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                        <p className="text-[10px]">Custo medio / dia</p>
+                        <p className="text-2xl font-bold text-slate-100 mt-1">{formatarMoeda(custosCustoMedioDia)}</p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                        <p className="text-[10px]">Qtd SKUs com custo</p>
+                        <p className="text-2xl font-bold text-slate-100 mt-1">{custosItensFiltrados.length || 0}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                   <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Diretos x indiretos</h3>
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between text-xs text-slate-400">
-                        <span>Custos diretos</span>
-                        <span className="font-bold text-emerald-300">{formatarMoeda(totalDiretoMes)}</span>
+                      <div>
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Custos diretos</span>
+                          <span className="font-bold text-emerald-300">{formatarMoeda(custosTotalDireto)}</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-emerald-500" style={{ width: `${Math.min(custosPercentualDireto, 100)}%` }} />
+                        </div>
                       </div>
-                      <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full bg-emerald-500" style={{ width: `${Math.min(percentualDireto, 100)}%` }} />
+                      <div>
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Custos indiretos (CIF)</span>
+                          <span className="font-bold text-amber-300">{formatarMoeda(custosTotalIndireto)}</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-amber-400" style={{ width: `${Math.min(custosPercentualIndireto, 100)}%` }} />
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between text-xs text-slate-400">
-                        <span>Custos indiretos (CIF)</span>
-                        <span className="font-bold text-amber-300">{formatarMoeda(totalIndiretoMes)}</span>
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-400">
+                      Rateio aplicado: {formatarMoeda(custosTotalIndireto)}
                       </div>
-                      <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full bg-amber-400" style={{ width: `${Math.min(percentualIndireto, 100)}%` }} />
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-400">
-                      Rateio aplicado: {formatarMoeda(faturamentoComCustos.summary?.alocado || 0)}
                     </div>
                   </div>
-                </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                   <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Comparativo ano anterior</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs text-slate-400">
-                      <span>Direto mes atual</span>
-                      <span className="font-bold text-slate-100">{formatarMoeda(totalDiretoPlanilhaAtual)}</span>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>Direto mes atual</span>
+                        <span className="font-bold text-slate-100">{formatarMoeda(custosDiretoAtualSelecionado)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>Direto ano anterior</span>
+                        <span className="font-bold text-slate-100">{formatarMoeda(custosDiretoPrevSelecionado)}</span>
+                      </div>
+                      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex items-center justify-between text-xs text-slate-300">
+                        <span>Variacao</span>
+                        <span className={`flex items-center gap-2 font-bold ${custosVariacaoDiretoSelecionado >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                          {custosVariacaoDiretoSelecionado >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                          {Number.isFinite(custosVariacaoDiretoSelecionado) ? `${custosVariacaoDiretoSelecionado.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">Comparativo calculado sobre os SKUs dentro do filtro atual.</p>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-400">
-                      <span>Direto ano anterior</span>
-                      <span className="font-bold text-slate-100">{formatarMoeda(totalDiretoPlanilhaPrev)}</span>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex items-center justify-between text-xs text-slate-300">
-                      <span>Variacao</span>
-                      <span className={`flex items-center gap-2 font-bold ${variacaoDiretoPlanilha >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
-                        {variacaoDiretoPlanilha >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                        {Number.isFinite(variacaoDiretoPlanilha) ? `${variacaoDiretoPlanilha.toFixed(1)}%` : '-'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500">Comparativo usa a mesma base de mes da planilha atual.</p>
                   </div>
                 </div>
-              </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
@@ -9328,9 +9782,9 @@ const custoDetalheTitulo = custoDetalheItem
                       Ver detalhes
                     </button>
                   </div>
-                  {topCustoItens.length ? (
+                  {custosTopItens.length ? (
                     <div className="space-y-3">
-                      {topCustoItens.map((item) => (
+                      {custosTopItens.map((item) => (
                         <div key={`${item.codigo}-${item.descricao}`} role="button" tabIndex={0} onClick={() => { setCustoDetalheItem(item); setCustoDetalheModalOpen(true); }} onKeyDown={(e) => { if (e.key === 'Enter') { setCustoDetalheItem(item); setCustoDetalheModalOpen(true); } }} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-left transition hover:border-emerald-400/60 hover:bg-slate-950/70">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold text-slate-100">{item.codigo || '-'}</span>
@@ -9358,10 +9812,10 @@ const custoDetalheTitulo = custoDetalheItem
                 </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Margens negativas</h3>
-                  {pioresMargens.length ? (
+                  <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Impacto absoluto no resultado</h3>
+                  {custosImpactoResultado.length ? (
                     <div className="space-y-3">
-                      {pioresMargens.map((item) => (
+                      {custosImpactoResultado.map((item) => (
                         <button
                           key={`${item.codigo}-${item.descricao}`}
                           type="button"
@@ -9369,71 +9823,73 @@ const custoDetalheTitulo = custoDetalheItem
                             setCustoDetalheItem(item);
                             setCustoDetalheModalOpen(true);
                           }}
-                          className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-left transition hover:border-rose-400/70 hover:bg-rose-500/15"
+                          className={`w-full rounded-xl border p-3 text-left transition ${
+                            item.impactoResultado >= 0
+                              ? 'border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-400/70 hover:bg-emerald-500/15'
+                              : 'border-rose-500/30 bg-rose-500/10 hover:border-rose-400/70 hover:bg-rose-500/15'
+                          }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-rose-100">{item.codigo || '-'}</span>
-                            <span className="text-xs font-bold text-rose-200">{item.margem.toFixed(1)}%</span>
+                            <span className={`text-xs font-bold ${item.impactoResultado >= 0 ? 'text-emerald-100' : 'text-rose-100'}`}>{item.codigo || '-'}</span>
+                            <span className={`text-xs font-bold ${item.impactoResultado >= 0 ? 'text-emerald-200' : 'text-rose-200'}`}>
+                              {formatarMoeda(item.impactoResultado)}
+                            </span>
                           </div>
-                          <p className="text-[11px] text-rose-200/70">{item.descricao || 'Sem descricao'}</p>
-                          <div className="mt-2 flex items-center justify-between text-[10px] text-rose-200/70">
+                          <p className={`text-[11px] ${item.impactoResultado >= 0 ? 'text-emerald-200/70' : 'text-rose-200/70'}`}>{item.descricao || 'Sem descricao'}</p>
+                          <div className={`mt-2 flex items-center justify-between text-[10px] ${item.impactoResultado >= 0 ? 'text-emerald-200/70' : 'text-rose-200/70'}`}>
                             <span>Custo {formatarMoeda(item.custo)}</span>
                             <span>Receita {formatarMoeda(item.receita)}</span>
                           </div>
-                          <div className="mt-1 flex items-center justify-between text-[10px] text-rose-200/70">
-                            <span>
-                              Preco medio {formatarMoeda(item.quantidade ? item.receita / item.quantidade : 0)}
-                            </span>
-                            <span>
-                              Custo medio {formatarMoeda(item.quantidade ? item.custo / item.quantidade : 0)}
-                            </span>
+                          <div className={`mt-1 flex items-center justify-between text-[10px] ${item.impactoResultado >= 0 ? 'text-emerald-200/70' : 'text-rose-200/70'}`}>
+                            <span>Margem {Number.isFinite(item.margem) ? `${item.margem.toFixed(1)}%` : '-'}</span>
+                            <span>Impacto abs. {formatarMoeda(item.impactoAbsoluto)}</span>
                           </div>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic">Nenhuma margem negativa encontrada.</p>
+                    <p className="text-xs text-slate-400 italic">Nenhum SKU com impacto relevante dentro do filtro.</p>
                   )}
                 </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
                   <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider mb-4">Confiabilidade do custo</h3>
-                  {confiabilidadeCustos.total ? (
+                  {custosConfiabilidade.total ? (
                     <div className="space-y-3">
                       <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
                         <div className="flex items-center justify-between text-xs text-slate-400">
                           <span>Custo direto atual</span>
-                          <span className="font-bold text-emerald-300">{confiabilidadeCustos.atual.toFixed(1)}%</span>
+                          <span className="font-bold text-emerald-300">{custosConfiabilidade.atual.toFixed(1)}%</span>
                         </div>
                         <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                          <div className="h-full bg-emerald-500" style={{ width: `${confiabilidadeCustos.atual}%` }} />
+                          <div className="h-full bg-emerald-500" style={{ width: `${custosConfiabilidade.atual}%` }} />
                         </div>
                       </div>
                       <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
                         <div className="flex items-center justify-between text-xs text-slate-400">
                           <span>Fallback ano anterior</span>
-                          <span className="font-bold text-blue-300">{confiabilidadeCustos.fallback.toFixed(1)}%</span>
+                          <span className="font-bold text-blue-300">{custosConfiabilidade.fallback.toFixed(1)}%</span>
                         </div>
                         <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                          <div className="h-full bg-blue-500" style={{ width: `${confiabilidadeCustos.fallback}%` }} />
+                          <div className="h-full bg-blue-500" style={{ width: `${custosConfiabilidade.fallback}%` }} />
                         </div>
                       </div>
                       <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
                         <div className="flex items-center justify-between text-xs text-slate-400">
                           <span>Estimado/rateado</span>
-                          <span className="font-bold text-amber-300">{confiabilidadeCustos.proxy.toFixed(1)}%</span>
+                          <span className="font-bold text-amber-300">{custosConfiabilidade.proxy.toFixed(1)}%</span>
                         </div>
                         <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                          <div className="h-full bg-amber-500" style={{ width: `${confiabilidadeCustos.proxy}%` }} />
+                          <div className="h-full bg-amber-500" style={{ width: `${custosConfiabilidade.proxy}%` }} />
                         </div>
                       </div>
                       <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
                         <div className="flex items-center justify-between text-xs text-slate-400">
                           <span>Sem custo direto</span>
-                          <span className="font-bold text-rose-300">{confiabilidadeCustos.semCusto.toFixed(1)}%</span>
+                          <span className="font-bold text-rose-300">{custosConfiabilidade.semCusto.toFixed(1)}%</span>
                         </div>
                         <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-                          <div className="h-full bg-rose-500" style={{ width: `${confiabilidadeCustos.semCusto}%` }} />
+                          <div className="h-full bg-rose-500" style={{ width: `${custosConfiabilidade.semCusto}%` }} />
                         </div>
                       </div>
                     </div>
@@ -9441,40 +9897,95 @@ const custoDetalheTitulo = custoDetalheItem
                     <p className="text-xs text-slate-400 italic">Sem dados suficientes para medir confiabilidade.</p>
                   )}
                   <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-xs text-slate-400">
-                    Base analisada: {confiabilidadeCustos.total} SKUs com receita.
+                    Base analisada: {custosConfiabilidade.total} SKUs com receita.
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">SKUs sem custo direto</h3>
-                    <p className="text-xs text-slate-400 mt-1">Itens com receita mas sem custo direto identificado.</p>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Curva ABC de custo</h3>
+                      <p className="text-xs text-slate-400 mt-1">Concentracao do custo total nos SKUs do filtro atual.</p>
+                    </div>
+                    <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                      {custosCurvaAbc.itens.length} SKUs
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setModalTabelaCustosOpen(true)}
-                    className="rounded-xl border border-emerald-500 bg-emerald-500/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-emerald-200"
-                  >
-                    Abrir detalhamento por SKU
-                  </button>
-                </div>
-                {semCustoTop.length ? (
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                    {semCustoTop.slice(0, 9).map((item) => (
-                      <div key={item.codigo} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-100">{item.codigo || '-'}</span>
-                          <span className="text-xs font-bold text-amber-300">{formatarMoeda(item.receita)}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    {['A', 'B', 'C'].map((classe) => (
+                      <div key={classe} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Classe {classe}</p>
+                        <p className={`mt-2 text-2xl font-black ${classe === 'A' ? 'text-rose-300' : classe === 'B' ? 'text-amber-300' : 'text-blue-300'}`}>
+                          {custosCurvaAbc.resumo[classe].percentual.toFixed(1)}%
+                        </p>
+                        <p className="mt-1 text-[11px] text-slate-400">{custosCurvaAbc.resumo[classe].quantidade} SKU(s)</p>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="mt-4 text-xs text-slate-400 italic">Nenhum SKU sem custo identificado.</p>
-                )}
+                  {custosCurvaAbc.itens.length ? (
+                    <div className="mt-4 space-y-3">
+                      {custosCurvaAbc.itens.slice(0, 8).map((item) => (
+                        <button
+                          key={`${item.codigo}-${item.descricao}-abc`}
+                          type="button"
+                          onClick={() => {
+                            setCustoDetalheItem(item);
+                            setCustoDetalheModalOpen(true);
+                          }}
+                          className="w-full rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-left transition hover:border-slate-600 hover:bg-slate-950/70"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-xs font-bold text-slate-100">{item.codigo || '-'}</p>
+                              <p className="text-[11px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs font-bold text-slate-100">{formatarMoeda(item.custo)}</p>
+                              <p className="text-[10px] text-slate-500">
+                                Classe {item.classeAbc} · {item.percentualAcumulado.toFixed(1)}% acum.
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-xs text-slate-400 italic">Sem SKUs suficientes para classificar a curva ABC.</p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">SKUs sem custo direto</h3>
+                      <p className="text-xs text-slate-400 mt-1">Itens com receita mas sem custo direto identificado.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setModalTabelaCustosOpen(true)}
+                      className="rounded-xl border border-emerald-500 bg-emerald-500/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-emerald-200"
+                    >
+                      Abrir detalhamento por SKU
+                    </button>
+                  </div>
+                  {custosSemCustoTop.length ? (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {custosSemCustoTop.slice(0, 8).map((item) => (
+                        <div key={item.codigo} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-100">{item.codigo || '-'}</span>
+                            <span className="text-xs font-bold text-amber-300">{formatarMoeda(item.receita)}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400">{item.descricao || 'Sem descricao'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-xs text-slate-400 italic">Nenhum SKU sem custo identificado dentro do filtro.</p>
+                  )}
+                </div>
               </div>
             </div>
           )}
