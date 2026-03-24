@@ -1,7 +1,7 @@
 [
   {
     "Cliente": 57097,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2005,
     "Descricao": 0,
@@ -17,7 +17,7 @@
   },
   {
     "Cliente": 54037,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2003,
     "Descricao": 0,
@@ -33,7 +33,7 @@
   },
   {
     "Cliente": 54037,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G160",
     "Codigo": "01368I",
     "Descricao": 0,
@@ -97,7 +97,7 @@
   },
   {
     "Cliente": 56675,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2005,
     "Descricao": 0,
@@ -113,7 +113,7 @@
   },
   {
     "Cliente": 56675,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2007,
     "Descricao": 0,
@@ -129,7 +129,7 @@
   },
   {
     "Cliente": 56675,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2008,
     "Descricao": 0,
@@ -145,7 +145,7 @@
   },
   {
     "Cliente": 55596,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01332A",
     "Descricao": 0,
@@ -161,7 +161,7 @@
   },
   {
     "Cliente": 55596,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01332B",
     "Descricao": 0,
@@ -177,7 +177,7 @@
   },
   {
     "Cliente": 43674,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G160",
     "Codigo": "01368I",
     "Descricao": 0,
@@ -193,7 +193,7 @@
   },
   {
     "Cliente": 54252,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01371C",
     "Descricao": 0,
@@ -209,7 +209,7 @@
   },
   {
     "Cliente": 54252,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01380C",
     "Descricao": 0,
@@ -273,7 +273,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01388E",
     "Descricao": 0,
@@ -289,7 +289,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2004,
     "Descricao": 0,
@@ -305,7 +305,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2005,
     "Descricao": 0,
@@ -321,7 +321,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2006,
     "Descricao": 0,
@@ -337,7 +337,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2007,
     "Descricao": 0,
@@ -353,7 +353,7 @@
   },
   {
     "Cliente": 56985,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2008,
     "Descricao": 0,
@@ -385,7 +385,7 @@
   },
   {
     "Cliente": 56629,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01375C",
     "Descricao": 0,
@@ -401,7 +401,7 @@
   },
   {
     "Cliente": 40677,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01380C",
     "Descricao": 0,
@@ -433,7 +433,7 @@
   },
   {
     "Cliente": 57307,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2014,
     "Descricao": 0,
@@ -449,7 +449,7 @@
   },
   {
     "Cliente": 57307,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2015,
     "Descricao": 0,
@@ -465,7 +465,7 @@
   },
   {
     "Cliente": 43909,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G130",
     "Codigo": "01331J",
     "Descricao": 0,
@@ -481,7 +481,7 @@
   },
   {
     "Cliente": 43909,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2013,
     "Descricao": 0,
@@ -497,7 +497,7 @@
   },
   {
     "Cliente": 43909,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2014,
     "Descricao": 0,
@@ -513,7 +513,7 @@
   },
   {
     "Cliente": 43909,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2015,
     "Descricao": 0,
@@ -529,7 +529,7 @@
   },
   {
     "Cliente": 43909,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2017,
     "Descricao": 0,
@@ -561,7 +561,7 @@
   },
   {
     "Cliente": 57278,
-    "Filial": 1,
+    "Filial": "01",
     "Grupo": "G140",
     "Codigo": 2006,
     "Descricao": 0,
@@ -592,8 +592,40 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": 13546,
+    "Filial": "01",
+    "Grupo": "G140",
+    "Codigo": 2016,
+    "Descricao": 0,
+    "Quantidade": 12,
+    "Unidade": "PC",
+    "ValorUnitario": 189.5,
+    "ValorTotal": 2274,
+    "Emissao": "2026-03-19T03:00:28.000Z",
+    "NF": 340514,
+    "MesEmissao": "03/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 53236,
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01371D",
+    "Descricao": 0,
+    "Quantidade": 48.15,
+    "Unidade": "KG",
+    "ValorUnitario": 8.42,
+    "ValorTotal": 405.42,
+    "Emissao": "2026-03-19T03:00:28.000Z",
+    "NF": 340603,
+    "MesEmissao": "03/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "C12798",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1120,
     "Descricao": 0,
@@ -609,7 +641,7 @@
   },
   {
     "Cliente": "C12798",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": "03153I",
     "Descricao": 0,
@@ -625,7 +657,7 @@
   },
   {
     "Cliente": "C19450",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 41,
     "Codigo": "05016A",
     "Descricao": 0,
@@ -641,7 +673,7 @@
   },
   {
     "Cliente": "C25176",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": 3224,
     "Descricao": 0,
@@ -657,7 +689,7 @@
   },
   {
     "Cliente": "C21810",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 6,
     "Codigo": 822,
     "Descricao": 0,
@@ -673,7 +705,7 @@
   },
   {
     "Cliente": "C21810",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 6,
     "Codigo": 903,
     "Descricao": 0,
@@ -689,7 +721,7 @@
   },
   {
     "Cliente": "C21810",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 42,
     "Codigo": 5116,
     "Descricao": 0,
@@ -705,7 +737,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 6,
     "Codigo": 902,
     "Descricao": 0,
@@ -721,7 +753,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1103,
     "Descricao": 0,
@@ -737,7 +769,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1115,
     "Descricao": 0,
@@ -753,7 +785,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1119,
     "Descricao": 0,
@@ -769,7 +801,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1124,
     "Descricao": 0,
@@ -785,7 +817,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": "03153I",
     "Descricao": 0,
@@ -801,7 +833,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 38,
     "Codigo": 4212,
     "Descricao": 0,
@@ -817,7 +849,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 60,
     "Codigo": 6016,
     "Descricao": 0,
@@ -833,7 +865,7 @@
   },
   {
     "Cliente": "C25304",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 60,
     "Codigo": 6017,
     "Descricao": 0,
@@ -849,7 +881,7 @@
   },
   {
     "Cliente": "C19716",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": "03142I",
     "Descricao": 0,
@@ -865,7 +897,7 @@
   },
   {
     "Cliente": "C19716",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": "03144I",
     "Descricao": 0,
@@ -881,7 +913,7 @@
   },
   {
     "Cliente": "C25433",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 27,
     "Codigo": "03153I",
     "Descricao": 0,
@@ -897,7 +929,7 @@
   },
   {
     "Cliente": "C25166",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 7,
     "Codigo": 1110,
     "Descricao": 0,
@@ -913,7 +945,7 @@
   },
   {
     "Cliente": "C25464",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 42,
     "Codigo": 5116,
     "Descricao": 0,
@@ -929,7 +961,7 @@
   },
   {
     "Cliente": "C00102",
-    "Filial": 4,
+    "Filial": "04",
     "Grupo": 51,
     "Codigo": 6107,
     "Descricao": 0,
@@ -945,7 +977,7 @@
   },
   {
     "Cliente": "V07394",
-    "Filial": 6,
+    "Filial": "06",
     "Grupo": 6,
     "Codigo": 811,
     "Descricao": 0,
@@ -961,7 +993,7 @@
   },
   {
     "Cliente": "V07394",
-    "Filial": 6,
+    "Filial": "06",
     "Grupo": 6,
     "Codigo": "00811I",
     "Descricao": 0,
@@ -977,7 +1009,7 @@
   },
   {
     "Cliente": 24479,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 365,
     "Descricao": 0,
@@ -993,7 +1025,7 @@
   },
   {
     "Cliente": 34100,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G070",
     "Codigo": 550,
     "Descricao": 0,
@@ -1009,7 +1041,7 @@
   },
   {
     "Cliente": 20711,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2410,
     "Descricao": 0,
@@ -1025,7 +1057,7 @@
   },
   {
     "Cliente": 20711,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -1041,7 +1073,7 @@
   },
   {
     "Cliente": 20711,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2503,
     "Descricao": 0,
@@ -1057,7 +1089,7 @@
   },
   {
     "Cliente": "D01758",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -1073,7 +1105,7 @@
   },
   {
     "Cliente": 18492,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00720ERF",
     "Descricao": 0,
@@ -1089,7 +1121,7 @@
   },
   {
     "Cliente": 36600,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -1105,7 +1137,7 @@
   },
   {
     "Cliente": 36600,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04751A",
     "Descricao": 0,
@@ -1121,7 +1153,7 @@
   },
   {
     "Cliente": 40773,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2411,
     "Descricao": 0,
@@ -1137,7 +1169,7 @@
   },
   {
     "Cliente": 37611,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -1153,7 +1185,7 @@
   },
   {
     "Cliente": 37611,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": 2511,
     "Descricao": 0,
@@ -1169,7 +1201,7 @@
   },
   {
     "Cliente": 7196,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -1185,7 +1217,7 @@
   },
   {
     "Cliente": 7196,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -1201,7 +1233,7 @@
   },
   {
     "Cliente": 7196,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2420,
     "Descricao": 0,
@@ -1217,7 +1249,7 @@
   },
   {
     "Cliente": 7196,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -1233,7 +1265,7 @@
   },
   {
     "Cliente": 35942,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04751A",
     "Descricao": 0,
@@ -1249,7 +1281,7 @@
   },
   {
     "Cliente": "D00900",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00111E",
     "Descricao": 0,
@@ -1265,7 +1297,7 @@
   },
   {
     "Cliente": "D00900",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00147E",
     "Descricao": 0,
@@ -1281,7 +1313,7 @@
   },
   {
     "Cliente": "D01533",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 778,
     "Descricao": 0,
@@ -1297,7 +1329,7 @@
   },
   {
     "Cliente": 36543,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -1313,7 +1345,7 @@
   },
   {
     "Cliente": 36543,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04751A",
     "Descricao": 0,
@@ -1329,7 +1361,7 @@
   },
   {
     "Cliente": 54,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1050,
     "Descricao": 0,
@@ -1345,7 +1377,7 @@
   },
   {
     "Cliente": 54,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1051,
     "Descricao": 0,
@@ -1361,7 +1393,7 @@
   },
   {
     "Cliente": 54,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1053,
     "Descricao": 0,
@@ -1377,7 +1409,7 @@
   },
   {
     "Cliente": "D01660",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00385E",
     "Descricao": 0,
@@ -1393,7 +1425,7 @@
   },
   {
     "Cliente": 48553,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1052,
     "Descricao": 0,
@@ -1409,7 +1441,7 @@
   },
   {
     "Cliente": "D01452",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -1425,7 +1457,7 @@
   },
   {
     "Cliente": 43326,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -1441,7 +1473,7 @@
   },
   {
     "Cliente": 56476,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2411,
     "Descricao": 0,
@@ -1457,7 +1489,7 @@
   },
   {
     "Cliente": 43384,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1058,
     "Descricao": 0,
@@ -1473,7 +1505,7 @@
   },
   {
     "Cliente": 29270,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1051,
     "Descricao": 0,
@@ -1489,7 +1521,7 @@
   },
   {
     "Cliente": "D01651",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00147E",
     "Descricao": 0,
@@ -1505,7 +1537,7 @@
   },
   {
     "Cliente": "D01651",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00385E",
     "Descricao": 0,
@@ -1520,8 +1552,24 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": 44163,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 701,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 696.121383,
+    "ValorTotal": 696.12,
+    "Emissao": "2026-03-19T03:00:28.000Z",
+    "NF": 286797,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": 27725,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -1537,7 +1585,7 @@
   },
   {
     "Cliente": "D01018",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 780,
     "Descricao": 0,
@@ -1553,7 +1601,7 @@
   },
   {
     "Cliente": 20897,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2410,
     "Descricao": 0,
@@ -1569,7 +1617,7 @@
   },
   {
     "Cliente": 20897,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -1585,7 +1633,7 @@
   },
   {
     "Cliente": 52181,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 770,
     "Descricao": 0,
@@ -1601,7 +1649,7 @@
   },
   {
     "Cliente": "D01110",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": 4780,
     "Descricao": 0,
@@ -1617,7 +1665,7 @@
   },
   {
     "Cliente": 18224,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 175,
     "Descricao": 0,
@@ -1633,7 +1681,7 @@
   },
   {
     "Cliente": 18224,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -1648,8 +1696,40 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": 26333,
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": "00147E",
+    "Descricao": 0,
+    "Quantidade": 7,
+    "Unidade": "PC",
+    "ValorUnitario": 85.230144,
+    "ValorTotal": 596.61,
+    "Emissao": "2026-03-13T03:00:28.000Z",
+    "NF": 819852,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 26333,
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": "00365E",
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 99.107496,
+    "ValorTotal": 99.11,
+    "Emissao": "2026-03-13T03:00:28.000Z",
+    "NF": 819852,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": 34788,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1052,
     "Descricao": 0,
@@ -1665,7 +1745,7 @@
   },
   {
     "Cliente": 43320,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -1681,7 +1761,7 @@
   },
   {
     "Cliente": 43320,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -1697,7 +1777,7 @@
   },
   {
     "Cliente": "D01172",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -1713,7 +1793,7 @@
   },
   {
     "Cliente": "D00830",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00771C",
     "Descricao": 0,
@@ -1729,7 +1809,7 @@
   },
   {
     "Cliente": "D00830",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00782C",
     "Descricao": 0,
@@ -1745,7 +1825,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00147E",
     "Descricao": 0,
@@ -1761,7 +1841,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2503,
     "Descricao": 0,
@@ -1777,7 +1857,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 701,
     "Descricao": 0,
@@ -1793,7 +1873,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 701,
     "Descricao": 0,
@@ -1809,7 +1889,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 771,
     "Descricao": 0,
@@ -1825,7 +1905,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -1841,7 +1921,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -1857,7 +1937,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 701,
     "Descricao": 0,
@@ -1873,7 +1953,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -1889,7 +1969,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -1905,7 +1985,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -1921,7 +2001,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1055,
     "Descricao": 0,
@@ -1937,7 +2017,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -1953,7 +2033,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 771,
     "Descricao": 0,
@@ -1969,7 +2049,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -1985,7 +2065,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -2001,7 +2081,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04753A",
     "Descricao": 0,
@@ -2017,7 +2097,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2033,7 +2113,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1051,
     "Descricao": 0,
@@ -2049,7 +2129,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1053,
     "Descricao": 0,
@@ -2065,7 +2145,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -2081,7 +2161,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 771,
     "Descricao": 0,
@@ -2097,7 +2177,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 771,
     "Descricao": 0,
@@ -2113,7 +2193,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2129,7 +2209,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -2145,7 +2225,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -2161,7 +2241,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2177,7 +2257,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2193,7 +2273,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -2209,7 +2289,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2225,7 +2305,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2241,7 +2321,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -2257,7 +2337,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2273,7 +2353,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2289,7 +2369,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": "04750A",
     "Descricao": 0,
@@ -2305,7 +2385,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2321,7 +2401,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2336,8 +2416,296 @@
     "TipoMovimento": "devolucao"
   },
   {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 771,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 99.69,
+    "ValorTotal": 99.69,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560215,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 141.25,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560215,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 141.25,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560216,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G030",
+    "Codigo": "04750A",
+    "Descricao": 0,
+    "Quantidade": 5,
+    "Unidade": "PC",
+    "ValorUnitario": 26.61,
+    "ValorTotal": 133.05,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560217,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G030",
+    "Codigo": "04753A",
+    "Descricao": 0,
+    "Quantidade": 6,
+    "Unidade": "PC",
+    "ValorUnitario": 44.56,
+    "ValorTotal": 267.36,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560217,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 4,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 565,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560218,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 782,
+    "Descricao": 0,
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 166.84,
+    "ValorTotal": 333.68,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560218,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 771,
+    "Descricao": 0,
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 99.69,
+    "ValorTotal": 199.38,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560220,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 141.25,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560220,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 782,
+    "Descricao": 0,
+    "Quantidade": 3,
+    "Unidade": "PC",
+    "ValorUnitario": 166.84,
+    "ValorTotal": 500.52,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560220,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G040",
+    "Codigo": 1053,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 40.58,
+    "ValorTotal": 40.58,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560223,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 282.5,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560224,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G040",
+    "Codigo": 1051,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 33.8,
+    "ValorTotal": 33.8,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560224,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 3,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 423.75,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560235,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 782,
+    "Descricao": 0,
+    "Quantidade": 4,
+    "Unidade": "PC",
+    "ValorUnitario": 166.84,
+    "ValorTotal": 667.36,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560235,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G040",
+    "Codigo": 1053,
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 40.58,
+    "ValorTotal": 40.58,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560239,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 774,
+    "Descricao": 0,
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 141.25,
+    "ValorTotal": 282.5,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560240,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 1591,
+    "Filial": "08",
+    "Grupo": "G040",
+    "Codigo": 1051,
+    "Descricao": 0,
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 33.8,
+    "ValorTotal": 67.6,
+    "Emissao": "2026-03-20T03:00:28.000Z",
+    "NF": 24560240,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
     "Cliente": "D01041",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -2353,7 +2721,7 @@
   },
   {
     "Cliente": 55340,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00385EV",
     "Descricao": 0,
@@ -2369,7 +2737,7 @@
   },
   {
     "Cliente": 11983,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00147E",
     "Descricao": 0,
@@ -2385,7 +2753,7 @@
   },
   {
     "Cliente": 11983,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00365E",
     "Descricao": 0,
@@ -2401,7 +2769,7 @@
   },
   {
     "Cliente": 11983,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -2417,7 +2785,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 111,
     "Descricao": 0,
@@ -2433,7 +2801,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -2449,7 +2817,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -2465,7 +2833,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 176,
     "Descricao": 0,
@@ -2481,7 +2849,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 381,
     "Descricao": 0,
@@ -2497,7 +2865,7 @@
   },
   {
     "Cliente": 52411,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -2513,7 +2881,7 @@
   },
   {
     "Cliente": 20295,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -2529,7 +2897,7 @@
   },
   {
     "Cliente": 20295,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -2545,7 +2913,7 @@
   },
   {
     "Cliente": 20295,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -2561,7 +2929,7 @@
   },
   {
     "Cliente": 20295,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G220",
     "Codigo": 45534,
     "Descricao": 0,
@@ -2577,7 +2945,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 111,
     "Descricao": 0,
@@ -2593,7 +2961,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -2609,7 +2977,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -2625,7 +2993,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 162,
     "Descricao": 0,
@@ -2641,7 +3009,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -2657,7 +3025,7 @@
   },
   {
     "Cliente": 51546,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G050",
     "Codigo": 1071,
     "Descricao": 0,
@@ -2673,7 +3041,7 @@
   },
   {
     "Cliente": 47993,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 136,
     "Descricao": 0,
@@ -2689,7 +3057,7 @@
   },
   {
     "Cliente": 47993,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 139,
     "Descricao": 0,
@@ -2705,7 +3073,7 @@
   },
   {
     "Cliente": 47993,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -2721,7 +3089,7 @@
   },
   {
     "Cliente": 47993,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -2737,7 +3105,7 @@
   },
   {
     "Cliente": 47993,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 774,
     "Descricao": 0,
@@ -2801,7 +3169,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00140E",
     "Descricao": 0,
@@ -2817,7 +3185,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": "00385E",
     "Descricao": 0,
@@ -2833,7 +3201,7 @@
   },
   {
     "Cliente": 1591,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": "02401A",
     "Descricao": 0,
@@ -2849,7 +3217,7 @@
   },
   {
     "Cliente": 20824,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -2865,7 +3233,7 @@
   },
   {
     "Cliente": 20824,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -2881,7 +3249,7 @@
   },
   {
     "Cliente": 20824,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": "02580A",
     "Descricao": 0,
@@ -2897,7 +3265,7 @@
   },
   {
     "Cliente": 23505,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G070",
     "Codigo": 550,
     "Descricao": 0,
@@ -2913,7 +3281,7 @@
   },
   {
     "Cliente": 8161,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2410,
     "Descricao": 0,
@@ -2929,7 +3297,7 @@
   },
   {
     "Cliente": 44367,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -2945,7 +3313,7 @@
   },
   {
     "Cliente": 44367,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G050",
     "Codigo": 1070,
     "Descricao": 0,
@@ -2961,7 +3329,7 @@
   },
   {
     "Cliente": 44367,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2420,
     "Descricao": 0,
@@ -2977,7 +3345,7 @@
   },
   {
     "Cliente": 44367,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2506,
     "Descricao": 0,
@@ -2993,7 +3361,7 @@
   },
   {
     "Cliente": 42917,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3009,7 +3377,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -3025,7 +3393,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -3041,7 +3409,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 365,
     "Descricao": 0,
@@ -3057,7 +3425,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3073,7 +3441,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3089,7 +3457,7 @@
   },
   {
     "Cliente": 54076,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": "02580A",
     "Descricao": 0,
@@ -3105,7 +3473,7 @@
   },
   {
     "Cliente": 51082,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3121,7 +3489,7 @@
   },
   {
     "Cliente": 51082,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -3137,7 +3505,7 @@
   },
   {
     "Cliente": 51082,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 162,
     "Descricao": 0,
@@ -3153,7 +3521,7 @@
   },
   {
     "Cliente": 51082,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 174,
     "Descricao": 0,
@@ -3169,7 +3537,7 @@
   },
   {
     "Cliente": 51082,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3201,7 +3569,7 @@
   },
   {
     "Cliente": "D01429",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -3217,7 +3585,7 @@
   },
   {
     "Cliente": "D01429",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3233,7 +3601,7 @@
   },
   {
     "Cliente": "D01429",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3249,7 +3617,7 @@
   },
   {
     "Cliente": "D01429",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 782,
     "Descricao": 0,
@@ -3265,7 +3633,7 @@
   },
   {
     "Cliente": 56213,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 112,
     "Descricao": 0,
@@ -3281,7 +3649,7 @@
   },
   {
     "Cliente": 56213,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722ERF",
     "Descricao": 0,
@@ -3297,7 +3665,7 @@
   },
   {
     "Cliente": 28387,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 385,
     "Descricao": 0,
@@ -3313,7 +3681,7 @@
   },
   {
     "Cliente": 28387,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3329,7 +3697,7 @@
   },
   {
     "Cliente": 28387,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": 2511,
     "Descricao": 0,
@@ -3345,7 +3713,7 @@
   },
   {
     "Cliente": 33247,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 174,
     "Descricao": 0,
@@ -3361,7 +3729,7 @@
   },
   {
     "Cliente": 52221,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -3377,7 +3745,7 @@
   },
   {
     "Cliente": 52221,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 168,
     "Descricao": 0,
@@ -3393,7 +3761,7 @@
   },
   {
     "Cliente": 52221,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 170,
     "Descricao": 0,
@@ -3409,7 +3777,7 @@
   },
   {
     "Cliente": 50389,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -3425,7 +3793,7 @@
   },
   {
     "Cliente": 50389,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 365,
     "Descricao": 0,
@@ -3441,7 +3809,7 @@
   },
   {
     "Cliente": 50389,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3457,7 +3825,7 @@
   },
   {
     "Cliente": 49945,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3473,7 +3841,7 @@
   },
   {
     "Cliente": 49945,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -3489,7 +3857,7 @@
   },
   {
     "Cliente": 49945,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3505,7 +3873,7 @@
   },
   {
     "Cliente": 49945,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3521,7 +3889,7 @@
   },
   {
     "Cliente": 45427,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 111,
     "Descricao": 0,
@@ -3537,7 +3905,7 @@
   },
   {
     "Cliente": 45427,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 112,
     "Descricao": 0,
@@ -3553,7 +3921,7 @@
   },
   {
     "Cliente": 52527,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -3569,7 +3937,7 @@
   },
   {
     "Cliente": 52527,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 385,
     "Descricao": 0,
@@ -3585,7 +3953,7 @@
   },
   {
     "Cliente": 52527,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3601,7 +3969,7 @@
   },
   {
     "Cliente": "D00985",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G030",
     "Codigo": 4756,
     "Descricao": 0,
@@ -3617,7 +3985,7 @@
   },
   {
     "Cliente": 7828,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -3633,7 +4001,7 @@
   },
   {
     "Cliente": 7828,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3649,7 +4017,7 @@
   },
   {
     "Cliente": 7828,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -3665,7 +4033,7 @@
   },
   {
     "Cliente": 7828,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 174,
     "Descricao": 0,
@@ -3681,7 +4049,7 @@
   },
   {
     "Cliente": 7828,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3697,7 +4065,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -3713,7 +4081,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3729,7 +4097,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3745,7 +4113,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 778,
     "Descricao": 0,
@@ -3761,7 +4129,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2410,
     "Descricao": 0,
@@ -3777,7 +4145,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3793,7 +4161,7 @@
   },
   {
     "Cliente": 23156,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2503,
     "Descricao": 0,
@@ -3809,7 +4177,7 @@
   },
   {
     "Cliente": 20915,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3825,7 +4193,7 @@
   },
   {
     "Cliente": 20915,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -3841,7 +4209,7 @@
   },
   {
     "Cliente": 20915,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G070",
     "Codigo": 550,
     "Descricao": 0,
@@ -3857,7 +4225,7 @@
   },
   {
     "Cliente": 37007,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -3873,7 +4241,7 @@
   },
   {
     "Cliente": 37007,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -3889,7 +4257,7 @@
   },
   {
     "Cliente": 37007,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -3905,7 +4273,7 @@
   },
   {
     "Cliente": 37007,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -3921,7 +4289,7 @@
   },
   {
     "Cliente": 37007,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -3937,7 +4305,7 @@
   },
   {
     "Cliente": 56577,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -3953,7 +4321,7 @@
   },
   {
     "Cliente": 56577,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00720E",
     "Descricao": 0,
@@ -3969,7 +4337,7 @@
   },
   {
     "Cliente": 43039,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00720E",
     "Descricao": 0,
@@ -3985,7 +4353,7 @@
   },
   {
     "Cliente": 43039,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 770,
     "Descricao": 0,
@@ -4001,7 +4369,7 @@
   },
   {
     "Cliente": 52178,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -4049,7 +4417,7 @@
   },
   {
     "Cliente": 43334,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G070",
     "Codigo": 550,
     "Descricao": 0,
@@ -4065,7 +4433,7 @@
   },
   {
     "Cliente": 48760,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -4081,7 +4449,7 @@
   },
   {
     "Cliente": "D01253",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -4097,7 +4465,7 @@
   },
   {
     "Cliente": "D01253",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -4113,7 +4481,7 @@
   },
   {
     "Cliente": "D01253",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4129,7 +4497,7 @@
   },
   {
     "Cliente": 24715,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -4145,7 +4513,7 @@
   },
   {
     "Cliente": 24715,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -4161,7 +4529,7 @@
   },
   {
     "Cliente": 24715,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -4177,7 +4545,7 @@
   },
   {
     "Cliente": 24715,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4193,7 +4561,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -4209,7 +4577,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -4225,7 +4593,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 174,
     "Descricao": 0,
@@ -4241,7 +4609,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 701,
     "Descricao": 0,
@@ -4257,7 +4625,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -4273,7 +4641,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4289,7 +4657,7 @@
   },
   {
     "Cliente": 51136,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": 2511,
     "Descricao": 0,
@@ -4305,7 +4673,7 @@
   },
   {
     "Cliente": 28385,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 174,
     "Descricao": 0,
@@ -4321,7 +4689,7 @@
   },
   {
     "Cliente": 28385,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2420,
     "Descricao": 0,
@@ -4337,7 +4705,7 @@
   },
   {
     "Cliente": 28385,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4353,7 +4721,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 111,
     "Descricao": 0,
@@ -4369,7 +4737,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 136,
     "Descricao": 0,
@@ -4385,7 +4753,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 150,
     "Descricao": 0,
@@ -4401,7 +4769,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00721E",
     "Descricao": 0,
@@ -4417,7 +4785,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00721EA",
     "Descricao": 0,
@@ -4433,7 +4801,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G050",
     "Codigo": 1070,
     "Descricao": 0,
@@ -4449,7 +4817,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G050",
     "Codigo": "01070A",
     "Descricao": 0,
@@ -4465,7 +4833,7 @@
   },
   {
     "Cliente": "D01712",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G220",
     "Codigo": 45534,
     "Descricao": 0,
@@ -4481,7 +4849,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 136,
     "Descricao": 0,
@@ -4497,7 +4865,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 154,
     "Descricao": 0,
@@ -4513,7 +4881,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00721EA",
     "Descricao": 0,
@@ -4529,7 +4897,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -4545,7 +4913,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": 2511,
     "Descricao": 0,
@@ -4561,7 +4929,7 @@
   },
   {
     "Cliente": 35256,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": 2522,
     "Descricao": 0,
@@ -4577,7 +4945,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -4593,7 +4961,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 166,
     "Descricao": 0,
@@ -4609,7 +4977,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 365,
     "Descricao": 0,
@@ -4625,7 +4993,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00722E",
     "Descricao": 0,
@@ -4641,7 +5009,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4657,7 +5025,7 @@
   },
   {
     "Cliente": "D00955",
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G010",
     "Codigo": "02580A",
     "Descricao": 0,
@@ -4673,7 +5041,7 @@
   },
   {
     "Cliente": 39765,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 147,
     "Descricao": 0,
@@ -4689,7 +5057,7 @@
   },
   {
     "Cliente": 39765,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4705,7 +5073,7 @@
   },
   {
     "Cliente": 43293,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 111,
     "Descricao": 0,
@@ -4721,7 +5089,7 @@
   },
   {
     "Cliente": 43293,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 140,
     "Descricao": 0,
@@ -4737,7 +5105,7 @@
   },
   {
     "Cliente": 43293,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G015",
     "Codigo": 2501,
     "Descricao": 0,
@@ -4753,7 +5121,7 @@
   },
   {
     "Cliente": 43209,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G070",
     "Codigo": 550,
     "Descricao": 0,
@@ -4769,7 +5137,7 @@
   },
   {
     "Cliente": 17790,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": 778,
     "Descricao": 0,
@@ -4785,7 +5153,7 @@
   },
   {
     "Cliente": 32115,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G040",
     "Codigo": 1055,
     "Descricao": 0,
@@ -4801,7 +5169,7 @@
   },
   {
     "Cliente": 41535,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G000",
     "Codigo": 164,
     "Descricao": 0,
@@ -4817,7 +5185,7 @@
   },
   {
     "Cliente": 41535,
-    "Filial": 8,
+    "Filial": "08",
     "Grupo": "G020",
     "Codigo": "00720E",
     "Descricao": 0,
@@ -4829,6 +5197,150 @@
     "NF": 76880,
     "MesEmissao": "03/2026",
     "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 39765,
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": 147,
+    "Descricao": 0,
+    "Quantidade": 30,
+    "Unidade": "PC",
+    "ValorUnitario": 88.621518,
+    "ValorTotal": 2658.64,
+    "Emissao": "2026-03-19T03:00:28.000Z",
+    "NF": 77090,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 39765,
+    "Filial": "08",
+    "Grupo": "G015",
+    "Codigo": 2501,
+    "Descricao": 0,
+    "Quantidade": 4,
+    "Unidade": "PC",
+    "ValorUnitario": 33.705552,
+    "ValorTotal": 134.82,
+    "Emissao": "2026-03-19T03:00:28.000Z",
+    "NF": 77090,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 47471,
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": 140,
+    "Descricao": 0,
+    "Quantidade": 10,
+    "Unidade": "PC",
+    "ValorUnitario": 91.836272,
+    "ValorTotal": 918.36,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77327,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 47471,
+    "Filial": "08",
+    "Grupo": "G000",
+    "Codigo": "00381E",
+    "Descricao": 0,
+    "Quantidade": 1,
+    "Unidade": "PC",
+    "ValorUnitario": 158.44556,
+    "ValorTotal": 158.44,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77327,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 47471,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": "00721E",
+    "Descricao": 0,
+    "Quantidade": 7,
+    "Unidade": "PC",
+    "ValorUnitario": 179.17418,
+    "ValorTotal": 1254.21,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77327,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 47471,
+    "Filial": "08",
+    "Grupo": "G010",
+    "Codigo": 2508,
+    "Descricao": 0,
+    "Quantidade": 4,
+    "Unidade": "PC",
+    "ValorUnitario": 0.92568,
+    "ValorTotal": 3.7,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77327,
+    "MesEmissao": "03/2026",
+    "CFOP": "2201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 30787,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 174,
+    "Descricao": 0,
+    "Quantidade": 15,
+    "Unidade": "PC",
+    "ValorUnitario": 155.84328,
+    "ValorTotal": 2337.64,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77332,
+    "MesEmissao": "03/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 30787,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 778,
+    "Descricao": 0,
+    "Quantidade": 6,
+    "Unidade": "PC",
+    "ValorUnitario": 191.3588,
+    "ValorTotal": 1148.15,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77332,
+    "MesEmissao": "03/2026",
+    "CFOP": "1201",
+    "TipoMovimento": "devolucao"
+  },
+  {
+    "Cliente": 30787,
+    "Filial": "08",
+    "Grupo": "G020",
+    "Codigo": 780,
+    "Descricao": 0,
+    "Quantidade": 6,
+    "Unidade": "PC",
+    "ValorUnitario": 288.79504,
+    "ValorTotal": 1732.77,
+    "Emissao": "2026-03-23T03:00:28.000Z",
+    "NF": 77332,
+    "MesEmissao": "03/2026",
+    "CFOP": "1201",
     "TipoMovimento": "devolucao"
   }
 ]
