@@ -11,8 +11,7 @@ import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import vendedoresData from './data/vendedores.json';
-import bensData from './data/bens.json';
-import veiculosData from './data/relacao_veiculos.json';
+import { maquinasBaseData, setoresBaseData } from './data/maquinasBase';
 import DashboardManutencaoTV from './components/DashboardManutencaoTV';
 import PainelOperacaoDiaria from './components/PainelOperacaoDiaria';
 import { computeCostBreakdown } from './services/costing';
@@ -958,7 +957,7 @@ export default function App() {
   const [processoEditOpen, setProcessoEditOpen] = useState(false);
   const [processoEditId, setProcessoEditId] = useState(null);
   const [processoEditValue, setProcessoEditValue] = useState('');
-  const [novoAtivoCc, setNovoAtivoCc] = useState('');
+  const [novoAtivoCc, setNovoAtivoCc] = useState('Industria');
   const [novoAtivoProcesso, setNovoAtivoProcesso] = useState('');
   const [novaOsFotoFile, setNovaOsFotoFile] = useState(null);
   const [novaOsFotoPreview, setNovaOsFotoPreview] = useState('');
@@ -1508,7 +1507,7 @@ export default function App() {
     if (filtroAtivos === 'Todos') return listaMaquinas;
     const filtroNorm = normalizarTexto(filtroAtivos);
     return listaMaquinas.filter((item) =>
-      normalizarTexto(item.setor).includes(filtroNorm)
+      normalizarTexto(`${item.setor} ${item.processo || ''}`).includes(filtroNorm)
     );
   }, [filtroAtivos, listaMaquinas]);
 
@@ -1517,9 +1516,17 @@ export default function App() {
     if (!filtro) return listaMaquinas;
     const filtroNorm = normalizarTexto(filtro);
     return listaMaquinas.filter((item) =>
-      normalizarTexto(`${item.nome} ${item.setor}`).includes(filtroNorm)
+      normalizarTexto(`${item.nome} ${item.setor} ${item.processo || ''}`).includes(filtroNorm)
     );
   }, [filtroAtivoMobile, listaMaquinas]);
+
+  const getMaquinaOpcaoLabel = (item) => {
+    if (!item) return '';
+    if (normalizarTexto(item.setor) === 'industria') {
+      return item.processo ? `${item.nome} - Industria / ${item.processo}` : `${item.nome} - Industria`;
+    }
+    return `${item.nome} - ${item.setor || 'Sem setor'}`;
+  };
 
   const manutencaoColaboradores = useMemo(() => {
     return [
@@ -3084,6 +3091,11 @@ export default function App() {
     }
   };
 
+  const handleResetNovoAtivoForm = () => {
+    setNovoAtivoCc('Industria');
+    setNovoAtivoProcesso('');
+  };
+
   const handleSalvarSetor = async (nome) => {
     const nomeLimpo = String(nome || '').trim();
     if (!nomeLimpo) return;
@@ -3881,29 +3893,9 @@ export default function App() {
           id: docRef.id,
           ...docRef.data(),
         }));
-        const fallbackBens = (bensData || [])
-          .map((item) => ({
-            id: normalizarIdFirestore(item.bem || item.nome || ''),
-            nome: item.nome || item.bem || 'Sem nome',
-            setor: item.familia || 'Industria',
-          }))
-          .filter((item) => item.id);
-        const fallbackVeiculos = (veiculosData || [])
-          .map((item) => {
-            const placa = item?.PLACAS || item?.placas || '';
-            const modelo = item?.MODELO || item?.modelo || '';
-            const nome = placa && modelo ? `${placa} - ${modelo}` : placa || modelo;
-            return {
-              id: normalizarIdFirestore(placa || modelo || ''),
-              nome: nome || 'Sem nome',
-              setor: 'Transporte',
-            };
-          })
-          .filter((item) => item.id);
-        const fallback = [...fallbackBens, ...fallbackVeiculos];
         const mergedMap = new Map();
         items.forEach((item) => mergedMap.set(item.id, item));
-        fallback.forEach((item) => {
+        maquinasBaseData.forEach((item) => {
           if (!mergedMap.has(item.id)) {
             mergedMap.set(item.id, item);
           }
@@ -3913,29 +3905,8 @@ export default function App() {
         setListaMaquinas(merged);
       } catch (err) {
         if (!ativo) return;
-        if ((bensData?.length || 0) + (veiculosData?.length || 0) > 0) {
-          const fallbackBens = (bensData || [])
-            .map((item) => ({
-              id: normalizarIdFirestore(item.bem || item.nome || ''),
-              nome: item.nome || item.bem || 'Sem nome',
-              setor: item.familia || 'Industria',
-            }))
-            .filter((item) => item.id);
-          const fallbackVeiculos = (veiculosData || [])
-            .map((item) => {
-              const placa = item?.PLACAS || item?.placas || '';
-              const modelo = item?.MODELO || item?.modelo || '';
-              const nome = placa && modelo ? `${placa} - ${modelo}` : placa || modelo;
-              return {
-                id: normalizarIdFirestore(placa || modelo || ''),
-                nome: nome || 'Sem nome',
-                setor: 'Transporte',
-              };
-            })
-            .filter((item) => item.id);
-          const fallback = [...fallbackBens, ...fallbackVeiculos];
-          fallback.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
-          setListaMaquinas(fallback);
+        if (maquinasBaseData.length > 0) {
+          setListaMaquinas(maquinasBaseData);
         } else {
           setMaquinasErro('Nao foi possivel carregar as maquinas.');
         }
@@ -3960,12 +3931,7 @@ export default function App() {
           .map((docRef) => docRef.data().nome || docRef.id)
           .filter(Boolean);
         const merged = new Set(items);
-        (bensData || []).forEach((item) => {
-          if (item.familia) {
-            merged.add(item.familia);
-          }
-        });
-        SETORES_BASE.forEach((setor) => merged.add(setor));
+        setoresBaseData.forEach((setor) => merged.add(setor));
         const mergedList = Array.from(merged)
           .filter(Boolean)
           .sort((a, b) => String(a).localeCompare(String(b)));
@@ -3973,11 +3939,8 @@ export default function App() {
         setSetoresCarregadosFirestore(true);
       } catch (err) {
         if (!ativo) return;
-        if (bensData?.length || SETORES_BASE.length) {
-          const fallback = Array.from(
-            new Set([...bensData.map((item) => item.familia).filter(Boolean), ...SETORES_BASE])
-          ).sort((a, b) => String(a).localeCompare(String(b)));
-          setListaSetores(fallback);
+        if (setoresBaseData.length || SETORES_BASE.length) {
+          setListaSetores(setoresBaseData);
         } else {
           setSetoresErro('Nao foi possivel carregar os setores.');
         }
@@ -7938,24 +7901,15 @@ const handleSeedBensFirestore = async () => {
     setBensSeedError('Sem permissao para importar bens.');
     return;
   }
-  if (!bensData?.length) {
-    setBensSeedError('Planilha de bens vazia ou nao carregada.');
+  if (!maquinasBaseData.length) {
+    setBensSeedError('Base local de ativos vazia ou nao carregada.');
     return;
   }
   setBensSeedError('');
   setBensSeedLoading(true);
   try {
-    const maquinas = bensData
-      .map((item) => ({
-        id: normalizarIdFirestore(item.bem || item.nome || ''),
-        nome: item.nome || item.bem || 'Sem nome',
-        setor: item.familia || 'Geral',
-      }))
-      .filter((item) => item.id);
-
-    const setores = Array.from(
-      new Set(bensData.map((item) => item.familia).filter(Boolean))
-    ).sort((a, b) => String(a).localeCompare(String(b)));
+    const maquinas = maquinasBaseData.map((item) => ({ ...item }));
+    const setores = setoresBaseData.filter(Boolean);
 
     const chunkSize = 450;
     for (let i = 0; i < maquinas.length; i += chunkSize) {
@@ -12377,6 +12331,9 @@ const custoDetalheTitulo = custoDetalheItem
                       <button onClick={() => setSubAbaManutencao('agenda')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                         <CalendarIcon size={13} />Agenda
                       </button>
+                      <button onClick={() => setSubAbaManutencao('ativos')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'ativos' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <Cpu size={13} />Ativos
+                      </button>
                       {isManutencaoOperador && (
                         <button onClick={() => setSubAbaManutencao('operador')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                           <UserCog size={13} />Operador
@@ -12953,6 +12910,179 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 )}
 
+                {subAbaManutencao === 'ativos' && (
+                  <div className="space-y-5">
+                    <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/70">Cadastro de ativos</p>
+                          <h3 className="mt-1 text-lg font-black text-white">Registrar máquina para abertura de OS</h3>
+                          <p className="mt-1 text-xs text-slate-400">
+                            Os ativos salvos aqui entram imediatamente na seleção da OS de manutenção.
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-slate-700/50 bg-slate-900/40 px-4 py-3 text-xs text-slate-300">
+                          Base atual: <span className="font-black text-white">{listaMaquinas.length}</span> ativo(s)
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
+                            <Plus size={16} className="text-amber-300" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black uppercase tracking-wider text-slate-200">Novo ativo</h4>
+                            <p className="text-[10px] text-slate-500">Cadastre máquinas e veículos sem sair da manutenção.</p>
+                          </div>
+                        </div>
+
+                        <form
+                          className="mt-5 space-y-4"
+                          onSubmit={async (e) => {
+                            e.preventDefault();
+                            const n = e.target.elements.nomeMaq.value;
+                            const cc = novoAtivoCc;
+                            const processo = normalizarTexto(cc) === 'industria' ? novoAtivoProcesso : '';
+                            await handleSalvarMaquina(n, cc, processo);
+                            e.target.reset();
+                            handleResetNovoAtivoForm();
+                          }}
+                        >
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Nome da máquina</label>
+                            <input
+                              name="nomeMaq"
+                              type="text"
+                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                              placeholder="Ex: Prensa hidráulica 03"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Centro de custo</label>
+                            <select
+                              value={novoAtivoCc}
+                              onChange={(e) => setNovoAtivoCc(e.target.value)}
+                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                              required
+                            >
+                              <option>Industria</option>
+                              <option>Transporte</option>
+                            </select>
+                          </div>
+                          {normalizarTexto(novoAtivoCc) === 'industria' && (
+                            <div>
+                              <label className="text-xs font-bold text-slate-400">Processo da indústria</label>
+                              <select
+                                value={novoAtivoProcesso}
+                                onChange={(e) => setNovoAtivoProcesso(e.target.value)}
+                                className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                              >
+                                <option value="">Selecione o processo</option>
+                                {listaSetores
+                                  .filter((item) => !['Industria', 'Transporte'].includes(String(item)))
+                                  .map((p) => (
+                                    <option key={p} value={p}>{p}</option>
+                                  ))}
+                              </select>
+                            </div>
+                          )}
+                          {maquinasErro && (
+                            <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300">
+                              {maquinasErro}
+                            </div>
+                          )}
+                          <div className="flex gap-3">
+                            <button
+                              type="submit"
+                              className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-4 py-3 text-xs font-black text-slate-950 shadow-lg shadow-amber-500/20 transition-all duration-200 hover:brightness-110"
+                            >
+                              Salvar ativo
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleResetNovoAtivoForm}
+                              className="rounded-xl border border-slate-700/60 bg-slate-900/30 px-4 py-3 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white"
+                            >
+                              Limpar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
+                        <div className="flex flex-col gap-3 border-b border-slate-800/40 bg-slate-900/30 p-5 md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <h4 className="text-sm font-black uppercase tracking-wider text-slate-200">Ativos cadastrados</h4>
+                            <p className="text-[10px] text-slate-500">Use o filtro para revisar a base usada pela abertura de OS.</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Filter size={14} className="text-slate-500" />
+                            <select
+                              value={filtroAtivos}
+                              onChange={(e) => setFiltroAtivos(e.target.value)}
+                              className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none"
+                            >
+                              <option>Todos</option>
+                              <option>Industria</option>
+                              <option>Transporte</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
+                          {ativosFiltrados.length ? (
+                            ativosFiltrados.map((m) => (
+                              <div key={m.id} className="flex items-start justify-between gap-4 rounded-xl border border-slate-800/40 bg-slate-950/20 p-4">
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-bold text-white">{m.nome}</p>
+                                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-amber-300">
+                                    {m.setor || 'Sem setor'}
+                                  </p>
+                                  {normalizarTexto(m.setor) === 'industria' && (
+                                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-300">
+                                      {m.processo ? `Processo: ${m.processo}` : 'Sem processo'}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex shrink-0 items-center gap-3">
+                                  {normalizarTexto(m.setor) === 'industria' && (
+                                    <button
+                                      type="button"
+                                      className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200"
+                                      onClick={() => {
+                                        setProcessoEditId(m.id);
+                                        setProcessoEditValue(m.processo || '');
+                                        setProcessoEditOpen(true);
+                                      }}
+                                    >
+                                      Editar
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleExcluirMaquina(m.id)}
+                                    className="text-[10px] font-bold text-rose-400 hover:text-rose-300"
+                                  >
+                                    Excluir
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="col-span-full rounded-xl border border-slate-800/40 bg-slate-950/20 p-8 text-center text-sm text-slate-500">
+                              Nenhum ativo encontrado para o filtro atual.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {subAbaManutencao === 'operador' && isManutencaoOperador && (
                   <div className="space-y-5">
                     <div className="flex items-center justify-between">
@@ -13331,7 +13461,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <option value="">Selecione...</option>
                               {listaMaquinasMobile.map((item) => (
                                 <option key={item.id} value={item.nome}>
-                                  {`${item.nome} - ${item.setor}`}
+                                  {getMaquinaOpcaoLabel(item)}
                                 </option>
                               ))}
                             </select>
@@ -13348,7 +13478,7 @@ const custoDetalheTitulo = custoDetalheItem
                             <datalist id="manutencao-ativos">
                               {listaMaquinas.map((item) => (
                                 <option key={item.id} value={item.nome}>
-                                  {`${item.nome} - ${item.setor}`}
+                                  {getMaquinaOpcaoLabel(item)}
                                 </option>
                               ))}
                             </datalist>
@@ -13889,8 +14019,7 @@ const custoDetalheTitulo = custoDetalheItem
                       const processo = normalizarTexto(cc) === 'industria' ? novoAtivoProcesso : '';
                       await handleSalvarMaquina(n, cc, processo);
                       e.target.reset();
-                      setNovoAtivoCc('');
-                      setNovoAtivoProcesso('');
+                      handleResetNovoAtivoForm();
                     }}>
                        <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Máquina" />
                        <div className="flex flex-col gap-2">
@@ -13926,7 +14055,7 @@ const custoDetalheTitulo = custoDetalheItem
                     </form>
                     {bensSeedDone && !bensSeedError && (
                       <div className="mb-4 text-xs font-semibold text-emerald-600">
-                        Bens importados no Firebase.
+                        Ativos base importados no Firebase.
                       </div>
                     )}
                     {bensSeedError && (
