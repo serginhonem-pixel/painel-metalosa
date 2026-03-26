@@ -12669,9 +12669,35 @@ const custoDetalheTitulo = custoDetalheItem
                           </button>
                         )}
                       </div>
-                      <div className="flex gap-2 text-xs">
-                        <button className="px-3 py-1.5 rounded-lg bg-slate-800/50 text-slate-300 font-bold border border-slate-700/30 hover:border-slate-600 transition-all">Todas</button>
-                        <button className="px-3 py-1.5 rounded-lg bg-blue-500/[0.12] text-blue-300 font-bold border border-blue-400/20 hover:bg-blue-500/20 transition-all">Abertas</button>
+                      <div className="flex flex-wrap gap-1.5 text-xs">
+                        {['Todas', 'Aberta', 'Em andamento', 'Aguardando peca', 'Finalizada'].map((s) => {
+                          const isActive = manutencaoFiltroStatus === s;
+                          const colorMap = {
+                            'Todas': isActive ? 'bg-slate-700/60 text-slate-100 border-slate-500/50' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                            'Aberta': isActive ? 'bg-blue-500/20 text-blue-200 border-blue-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                            'Em andamento': isActive ? 'bg-amber-500/20 text-amber-200 border-amber-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                            'Aguardando peca': isActive ? 'bg-purple-500/20 text-purple-200 border-purple-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                            'Finalizada': isActive ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                          };
+                          const countMap = {
+                            'Todas': manutencaoOrdens.length,
+                            'Aberta': manutencaoOrdens.filter(o => o.status === 'Aberta').length,
+                            'Em andamento': manutencaoOrdens.filter(o => o.status === 'Em andamento').length,
+                            'Aguardando peca': manutencaoOrdens.filter(o => o.status === 'Aguardando peca').length,
+                            'Finalizada': manutencaoOrdens.filter(o => o.status === 'Finalizada').length,
+                          };
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setManutencaoFiltroStatus(s)}
+                              className={`px-3 py-1.5 rounded-lg font-bold border transition-all flex items-center gap-1.5 ${colorMap[s]}`}
+                            >
+                              {s}
+                              <span className="text-[9px] opacity-70">{countMap[s]}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                     <div className="overflow-x-auto">
@@ -12703,8 +12729,8 @@ const custoDetalheTitulo = custoDetalheItem
                                 {manutencaoOrdensError}
                               </td>
                             </tr>
-                          ) : manutencaoOrdens.length ? (
-                            manutencaoOrdens.map((ordem) => {
+                          ) : manutencaoOrdensFiltradas.length ? (
+                            manutencaoOrdensFiltradas.map((ordem) => {
                               const prioridadeMap = {
                                 'critica': 'bg-rose-500/15 text-rose-300 border-rose-400/20',
                                 'alta': 'bg-amber-500/15 text-amber-300 border-amber-400/20',
@@ -12776,7 +12802,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <td className="px-5 py-10 text-sm text-slate-500 text-center" colSpan={7}>
                                 <div className="flex flex-col items-center gap-2">
                                   <Layers size={24} className="text-slate-600" />
-                                  Sem ordens registradas
+                                  {manutencaoFiltroStatus !== 'Todas' ? `Nenhuma OS com status "${manutencaoFiltroStatus}"` : 'Sem ordens registradas'}
                                 </div>
                               </td>
                             </tr>
@@ -13133,28 +13159,55 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                       {manutencaoOperadorListas.abertas.length ? (
                         <div className="space-y-3">
-                          {manutencaoOperadorListas.abertas.map((os) => (
-                            <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-4 hover:bg-slate-800/30 transition-all duration-200">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
-                                  <p className="text-[11px] text-slate-500">{os.setor || 'Sem setor'} · {os.prioridade || '-'}</p>
+                          {manutencaoOperadorListas.abertas.map((os) => {
+                            const prioridadeColor = {
+                              'Critica': 'bg-rose-500/15 text-rose-300 border-rose-400/25',
+                              'Alta': 'bg-amber-500/15 text-amber-300 border-amber-400/25',
+                              'Media': 'bg-blue-500/10 text-blue-300 border-blue-400/20',
+                              'Baixa': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
+                            }[os.prioridade] || 'bg-slate-700/30 text-slate-400 border-slate-600/20';
+                            const tempoAberta = os.createdAt ? (() => {
+                              const diff = Date.now() - new Date(os.createdAt).getTime();
+                              const h = Math.floor(diff / 3600000);
+                              return h < 1 ? 'Há menos de 1h' : h < 24 ? `Há ${h}h` : `Há ${Math.floor(h/24)}d`;
+                            })() : null;
+                            return (
+                              <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-4 hover:bg-slate-800/30 transition-all duration-200">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <span className="text-[9px] font-bold text-slate-500 font-mono">{os.id}</span>
+                                      {os.prioridade && (
+                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${prioridadeColor}`}>{os.prioridade}</span>
+                                      )}
+                                      {os.tipo && (
+                                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-slate-700/30 bg-slate-800/30 text-slate-400">{os.tipo}</span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
+                                    {os.sintoma && (
+                                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{os.sintoma}</p>
+                                    )}
+                                    <p className="text-[10px] text-slate-600 mt-1">
+                                      {os.setor || 'Sem setor'}{tempoAberta ? ` · ${tempoAberta}` : ''}{os.solicitante ? ` · ${os.solicitante}` : ''}
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAssumirModalOs(os);
+                                      setAssumirResponsavel('');
+                                      setAssumirErro('');
+                                    }}
+                                    data-tour="assumir-os"
+                                    className="rounded-lg border border-cyan-400/30 bg-cyan-500/[0.07] px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/15 hover:border-cyan-400/40 transition-all duration-200 shrink-0"
+                                  >
+                                    Assumir
+                                  </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setAssumirModalOs(os);
-                                    setAssumirResponsavel('');
-                                    setAssumirErro('');
-                                  }}
-                                  data-tour="assumir-os"
-                                  className="rounded-lg border border-cyan-400/30 bg-cyan-500/[0.07] px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/15 hover:border-cyan-400/40 transition-all duration-200"
-                                >
-                                  Assumir
-                                </button>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       ) : (
                         <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-6 text-sm text-slate-500 text-center">
@@ -13179,36 +13232,63 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                       {manutencaoOperadorListas.minhas.length ? (
                         <div className="space-y-3">
-                          {manutencaoOperadorListas.minhas.map((os) => (
-                            <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-4 hover:bg-slate-800/30 transition-all duration-200">
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className="text-sm font-bold text-white truncate">{os.ativo || os.id}</p>
-                                  <p className="text-[11px] text-slate-500">
-                                    {os.status || '-'} · {os.statusMaquina || 'Rodando'}
-                                  </p>
+                          {manutencaoOperadorListas.minhas.map((os) => {
+                            const statusColor = {
+                              'Em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/25',
+                              'Aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/25',
+                              'Aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/25',
+                            }[os.status] || 'bg-slate-700/20 text-slate-400 border-slate-600/20';
+                            const maquinaParada = os.statusMaquina === 'Parada' || os.parada === 'Sim';
+                            return (
+                              <div key={os.id} className={`rounded-xl border p-4 hover:bg-slate-800/30 transition-all duration-200 ${maquinaParada ? 'border-rose-500/20 bg-rose-950/10' : 'border-slate-800/30 bg-slate-900/30'}`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <span className="text-[9px] font-bold text-slate-500 font-mono">{os.id}</span>
+                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${statusColor}`}>{os.status || '-'}</span>
+                                      {maquinaParada && (
+                                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-rose-400/25 bg-rose-500/10 text-rose-300">Máq. parada</span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm font-bold text-white truncate">{os.ativo || os.id}</p>
+                                    {os.sintoma && (
+                                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{os.sintoma}</p>
+                                    )}
+                                    <p className="text-[10px] text-slate-600 mt-1">{os.setor || 'Sem setor'}{os.prioridade ? ` · ${os.prioridade}` : ''}</p>
+                                  </div>
                                 </div>
-                                <div data-tour="acoes-os" className="flex flex-wrap items-center gap-1.5 text-xs shrink-0">
+                                <div data-tour="acoes-os" className="flex flex-wrap items-center gap-1.5 text-xs mt-3 pt-3 border-t border-slate-800/30">
+                                  {os.status !== 'Em andamento' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
+                                      className="rounded-lg border border-blue-400/25 bg-blue-500/[0.06] px-2.5 py-1 font-bold text-blue-300 hover:bg-blue-500/15 transition-all"
+                                    >
+                                      Iniciar
+                                    </button>
+                                  )}
+                                  {os.status !== 'Aguardando peca' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => atualizarOs(os.id, { status: 'Aguardando peca' })}
+                                      className="rounded-lg border border-amber-400/25 bg-amber-500/[0.06] px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/15 transition-all"
+                                    >
+                                      Pausar
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
-                                    onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
-                                    className="rounded-lg border border-blue-400/25 bg-blue-500/[0.06] px-2.5 py-1 font-bold text-blue-300 hover:bg-blue-500/15 transition-all"
-                                  >
-                                    Iniciar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => atualizarOs(os.id, { status: 'Aguardando peca' })}
-                                    className="rounded-lg border border-amber-400/25 bg-amber-500/[0.06] px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/15 transition-all"
-                                  >
-                                    Pausar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => atualizarOs(os.id, { status: 'Finalizada' })}
+                                    onClick={() => atualizarOs(os.id, { status: 'Finalizada', fechadaEm: new Date().toISOString() })}
                                     className="rounded-lg border border-emerald-400/25 bg-emerald-500/[0.06] px-2.5 py-1 font-bold text-emerald-300 hover:bg-emerald-500/15 transition-all"
                                   >
                                     Finalizar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleVisualizarOs(os)}
+                                    className="rounded-lg border border-amber-400/20 bg-amber-500/[0.05] px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/10 transition-all"
+                                  >
+                                    Ver
                                   </button>
                                   <button
                                     type="button"
@@ -13219,8 +13299,8 @@ const custoDetalheTitulo = custoDetalheItem
                                   </button>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       ) : (
                         <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-6 text-sm text-slate-500 text-center">
