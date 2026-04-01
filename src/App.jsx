@@ -7227,6 +7227,8 @@ useEffect(() => {
 const mesCustoAtual = custoFiltroMes || (mesesCustos.length ? mesesCustos[mesesCustos.length - 1].raw : '');
 const mesCustoAtualDisplay =
   mesesCustos.find((item) => item.raw === mesCustoAtual)?.display || mesCustoAtual;
+const mesCustoAtualKey =
+  mesesCustos.find((item) => item.raw === mesCustoAtual)?.sortKey || '';
 
 const faturamentoComCustos = useMemo(
   () =>
@@ -7352,7 +7354,9 @@ const custosBaseFiltravel = useMemo(() => {
   });
 
   const meses = Array.from(new Set(normalizadas.map((row) => row.mesKey).filter(Boolean))).sort();
-  const mesAtualKey = meses.length ? meses[meses.length - 1] : '';
+  const ultimoMesKey = meses.length ? meses[meses.length - 1] : '';
+  const mesAtualKey =
+    mesCustoAtualKey && meses.includes(mesCustoAtualKey) ? mesCustoAtualKey : ultimoMesKey;
   const mesAtualDisplay = normalizadas.find((row) => row.mesKey === mesAtualKey)?.mesDisplay || '';
   const linhasMesAtual = mesAtualKey ? normalizadas.filter((row) => row.mesKey === mesAtualKey) : normalizadas;
 
@@ -7362,7 +7366,7 @@ const custosBaseFiltravel = useMemo(() => {
     mesAtualKey,
     mesAtualDisplay,
   };
-}, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap]);
+}, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap, mesCustoAtualKey]);
 
 const custosPeriodoLabel = useMemo(() => {
   const periodoOperacao = custoPeriodoInicio || custoPeriodoFim
