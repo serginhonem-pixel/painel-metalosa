@@ -984,6 +984,7 @@ export default function App() {
   const [custoDetalhePedidoSelecionado, setCustoDetalhePedidoSelecionado] = useState(null);
   const [custoPeriodoInicio, setCustoPeriodoInicio] = useState('');
   const [custoPeriodoFim, setCustoPeriodoFim] = useState('');
+  const [custoFiltroMesFaturamento, setCustoFiltroMesFaturamento] = useState('');
   const [custoFiltroMes, setCustoFiltroMes] = useState('');
   const [custoFiltroFilial, setCustoFiltroFilial] = useState('Todas');
   const [custoFiltroGrupo, setCustoFiltroGrupo] = useState('Todos');
@@ -7227,8 +7228,6 @@ useEffect(() => {
 const mesCustoAtual = custoFiltroMes || (mesesCustos.length ? mesesCustos[mesesCustos.length - 1].raw : '');
 const mesCustoAtualDisplay =
   mesesCustos.find((item) => item.raw === mesCustoAtual)?.display || mesCustoAtual;
-const mesCustoAtualKey =
-  mesesCustos.find((item) => item.raw === mesCustoAtual)?.sortKey || '';
 
 const faturamentoComCustos = useMemo(
   () =>
@@ -7356,17 +7355,35 @@ const custosBaseFiltravel = useMemo(() => {
   const meses = Array.from(new Set(normalizadas.map((row) => row.mesKey).filter(Boolean))).sort();
   const ultimoMesKey = meses.length ? meses[meses.length - 1] : '';
   const mesAtualKey =
-    mesCustoAtualKey && meses.includes(mesCustoAtualKey) ? mesCustoAtualKey : ultimoMesKey;
+    custoFiltroMesFaturamento && meses.includes(custoFiltroMesFaturamento)
+      ? custoFiltroMesFaturamento
+      : ultimoMesKey;
   const mesAtualDisplay = normalizadas.find((row) => row.mesKey === mesAtualKey)?.mesDisplay || '';
   const linhasMesAtual = mesAtualKey ? normalizadas.filter((row) => row.mesKey === mesAtualKey) : normalizadas;
+  const mesesDisponiveis = meses.map((mesKey) => ({
+    key: mesKey,
+    display: normalizadas.find((row) => row.mesKey === mesKey)?.mesDisplay || mesKey,
+  }));
 
   return {
     linhasTodas: normalizadas,
     linhasMesAtual,
     mesAtualKey,
     mesAtualDisplay,
+    mesesDisponiveis,
   };
-}, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap, mesCustoAtualKey]);
+}, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap, custoFiltroMesFaturamento]);
+
+useEffect(() => {
+  const mesesDisponiveis = custosBaseFiltravel.mesesDisponiveis || [];
+  if (!mesesDisponiveis.length) {
+    if (custoFiltroMesFaturamento) setCustoFiltroMesFaturamento('');
+    return;
+  }
+  if (!custoFiltroMesFaturamento || !mesesDisponiveis.some((item) => item.key === custoFiltroMesFaturamento)) {
+    setCustoFiltroMesFaturamento(mesesDisponiveis[mesesDisponiveis.length - 1].key);
+  }
+}, [custoFiltroMesFaturamento, custosBaseFiltravel.mesesDisponiveis]);
 
 const custosPeriodoLabel = useMemo(() => {
   const periodoOperacao = custoPeriodoInicio || custoPeriodoFim
@@ -7375,7 +7392,10 @@ const custosPeriodoLabel = useMemo(() => {
   if (custoPeriodoInicio || custoPeriodoFim) {
     return mesCustoAtualDisplay ? `${periodoOperacao} · custo ${mesCustoAtualDisplay}` : periodoOperacao;
   }
-  return mesCustoAtualDisplay ? `${periodoOperacao} · custo ${mesCustoAtualDisplay}` : periodoOperacao;
+  if (mesCustoAtualDisplay && periodoOperacao) {
+    return `Fat. ${periodoOperacao} · Custo ${mesCustoAtualDisplay}`;
+  }
+  return periodoOperacao || mesCustoAtualDisplay || 'Periodo atual';
 }, [custoPeriodoInicio, custoPeriodoFim, custosBaseFiltravel.mesAtualDisplay, mesCustoAtualDisplay]);
 
 const custosLinhasPeriodo = useMemo(() => {
@@ -9628,7 +9648,7 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-8 gap-3">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Data inicio
                     <input
@@ -9646,6 +9666,20 @@ const custoDetalheTitulo = custoDetalheItem
                       onChange={(e) => setCustoPeriodoFim(e.target.value)}
                       className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
                     />
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Mes faturamento
+                    <select
+                      value={custoFiltroMesFaturamento}
+                      onChange={(e) => setCustoFiltroMesFaturamento(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    >
+                      {custosBaseFiltravel.mesesDisponiveis.map((item) => (
+                        <option key={item.key} value={item.key}>
+                          {item.display}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Mes custo
@@ -9737,6 +9771,7 @@ const custoDetalheTitulo = custoDetalheItem
                     onClick={() => {
                       setCustoPeriodoInicio('');
                       setCustoPeriodoFim('');
+                      setCustoFiltroMesFaturamento('');
                       setCustoFiltroMes('');
                       setCustoFiltroFilial('Todas');
                       setCustoFiltroGrupo('Todos');
