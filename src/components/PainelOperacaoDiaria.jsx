@@ -189,6 +189,7 @@ const ABSENTEISMO_MESES_FALLBACK = [
 const ABSENTEISMO_EVOLUCAO_MANUAL = {
   '2026-01': 8.7,
   '2026-02': 8.4,
+  '2026-03': 8.5,
 };
 
 const MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
