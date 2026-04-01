@@ -27,7 +27,8 @@ const removerAcentos = (texto) =>
 
 const normalizarMes = (texto) => {
   const limpo = removerAcentos(texto);
-  return MONTH_INDEX[limpo] ? limpo : '';
+  if (MONTH_INDEX[limpo]) return limpo;
+  return MONTHS_NORMALIZED.find((mes) => limpo.includes(mes)) || '';
 };
 
 const numeroDoMes = (mesNormalizado) => {
@@ -96,6 +97,12 @@ const normalizePeriod = (value, fallbackYear) => {
   }
   const raw = String(value).trim();
   if (!raw) return '';
+  const mesNorm = normalizarMes(raw);
+  const yearMatch = raw.match(/(20\d{2})/);
+  const year = yearMatch?.[1] || fallbackYear;
+  if (mesNorm && year) {
+    return `${year}-${String(numeroDoMes(mesNorm)).padStart(2, '0')}`;
+  }
   if (/^\d{4}-\d{2}$/.test(raw)) return raw;
   const slashMatch = raw.match(/^(\d{1,2})[\/\-](\d{4})$/);
   if (slashMatch) {

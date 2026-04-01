@@ -338,6 +338,64 @@ const parseValor = (value) => {
   return 0;
 };
 
+const CUSTO_MESES_NORMALIZADOS = [
+  'janeiro',
+  'fevereiro',
+  'marco',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro',
+];
+
+const CUSTO_INDICE_MESES = CUSTO_MESES_NORMALIZADOS.reduce((acc, mes, index) => {
+  acc[mes] = index + 1;
+  return acc;
+}, {});
+
+const removerAcentosTexto = (texto) =>
+  String(texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+const normalizarMesCusto = (texto) => {
+  const limpo = removerAcentosTexto(texto);
+  if (CUSTO_INDICE_MESES[limpo]) return limpo;
+  return CUSTO_MESES_NORMALIZADOS.find((mes) => limpo.includes(mes)) || '';
+};
+
+const formatarRotuloMesCusto = (rotulo, fallbackYear) => {
+  const raw = String(rotulo || '').trim();
+  if (!raw) {
+    return { raw: '', display: '', sortKey: '', mes: '', ano: fallbackYear || 0 };
+  }
+  const mes = normalizarMesCusto(raw);
+  const ano = Number(raw.match(/(20\d{2})/)?.[1] || fallbackYear || 0);
+  const numeroMes = mes ? CUSTO_INDICE_MESES[mes] || 0 : 0;
+  const nomeMes = mes ? `${mes.charAt(0).toUpperCase()}${mes.slice(1)}` : raw;
+  const display = ano && numeroMes ? `${nomeMes} ${ano}` : raw;
+  const sortKey = ano && numeroMes ? `${ano}-${String(numeroMes).padStart(2, '0')}` : raw;
+  return { raw, display, sortKey, mes, ano };
+};
+
+const obterValorPlanilhaPorMes = (valores, rotuloSelecionado) => {
+  if (!valores || !rotuloSelecionado) return 0;
+  if (Object.prototype.hasOwnProperty.call(valores, rotuloSelecionado)) {
+    return parseValor(valores[rotuloSelecionado]);
+  }
+  const mesSelecionado = normalizarMesCusto(rotuloSelecionado);
+  if (!mesSelecionado) return 0;
+  const entrada = Object.entries(valores).find(([rotulo]) => normalizarMesCusto(rotulo) === mesSelecionado);
+  return entrada ? parseValor(entrada[1]) : 0;
+};
+
 const normalizarTipoMovimento = (valor) => {
   const tipo = String(valor ?? '').trim().toLowerCase();
   return tipo === 'devolucao' ? 'devolucao' : 'venda';
@@ -926,6 +984,7 @@ export default function App() {
   const [custoDetalhePedidoSelecionado, setCustoDetalhePedidoSelecionado] = useState(null);
   const [custoPeriodoInicio, setCustoPeriodoInicio] = useState('');
   const [custoPeriodoFim, setCustoPeriodoFim] = useState('');
+  const [custoFiltroMes, setCustoFiltroMes] = useState('');
   const [custoFiltroFilial, setCustoFiltroFilial] = useState('Todas');
   const [custoFiltroGrupo, setCustoFiltroGrupo] = useState('Todos');
   const [custoFiltroFonte, setCustoFiltroFonte] = useState('Todas');
@@ -7138,13 +7197,36 @@ export default function App() {
   }, [faturamentoLinhas, filtroFilial2025, filtroCfops2025]);
 
   const mesesCustos = useMemo(() => {
-  if (!custosData?.length) return [];
-  const primeiro = custosData.find((item) => item.Valores && Object.keys(item.Valores).length);
-  if (!primeiro) return [];
-  return Object.keys(primeiro.Valores);
-}, [custosData]);
+    if (!custosData?.length) return [];
+    const labels = new Set();
+    custosData.forEach((item) => {
+      Object.keys(item?.Valores || {}).forEach((rotulo) => {
+        if (rotulo) labels.add(rotulo);
+      });
+    });
+    const anosEncontrados = Array.from(labels)
+      .map((rotulo) => Number(String(rotulo).match(/(20\d{2})/)?.[1] || 0))
+      .filter(Boolean);
+    const fallbackYear = anosEncontrados.length ? Math.max(...anosEncontrados) : new Date().getFullYear();
+    return Array.from(labels)
+      .map((rotulo) => formatarRotuloMesCusto(rotulo, fallbackYear))
+      .filter((item) => item.raw)
+      .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  }, [custosData]);
 
-const mesCustoAtual = mesesCustos.length ? mesesCustos[mesesCustos.length - 1] : '';
+useEffect(() => {
+  if (!mesesCustos.length) {
+    if (custoFiltroMes) setCustoFiltroMes('');
+    return;
+  }
+  if (!custoFiltroMes || !mesesCustos.some((item) => item.raw === custoFiltroMes)) {
+    setCustoFiltroMes(mesesCustos[mesesCustos.length - 1].raw);
+  }
+}, [custoFiltroMes, mesesCustos]);
+
+const mesCustoAtual = custoFiltroMes || (mesesCustos.length ? mesesCustos[mesesCustos.length - 1].raw : '');
+const mesCustoAtualDisplay =
+  mesesCustos.find((item) => item.raw === mesCustoAtual)?.display || mesCustoAtual;
 
 const faturamentoComCustos = useMemo(
   () =>
@@ -7225,12 +7307,12 @@ const resumoCustosIndiretos = useMemo(() => {
 
 const totalDiretoPlanilhaAtual = useMemo(() => {
   if (!mesCustoAtual) return 0;
-  return custosData.reduce((acc, item) => acc + parseValor(item?.Valores?.[mesCustoAtual]), 0);
+  return custosData.reduce((acc, item) => acc + obterValorPlanilhaPorMes(item?.Valores, mesCustoAtual), 0);
 }, [custosData, mesCustoAtual]);
 
 const totalDiretoPlanilhaPrev = useMemo(() => {
   if (!mesCustoAtual) return 0;
-  return custosPrevanoData.reduce((acc, item) => acc + parseValor(item?.Valores?.[mesCustoAtual]), 0);
+  return custosPrevanoData.reduce((acc, item) => acc + obterValorPlanilhaPorMes(item?.Valores, mesCustoAtual), 0);
 }, [custosPrevanoData, mesCustoAtual]);
 
 const variacaoDiretoPlanilha = useMemo(() => {
@@ -7283,11 +7365,14 @@ const custosBaseFiltravel = useMemo(() => {
 }, [faturamentoLinhas, clientesPorCodigo, produtoDescricaoMap]);
 
 const custosPeriodoLabel = useMemo(() => {
+  const periodoOperacao = custoPeriodoInicio || custoPeriodoFim
+    ? [custoPeriodoInicio || 'inicio', custoPeriodoFim || 'fim'].join(' a ')
+    : custosBaseFiltravel.mesAtualDisplay || 'Periodo atual';
   if (custoPeriodoInicio || custoPeriodoFim) {
-    return [custoPeriodoInicio || 'inicio', custoPeriodoFim || 'fim'].join(' a ');
+    return mesCustoAtualDisplay ? `${periodoOperacao} · custo ${mesCustoAtualDisplay}` : periodoOperacao;
   }
-  return custosBaseFiltravel.mesAtualDisplay || mesCustoAtual || 'Planilha atual';
-}, [custoPeriodoInicio, custoPeriodoFim, custosBaseFiltravel.mesAtualDisplay, mesCustoAtual]);
+  return mesCustoAtualDisplay ? `${periodoOperacao} · custo ${mesCustoAtualDisplay}` : periodoOperacao;
+}, [custoPeriodoInicio, custoPeriodoFim, custosBaseFiltravel.mesAtualDisplay, mesCustoAtualDisplay]);
 
 const custosLinhasPeriodo = useMemo(() => {
   const linhasBase =
@@ -9387,7 +9472,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <div>
                         <p className="text-[11px] uppercase tracking-[0.4em] text-slate-500 font-black">Custos consolidados</p>
                         <p className="text-4xl font-black text-slate-900">{formatarMoeda(totalCustosMes)}</p>
-                        <p className="text-xs text-slate-400 mt-1">{mesCustoAtual || 'Planilha de custos'}</p>
+                        <p className="text-xs text-slate-400 mt-1">{mesCustoAtualDisplay || 'Planilha de custos'}</p>
                       </div>
                       <div className="flex flex-col text-right text-[11px] text-slate-500">
                         <span>Capturado dos insumos</span>
@@ -9539,7 +9624,7 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.9)]">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-3">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Data inicio
                     <input
@@ -9557,6 +9642,20 @@ const custoDetalheTitulo = custoDetalheItem
                       onChange={(e) => setCustoPeriodoFim(e.target.value)}
                       className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
                     />
+                  </label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Mes custo
+                    <select
+                      value={mesCustoAtual}
+                      onChange={(e) => setCustoFiltroMes(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200"
+                    >
+                      {mesesCustos.map((item) => (
+                        <option key={item.raw} value={item.raw}>
+                          {item.display}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Filial
@@ -9634,6 +9733,7 @@ const custoDetalheTitulo = custoDetalheItem
                     onClick={() => {
                       setCustoPeriodoInicio('');
                       setCustoPeriodoFim('');
+                      setCustoFiltroMes('');
                       setCustoFiltroFilial('Todas');
                       setCustoFiltroGrupo('Todos');
                       setCustoFiltroFonte('Todas');
