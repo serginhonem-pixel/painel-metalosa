@@ -234872,6 +234872,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "057635",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01382I         ",
+    "Descricao": "TUBO QD 50X30X1,20                                ",
+    "Quantidade": 17.78,
+    "Unidade": "KG",
+    "ValorUnitario": 7.93,
+    "ValorTotal": 140.99,
+    "Emissao": "2026-04-01T00:00:00.000Z",
+    "Vendedor1": "C13   ",
+    "NF": 341484,
+    "CodFiscal": "5101",
+    "MesEmissao": "04/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "0967  ",
     "Filial": "01",
     "Grupo": "0090",
@@ -237351,6 +237368,23 @@
     "NF": 254144,
     "CodFiscal": "5102",
     "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "C00415",
+    "Filial": "04",
+    "Grupo": "0027",
+    "Codigo": "03197I         ",
+    "Descricao": "****",
+    "Quantidade": 1,
+    "Unidade": "LT",
+    "ValorUnitario": 137.95,
+    "ValorTotal": 137.95,
+    "Emissao": "2026-04-01T00:00:00.000Z",
+    "Vendedor1": "C04   ",
+    "NF": 254188,
+    "CodFiscal": "5102",
+    "MesEmissao": "04/2026",
     "TipoMovimento": "N"
   },
   {
@@ -295389,6 +295423,23 @@
     "NF": 253756,
     "CodFiscal": "5102",
     "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "C18799",
+    "Filial": "04",
+    "Grupo": "0055",
+    "Codigo": "09060          ",
+    "Descricao": "****",
+    "Quantidade": 3,
+    "Unidade": "RL",
+    "ValorUnitario": 256.87,
+    "ValorTotal": 770.61,
+    "Emissao": "2026-04-01T00:00:00.000Z",
+    "Vendedor1": "C12   ",
+    "NF": 254187,
+    "CodFiscal": "5102",
+    "MesEmissao": "04/2026",
     "TipoMovimento": "N"
   },
   {
@@ -554948,6 +554999,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "043231",
+    "Filial": "06",
+    "Grupo": "G020",
+    "Codigo": "00720E         ",
+    "Descricao": "CARRO METALFORTE M16 PC 3 E                       ",
+    "Quantidade": 2,
+    "Unidade": "PC",
+    "ValorUnitario": 305,
+    "ValorTotal": 610,
+    "Emissao": "2026-04-01T00:00:00.000Z",
+    "Vendedor1": "S05   ",
+    "NF": 77962,
+    "CodFiscal": "5101",
+    "MesEmissao": "04/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "043255",
     "Filial": "08",
     "Grupo": "G010",
@@ -619749,6 +619817,23 @@
     "NF": 77104,
     "CodFiscal": "5101",
     "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "056580",
+    "Filial": "01",
+    "Grupo": "G110",
+    "Codigo": "01398          ",
+    "Descricao": "DW CANTONEIRA L 25/30 - 3,00M                     ",
+    "Quantidade": 60,
+    "Unidade": "M ",
+    "ValorUnitario": 1.87,
+    "ValorTotal": 112.2,
+    "Emissao": "2026-04-01T00:00:00.000Z",
+    "Vendedor1": "C12   ",
+    "NF": 77961,
+    "CodFiscal": "5101",
+    "MesEmissao": "04/2026",
     "TipoMovimento": "N"
   },
   {
