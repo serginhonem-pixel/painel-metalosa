@@ -7570,6 +7570,8 @@ const custosTopItens = useMemo(
   [custosItensFiltrados]
 );
 
+const FILIAL_RELATORIO_ANALITICO_CUSTOS = '08';
+
 const custosComparativoMensal = useMemo(() => {
   const skuBusca = normalizarTexto(custoFiltroSku);
   const clienteBusca = normalizarTexto(custoFiltroCliente);
@@ -7582,7 +7584,7 @@ const custosComparativoMensal = useMemo(() => {
     const dataISO = obterDataIsoUtc(row.emissao);
     if (custoPeriodoInicio && dataISO < custoPeriodoInicio) return;
     if (custoPeriodoFim && dataISO > custoPeriodoFim) return;
-    if (custoFiltroFilial !== 'Todas' && row.filial !== custoFiltroFilial) return;
+    if (row.filial !== FILIAL_RELATORIO_ANALITICO_CUSTOS) return;
     if (custoFiltroGrupo !== 'Todos' && row.grupo !== custoFiltroGrupo) return;
     if (skuBusca && !normalizarTexto(`${row.codigo || ''} ${row.descricao || ''}`).includes(skuBusca)) return;
     if (clienteBusca && !normalizarTexto(`${row.clienteNome || ''} ${row.cliente || ''}`).includes(clienteBusca)) return;
@@ -7606,7 +7608,7 @@ const custosComparativoMensal = useMemo(() => {
         linhas,
         produtoDescricaoMap,
         custosDiretos: custosData,
-        custosDiretosAnoAnterior: custosPrevanoData,
+        custosDiretosAnoAnterior: [],
         custosIndiretos: custosIndiretosData,
         mesCustoAtual: mesDisplay,
         diasAtivos: diasAtivosMes,
@@ -7658,7 +7660,6 @@ const custosComparativoMensal = useMemo(() => {
   });
 }, [
   custosBaseFiltravel.linhasTodas,
-  custoFiltroFilial,
   custoFiltroGrupo,
   custoFiltroSku,
   custoFiltroCliente,
@@ -7668,7 +7669,6 @@ const custosComparativoMensal = useMemo(() => {
   custoPeriodoFim,
   produtoDescricaoMap,
   custosData,
-  custosPrevanoData,
   custosIndiretosData,
 ]);
 
@@ -8037,6 +8037,7 @@ const handleExportarComparativoCustosExcel = () => {
 
   const resumoMensal = custosComparativoMensal.map((item) => ({
     Mes: item.mesDisplay,
+    Filial: FILIAL_RELATORIO_ANALITICO_CUSTOS,
     Movimentos: item.movimentos,
     DiasAtivos: item.diasAtivos,
     Quantidade: item.quantidade ?? 0,
@@ -8058,6 +8059,7 @@ const handleExportarComparativoCustosExcel = () => {
   const analiticoMensal = custosComparativoMensal.flatMap((mes) =>
     mes.itens.map((item) => ({
       Mes: mes.mesDisplay,
+      Filial: FILIAL_RELATORIO_ANALITICO_CUSTOS,
       SKU: item.codigo || '',
       Descricao: item.descricao || '',
       Quantidade: item.quantidade ?? 0,
@@ -8105,7 +8107,7 @@ const handleExportarComparativoCustosPdf = () => {
   doc.setFontSize(9);
   doc.text(`Base ${custosPeriodoLabel || 'Filtro atual'}`, margem + 4, 23);
   doc.text(`Gerado em ${formatDateTimeRelatorio(now)}`, pageWidth - margem - 4, 17, { align: 'right' });
-  doc.text(`Fonte ${custoFiltroFonte || 'Todas'}`, pageWidth - margem - 4, 23, { align: 'right' });
+  doc.text(`Filial ${FILIAL_RELATORIO_ANALITICO_CUSTOS} · Fonte ${custoFiltroFonte || 'Todas'}`, pageWidth - margem - 4, 23, { align: 'right' });
 
   const cards = [
     ['Meses comparados', String(custosComparativoMensal.length)],
