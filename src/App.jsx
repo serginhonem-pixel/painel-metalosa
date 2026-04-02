@@ -7566,6 +7566,110 @@ const custosTopItens = useMemo(
   [custosItensFiltrados]
 );
 
+const custosComparativoMensal = useMemo(() => {
+  const skuBusca = normalizarTexto(custoFiltroSku);
+  const clienteBusca = normalizarTexto(custoFiltroCliente);
+  const linhasAgrupadas = new Map();
+
+  (custosBaseFiltravel.linhasTodas || []).forEach((row) => {
+    const mesKey = row.mesKey || '';
+    if (!mesKey) return;
+    if (!row.emissao) return;
+    const dataISO = obterDataIsoUtc(row.emissao);
+    if (custoPeriodoInicio && dataISO < custoPeriodoInicio) return;
+    if (custoPeriodoFim && dataISO > custoPeriodoFim) return;
+    if (custoFiltroFilial !== 'Todas' && row.filial !== custoFiltroFilial) return;
+    if (custoFiltroGrupo !== 'Todos' && row.grupo !== custoFiltroGrupo) return;
+    if (skuBusca && !normalizarTexto(`${row.codigo || ''} ${row.descricao || ''}`).includes(skuBusca)) return;
+    if (clienteBusca && !normalizarTexto(`${row.clienteNome || ''} ${row.cliente || ''}`).includes(clienteBusca)) return;
+
+    if (!linhasAgrupadas.has(mesKey)) {
+      linhasAgrupadas.set(mesKey, []);
+    }
+    linhasAgrupadas.get(mesKey).push(row);
+  });
+
+  const mesesDisponiveis = custosBaseFiltravel.mesesDisponiveis || [];
+  const mesesOrdenados = Array.from(linhasAgrupadas.entries())
+    .sort(([mesA], [mesB]) => mesA.localeCompare(mesB))
+    .map(([mesKey, linhas]) => {
+      const diasAtivosMes = new Set(linhas.map((row) => obterDataIsoUtc(row.emissao)).filter(Boolean)).size;
+      const mesDisplay =
+        mesesDisponiveis.find((item) => item.key === mesKey)?.display ||
+        `${mesKey.slice(5, 7)}/${mesKey.slice(0, 4)}`;
+
+      const breakdownMes = computeCostBreakdown({
+        linhas,
+        produtoDescricaoMap,
+        custosDiretos: custosData,
+        custosDiretosAnoAnterior: custosPrevanoData,
+        custosIndiretos: custosIndiretosData,
+        mesCustoAtual: mesDisplay,
+        diasAtivos: diasAtivosMes,
+      });
+
+      const itensFiltradosMes =
+        custoFiltroFonte === 'Todas'
+          ? breakdownMes.itens || []
+          : (breakdownMes.itens || []).filter((item) => item.fonteDireto === custoFiltroFonte);
+
+      const itensOrdenadosMes = [...itensFiltradosMes].sort((a, b) => (b.custo || 0) - (a.custo || 0));
+      const totalReceitaMes = itensFiltradosMes.reduce((acc, item) => acc + (item.receita || 0), 0);
+      const totalCustosMes = itensFiltradosMes.reduce((acc, item) => acc + (item.custo || 0), 0);
+      const totalDiretoMes = itensFiltradosMes.reduce((acc, item) => acc + (item.custoDireto || 0), 0);
+      const totalIndiretoMes = itensFiltradosMes.reduce((acc, item) => acc + (item.cifRateado || 0), 0);
+      const totalQuantidadeMes = linhas.reduce((acc, row) => acc + (row.quantidade || 0), 0);
+      const percentualCustoMes = totalReceitaMes > 0 ? (totalCustosMes / totalReceitaMes) * 100 : 0;
+      const margemMes = totalReceitaMes > 0 ? ((totalReceitaMes - totalCustosMes) / totalReceitaMes) * 100 : 0;
+      const markupMes = totalCustosMes > 0 ? ((totalReceitaMes - totalCustosMes) / totalCustosMes) * 100 : 0;
+
+      return {
+        mesKey,
+        mesDisplay,
+        movimentos: linhas.length,
+        diasAtivos: diasAtivosMes,
+        quantidade: totalQuantidadeMes,
+        skus: itensFiltradosMes.length,
+        receita: totalReceitaMes,
+        custo: totalCustosMes,
+        custoDireto: totalDiretoMes,
+        custoIndireto: totalIndiretoMes,
+        percentualCusto: percentualCustoMes,
+        margem: margemMes,
+        markup: markupMes,
+        topSku: itensOrdenadosMes[0] || null,
+        itens: itensOrdenadosMes,
+      };
+    });
+
+  return mesesOrdenados.map((mes, index) => {
+    const anterior = index > 0 ? mesesOrdenados[index - 1] : null;
+    const variacaoAbs = anterior ? mes.custo - anterior.custo : 0;
+    const variacaoPct = anterior && anterior.custo > 0 ? (variacaoAbs / anterior.custo) * 100 : 0;
+    return {
+      ...mes,
+      variacaoAbs,
+      variacaoPct,
+    };
+  });
+}, [
+  custosBaseFiltravel.linhasTodas,
+  custoFiltroFilial,
+  custoFiltroGrupo,
+  custoFiltroSku,
+  custoFiltroCliente,
+  custoFiltroFonte,
+  custosBaseFiltravel.mesesDisponiveis,
+  custoPeriodoInicio,
+  custoPeriodoFim,
+  produtoDescricaoMap,
+  custosData,
+  custosPrevanoData,
+  custosIndiretosData,
+]);
+
+const exportComparativoCustosDisponivel = custosComparativoMensal.length > 0;
+
 const custosPioresMargens = useMemo(
   () =>
     custosItensFiltrados
@@ -7912,6 +8016,232 @@ const handleExportarCustosPdf = () => {
             <tbody>
               ${linhasHtml}
             </tbody>
+          </table>
+        </div>
+
+        <div class="footer">Metalosa · Custos</div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  printHtmlRelatorio(html);
+};
+
+const handleExportarComparativoCustosExcel = () => {
+  if (!custosComparativoMensal.length) return;
+
+  const resumoMensal = custosComparativoMensal.map((item) => ({
+    Mes: item.mesDisplay,
+    Movimentos: item.movimentos,
+    DiasAtivos: item.diasAtivos,
+    Quantidade: item.quantidade ?? 0,
+    Skus: item.skus ?? 0,
+    Receita: item.receita ?? 0,
+    CustoTotal: item.custo ?? 0,
+    CustoDireto: item.custoDireto ?? 0,
+    CustoIndireto: item.custoIndireto ?? 0,
+    PercentualCusto: Number.isFinite(item.percentualCusto) ? Number(item.percentualCusto.toFixed(2)) : 0,
+    MargemPercentual: Number.isFinite(item.margem) ? Number(item.margem.toFixed(2)) : 0,
+    MarkupPercentual: Number.isFinite(item.markup) ? Number(item.markup.toFixed(2)) : 0,
+    VariacaoAbs: item.variacaoAbs ?? 0,
+    VariacaoPct: Number.isFinite(item.variacaoPct) ? Number(item.variacaoPct.toFixed(2)) : 0,
+    TopSku: item.topSku?.codigo || '',
+    TopSkuDescricao: item.topSku?.descricao || '',
+    TopSkuCusto: item.topSku?.custo ?? 0,
+  }));
+
+  const analiticoMensal = custosComparativoMensal.flatMap((mes) =>
+    mes.itens.map((item) => ({
+      Mes: mes.mesDisplay,
+      SKU: item.codigo || '',
+      Descricao: item.descricao || '',
+      Quantidade: item.quantidade ?? 0,
+      Receita: item.receita ?? 0,
+      CustoTotal: item.custo ?? 0,
+      CustoUnitario: item.quantidade ? item.custo / item.quantidade : 0,
+      CustoDireto: item.custoDireto ?? 0,
+      CifTotal: item.cifRateado ?? 0,
+      FonteDireto: item.fonteDireto || '',
+      MargemPercentual: Number.isFinite(item.margem) ? Number(item.margem.toFixed(2)) : 0,
+      MarkupPercentual: Number.isFinite(item.markup) ? Number(item.markup.toFixed(2)) : 0,
+    }))
+  );
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumoMensal), 'Resumo mensal');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(analiticoMensal), 'Analitico por SKU');
+
+  const periodo = String(custosPeriodoLabel || 'comparativo')
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^\w-]/g, '')
+    .toLowerCase();
+  XLSX.writeFile(wb, `relatorio_analitico_custos_${periodo}.xlsx`);
+};
+
+const handleExportarComparativoCustosPdf = () => {
+  if (!custosComparativoMensal.length) return;
+
+  const now = new Date();
+  const resumoLinhasHtml = custosComparativoMensal
+    .map(
+      (item) => `
+        <tr>
+          <td>${escapeHtmlRelatorio(item.mesDisplay)}</td>
+          <td class="num">${escapeHtmlRelatorio(item.movimentos)}</td>
+          <td class="num">${escapeHtmlRelatorio(item.skus)}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.receita))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custo))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custoDireto))}</td>
+          <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custoIndireto))}</td>
+          <td class="num">${escapeHtmlRelatorio(`${item.percentualCusto.toFixed(1)}%`)}</td>
+          <td class="num">${escapeHtmlRelatorio(`${item.margem.toFixed(1)}%`)}</td>
+          <td class="num">${escapeHtmlRelatorio(
+            Number.isFinite(item.variacaoPct) ? `${item.variacaoPct.toFixed(1)}%` : '-'
+          )}</td>
+          <td>${escapeHtmlRelatorio(item.topSku?.codigo || '-')}</td>
+        </tr>
+      `
+    )
+    .join('');
+
+  const analiticoLinhasHtml = custosComparativoMensal
+    .flatMap((mes) =>
+      mes.itens.map(
+        (item) => `
+          <tr>
+            <td>${escapeHtmlRelatorio(mes.mesDisplay)}</td>
+            <td>${escapeHtmlRelatorio(item.codigo || '-')}</td>
+            <td>${escapeHtmlRelatorio(item.descricao || 'Sem descricao')}</td>
+            <td class="num">${escapeHtmlRelatorio(item.quantidade ? Math.round(item.quantidade) : 0)}</td>
+            <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.receita))}</td>
+            <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custo))}</td>
+            <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.custoDireto))}</td>
+            <td class="num">${escapeHtmlRelatorio(formatarMoeda(item.cifRateado))}</td>
+            <td>${escapeHtmlRelatorio(item.fonteDireto || '-')}</td>
+            <td class="num">${escapeHtmlRelatorio(Number.isFinite(item.margem) ? `${item.margem.toFixed(1)}%` : '-')}</td>
+          </tr>
+        `
+      )
+    )
+    .join('');
+
+  const html = `
+    <!doctype html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <title>Relatorio analitico comparativo de custos</title>
+      <style>
+        * { box-sizing: border-box; }
+        body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f8fafc; }
+        .page { padding: 24px; }
+        .header { background: linear-gradient(120deg, #0f172a, #1e293b); color: #f8fafc; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { height: 40px; width: auto; }
+        .brand small { display: block; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; }
+        h1 { font-size: 22px; margin: 0; }
+        h2 { font-size: 16px; margin: 24px 0 10px; color: #0f172a; }
+        .meta { font-size: 11px; color: #cbd5e1; text-align: right; }
+        .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+        .card { background: #ffffff; border-radius: 14px; padding: 12px 14px; border: 1px solid #e2e8f0; }
+        .card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: #64748b; }
+        .card .value { margin-top: 6px; font-size: 15px; font-weight: 700; color: #0f172a; }
+        .table-wrap { margin-top: 12px; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #ffffff; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        th, td { padding: 7px 9px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+        th { background: #e2e8f0; color: #334155; text-transform: uppercase; letter-spacing: 0.14em; font-size: 9px; }
+        td.num, th.num { text-align: right; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        tr:last-child td { border-bottom: none; }
+        .footer { margin-top: 14px; text-align: right; font-size: 10px; color: #64748b; }
+        @page { size: A4 landscape; margin: 10mm; }
+        @media print {
+          body { background: #fff; }
+          .page { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="page">
+        <div class="header">
+          <div class="brand">
+            <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
+            <div>
+              <small>Relatorio comparativo</small>
+              <h1>Custos mes a mes</h1>
+            </div>
+          </div>
+          <div class="meta">
+            <div>Base ${escapeHtmlRelatorio(custosPeriodoLabel || 'Filtro atual')}</div>
+            <div>Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="card">
+            <div class="label">Meses comparados</div>
+            <div class="value">${escapeHtmlRelatorio(custosComparativoMensal.length)}</div>
+          </div>
+          <div class="card">
+            <div class="label">Custo acumulado</div>
+            <div class="value">${escapeHtmlRelatorio(
+              formatarMoeda(custosComparativoMensal.reduce((acc, item) => acc + (item.custo || 0), 0))
+            )}</div>
+          </div>
+          <div class="card">
+            <div class="label">Receita acumulada</div>
+            <div class="value">${escapeHtmlRelatorio(
+              formatarMoeda(custosComparativoMensal.reduce((acc, item) => acc + (item.receita || 0), 0))
+            )}</div>
+          </div>
+          <div class="card">
+            <div class="label">Filtro de fonte</div>
+            <div class="value">${escapeHtmlRelatorio(custoFiltroFonte || 'Todas')}</div>
+          </div>
+        </div>
+
+        <h2>Resumo mensal</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th class="num">Mov.</th>
+                <th class="num">SKUs</th>
+                <th class="num">Receita</th>
+                <th class="num">Custo total</th>
+                <th class="num">Direto</th>
+                <th class="num">CIF</th>
+                <th class="num">% custo</th>
+                <th class="num">Margem</th>
+                <th class="num">Var. vs mes ant.</th>
+                <th>Top SKU</th>
+              </tr>
+            </thead>
+            <tbody>${resumoLinhasHtml}</tbody>
+          </table>
+        </div>
+
+        <h2>Analitico por SKU</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>SKU</th>
+                <th>Descricao</th>
+                <th class="num">Qtd</th>
+                <th class="num">Receita</th>
+                <th class="num">Custo total</th>
+                <th class="num">Direto</th>
+                <th class="num">CIF</th>
+                <th>Fonte</th>
+                <th class="num">Margem</th>
+              </tr>
+            </thead>
+            <tbody>${analiticoLinhasHtml}</tbody>
           </table>
         </div>
 
@@ -9782,6 +10112,30 @@ const custoDetalheTitulo = custoDetalheItem
                     className="ml-auto rounded-full border border-slate-700 px-3 py-1.5 text-slate-300 hover:border-slate-500 hover:text-white"
                   >
                     Limpar filtros
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportarComparativoCustosExcel}
+                    disabled={!exportComparativoCustosDisponivel}
+                    className={`rounded-full px-3 py-1.5 transition-all ${
+                      exportComparativoCustosDisponivel
+                        ? 'border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20'
+                        : 'cursor-not-allowed border border-slate-800 bg-slate-900/70 text-slate-600'
+                    }`}
+                  >
+                    <Download size={12} className="mr-1 inline-block" /> Analitico Excel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportarComparativoCustosPdf}
+                    disabled={!exportComparativoCustosDisponivel}
+                    className={`rounded-full px-3 py-1.5 transition-all ${
+                      exportComparativoCustosDisponivel
+                        ? 'border border-blue-500/40 bg-blue-500/10 text-blue-200 hover:bg-blue-500/20'
+                        : 'cursor-not-allowed border border-slate-800 bg-slate-900/70 text-slate-600'
+                    }`}
+                  >
+                    <FileText size={12} className="mr-1 inline-block" /> Analitico PDF
                   </button>
                 </div>
               </div>
