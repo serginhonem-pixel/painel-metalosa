@@ -31,6 +31,8 @@ import {
   AlertTriangle, 
   Factory, 
   DollarSign, 
+  Download,
+  FileText,
   Layers,
   ChevronRight,
   ChevronLeft,
