@@ -1,4 +1,4 @@
-import bensData from './bens.json';
+import ativosData from './ativosResumido.json';
 import veiculosData from './relacao_veiculos.json';
 
 const normalizarId = (valor) =>
@@ -9,12 +9,12 @@ const normalizarId = (valor) =>
     .replace(/^-+|-+$/g, '')
     .toLowerCase();
 
-const maquinasIndustria = (bensData || [])
+const maquinasAtivos = (ativosData || [])
   .map((item) => ({
-    id: normalizarId(item?.bem || item?.nome || ''),
-    nome: item?.nome || item?.bem || 'Sem nome',
-    setor: 'Industria',
-    processo: item?.familia || '',
+    id: normalizarId(item?.nome || ''),
+    nome: item?.nome || 'Sem nome',
+    setor: item?.setor || 'Industria',
+    processo: item?.setor || '',
   }))
   .filter((item) => item.id);
 
@@ -33,17 +33,8 @@ const maquinasTransporte = (veiculosData || [])
   })
   .filter((item) => item.id);
 
-const maquinasManuais = [
-  {
-    id: normalizarId('Calandra do Tubo 01'),
-    nome: 'Calandra do Tubo 01',
-    setor: 'Industria',
-    processo: 'Caldeiraria',
-  },
-];
-
 const mergedMap = new Map();
-[...maquinasIndustria, ...maquinasTransporte, ...maquinasManuais].forEach((item) => {
+[...maquinasAtivos, ...maquinasTransporte].forEach((item) => {
   if (!mergedMap.has(item.id)) {
     mergedMap.set(item.id, item);
   }
@@ -55,9 +46,7 @@ export const maquinasBaseData = Array.from(mergedMap.values()).sort((a, b) =>
 
 export const setoresBaseData = Array.from(
   new Set([
-    'Industria',
+    ...maquinasAtivos.map((item) => item.setor).filter(Boolean),
     'Transporte',
-    ...maquinasManuais.map((item) => item.processo).filter(Boolean),
-    ...maquinasIndustria.map((item) => item.processo).filter(Boolean),
   ])
 ).sort((a, b) => String(a).localeCompare(String(b)));

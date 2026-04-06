@@ -1001,6 +1001,7 @@ export default function App() {
   const [modoRapidoOpen, setModoRapidoOpen] = useState(false);
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
   const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
+  const [novaOsFiltroSetor, setNovaOsFiltroSetor] = useState('Todos');
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
   const [statusMaquinaPromptOpen, setStatusMaquinaPromptOpen] = useState(false);
   const [manutencaoDetalheModal, setManutencaoDetalheModal] = useState(null);
@@ -1057,6 +1058,7 @@ export default function App() {
     setNovaOsFotoFile(null);
     setNovaOsFotoPreview('');
     setManutencaoSaveError('');
+    setNovaOsFiltroSetor('Todos');
     setStatusMaquinaPromptOpen(true);
   };
 
@@ -1573,20 +1575,24 @@ export default function App() {
     );
   }, [filtroAtivos, listaMaquinas]);
 
-  const listaMaquinasMobile = useMemo(() => {
+  const listaMaquinasNovaOs = useMemo(() => {
+    const base = novaOsFiltroSetor === 'Todos'
+      ? listaMaquinas
+      : listaMaquinas.filter((item) =>
+          normalizarTexto(item.setor) === normalizarTexto(novaOsFiltroSetor)
+        );
     const filtro = filtroAtivoMobile.trim();
-    if (!filtro) return listaMaquinas;
+    if (!filtro) return base;
     const filtroNorm = normalizarTexto(filtro);
-    return listaMaquinas.filter((item) =>
+    return base.filter((item) =>
       normalizarTexto(`${item.nome} ${item.setor} ${item.processo || ''}`).includes(filtroNorm)
     );
-  }, [filtroAtivoMobile, listaMaquinas]);
+  }, [novaOsFiltroSetor, filtroAtivoMobile, listaMaquinas]);
+
+  const listaMaquinasMobile = listaMaquinasNovaOs;
 
   const getMaquinaOpcaoLabel = (item) => {
     if (!item) return '';
-    if (normalizarTexto(item.setor) === 'industria') {
-      return item.processo ? `${item.nome} - Industria / ${item.processo}` : `${item.nome} - Industria`;
-    }
     return `${item.nome} - ${item.setor || 'Sem setor'}`;
   };
 
@@ -8019,6 +8025,16 @@ const handleSeedBensFirestore = async () => {
   setBensSeedError('');
   setBensSeedLoading(true);
   try {
+    // Apaga todos os docs existentes na coleção maquinas
+    const snapExistente = await getDocs(collection(db, 'maquinas'));
+    const chunkSizeDel = 450;
+    const docsDel = snapExistente.docs;
+    for (let i = 0; i < docsDel.length; i += chunkSizeDel) {
+      const batch = writeBatch(db);
+      docsDel.slice(i, i + chunkSizeDel).forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+
     const maquinas = maquinasBaseData.map((item) => ({ ...item }));
     const setores = setoresBaseData.filter(Boolean);
 
@@ -8027,7 +8043,7 @@ const handleSeedBensFirestore = async () => {
       const batch = writeBatch(db);
       const slice = maquinas.slice(i, i + chunkSize);
       slice.forEach((item) => {
-        batch.set(doc(db, 'maquinas', item.id), item, { merge: true });
+        batch.set(doc(db, 'maquinas', item.id), item);
       });
       await batch.commit();
     }
@@ -8050,18 +8066,13 @@ const handleSeedBensFirestore = async () => {
       { merge: true }
     );
 
-    const mergedMap = new Map();
-    listaMaquinas.forEach((item) => mergedMap.set(item.id, item));
-    maquinas.forEach((item) => {
-      if (!mergedMap.has(item.id)) {
-        mergedMap.set(item.id, item);
-      }
-    });
-    const merged = Array.from(mergedMap.values());
+    const novoMap = new Map();
+    maquinas.forEach((item) => novoMap.set(item.id, item));
+    const merged = Array.from(novoMap.values());
     merged.sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || '')));
     setListaMaquinas(merged);
 
-    const setoresMerged = Array.from(new Set([...listaSetores, ...setores]))
+    const setoresMerged = Array.from(new Set([...setores]))
       .filter(Boolean)
       .sort((a, b) => String(a).localeCompare(String(b)));
     setListaSetores(setoresMerged);
@@ -13194,8 +13205,9 @@ const custoDetalheTitulo = custoDetalheItem
                               className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none"
                             >
                               <option>Todos</option>
-                              <option>Industria</option>
-                              <option>Transporte</option>
+                              {Array.from(new Set(listaMaquinas.map((m) => m.setor).filter(Boolean))).sort().map((s) => (
+                                <option key={s}>{s}</option>
+                              ))}
                             </select>
                           </div>
                         </div>
@@ -13660,6 +13672,30 @@ const custoDetalheTitulo = custoDetalheItem
                         <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
                       </div>
                       <form data-tour="nova-os-scroll" onSubmit={handleNovaOsSubmit} className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
+                        {!manutencaoEditId && (
+                          <div>
+                            <label className="text-xs font-bold text-slate-400">Filtrar por Setor</label>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {['Todos', ...Array.from(new Set(listaMaquinas.map((m) => m.setor).filter(Boolean))).sort()].map((s) => (
+                                <button
+                                  key={s}
+                                  type="button"
+                                  onClick={() => {
+                                    setNovaOsFiltroSetor(s);
+                                    setNovaOsForm((prev) => ({ ...prev, ativo: '', setor: '', processo: '' }));
+                                  }}
+                                  className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                                    novaOsFiltroSetor === s
+                                      ? 'bg-blue-600 text-white shadow'
+                                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                                  }`}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-bold text-slate-400">Ativo</label>
@@ -13697,7 +13733,7 @@ const custoDetalheTitulo = custoDetalheItem
                               required
                             />
                             <datalist id="manutencao-ativos">
-                              {listaMaquinas.map((item) => (
+                              {listaMaquinasNovaOs.map((item) => (
                                 <option key={item.id} value={item.nome}>
                                   {getMaquinaOpcaoLabel(item)}
                                 </option>
@@ -14255,7 +14291,9 @@ const custoDetalheTitulo = custoDetalheItem
                              className="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
                              required
                            >
-                             <option>Industria</option>
+                             {Array.from(new Set(listaMaquinas.map((m) => m.setor).filter(Boolean))).sort().map((s) => (
+                               <option key={s}>{s}</option>
+                             ))}
                              <option>Transporte</option>
                            </select>
                          </div>
@@ -14273,6 +14311,14 @@ const custoDetalheTitulo = custoDetalheItem
                          )}
                        </div>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
+                       <button
+                         type="button"
+                         onClick={handleSeedBensFirestore}
+                         disabled={bensSeedLoading}
+                         className="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2 text-sm"
+                       >
+                         {bensSeedLoading ? 'Importando...' : '↺ Reimportar ativos base'}
+                       </button>
                     </form>
                     {bensSeedDone && !bensSeedError && (
                       <div className="mb-4 text-xs font-semibold text-emerald-600">
