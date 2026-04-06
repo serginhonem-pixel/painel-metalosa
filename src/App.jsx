@@ -17,6 +17,7 @@ import PainelOperacaoDiaria from './components/PainelOperacaoDiaria';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, getDoc, doc, setDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
@@ -1002,6 +1003,8 @@ export default function App() {
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
   const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
   const [novaOsFiltroSetor, setNovaOsFiltroSetor] = useState('Todos');
+  const [relatorioInicio, setRelatorioInicio] = useState('');
+  const [relatorioFim, setRelatorioFim] = useState('');
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
   const [statusMaquinaPromptOpen, setStatusMaquinaPromptOpen] = useState(false);
   const [manutencaoDetalheModal, setManutencaoDetalheModal] = useState(null);
@@ -1838,6 +1841,160 @@ export default function App() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 6);
   }, [manutencaoOrdens]);
+
+  // ── Dados para aba Relatórios ──
+  const relatorioOrdensFiltradas = useMemo(() => {
+    let lista = manutencaoOrdens;
+    if (relatorioInicio) {
+      lista = lista.filter((os) => {
+        const dt = (os.createdAt || os.dataFalha || '').slice(0, 10);
+        return dt >= relatorioInicio;
+      });
+    }
+    if (relatorioFim) {
+      lista = lista.filter((os) => {
+        const dt = (os.createdAt || os.dataFalha || '').slice(0, 10);
+        return dt <= relatorioFim;
+      });
+    }
+    return lista;
+  }, [manutencaoOrdens, relatorioInicio, relatorioFim]);
+
+  const relatorioResumoGeral = useMemo(() => {
+    const ord = relatorioOrdensFiltradas;
+    const total = ord.length;
+    const abertas = ord.filter((os) => os.status === 'Aberta').length;
+    const emAndamento = ord.filter((os) => os.status === 'Em andamento').length;
+    const aguardando = ord.filter((os) => os.status === 'Aguardando peca').length;
+    const finalizadas = ord.filter((os) => os.status === 'Finalizada').length;
+    const canceladas = ord.filter((os) => os.status === 'Cancelada').length;
+    const corretivas = ord.filter((os) => os.tipo === 'Corretiva').length;
+    const preventivas = ord.filter((os) => os.tipo === 'Preventiva').length;
+    const criticas = ord.filter((os) => (os.prioridade || '').toLowerCase() === 'critica').length;
+    const altas = ord.filter((os) => (os.prioridade || '').toLowerCase() === 'alta').length;
+    const paradasProd = ord.filter((os) => os.parada === 'Sim' || ['Parada', 'Parada programada', 'Parada nao programada'].includes(os.statusMaquina)).length;
+    const pctResolvidas = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+    const pctCorretiva = total > 0 ? Math.round((corretivas / total) * 100) : 0;
+    const pctPreventiva = total > 0 ? Math.round((preventivas / total) * 100) : 0;
+    const finComTempo = ord.filter((os) => os.status === 'Finalizada' && (os.createdAt || os.dataFalha) && (os.fechadaEm || os.updatedAt));
+    let tempoMedioH = 0;
+    if (finComTempo.length > 0) {
+      const soma = finComTempo.reduce((acc, os) => acc + Math.max(0, new Date(os.fechadaEm || os.updatedAt) - new Date(os.createdAt || os.dataFalha)), 0);
+      tempoMedioH = Math.round(soma / finComTempo.length / 3600000);
+    }
+    const tempoMedioStr = tempoMedioH === 0 ? '-' : tempoMedioH < 24 ? `${tempoMedioH}h` : `${Math.round(tempoMedioH / 24)}d`;
+    return { total, abertas, emAndamento, aguardando, finalizadas, canceladas, corretivas, preventivas, criticas, altas, paradasProd, pctResolvidas, pctCorretiva, pctPreventiva, tempoMedioStr, tempoMedioH };
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioStatusData = useMemo(() => {
+    const r = relatorioResumoGeral;
+    return [
+      { name: 'Abertas', value: r.abertas, color: '#f59e0b' },
+      { name: 'Em andamento', value: r.emAndamento, color: '#3b82f6' },
+      { name: 'Aguardando', value: r.aguardando, color: '#a855f7' },
+      { name: 'Finalizadas', value: r.finalizadas, color: '#10b981' },
+      { name: 'Canceladas', value: r.canceladas, color: '#64748b' },
+    ].filter((d) => d.value > 0);
+  }, [relatorioResumoGeral]);
+
+  const relatorioPorSetor = useMemo(() => {
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const setor = os.setor || 'Sem setor';
+      const atual = mapa.get(setor) || { setor, total: 0, abertas: 0, finalizadas: 0, tempoTotal: 0, tempoCount: 0 };
+      atual.total += 1;
+      if (os.status === 'Aberta') atual.abertas += 1;
+      if (os.status === 'Finalizada') {
+        atual.finalizadas += 1;
+        if ((os.createdAt || os.dataFalha) && (os.fechadaEm || os.updatedAt)) {
+          const diff = new Date(os.fechadaEm || os.updatedAt) - new Date(os.createdAt || os.dataFalha);
+          if (diff > 0) { atual.tempoTotal += diff; atual.tempoCount += 1; }
+        }
+      }
+      mapa.set(setor, atual);
+    });
+    return Array.from(mapa.values()).sort((a, b) => b.total - a.total);
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioPorTipo = useMemo(() => {
+    const cores = { Corretiva: '#f43f5e', Preventiva: '#14b8a6', Inspecao: '#0ea5e9', Melhoria: '#8b5cf6', Outro: '#64748b' };
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const tipo = os.tipo || 'Outro';
+      mapa.set(tipo, (mapa.get(tipo) || 0) + 1);
+    });
+    return Array.from(mapa.entries()).map(([name, value]) => ({ name, value, color: cores[name] || '#64748b' })).sort((a, b) => b.value - a.value);
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioPorCategoria = useMemo(() => {
+    const cores = ['#8b5cf6', '#ec4899', '#f97316', '#06b6d4', '#84cc16', '#eab308', '#64748b', '#6366f1'];
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const cat = os.categoria || 'Sem categoria';
+      mapa.set(cat, (mapa.get(cat) || 0) + 1);
+    });
+    return Array.from(mapa.entries()).map(([name, value], i) => ({ name, value, color: cores[i % cores.length] })).sort((a, b) => b.value - a.value);
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioPorPrioridade = useMemo(() => {
+    const cores = { Critica: '#dc2626', Alta: '#f97316', Media: '#eab308', Baixa: '#64748b' };
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const pri = os.prioridade || 'Sem prioridade';
+      mapa.set(pri, (mapa.get(pri) || 0) + 1);
+    });
+    return Array.from(mapa.entries()).map(([name, value]) => ({ name, value, color: cores[name] || '#64748b' })).sort((a, b) => b.value - a.value);
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioPorResponsavel = useMemo(() => {
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const resp = os.responsavel || 'Sem responsável';
+      const atual = mapa.get(resp) || { responsavel: resp, total: 0, finalizadas: 0, emAndamento: 0, tempoTotal: 0, tempoCount: 0 };
+      atual.total += 1;
+      if (os.status === 'Finalizada') {
+        atual.finalizadas += 1;
+        if ((os.createdAt || os.dataFalha) && (os.fechadaEm || os.updatedAt)) {
+          const diff = new Date(os.fechadaEm || os.updatedAt) - new Date(os.createdAt || os.dataFalha);
+          if (diff > 0) { atual.tempoTotal += diff; atual.tempoCount += 1; }
+        }
+      }
+      if (os.status === 'Em andamento') atual.emAndamento += 1;
+      mapa.set(resp, atual);
+    });
+    return Array.from(mapa.values()).sort((a, b) => b.finalizadas - a.finalizadas);
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioPorMes = useMemo(() => {
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const dt = os.createdAt || os.dataFalha || '';
+      if (!dt) return;
+      const d = new Date(dt);
+      if (Number.isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = `${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+      const atual = mapa.get(key) || { key, label, Abertas: 0, Finalizadas: 0, total: 0 };
+      atual.total += 1;
+      atual.Abertas += 1;
+      if (os.status === 'Finalizada') atual.Finalizadas += 1;
+      mapa.set(key, atual);
+    });
+    return Array.from(mapa.values()).sort((a, b) => a.key.localeCompare(b.key));
+  }, [relatorioOrdensFiltradas]);
+
+  const relatorioTopAtivos = useMemo(() => {
+    const mapa = new Map();
+    relatorioOrdensFiltradas.forEach((os) => {
+      const ativo = os.ativo || 'Sem ativo';
+      const atual = mapa.get(ativo) || { ativo, total: 0, finalizadas: 0, abertas: 0 };
+      atual.total += 1;
+      if (os.status === 'Aberta') atual.abertas += 1;
+      if (os.status === 'Finalizada') atual.finalizadas += 1;
+      mapa.set(ativo, atual);
+    });
+    return Array.from(mapa.values()).sort((a, b) => b.total - a.total).slice(0, 15);
+  }, [relatorioOrdensFiltradas]);
 
   const formatDateTimeRelatorio = (value) => {
     if (!value) return '-';
@@ -12396,11 +12553,7 @@ const custoDetalheTitulo = custoDetalheItem
           
           {/* ABA DE MANUTENCAO */}
           {abaAtiva === 'manutencao' && (
-             <div className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-gradient-to-br from-slate-950/90 via-slate-900/70 to-slate-950/90 p-0 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
-                {/* Decorative blurs */}
-                <div className="pointer-events-none absolute -top-32 -right-20 h-72 w-72 rounded-full bg-amber-500/[0.07] blur-[80px]"></div>
-                <div className="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-blue-500/[0.06] blur-[80px]"></div>
-                <div className="pointer-events-none absolute top-1/2 right-1/4 h-48 w-48 rounded-full bg-emerald-500/[0.04] blur-[60px]"></div>
+             <div className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950 p-0 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
                 
                 <div className="relative animate-in slide-in-from-top duration-500">
                   
@@ -12485,6 +12638,9 @@ const custoDetalheTitulo = custoDetalheItem
                       </button>
                       <button onClick={() => setSubAbaManutencao('ativos')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'ativos' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                         <Cpu size={13} />Ativos
+                      </button>
+                      <button onClick={() => setSubAbaManutencao('relatorios')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'relatorios' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <BarChart3 size={13} />Relatórios
                       </button>
                       {isManutencaoOperador && (
                         <button onClick={() => setSubAbaManutencao('operador')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
@@ -13510,6 +13666,309 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                     </div>
                   )}
+                  </div>
+                )}
+
+                {/* ── SUB-ABA RELATÓRIOS ── */}
+                {subAbaManutencao === 'relatorios' && (
+                  <div className="space-y-6">
+                    {/* Header + filtro período */}
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/20 flex items-center justify-center">
+                          <BarChart3 size={18} className="text-amber-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-slate-100 uppercase tracking-wider">Relatórios de Manutenção</h3>
+                          <p className="text-[10px] text-slate-500 mt-0.5">{relatorioResumoGeral.total} ordens no período selecionado</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-900/60 border border-slate-800/60 rounded-xl px-4 py-2.5">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mr-1">Período:</span>
+                        <input type="date" value={relatorioInicio} onChange={(e) => setRelatorioInicio(e.target.value)} className="bg-slate-800/60 border border-slate-700/40 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:border-amber-500/50 focus:outline-none" />
+                        <span className="text-slate-600 text-xs">até</span>
+                        <input type="date" value={relatorioFim} onChange={(e) => setRelatorioFim(e.target.value)} className="bg-slate-800/60 border border-slate-700/40 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:border-amber-500/50 focus:outline-none" />
+                        {(relatorioInicio || relatorioFim) && (
+                          <button onClick={() => { setRelatorioInicio(''); setRelatorioFim(''); }} className="text-[10px] text-amber-400 hover:text-amber-300 font-bold ml-1">Limpar</button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* KPIs */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                      {[
+                        { label: 'Total OS', value: relatorioResumoGeral.total, icon: '📋', accent: 'from-slate-500/20 to-slate-600/10', border: 'border-slate-700/40', tone: 'text-white' },
+                        { label: 'Abertas', value: relatorioResumoGeral.abertas, icon: '🔓', accent: 'from-amber-500/15 to-amber-600/5', border: 'border-amber-500/25', tone: 'text-amber-300' },
+                        { label: 'Em andamento', value: relatorioResumoGeral.emAndamento, icon: '⚙️', accent: 'from-blue-500/15 to-blue-600/5', border: 'border-blue-500/25', tone: 'text-blue-300' },
+                        { label: 'Finalizadas', value: relatorioResumoGeral.finalizadas, icon: '✅', accent: 'from-emerald-500/15 to-emerald-600/5', border: 'border-emerald-500/25', tone: 'text-emerald-300' },
+                        { label: '% Resolvidas', value: `${relatorioResumoGeral.pctResolvidas}%`, icon: '📊', accent: 'from-cyan-500/15 to-cyan-600/5', border: 'border-cyan-500/25', tone: 'text-cyan-300' },
+                        { label: 'Tempo médio', value: relatorioResumoGeral.tempoMedioStr, icon: '⏱️', accent: 'from-purple-500/15 to-purple-600/5', border: 'border-purple-500/25', tone: 'text-purple-300' },
+                      ].map((kpi) => (
+                        <div key={kpi.label} className={`rounded-xl border ${kpi.border} bg-gradient-to-br ${kpi.accent} p-4 hover:scale-[1.02] transition-transform`}>
+                          <div className="flex items-center justify-between">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-500">{kpi.label}</p>
+                            <span className="text-sm">{kpi.icon}</span>
+                          </div>
+                          <p className={`mt-2 text-2xl font-black ${kpi.tone}`}>{kpi.value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Gráficos: Status + Tipo + Prioridade */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                      {/* Status Donut */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Distribuição por Status</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">{relatorioResumoGeral.total} ordens</p>
+                        {relatorioStatusData.length > 0 ? (
+                          <>
+                            <ResponsiveContainer width="100%" height={200}>
+                              <PieChart>
+                                <Pie data={relatorioStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                  {relatorioStatusData.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
+                                </Pie>
+                                <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 justify-center">
+                              {relatorioStatusData.map((d) => (
+                                <div key={d.name} className="flex items-center gap-1.5">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                                  <span className="text-[10px] text-slate-400">{d.name}</span>
+                                  <span className="text-[10px] font-bold text-slate-200">{d.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : <p className="text-xs text-slate-600 text-center py-10">Sem dados</p>}
+                      </div>
+
+                      {/* Tipo Donut */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Distribuição por Tipo</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Corretiva vs Preventiva</p>
+                        {relatorioPorTipo.length > 0 ? (
+                          <>
+                            <ResponsiveContainer width="100%" height={200}>
+                              <PieChart>
+                                <Pie data={relatorioPorTipo} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                  {relatorioPorTipo.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
+                                </Pie>
+                                <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 justify-center">
+                              {relatorioPorTipo.map((d) => (
+                                <div key={d.name} className="flex items-center gap-1.5">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                                  <span className="text-[10px] text-slate-400">{d.name}</span>
+                                  <span className="text-[10px] font-bold text-slate-200">{d.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : <p className="text-xs text-slate-600 text-center py-10">Sem dados</p>}
+                      </div>
+
+                      {/* Prioridade Donut */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Distribuição por Prioridade</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Crítica / Alta / Média / Baixa</p>
+                        {relatorioPorPrioridade.length > 0 ? (
+                          <>
+                            <ResponsiveContainer width="100%" height={200}>
+                              <PieChart>
+                                <Pie data={relatorioPorPrioridade} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                  {relatorioPorPrioridade.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
+                                </Pie>
+                                <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 justify-center">
+                              {relatorioPorPrioridade.map((d) => (
+                                <div key={d.name} className="flex items-center gap-1.5">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                                  <span className="text-[10px] text-slate-400">{d.name}</span>
+                                  <span className="text-[10px] font-bold text-slate-200">{d.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : <p className="text-xs text-slate-600 text-center py-10">Sem dados</p>}
+                      </div>
+                    </div>
+
+                    {/* Evolução Mensal - BarChart */}
+                    {relatorioPorMes.length > 0 && (
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Evolução Mensal</h4>
+                        <p className="text-[10px] text-slate-500 mb-4">Abertas vs Finalizadas por mês</p>
+                        <ResponsiveContainer width="100%" height={280}>
+                          <BarChart data={relatorioPorMes} barGap={4}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                            <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#334155' }} />
+                            <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#334155' }} />
+                            <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                            <Legend wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+                            <Bar dataKey="Abertas" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Finalizadas" fill="#10b981" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+
+                    {/* Categoria Donut + Setor Table */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                      {/* Categoria */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">OS por Categoria</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Distribuição das categorias de falha</p>
+                        {relatorioPorCategoria.length > 0 ? (
+                          <>
+                            <ResponsiveContainer width="100%" height={220}>
+                              <PieChart>
+                                <Pie data={relatorioPorCategoria} cx="50%" cy="50%" outerRadius={85} paddingAngle={2} dataKey="value" stroke="none">
+                                  {relatorioPorCategoria.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
+                                </Pie>
+                                <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 justify-center">
+                              {relatorioPorCategoria.map((d) => (
+                                <div key={d.name} className="flex items-center gap-1.5">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                                  <span className="text-[10px] text-slate-400">{d.name}</span>
+                                  <span className="text-[10px] font-bold text-slate-200">{d.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : <p className="text-xs text-slate-600 text-center py-10">Sem dados</p>}
+                      </div>
+
+                      {/* Por setor - tabela */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">OS por Setor</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Performance de cada setor</p>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b border-slate-800/60">
+                                <th className="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Setor</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Abertas</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Finalizadas</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">T. Médio</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {relatorioPorSetor.map((s) => {
+                                const tm = s.tempoCount > 0 ? Math.round(s.tempoTotal / s.tempoCount / 3600000) : 0;
+                                const tmStr = tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`;
+                                return (
+                                  <tr key={s.setor} className="border-b border-slate-800/20 hover:bg-slate-800/20 transition-colors">
+                                    <td className="py-2 px-3 font-bold text-slate-200">{s.setor}</td>
+                                    <td className="text-right py-2 px-3 text-slate-100 font-black">{s.total}</td>
+                                    <td className="text-right py-2 px-3 text-amber-300 font-bold">{s.abertas}</td>
+                                    <td className="text-right py-2 px-3 text-emerald-300 font-bold">{s.finalizadas}</td>
+                                    <td className="text-right py-2 px-3 text-purple-300 font-bold">{tmStr}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Top Ativos + Responsáveis */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                      {/* Top 15 ativos */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Top 15 Ativos com mais OS</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Equipamentos que mais demandam manutenção</p>
+                        <div className="overflow-x-auto max-h-[350px] overflow-y-auto">
+                          <table className="w-full text-xs">
+                            <thead className="sticky top-0 bg-slate-900">
+                              <tr className="border-b border-slate-800/60">
+                                <th className="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">#</th>
+                                <th className="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ativo</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Abertas</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Fin.</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {relatorioTopAtivos.map((item, idx) => (
+                                <tr key={item.ativo} className="border-b border-slate-800/20 hover:bg-slate-800/20 transition-colors">
+                                  <td className="py-2 px-3 text-slate-600 font-bold">{idx + 1}</td>
+                                  <td className="py-2 px-3 font-bold text-slate-200 truncate max-w-[200px]">{item.ativo}</td>
+                                  <td className="text-right py-2 px-3 text-slate-100 font-black">{item.total}</td>
+                                  <td className="text-right py-2 px-3 text-amber-300 font-bold">{item.abertas}</td>
+                                  <td className="text-right py-2 px-3 text-emerald-300 font-bold">{item.finalizadas}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* Responsáveis */}
+                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Performance por Responsável</h4>
+                        <p className="text-[10px] text-slate-500 mb-3">Ranking de resolução</p>
+                        <div className="overflow-x-auto max-h-[350px] overflow-y-auto">
+                          <table className="w-full text-xs">
+                            <thead className="sticky top-0 bg-slate-900">
+                              <tr className="border-b border-slate-800/60">
+                                <th className="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Responsável</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Fin.</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Andamento</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">T.Médio</th>
+                                <th className="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">%Res</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {relatorioPorResponsavel.map((item) => {
+                                const tm = item.tempoCount > 0 ? Math.round(item.tempoTotal / item.tempoCount / 3600000) : 0;
+                                const tmStr = tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`;
+                                const pctR = item.total > 0 ? Math.round((item.finalizadas / item.total) * 100) : 0;
+                                return (
+                                  <tr key={item.responsavel} className="border-b border-slate-800/20 hover:bg-slate-800/20 transition-colors">
+                                    <td className="py-2 px-3 font-bold text-slate-200">{item.responsavel}</td>
+                                    <td className="text-right py-2 px-3 text-slate-100 font-black">{item.total}</td>
+                                    <td className="text-right py-2 px-3 text-emerald-300 font-bold">{item.finalizadas}</td>
+                                    <td className="text-right py-2 px-3 text-blue-300 font-bold">{item.emAndamento}</td>
+                                    <td className="text-right py-2 px-3 text-purple-300 font-bold">{tmStr}</td>
+                                    <td className="text-right py-2 px-3">
+                                      <span className={`font-black ${pctR >= 70 ? 'text-emerald-300' : pctR >= 40 ? 'text-amber-300' : 'text-rose-300'}`}>{pctR}%</span>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tendência 7 dias */}
+                    <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-950/40 p-5">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-1">Tendência — Últimos 7 dias</h4>
+                      <p className="text-[10px] text-slate-500 mb-4">Abertas vs Finalizadas por dia</p>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={manutencaoTendencia7d} barGap={2}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                          <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#334155' }} />
+                          <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#334155' }} allowDecimals={false} />
+                          <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
+                          <Legend wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+                          <Bar dataKey="abertas" name="Abertas" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="finalizadas" name="Finalizadas" fill="#10b981" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 )}
 
