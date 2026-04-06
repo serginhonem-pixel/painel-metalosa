@@ -14344,8 +14344,9 @@ const custoDetalheTitulo = custoDetalheItem
                         className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 outline-none"
                       >
                         <option>Todos</option>
-                        <option>Industria</option>
-                        <option>Transporte</option>
+                        {Array.from(new Set(listaMaquinas.map((m) => m.setor).filter(Boolean))).sort().map((s) => (
+                          <option key={s}>{s}</option>
+                        ))}
                       </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
