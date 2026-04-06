@@ -12553,12 +12553,12 @@ const custoDetalheTitulo = custoDetalheItem
           
           {/* ABA DE MANUTENCAO */}
           {abaAtiva === 'manutencao' && (
-             <div className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950 p-0 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.8)]">
+             <div className="space-y-6 animate-in slide-in-from-top duration-500">
                 
-                <div className="relative animate-in slide-in-from-top duration-500">
+                <div className="relative">
                   
                   {/* ── HEADER PRINCIPAL ── */}
-                  <div className="relative border-b border-slate-800/60 bg-gradient-to-r from-slate-900/80 via-slate-900/60 to-slate-950/80 px-8 py-7">
+                  <div className="relative border-b border-slate-800/40 px-2 py-7">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                       <div className="space-y-4 flex-1">
                         <div className="flex items-center gap-4">
@@ -12622,7 +12622,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
 
                   {/* ── BARRA DE NAVEGAÇÃO ── */}
-                  <div className="flex flex-wrap items-center gap-3 px-8 py-4 border-b border-slate-800/40 bg-slate-950/30">
+                  <div className="flex flex-wrap items-center gap-3 px-2 py-4 border-b border-slate-800/40">
                     <div className="flex bg-slate-900/60 p-1 rounded-xl border border-slate-800/60 backdrop-blur-sm">
                       <button onClick={() => setSubAbaManutencao('resumo')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                         <LayoutDashboard size={13} />Resumo
