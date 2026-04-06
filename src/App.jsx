@@ -13671,7 +13671,7 @@ const custoDetalheTitulo = custoDetalheItem
                         </div>
                         <button onClick={() => setManutencaoModalOpen(false)} className="text-slate-500 hover:text-slate-200">Fechar</button>
                       </div>
-                      <form data-tour="nova-os-scroll" onSubmit={handleNovaOsSubmit} className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
+                      <form data-tour="nova-os-scroll" onSubmit={handleNovaOsSubmit} autoComplete="off" className="max-h-[calc(90vh-120px)] overflow-y-auto space-y-4 px-6 py-5">
                         {!manutencaoEditId && (
                           <div>
                             <label className="text-xs font-bold text-slate-400">Filtrar por Setor</label>
@@ -13727,6 +13727,7 @@ const custoDetalheTitulo = custoDetalheItem
                               list="manutencao-ativos"
                               value={novaOsForm.ativo}
                               onChange={handleNovaOsChange}
+                              autoComplete="off"
                               data-tour="nova-os-ativo"
                               className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none hidden md:block"
                               placeholder="Ex: Injetora 01"
