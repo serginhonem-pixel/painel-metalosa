@@ -1606,6 +1606,8 @@ export default function App() {
       { nome: 'Alex', setor: 'Manutencao - Mecanico' },
       { nome: 'Guilherme', setor: 'Manutencao - Mecanico' },
       { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
+      { nome: 'Timóteo Vaz', setor: 'Manutencao - Ferramenteiro' },
+      { nome: 'Jose Ricardo de Barros', setor: 'Manutencao - Ferramenteiro' },
       { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Juliano', setor: 'Manutencao - Eletricista' },

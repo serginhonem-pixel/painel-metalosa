@@ -63,10 +63,10 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'custos', label: 'Custos', icon: Layers },
-  { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
-  { id: 'gestao', label: 'Operação Diária', icon: Activity },
+  { id: 'portfolio', label: 'Portfï¿½lio / Mix', icon: Briefcase },
+  { id: 'gestao', label: 'Operaï¿½ï¿½o Diï¿½ria', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
-  { id: 'configuracao', label: 'Configuração Global', icon: Settings },
+  { id: 'configuracao', label: 'Configuraï¿½ï¿½o Global', icon: Settings },
 ];
 
 const MANUTENCAO_KPIS = [];
@@ -93,7 +93,7 @@ const GUIA_OPERADOR_PASSOS = [
   },
   {
     titulo: 'Assumir uma OS',
-    texto: 'Na aba "Operador", use o botão "Assumir" na fila para pegar uma OS.',
+    texto: 'Na aba "Operador", use o botï¿½o "Assumir" na fila para pegar uma OS.',
   },
   {
     titulo: 'Acompanhar a OS',
@@ -105,7 +105,7 @@ const GUIA_OPERADOR_PASSOS = [
   },
   {
     titulo: 'Editar detalhes',
-    texto: 'Se precisar ajustar informações, clique em "Editar" dentro da OS.',
+    texto: 'Se precisar ajustar informaï¿½ï¿½es, clique em "Editar" dentro da OS.',
   },
 ];
 
@@ -567,8 +567,8 @@ const encontrarSheet = (planilhas, includes) => {
 const CFOP_SAIDA_TABLE = [
   {
     cfop: '5101',
-    descricaoFiscal: 'Venda de produção do estabelecimento',
-    pratica: 'Venda de produto fabricado pela própria empresa, dentro do estado',
+    descricaoFiscal: 'Venda de produï¿½ï¿½o do estabelecimento',
+    pratica: 'Venda de produto fabricado pela prï¿½pria empresa, dentro do estado',
     faturamento: '? Sim',
   },
   {
@@ -579,7 +579,7 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6101',
-    descricaoFiscal: 'Venda de produção do estabelecimento (interestadual)',
+    descricaoFiscal: 'Venda de produï¿½ï¿½o do estabelecimento (interestadual)',
     pratica: 'Venda de produto fabricado, para outro estado',
     faturamento: '? Sim',
   },
@@ -591,13 +591,13 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6107',
-    descricaoFiscal: 'Venda de produção fora do estado sem destaque de ICMS',
-    pratica: 'Venda interestadual com tratamento fiscal específico',
-    faturamento: '?? Depende (normalmente não)',
+    descricaoFiscal: 'Venda de produï¿½ï¿½o fora do estado sem destaque de ICMS',
+    pratica: 'Venda interestadual com tratamento fiscal especï¿½fico',
+    faturamento: '?? Depende (normalmente nï¿½o)',
   },
   {
     cfop: '5401',
-    descricaoFiscal: 'Venda de produção do estabelecimento com ST',
+    descricaoFiscal: 'Venda de produï¿½ï¿½o do estabelecimento com ST',
     pratica: 'Venda de produto fabricado com ICMS-ST',
     faturamento: '? Sim (bruto)',
   },
@@ -609,7 +609,7 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '6401',
-    descricaoFiscal: 'Venda de produção do estabelecimento com ST (interestadual)',
+    descricaoFiscal: 'Venda de produï¿½ï¿½o do estabelecimento com ST (interestadual)',
     pratica: 'Venda interestadual com ST',
     faturamento: '? Sim (bruto)',
   },
@@ -621,21 +621,21 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '5152',
-    descricaoFiscal: 'Transferência de mercadoria entre estabelecimentos',
+    descricaoFiscal: 'Transferï¿½ncia de mercadoria entre estabelecimentos',
     pratica: 'Envio entre filiais da mesma empresa',
-    faturamento: '? Não',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '5405',
-    descricaoFiscal: 'Transferência de produção do estabelecimento com ST',
-    pratica: 'Transferência interna com ST',
-    faturamento: '? Não',
+    descricaoFiscal: 'Transferï¿½ncia de produï¿½ï¿½o do estabelecimento com ST',
+    pratica: 'Transferï¿½ncia interna com ST',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '5409',
-    descricaoFiscal: 'Transferência de mercadoria adquirida de terceiros com ST',
-    pratica: 'Transferência interna de mercadoria com ST',
-    faturamento: '? Não',
+    descricaoFiscal: 'Transferï¿½ncia de mercadoria adquirida de terceiros com ST',
+    pratica: 'Transferï¿½ncia interna de mercadoria com ST',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '5915',
@@ -646,7 +646,7 @@ const CFOP_SAIDA_TABLE = [
   {
     cfop: '6108',
     descricaoFiscal: 'Venda de mercadoria adquirida de terceiros com ST (interestadual)',
-    pratica: 'Venda interestadual com ST e regra específica',
+    pratica: 'Venda interestadual com ST e regra especï¿½fica',
     faturamento: '?? Depende',
   },
   {
@@ -663,27 +663,27 @@ const CFOP_SAIDA_TABLE = [
   },
   {
     cfop: '5201',
-    descricaoFiscal: 'Devolução de compra para industrialização',
+    descricaoFiscal: 'Devoluï¿½ï¿½o de compra para industrializaï¿½ï¿½o',
     pratica: 'Retorno de mercadoria ao fornecedor',
-    faturamento: '? Não',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '6910',
-    descricaoFiscal: 'Bonificação / doação / brinde',
-    pratica: 'Saída sem cobrança',
-    faturamento: '? Não',
+    descricaoFiscal: 'Bonificaï¿½ï¿½o / doaï¿½ï¿½o / brinde',
+    pratica: 'Saï¿½da sem cobranï¿½a',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '6915',
-    descricaoFiscal: 'Remessa simbólica / retorno de industrialização',
-    pratica: 'Ajuste fiscal/logístico',
-    faturamento: '? Não',
+    descricaoFiscal: 'Remessa simbï¿½lica / retorno de industrializaï¿½ï¿½o',
+    pratica: 'Ajuste fiscal/logï¿½stico',
+    faturamento: '? Nï¿½o',
   },
   {
     cfop: '6901',
-    descricaoFiscal: 'Remessa para industrialização fora do estabelecimento',
-    pratica: 'Envio para industrialização em terceiro',
-    faturamento: '? Não',
+    descricaoFiscal: 'Remessa para industrializaï¿½ï¿½o fora do estabelecimento',
+    pratica: 'Envio para industrializaï¿½ï¿½o em terceiro',
+    faturamento: '? Nï¿½o',
   },
 ];
 
@@ -767,7 +767,7 @@ const isDataSemApontamento = (dataISO) =>
 const isDiaDesconsiderado = (dataISO) =>
   isFolgaColetiva(dataISO) || isFinalDeSemana(dataISO);
 
-// --- Aplicação Principal ---
+// --- Aplicaï¿½ï¿½o Principal ---
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
@@ -1091,7 +1091,7 @@ export default function App() {
       setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
     } catch (err) {
       console.error('Erro ao excluir OS:', err);
-      alert('Erro ao excluir a ordem de serviço.');
+      alert('Erro ao excluir a ordem de serviï¿½o.');
     }
   };
 
@@ -1100,8 +1100,8 @@ export default function App() {
       alert('Sem permissao para excluir OS.');
       return;
     }
-    if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de serviço? Esta ação não pode ser desfeita!')) return;
-    if (!window.confirm('CONFIRMAÇÃO FINAL: Isso apagará TODAS as ordens. Continuar?')) return;
+    if (!window.confirm('Tem certeza que deseja EXCLUIR TODAS as ordens de serviï¿½o? Esta aï¿½ï¿½o nï¿½o pode ser desfeita!')) return;
+    if (!window.confirm('CONFIRMAï¿½ï¿½O FINAL: Isso apagarï¿½ TODAS as ordens. Continuar?')) return;
     try {
       const batch = writeBatch(db);
       manutencaoOrdens.forEach((ordem) => {
@@ -1111,7 +1111,7 @@ export default function App() {
       setManutencaoOrdens([]);
     } catch (err) {
       console.error('Erro ao excluir todas as OS:', err);
-      alert('Erro ao excluir as ordens de serviço.');
+      alert('Erro ao excluir as ordens de serviï¿½o.');
     }
   };
 
@@ -1710,7 +1710,7 @@ export default function App() {
           ${sintomaHtml}
           ${descricaoHtml}
           ${fotoHtml ? `<div class="section">${fotoHtml.replace('<div class="section">', '').replace('</div>', '')}</div>` : ''}
-          <div class="footer">Metalosa · Manutencao</div>
+          <div class="footer">Metalosa ï¿½ Manutencao</div>
         </div>
       </body>
       </html>
@@ -2854,6 +2854,8 @@ export default function App() {
       { nome: 'Alex', setor: 'Manutencao - Mecanico' },
       { nome: 'Guilherme', setor: 'Manutencao - Mecanico' },
       { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
+      { nome: 'TimÃ³teo Vaz', setor: 'Manutencao - Ferramenteiro' },
+      { nome: 'Jose Ricardo de Barros', setor: 'Manutencao - Ferramenteiro' },
       { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Juliano', setor: 'Manutencao - Eletricista' },
@@ -3228,7 +3230,7 @@ export default function App() {
           top: el.offsetTop - scrollModal.clientHeight / 2 + el.clientHeight / 2,
           behavior: 'smooth',
         });
-        // Recalcula após o scroll animado do modal
+        // Recalcula apï¿½s o scroll animado do modal
         setTimeout(() => {
           if (cancelled) return;
           const rectAfter = el.getBoundingClientRect();
@@ -5375,7 +5377,7 @@ export default function App() {
     return item?.valor || 0;
   }, [dashboardFaturamentoFilial.porDia, agora]);
 
-  // Últimos 10 dias de faturamento (independente do mês selecionado)
+  // ï¿½ltimos 10 dias de faturamento (independente do mï¿½s selecionado)
   const ultimos10DiasFaturamento = useMemo(() => {
     if (!faturamentoLinhas || !faturamentoLinhas.length) return [];
     
@@ -7390,7 +7392,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-400">Ainda não há dados de custos para mostrar.</p>
+                <p className="text-sm text-slate-400">Ainda nï¿½o hï¿½ dados de custos para mostrar.</p>
               )}
             </div>
           </div>
@@ -7809,7 +7811,7 @@ const custoDetalheTitulo = custoDetalheItem
         </div>
       )}
       
-      {/* Sidebar Clássica */}
+      {/* Sidebar Clï¿½ssica */}
       <aside
         className={`hidden md:flex bg-slate-900 text-white flex-col sticky top-0 h-screen z-20 shadow-2xl transition-[width] duration-300 overflow-hidden shrink-0 ${
           sidebarOpen ? 'w-64' : 'w-0'
@@ -7942,7 +7944,7 @@ const custoDetalheTitulo = custoDetalheItem
         </button>
       )}
 
-      {/* Conteúdo Principal */}
+      {/* Conteï¿½do Principal */}
       <main className={`flex-1 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && abaAtiva !== 'dashboard-tv' && (
           <header className="w-full mb-8 flex justify-between items-end">
@@ -7953,7 +7955,7 @@ const custoDetalheTitulo = custoDetalheItem
               </h1>
             )}
             {abaAtiva !== 'custos' && (
-              <p className="text-slate-500 mt-1">Status da operação em {new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="text-slate-500 mt-1">Status da operaï¿½ï¿½o em {new Date().toLocaleDateString('pt-BR')}</p>
             )}
           </div>
           <div className="flex gap-4" />
@@ -7977,18 +7979,18 @@ const custoDetalheTitulo = custoDetalheItem
                       <div className="flex items-center gap-3 mb-1">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
                         <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">
-                          Operação em tempo real
+                          Operaï¿½ï¿½o em tempo real
                         </p>
                       </div>
                       <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Painel Executivo</h2>
                       <p className="text-xs md:text-sm text-slate-400 mt-1 font-medium">
-                        Consolidado industrial · {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        Consolidado industrial ï¿½ {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 min-w-[340px]">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Presença hoje</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Presenï¿½a hoje</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-emerald-400">{resumoFaltas.percentualPresenca.toFixed(1)}%</span>
                         <span className="text-[10px] text-slate-500 mb-1">da meta</span>
@@ -7998,11 +8000,11 @@ const custoDetalheTitulo = custoDetalheItem
                       <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Dias ativos</p>
                       <div className="flex items-end gap-1">
                         <span className="text-2xl font-black text-blue-300">{faturamentoAtual.diasAtivos}</span>
-                        <span className="text-[10px] text-slate-500 mb-1">dias úteis</span>
+                        <span className="text-[10px] text-slate-500 mb-1">dias ï¿½teis</span>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Faturamento mês</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Faturamento mï¿½s</p>
                       <div className="flex items-end gap-1">
                         <span className="text-xl font-black text-emerald-300">{formatarMoeda(faturamentoAtual.total)}</span>
                       </div>
@@ -8075,16 +8077,16 @@ const custoDetalheTitulo = custoDetalheItem
                     corFundo: 'bg-blue-500',
                   },
                   {
-                    titulo: 'Média por dia',
+                    titulo: 'Mï¿½dia por dia',
                     valor: formatarMoeda(
                       faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0
                     ),
-                    subtitulo: 'Performance diária',
+                    subtitulo: 'Performance diï¿½ria',
                     icon: TrendingUp,
                     corFundo: 'bg-emerald-500',
                   },
                   {
-                    titulo: 'Ticket médio',
+                    titulo: 'Ticket mï¿½dio',
                     valor: formatarMoeda(faturamentoAtual.ticketMedio),
                     subtitulo: 'Valor por pedido',
                     icon: ShoppingCart,
@@ -8093,19 +8095,19 @@ const custoDetalheTitulo = custoDetalheItem
                   {
                     titulo: 'Clientes ativos',
                     valor: faturamentoAtual.clientesAtivos,
-                    subtitulo: 'Carteira no mês',
+                    subtitulo: 'Carteira no mï¿½s',
                     icon: Users,
                     corFundo: 'bg-emerald-500',
                   },
                   {
                     titulo: 'Faltas hoje',
                     valor: resumoFaltas.ausentes,
-                    subtitulo: 'Atenção operacional',
+                    subtitulo: 'Atenï¿½ï¿½o operacional',
                     icon: UserX,
                     corFundo: 'bg-blue-500',
                   },
                   {
-                    titulo: 'Férias hoje',
+                    titulo: 'Fï¿½rias hoje',
                     valor: resumoFaltas.porTipo['Ferias'] || 0,
                     subtitulo: 'Planejamento RH',
                     icon: CalendarIcon,
@@ -8132,7 +8134,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <Activity className="text-blue-600" size={18} />
                           Faturamento por Dia
                         </h3>
-                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Histórico dos últimos dias ativos</p>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Histï¿½rico dos ï¿½ltimos dias ativos</p>
                       </div>
                       <span className="px-3 py-1.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">
                         {ultimos10DiasFaturamento.length} dias
@@ -8187,7 +8189,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <div>
                         <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
                           <AlertTriangle className="text-rose-500" size={18} />
-                          Alertas de Absenteísmo
+                          Alertas de Absenteï¿½smo
                         </h3>
                         <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">Impacto por processo produtivo</p>
                       </div>
@@ -8259,11 +8261,11 @@ const custoDetalheTitulo = custoDetalheItem
                         </p>
                       </div>
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                        <p className="text-[10px]">Custo médio / movimento</p>
+                        <p className="text-[10px]">Custo mï¿½dio / movimento</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioMovimento)}</p>
                       </div>
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                        <p className="text-[10px]">Custo médio / dia</p>
+                        <p className="text-[10px]">Custo mï¿½dio / dia</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{formatarMoeda(custoMedioDia)}</p>
                       </div>
                     </div>
@@ -8283,7 +8285,7 @@ const custoDetalheTitulo = custoDetalheItem
                               </div>
                               <p className="text-[12px] text-slate-500">{item.descricao || 'Sem descricao'}</p>
                               <p className="text-[11px] text-slate-400 mt-1">
-                                Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} · Markup{' '}
+                                Margem {Number.isFinite(margemItem) ? `${margemItem.toFixed(1)}%` : '0%'} ï¿½ Markup{' '}
                                 {Number.isFinite(markupItem) ? `${markupItem.toFixed(1)}%` : '0%'}
                               </p>
                             </div>
@@ -8707,7 +8709,7 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                     {dashboardView === 'faturamento' && dashboardFilialAtual && (
                       <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-emerald-200">
-                        Filial {dashboardFilialAtual} · troca 10s
+                        Filial {dashboardFilialAtual} ï¿½ troca 10s
                       </span>
                     )}
                     <button
@@ -8741,7 +8743,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
-                        Faturamento total {dashboardFilialAtual ? `· Filial ${dashboardFilialAtual}` : ''}
+                        Faturamento total {dashboardFilialAtual ? `ï¿½ Filial ${dashboardFilialAtual}` : ''}
                       </p>
                       <p className="text-3xl font-black text-blue-300 mt-2">
                         {formatarMoeda(dashboardFaturamentoFilial.total || 0)}
@@ -9215,7 +9217,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="p-6 bg-slate-50 border-b border-slate-200">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div className="font-bold text-slate-700 text-sm uppercase tracking-wider">
-                        Faturamento por Mês (2025)
+                        Faturamento por Mï¿½s (2025)
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         <span className="mr-1">Filial</span>
@@ -9398,7 +9400,7 @@ const custoDetalheTitulo = custoDetalheItem
                         return (
                           <div className="space-y-3">
                             <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
-                              <span>Interação: passe o mouse para ver detalhes, clique para abrir o ABC.</span>
+                              <span>Interaï¿½ï¿½o: passe o mouse para ver detalhes, clique para abrir o ABC.</span>
                               {paretoAtivo && (
                                 <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold">
                                   {paretoAtivo.grupo} ??? R$ {paretoAtivo.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ??? {paretoAtivo.percentual.toFixed(1)}%
@@ -9517,13 +9519,13 @@ const custoDetalheTitulo = custoDetalheItem
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe A</div>
                                     <div className="text-2xl font-bold text-slate-100">{abcDados.a}</div>
                                     <div className="text-xs text-slate-400">R$ {abcDados.valorA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div className="text-xs text-slate-500">Até 80% do faturamento</div>
+                                    <div className="text-xs text-slate-500">Atï¿½ 80% do faturamento</div>
                                   </div>
                                   <div className="border border-slate-200 rounded-xl p-4 bg-slate-950/30">
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe B</div>
                                     <div className="text-2xl font-bold text-slate-100">{abcDados.b}</div>
                                     <div className="text-xs text-slate-400">R$ {abcDados.valorB.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div className="text-xs text-slate-500">Até 95% do faturamento</div>
+                                    <div className="text-xs text-slate-500">Atï¿½ 95% do faturamento</div>
                                   </div>
                                   <div className="border border-slate-200 rounded-xl p-4 bg-slate-950/30">
                                     <div className="text-[10px] uppercase font-bold text-slate-500">Classe C</div>
@@ -9627,8 +9629,8 @@ const custoDetalheTitulo = custoDetalheItem
                                       <table className="w-full text-left text-xs">
                                         <thead className="sticky top-0 bg-slate-900/90 text-slate-400 uppercase tracking-wider">
                                           <tr>
-                                            <th className="px-5 py-3">Código</th>
-                                            <th className="px-5 py-3">Descrição</th>
+                                            <th className="px-5 py-3">Cï¿½digo</th>
+                                            <th className="px-5 py-3">Descriï¿½ï¿½o</th>
                                             <th className="px-5 py-3">Classe</th>
                                             <th className="px-5 py-3 text-right">Valor</th>
                                           </tr>
@@ -9895,7 +9897,7 @@ const custoDetalheTitulo = custoDetalheItem
                             if (!dados.length) {
                               return (
                                 <div className="h-60 flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl">
-                                  <p className="text-slate-400 text-sm italic">Sem dados para o mês selecionado.</p>
+                                  <p className="text-slate-400 text-sm italic">Sem dados para o mï¿½s selecionado.</p>
                                 </div>
                               );
                             }
@@ -10772,12 +10774,12 @@ const custoDetalheTitulo = custoDetalheItem
             </div>
           )}
 
-          {/* ABA DE GESTÃO DIÁRIA */}
+          {/* ABA DE GESTï¿½O DIï¿½RIA */}
           {abaAtiva === 'gestao' && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-500">
                <div className="flex gap-6 border-b border-slate-200">
                   <button onClick={() => setSubAbaGestao('lista')} className={`pb-3 text-sm font-bold transition-all ${subAbaGestao === 'lista' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>Quadro de Faltas</button>
-                  <button onClick={() => setSubAbaGestao('calendario')} className={`pb-3 text-sm font-bold transition-all flex items-center gap-2 ${subAbaGestao === 'calendario' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}><CalendarIcon size={16} /> Histórico Mensal</button>
+                  <button onClick={() => setSubAbaGestao('calendario')} className={`pb-3 text-sm font-bold transition-all flex items-center gap-2 ${subAbaGestao === 'calendario' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}><CalendarIcon size={16} /> Histï¿½rico Mensal</button>
                </div>
 
                {subAbaGestao === 'lista' ? (
@@ -11780,7 +11782,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
-                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} · {os.prioridade || '-'}</p>
+                                  <p className="text-xs text-slate-400">{os.setor || 'Sem setor'} ï¿½ {os.prioridade || '-'}</p>
                                 </div>
                                 <button
                                   type="button"
@@ -11820,7 +11822,7 @@ const custoDetalheTitulo = custoDetalheItem
                                 <div>
                                   <p className="text-sm font-bold text-white">{os.ativo || os.id}</p>
                                   <p className="text-xs text-slate-400">
-                                    {os.status || '-'} · {os.statusMaquina || 'Rodando'}
+                                    {os.status || '-'} ï¿½ {os.statusMaquina || 'Rodando'}
                                   </p>
                                 </div>
                                 <div data-tour="acoes-os" className="flex flex-wrap items-center gap-2 text-xs">
@@ -12284,7 +12286,7 @@ const custoDetalheTitulo = custoDetalheItem
                             {assumirModalOs.ativo || assumirModalOs.id}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {assumirModalOs.setor || 'Sem setor'} · {assumirModalOs.prioridade || '-'}
+                            {assumirModalOs.setor || 'Sem setor'} ï¿½ {assumirModalOs.prioridade || '-'}
                           </p>
                         </div>
 
@@ -12345,7 +12347,7 @@ const custoDetalheTitulo = custoDetalheItem
                 </div>
              </div>
           )}
-          {/* ABA DE CONFIGURAÇÃO */}
+          {/* ABA DE CONFIGURAï¿½ï¿½O */}
           {abaAtiva === 'configuracao' && (
              <div className="space-y-8 animate-in slide-in-from-top duration-500">
                 <div className="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 w-fit">
@@ -12464,7 +12466,7 @@ const custoDetalheTitulo = custoDetalheItem
                       setNovoAtivoCc('');
                       setNovoAtivoProcesso('');
                     }}>
-                       <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Máquina" />
+                       <input name="nomeMaq" type="text" className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none" placeholder="Nome da Mï¿½quina" />
                        <div className="flex flex-col gap-2">
                          <div>
                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
@@ -12574,7 +12576,7 @@ const custoDetalheTitulo = custoDetalheItem
                           </div>
                           <div className="px-6 py-5 space-y-4">
                             <div>
-                              <label className="text-xs font-bold text-slate-500">Processo da indústria</label>
+                              <label className="text-xs font-bold text-slate-500">Processo da indï¿½stria</label>
                               <select
                                 value={processoEditValue}
                                 onChange={(e) => setProcessoEditValue(e.target.value)}
