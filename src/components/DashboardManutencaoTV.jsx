@@ -237,6 +237,8 @@ const DashboardManutencaoTV = ({ agora, manutencaoParadas, manutencaoOrdens, log
       { nome: 'Juliano', area: 'Eletricista' },
       { nome: 'Rogerio', area: 'Eletricista' },
       { nome: 'Matheus', area: 'Eletricista' },
+      { nome: 'Timoteo Vaz', area: 'Ferramenteiro' },
+      { nome: 'Jose Ricardo', area: 'Ferramenteiro' },
     ],
     []
   );
