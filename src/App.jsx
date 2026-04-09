@@ -1360,16 +1360,19 @@ export default function App() {
     }
     if (!window.confirm(`Tem certeza que deseja excluir a OS ${ordem.id}?`)) return;
     try {
-      await registrarLogManutencao({
+      await deleteDoc(doc(db, 'manutencao_os', ordem.id));
+      setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
+      registrarLogManutencao({
         acao: 'os_excluida',
         ordem,
         ordemId: ordem.id,
         statusAnterior: ordem.status || '',
         statusNovo: 'Excluida',
         descricao: `Excluiu a OS ${ordem.id}.`,
+        extra: { deletedAt: new Date().toISOString() },
+      }).catch((logErr) => {
+        console.error('Erro ao registrar log de exclusao:', logErr);
       });
-      await deleteDoc(doc(db, 'manutencao_os', ordem.id));
-      setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
     } catch (err) {
       console.error('Erro ao excluir OS:', err);
       alert('Erro ao excluir a ordem de serviço.');
@@ -1546,7 +1549,7 @@ export default function App() {
     contestacao = null,
     extra = {},
   }) => {
-    if (!authUser || !isAllowedDomain) return;
+    if (!authUser) return;
     await setDoc(doc(db, 'manutencao_logs', criarIdLogManutencao()), {
       acao,
       ordemId: ordemId || ordem?.id || '',
