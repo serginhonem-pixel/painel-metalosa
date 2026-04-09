@@ -1360,6 +1360,14 @@ export default function App() {
     }
     if (!window.confirm(`Tem certeza que deseja excluir a OS ${ordem.id}?`)) return;
     try {
+      await registrarLogManutencao({
+        acao: 'os_excluida',
+        ordem,
+        ordemId: ordem.id,
+        statusAnterior: ordem.status || '',
+        statusNovo: 'Excluida',
+        descricao: `Excluiu a OS ${ordem.id}.`,
+      });
       await deleteDoc(doc(db, 'manutencao_os', ordem.id));
       setManutencaoOrdens((prev) => prev.filter((o) => o.id !== ordem.id));
     } catch (err) {
@@ -1832,6 +1840,7 @@ export default function App() {
       status_alterado: 'Alterou status',
       os_assumida: 'Assumiu OS',
       os_reaberta: 'Reabriu OS',
+      os_excluida: 'Excluiu OS',
       perfil_nome_atualizado: 'Atualizou nome',
     };
     return labels[acao] || 'Acao registrada';
@@ -1845,6 +1854,7 @@ export default function App() {
       status_alterado: 'border-amber-400/20 bg-amber-500/10 text-amber-200',
       os_assumida: 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200',
       os_reaberta: 'border-rose-400/20 bg-rose-500/10 text-rose-200',
+      os_excluida: 'border-rose-500/25 bg-rose-600/15 text-rose-100',
       perfil_nome_atualizado: 'border-purple-400/20 bg-purple-500/10 text-purple-200',
     };
     return tones[acao] || 'border-slate-700/30 bg-slate-800/40 text-slate-200';
@@ -13365,15 +13375,6 @@ const custoDetalheTitulo = custoDetalheItem
                           <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
                           <p className="text-[10px] text-slate-500 mt-0.5">Todas as ordens de serviço registradas</p>
                         </div>
-                        {canDeleteOs && manutencaoOrdens.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={handleExcluirTodasOs}
-                            className="ml-4 px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 text-[10px] font-bold hover:bg-rose-500/20 border border-rose-500/20 hover:border-rose-500/30 transition-all duration-200"
-                          >
-                            Excluir Todas ({manutencaoOrdens.length})
-                          </button>
-                        )}
                       </div>
                       <div className="flex flex-wrap gap-1.5 text-xs">
                         {['Todas', 'Aberta', 'Contestada', 'Em andamento', 'Aguardando peca', 'Finalizada'].map((s) => {
