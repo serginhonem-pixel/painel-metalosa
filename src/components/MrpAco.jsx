@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
   ResponsiveContainer, Tooltip as RechartsTooltip,
@@ -7,7 +7,10 @@ import {
   ShoppingCart, Package, BarChart3, LayoutList,
   CheckCircle2, XCircle, AlertTriangle, Download,
   Layers, ChevronRight, History, TrendingUp,
+  Lock, Cloud, CloudOff, RefreshCw,
 } from 'lucide-react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 const MESES = [
@@ -297,7 +300,19 @@ function StatusBadge({ status }) {
 }
 
 // ─── Componente principal ───────────────────────────────────────────────────────
+const MRP_DOC = doc(db, 'mrp-aco', 'plano');
+const SENHA_CORRETA = 'planejamento';
+
 export default function MrpAco() {
+  // ── Portão de acesso ─────────────────────────────────────────────────────────
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('mrp-unlocked') === '1');
+  const [senhaInput, setSenhaInput] = useState('');
+  const [senhaErro, setSenhaErro] = useState(false);
+
+  // ── Sync Firebase ────────────────────────────────────────────────────────────
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle'|'loading'|'saving'|'saved'|'error'
+  const isLoadingRef = useRef(false);
+  const saveTimerRef = useRef(null);
   const [subAba, setSubAba] = useState('dashboard');
   const [plano, setPlano] = useState(
     () => JSON.parse(JSON.stringify(PLANO_INICIAL))
@@ -400,6 +415,62 @@ export default function MrpAco() {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carrosDia, diasUteis, pctEdit]);
+
+  // ── Firebase: load e save ────────────────────────────────────────────────────
+  async function loadFromFirestore() {
+    setSyncStatus('loading');
+    try {
+      const snap = await getDoc(MRP_DOC);
+      if (snap.exists()) {
+        const d = snap.data();
+        isLoadingRef.current = true;
+        if (d.carrosDia   !== undefined) setCarrosDia(d.carrosDia);
+        if (d.diasUteis   !== undefined) setDiasUteis(d.diasUteis);
+        if (d.carteira    !== undefined) setCarteira(d.carteira);
+        if (d.pctEdit     !== undefined) setPctEdit(d.pctEdit);
+        if (d.estoqueEdit !== undefined) setEstoqueEdit(d.estoqueEdit);
+        if (d.pmpMf       !== undefined) setPmpMf(d.pmpMf);
+        if (d.pmpCC       !== undefined) setPmpCC(d.pmpCC);
+        // aguarda um tick para os estados serem aplicados antes de limpar a flag
+        setTimeout(() => { isLoadingRef.current = false; }, 100);
+      } else {
+        isLoadingRef.current = false;
+      }
+      setSyncStatus('saved');
+    } catch (e) {
+      console.error('MRP load error:', e);
+      isLoadingRef.current = false;
+      setSyncStatus('error');
+    }
+  }
+
+  async function saveToFirestore(data) {
+    setSyncStatus('saving');
+    try {
+      await setDoc(MRP_DOC, { ...data, savedAt: new Date().toISOString() });
+      setSyncStatus('saved');
+    } catch (e) {
+      console.error('MRP save error:', e);
+      setSyncStatus('error');
+    }
+  }
+
+  // Load ao desbloquear
+  useEffect(() => {
+    if (unlocked) loadFromFirestore();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unlocked]);
+
+  // Auto-save com debounce de 1,5s
+  useEffect(() => {
+    if (!unlocked || isLoadingRef.current) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveToFirestore({ carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC });
+    }, 1500);
+    return () => clearTimeout(saveTimerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC]);
 
   // ── Cálculo MRP (memoizado) ──────────────────────────────────────────────────
   const mrpResult = useMemo(() => calcMRP(plano, componentesEfetivos), [plano, componentesEfetivos]);
@@ -760,6 +831,62 @@ export default function MrpAco() {
     </button>
   );
 
+  // ── Portão de senha ──────────────────────────────────────────────────────────
+  if (!unlocked) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-700/60 bg-slate-900/80 p-8 space-y-6 shadow-2xl">
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center">
+              <Lock size={22} className="text-blue-400" />
+            </div>
+            <h2 className="text-base font-black text-slate-100">Planejamento de Aço</h2>
+            <p className="text-xs text-slate-500">Digite a senha para acessar o módulo MRP</p>
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (senhaInput === SENHA_CORRETA) {
+                sessionStorage.setItem('mrp-unlocked', '1');
+                setUnlocked(true);
+              } else {
+                setSenhaErro(true);
+                setSenhaInput('');
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <input
+                type="password"
+                autoFocus
+                placeholder="Senha de acesso"
+                value={senhaInput}
+                onChange={(e) => { setSenhaInput(e.target.value); setSenhaErro(false); }}
+                className={`w-full rounded-xl border px-4 py-3 text-sm font-bold bg-slate-800/60 text-white outline-none transition-colors ${
+                  senhaErro
+                    ? 'border-rose-500/60 focus:border-rose-400'
+                    : 'border-slate-600/60 focus:border-blue-500'
+                }`}
+              />
+              {senhaErro && (
+                <p className="mt-2 text-xs font-bold text-rose-400 flex items-center gap-1">
+                  <XCircle size={12} /> Senha incorreta
+                </p>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-sm py-3 transition-colors"
+            >
+              Acessar
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-in slide-in-from-top duration-500">
 
@@ -770,7 +897,28 @@ export default function MrpAco() {
         {navBtn('componentes', 'Componentes',     <Package size={13} />)}
         {navBtn('lista',       'Lista de Compra', <ShoppingCart size={13} />)}
         {navBtn('historico',   'Histórico',       <History size={13} />)}
-        <div className="ml-auto pl-2 border-l border-slate-700/50">
+        <div className="ml-auto pl-2 border-l border-slate-700/50 flex items-center gap-2">
+          {/* Indicador de sync */}
+          {syncStatus === 'loading' && (
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-blue-400">
+              <RefreshCw size={11} className="animate-spin" /> Carregando...
+            </span>
+          )}
+          {syncStatus === 'saving' && (
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-amber-400">
+              <RefreshCw size={11} className="animate-spin" /> Salvando...
+            </span>
+          )}
+          {syncStatus === 'saved' && (
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400">
+              <Cloud size={11} /> Salvo
+            </span>
+          )}
+          {syncStatus === 'error' && (
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-rose-400">
+              <CloudOff size={11} /> Erro ao salvar
+            </span>
+          )}
           <button
             onClick={exportarPDF}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-rose-600/20 border border-rose-500/30 text-rose-300 hover:bg-rose-600/30 hover:text-rose-200 transition-all"
