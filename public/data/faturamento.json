@@ -157522,6 +157522,40 @@
     "TipoMovimento": "venda"
   },
   {
+    "Cliente": "053987",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01373D         ",
+    "Descricao": "TUBO QD 30X30X1,50 GALV                           ",
+    "Quantidade": 8.2,
+    "Unidade": "KG",
+    "ValorUnitario": 9.22,
+    "ValorTotal": 75.6,
+    "Emissao": "2026-04-09T00:00:00.000Z",
+    "Vendedor1": "S05   ",
+    "NF": 341971,
+    "CodFiscal": "5101",
+    "MesEmissao": "04/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "053987",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01333D         ",
+    "Descricao": "TUBO RED 1X1,50 GALV                             ;09/04/2026;04;341972   ;       5,3500;KG;       48,41;        9,05;N;5101 ;S05   ;ES",
+    "Quantidade": "",
+    "Unidade": "",
+    "ValorUnitario": "",
+    "ValorTotal": "",
+    "Emissao": "",
+    "Vendedor1": "",
+    "NF": "",
+    "CodFiscal": "",
+    "MesEmissao": "",
+    "TipoMovimento": "venda"
+  },
+  {
     "Cliente": "053992",
     "Filial": "01",
     "Grupo": "G140",
@@ -266149,6 +266183,23 @@
     "NF": 253087,
     "CodFiscal": "6102",
     "MesEmissao": "03/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "C06562",
+    "Filial": "04",
+    "Grupo": "0029",
+    "Codigo": "03319          ",
+    "Descricao": "****",
+    "Quantidade": 12,
+    "Unidade": "PC",
+    "ValorUnitario": 18.87,
+    "ValorTotal": 226.44,
+    "Emissao": "2026-04-09T00:00:00.000Z",
+    "Vendedor1": "C04   ",
+    "NF": 254497,
+    "CodFiscal": "6102",
+    "MesEmissao": "04/2026",
     "TipoMovimento": "N"
   },
   {
@@ -540563,6 +540614,23 @@
     "NF": 75105,
     "CodFiscal": "6101",
     "MesEmissao": "02/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "025534",
+    "Filial": "01",
+    "Grupo": "G100",
+    "Codigo": "02025E         ",
+    "Descricao": "PERFIL LAMBRI BZ 0,75 3000X1000MM                 ",
+    "Quantidade": 10,
+    "Unidade": "PC",
+    "ValorUnitario": 164.3,
+    "ValorTotal": 1643,
+    "Emissao": "2026-04-09T00:00:00.000Z",
+    "Vendedor1": "C04   ",
+    "NF": 78326,
+    "CodFiscal": "6101",
+    "MesEmissao": "04/2026",
     "TipoMovimento": "N"
   },
   {
