@@ -14,6 +14,7 @@ import vendedoresData from './data/vendedores.json';
 import { maquinasBaseData, setoresBaseData } from './data/maquinasBase';
 import DashboardManutencaoTV from './components/DashboardManutencaoTV';
 import PainelOperacaoDiaria from './components/PainelOperacaoDiaria';
+import MrpAco from './components/MrpAco';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
@@ -70,6 +71,7 @@ const ITENS_MENU = [
   { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
+  { id: 'mrp-aco', label: 'Planejamento Aço', icon: ShoppingCart },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
 
@@ -15325,6 +15327,13 @@ const custoDetalheTitulo = custoDetalheItem
           )}
 
           {/* ABA DE CONFIGURAÇÃO */}
+          {/* ABA PLANEJAMENTO AÇO */}
+          {abaAtiva === 'mrp-aco' && (
+            <div className="animate-in slide-in-from-top duration-500">
+              <MrpAco />
+            </div>
+          )}
+
           {abaAtiva === 'configuracao' && (
              <div className="space-y-8 animate-in slide-in-from-top duration-500">
                 <div className="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 w-fit">
