@@ -20,8 +20,8 @@ import pptxgen from 'pptxgenjs';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { collection, getDocs, getDoc, doc, setDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { collection, getDocs, getDoc, doc, setDoc, deleteDoc, writeBatch, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getToken, onMessage, isSupported, deleteToken } from 'firebase/messaging';
 import { db, auth, storage, messaging } from './firebase';
@@ -597,6 +597,20 @@ const normalizarTexto = (texto) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const sugerirNomePorEmail = (email) => {
+  const local = String(email || '').split('@')[0] || '';
+  if (!local) return '';
+  return local
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .join(' ')
+    .trim();
+};
+
+const criarIdLogManutencao = () =>
+  `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
 const parseNumeroPlanilha = (valor) => {
   if (typeof valor === 'number') return valor;
   if (valor === null || valor === undefined) return 0;
@@ -862,6 +876,10 @@ const isDiaDesconsiderado = (dataISO) =>
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
+  const [perfilManutencao, setPerfilManutencao] = useState(null);
+  const [perfilNomeModalOpen, setPerfilNomeModalOpen] = useState(false);
+  const [perfilNomeInput, setPerfilNomeInput] = useState('');
+  const [perfilNomeErro, setPerfilNomeErro] = useState('');
   const [authLoading, setAuthLoading] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -1011,6 +1029,9 @@ export default function App() {
   const [manutencaoOrdens, setManutencaoOrdens] = useState([]);
   const [manutencaoOrdensLoading, setManutencaoOrdensLoading] = useState(true);
   const [manutencaoOrdensError, setManutencaoOrdensError] = useState('');
+  const [manutencaoLogs, setManutencaoLogs] = useState([]);
+  const [manutencaoLogsLoading, setManutencaoLogsLoading] = useState(true);
+  const [manutencaoLogsError, setManutencaoLogsError] = useState('');
   const [manutencaoSaveError, setManutencaoSaveError] = useState('');
   const [manutencaoFiltroStatus, setManutencaoFiltroStatus] = useState('Todas');
   const [manutencaoFiltroPrioridade, setManutencaoFiltroPrioridade] = useState('Todas');
@@ -1020,6 +1041,11 @@ export default function App() {
   const [assumirModalOs, setAssumirModalOs] = useState(null);
   const [assumirResponsavel, setAssumirResponsavel] = useState('');
   const [assumirErro, setAssumirErro] = useState('');
+  const [reaberturaContexto, setReaberturaContexto] = useState(null);
+  const [reaberturaStatusDestino, setReaberturaStatusDestino] = useState('Contestada');
+  const [reaberturaContestar, setReaberturaContestar] = useState(true);
+  const [reaberturaMotivo, setReaberturaMotivo] = useState('');
+  const [reaberturaErro, setReaberturaErro] = useState('');
   const [processoEditOpen, setProcessoEditOpen] = useState(false);
   const [processoEditId, setProcessoEditId] = useState(null);
   const [processoEditValue, setProcessoEditValue] = useState('');
@@ -1047,6 +1073,7 @@ export default function App() {
     custoEstimado: '',
     status: 'Aberta',
     statusMaquina: 'Rodando',
+    responsavel: '',
     descricao: '',
     fotoUrl: '',
     fechadaEm: '',
@@ -1121,6 +1148,39 @@ export default function App() {
     return rawMessage || code || 'Nao foi possivel salvar a OS.';
   };
 
+  const resetManutencaoFormState = () => {
+    setManutencaoModalOpen(false);
+    setManutencaoEditId(null);
+    setNovaOsFotoFile(null);
+    setNovaOsFotoPreview('');
+    setNovaOsForm(novaOsDefaults);
+  };
+
+  const persistirOs = async ({
+    osId,
+    payload,
+    fotoUploadFalhou = false,
+    logConfig = null,
+  }) => {
+    await setDoc(doc(db, 'manutencao_os', osId), payload);
+    setManutencaoOrdens((prev) => {
+      const next = prev.filter((item) => item.id !== osId);
+      return [{ id: osId, ...payload }, ...next];
+    });
+    resetManutencaoFormState();
+    if (logConfig) {
+      await registrarLogManutencao({
+        ordemId: osId,
+        ativo: payload.ativo,
+        setor: payload.setor,
+        ...logConfig,
+      });
+    }
+    if (fotoUploadFalhou) {
+      window.alert('A OS foi salva sem a foto. O Firebase Storage recusou o upload por permissao.');
+    }
+  };
+
   const handleNovaOsSubmit = async (e) => {
     e.preventDefault();
     setManutencaoSaveError('');
@@ -1132,7 +1192,14 @@ export default function App() {
       setManutencaoSaveError('Sem permissao para salvar.');
       return;
     }
+    if (!String(novaOsForm.ativo || '').trim()) {
+      setManutencaoSaveError('Selecione ou informe o ativo da OS.');
+      return;
+    }
     const osId = manutencaoEditId || `os-${Date.now()}`;
+    const ordemAtual = manutencaoEditId
+      ? manutencaoOrdens.find((item) => item.id === manutencaoEditId)
+      : null;
     let fotoUrl = novaOsForm.fotoUrl || '';
     let fotoUploadFalhou = false;
     if (novaOsFotoFile) {
@@ -1175,34 +1242,64 @@ export default function App() {
       custoEstimado: novaOsForm.custoEstimado,
       status: novaOsForm.status,
       statusMaquina: statusMaquinaFinal,
+      responsavel: manutencaoEditId
+        ? novaOsForm.responsavel || ordemAtual?.responsavel || ''
+        : currentUserLabel,
       descricao: novaOsForm.descricao,
       fotoUrl,
-      responsavel: authUser?.displayName || authUser?.email || 'Usuario',
       createdByEmail: manutencaoEditId
         ? novaOsForm.createdByEmail || authUser?.email || ''
         : authUser?.email || '',
       createdByName: manutencaoEditId
-        ? novaOsForm.createdByName || authUser?.displayName || authUser?.email || 'Usuario'
-        : authUser?.displayName || authUser?.email || 'Usuario',
+        ? novaOsForm.createdByName || currentUserLabel
+        : currentUserLabel,
       createdAt: manutencaoEditId ? novaOsForm.createdAt : new Date().toISOString(),
       fechadaEm: fechadaEmFinal,
       updatedAt: new Date().toISOString(),
     };
 
-    try {
-      await setDoc(doc(db, 'manutencao_os', osId), payload);
-      setManutencaoOrdens((prev) => {
-        const next = prev.filter((item) => item.id !== osId);
-        return [{ id: osId, ...payload }, ...next];
+    const statusAnterior = ordemAtual?.status || '';
+    const statusNovo = payload.status || '';
+    const reabrindoFinalizada =
+      normalizarTexto(statusAnterior) === 'finalizada' &&
+      normalizarTexto(statusNovo) !== 'finalizada';
+
+    if (reabrindoFinalizada) {
+      setReaberturaContexto({
+        tipo: 'submit',
+        osId,
+        payload,
+        fotoUploadFalhou,
+        ordem: ordemAtual,
       });
-      setManutencaoModalOpen(false);
-      setManutencaoEditId(null);
-      setNovaOsFotoFile(null);
-      setNovaOsFotoPreview('');
-      setNovaOsForm(novaOsDefaults);
-      if (fotoUploadFalhou) {
-        window.alert('A OS foi salva sem a foto. O Firebase Storage recusou o upload por permissao.');
-      }
+      setReaberturaStatusDestino(statusNovo || 'Contestada');
+      setReaberturaContestar(true);
+      setReaberturaMotivo('');
+      setReaberturaErro('');
+      return;
+    }
+
+    try {
+      const logConfig = !manutencaoEditId
+        ? {
+            acao: 'os_aberta',
+            statusNovo,
+            descricao: `Abriu a OS ${osId}.`,
+          }
+        : statusAnterior !== statusNovo
+          ? {
+              acao: 'status_alterado',
+              statusAnterior,
+              statusNovo,
+              descricao: `Alterou o status de ${statusAnterior || '-'} para ${statusNovo || '-'}.`,
+            }
+          : {
+              acao: 'os_editada',
+              statusAnterior,
+              statusNovo,
+              descricao: `Editou a OS ${osId}.`,
+            };
+      await persistirOs({ osId, payload, fotoUploadFalhou, logConfig });
     } catch (err) {
       console.error('Erro ao salvar OS:', err);
       setManutencaoSaveError(getFirebaseSaveErrorMessage(err));
@@ -1231,6 +1328,7 @@ export default function App() {
       custoEstimado: ordem.custoEstimado || '',
       status: ordem.status || 'Aberta',
       statusMaquina: ordem.statusMaquina || 'Rodando',
+      responsavel: ordem.responsavel || '',
       descricao: ordem.descricao || '',
       fotoUrl: ordem.fotoUrl || '',
       fechadaEm: ordem.fechadaEm || '',
@@ -1246,6 +1344,13 @@ export default function App() {
 
   const handleVisualizarOs = (ordem) => {
     setManutencaoDetalheModal(ordem);
+    registrarLogManutencao({
+      acao: 'os_visualizada',
+      ordem,
+      ordemId: ordem.id,
+      statusNovo: ordem.status || '',
+      descricao: `Abriu os detalhes da OS ${ordem.id}.`,
+    }).catch(() => {});
   };
 
   const handleExcluirOs = async (ordem) => {
@@ -1293,6 +1398,41 @@ export default function App() {
     });
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!authUser) {
+      setPerfilManutencao(null);
+      setPerfilNomeModalOpen(false);
+      setPerfilNomeInput('');
+      setPerfilNomeErro('');
+      return;
+    }
+
+    let active = true;
+    const carregarPerfil = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'manutencao_usuarios', authUser.uid));
+        if (!active) return;
+        const perfil = snap.exists() ? snap.data() : null;
+        const nomeSalvo = String(perfil?.nome || '').trim();
+        setPerfilManutencao(perfil);
+        setPerfilNomeInput(nomeSalvo || authUser.displayName || sugerirNomePorEmail(authUser.email));
+        setPerfilNomeErro('');
+        setPerfilNomeModalOpen(!nomeSalvo);
+      } catch (err) {
+        if (!active) return;
+        setPerfilManutencao(null);
+        setPerfilNomeInput(authUser.displayName || sugerirNomePorEmail(authUser.email));
+        setPerfilNomeErro('');
+        setPerfilNomeModalOpen(true);
+      }
+    };
+
+    carregarPerfil();
+    return () => {
+      active = false;
+    };
+  }, [authUser?.uid, authUser?.email, authUser?.displayName]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -1371,21 +1511,52 @@ export default function App() {
   ].includes(authUser?.email?.toLowerCase());
   const isPortfolioDisabled = true;
   const currentUserLabel = useMemo(() => {
+    const nomePerfil = String(perfilManutencao?.nome || '').trim();
+    if (nomePerfil) return nomePerfil;
     const email = authUser?.email?.toLowerCase();
     if (email === 'pcp@metalosa.com.br') return 'Sergio Betini';
     if (email === 'sergio@metalosa.com.br') return 'Sergio Betini';
     if (email === 'wilson@metalosa.com.br') return 'Wilson';
     if (email === 'industria@metalosa.com.br') return 'Leandro Freitas';
-    return authUser?.displayName || authUser?.email || 'Usuario';
-  }, [authUser?.displayName, authUser?.email]);
+    return authUser?.displayName || sugerirNomePorEmail(authUser?.email) || authUser?.email || 'Usuario';
+  }, [perfilManutencao?.nome, authUser?.displayName, authUser?.email]);
   const nomeBoasVindas = useMemo(() => {
-    const email = authUser?.email;
-    if (!email) return 'Operador';
-    const user = email.split('@')[0] || '';
-    const first = user.split(/[._-]/)[0] || user;
+    const first = String(currentUserLabel || '').trim().split(/\s+/)[0] || '';
     if (!first) return 'Operador';
     return `${first.charAt(0).toUpperCase()}${first.slice(1)}`;
-  }, [authUser?.email]);
+  }, [currentUserLabel]);
+
+  const registrarLogManutencao = async ({
+    acao,
+    ordem = null,
+    ordemId = '',
+    ativo = '',
+    setor = '',
+    statusAnterior = '',
+    statusNovo = '',
+    descricao = '',
+    contestacao = null,
+    extra = {},
+  }) => {
+    if (!authUser || !isAllowedDomain) return;
+    await setDoc(doc(db, 'manutencao_logs', criarIdLogManutencao()), {
+      acao,
+      ordemId: ordemId || ordem?.id || '',
+      ativo: ativo || ordem?.ativo || '',
+      setor: setor || ordem?.setor || '',
+      statusAnterior,
+      statusNovo,
+      descricao,
+      contestacao,
+      usuario: {
+        uid: authUser.uid,
+        email: authUser.email || '',
+        nome: currentUserLabel,
+      },
+      createdAt: new Date().toISOString(),
+      ...extra,
+    });
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -1476,13 +1647,13 @@ export default function App() {
         token: notifToken,
         uid: authUser.uid,
         email: authUser.email || '',
-        displayName: authUser.displayName || authUser.email || 'Usuario',
+        displayName: currentUserLabel,
         enabled: true,
         lastSeen: nowIso,
       },
       { merge: true }
     ).catch(() => {});
-  }, [authUser, notifToken, isAllowedDomain]);
+  }, [authUser, notifToken, isAllowedDomain, currentUserLabel]);
 
   const handleEnableNotifications = async () => {
     setNotifError('');
@@ -1533,7 +1704,7 @@ export default function App() {
           token,
           uid: authUser.uid,
           email: authUser.email || '',
-          displayName: authUser.displayName || authUser.email || 'Usuario',
+          displayName: currentUserLabel,
           enabled: true,
           createdAt: nowIso,
           lastSeen: nowIso,
@@ -1617,7 +1788,7 @@ export default function App() {
   }, []);
 
   const manutencaoOperadorListas = useMemo(() => {
-    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta');
+    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta' || os.status === 'Contestada');
     const minhas = manutencaoOrdens.filter((os) =>
       (os.responsavel || '').toLowerCase() === currentUserLabel.toLowerCase()
     );
@@ -1653,8 +1824,34 @@ export default function App() {
     return `${dias}d ${hrs % 24}h`;
   };
 
+  const getLogAcaoLabel = (acao) => {
+    const labels = {
+      os_aberta: 'Abriu OS',
+      os_editada: 'Editou OS',
+      os_visualizada: 'Abriu detalhes',
+      status_alterado: 'Alterou status',
+      os_assumida: 'Assumiu OS',
+      os_reaberta: 'Reabriu OS',
+      perfil_nome_atualizado: 'Atualizou nome',
+    };
+    return labels[acao] || 'Acao registrada';
+  };
+
+  const getLogAcaoTone = (acao) => {
+    const tones = {
+      os_aberta: 'border-blue-400/20 bg-blue-500/10 text-blue-200',
+      os_editada: 'border-cyan-400/20 bg-cyan-500/10 text-cyan-200',
+      os_visualizada: 'border-slate-500/20 bg-slate-500/10 text-slate-200',
+      status_alterado: 'border-amber-400/20 bg-amber-500/10 text-amber-200',
+      os_assumida: 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200',
+      os_reaberta: 'border-rose-400/20 bg-rose-500/10 text-rose-200',
+      perfil_nome_atualizado: 'border-purple-400/20 bg-purple-500/10 text-purple-200',
+    };
+    return tones[acao] || 'border-slate-700/30 bg-slate-800/40 text-slate-200';
+  };
+
   const manutencaoKpis = useMemo(() => {
-    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta').length;
+    const abertas = manutencaoOrdens.filter((os) => os.status === 'Aberta' || os.status === 'Contestada').length;
     const emAndamento = manutencaoOrdens.filter((os) => os.status === 'Em andamento').length;
     const finalizadas = manutencaoOrdens.filter((os) => os.status === 'Finalizada').length;
     const criticas = manutencaoOrdens.filter((os) => (os.prioridade || '').toLowerCase() === 'critica' && os.status !== 'Finalizada' && os.status !== 'Cancelada').length;
@@ -1865,7 +2062,7 @@ export default function App() {
   const relatorioResumoGeral = useMemo(() => {
     const ord = relatorioOrdensFiltradas;
     const total = ord.length;
-    const abertas = ord.filter((os) => os.status === 'Aberta').length;
+    const abertas = ord.filter((os) => os.status === 'Aberta' || os.status === 'Contestada').length;
     const emAndamento = ord.filter((os) => os.status === 'Em andamento').length;
     const aguardando = ord.filter((os) => os.status === 'Aguardando peca').length;
     const finalizadas = ord.filter((os) => os.status === 'Finalizada').length;
@@ -3158,15 +3355,66 @@ export default function App() {
     }
   };
 
+  const handleSalvarPerfilNome = async () => {
+    if (!authUser) return;
+    const nome = String(perfilNomeInput || '').trim();
+    if (nome.length < 3) {
+      setPerfilNomeErro('Informe o nome completo ou um identificador com pelo menos 3 caracteres.');
+      return;
+    }
+    const nowIso = new Date().toISOString();
+    const payload = {
+      uid: authUser.uid,
+      email: authUser.email || '',
+      nome,
+      updatedAt: nowIso,
+      createdAt: perfilManutencao?.createdAt || nowIso,
+    };
+    try {
+      await setDoc(doc(db, 'manutencao_usuarios', authUser.uid), payload, { merge: true });
+      await updateProfile(auth.currentUser, { displayName: nome }).catch(() => {});
+      setPerfilManutencao(payload);
+      setPerfilNomeInput(nome);
+      setPerfilNomeErro('');
+      setPerfilNomeModalOpen(false);
+      await registrarLogManutencao({
+        acao: 'perfil_nome_atualizado',
+        descricao: `Atualizou o nome exibido para ${nome}.`,
+        extra: { tipo: 'perfil' },
+      }).catch(() => {});
+    } catch (err) {
+      setPerfilNomeErro('Nao foi possivel salvar o nome agora.');
+    }
+  };
+
   const handleLogout = async () => {
+    setPerfilNomeModalOpen(false);
+    setPerfilNomeErro('');
+    setPerfilManutencao(null);
     await signOut(auth);
   };
 
-  const atualizarOs = async (osId, updates) => {
+  const atualizarOs = async (osId, updates, options = {}) => {
     if (!isAllowedDomain) {
       setManutencaoSaveError('Sem permissao para salvar.');
       return;
     }
+    const ordemAtual = manutencaoOrdens.find((item) => item.id === osId);
+    const statusAnterior = ordemAtual?.status || '';
+    const statusNovo = updates?.status || statusAnterior;
+    const reabrindoFinalizada =
+      normalizarTexto(statusAnterior) === 'finalizada' &&
+      normalizarTexto(statusNovo) !== 'finalizada';
+
+    if (reabrindoFinalizada && !options.allowReopen) {
+      setReaberturaContexto({ tipo: 'update', osId, updates, ordem: ordemAtual });
+      setReaberturaStatusDestino(statusNovo || 'Contestada');
+      setReaberturaContestar(true);
+      setReaberturaMotivo('');
+      setReaberturaErro('');
+      return;
+    }
+
     const patch = { ...updates, updatedAt: new Date().toISOString() };
     if (String(updates?.status || '').toLowerCase() === 'finalizada') {
       if (!updates?.statusMaquina) {
@@ -3177,16 +3425,129 @@ export default function App() {
         patch.fechadaEm = patch.updatedAt;
       }
     }
+    if (reabrindoFinalizada) {
+      patch.fechadaEm = '';
+      patch.reabertaEm = patch.updatedAt;
+      patch.reabertaPor = {
+        uid: authUser?.uid || '',
+        email: authUser?.email || '',
+        nome: currentUserLabel,
+      };
+      patch.ultimaContestacao = options.reopenMeta || null;
+    }
     try {
       await setDoc(doc(db, 'manutencao_os', osId), patch, { merge: true });
       setManutencaoOrdens((prev) =>
         prev.map((item) => (item.id === osId ? { ...item, ...patch } : item))
       );
+      if (reabrindoFinalizada) {
+        await registrarLogManutencao({
+          acao: 'os_reaberta',
+          ordem: ordemAtual,
+          ordemId: osId,
+          statusAnterior,
+          statusNovo: patch.status || statusNovo,
+          descricao: options.reopenMeta?.motivo
+            ? `Reabriu a OS com contestacao: ${options.reopenMeta.motivo}`
+            : 'Reabriu a OS sem contestacao.',
+          contestacao: options.reopenMeta || null,
+        });
+      } else if (statusAnterior !== statusNovo) {
+        await registrarLogManutencao({
+          acao: 'status_alterado',
+          ordem: ordemAtual,
+          ordemId: osId,
+          statusAnterior,
+          statusNovo,
+          descricao: `Alterou o status de ${statusAnterior || '-'} para ${statusNovo || '-'}.`,
+        });
+      } else if (
+        updates?.responsavel &&
+        normalizarTexto(updates.responsavel) !== normalizarTexto(ordemAtual?.responsavel || '')
+      ) {
+        await registrarLogManutencao({
+          acao: 'os_assumida',
+          ordem: ordemAtual,
+          ordemId: osId,
+          statusAnterior,
+          statusNovo: patch.status || statusAnterior,
+          descricao: `Atribuiu a OS para ${updates.responsavel}.`,
+        });
+      }
       if (String(updates?.status || '').toLowerCase() === 'finalizada') {
         playTone(784, 220);
       }
     } catch (err) {
       setManutencaoSaveError('Nao foi possivel atualizar a OS.');
+    }
+  };
+
+  const fecharModalReabertura = () => {
+    setReaberturaContexto(null);
+    setReaberturaStatusDestino('Contestada');
+    setReaberturaContestar(true);
+    setReaberturaMotivo('');
+    setReaberturaErro('');
+  };
+
+  const confirmarReaberturaOs = async () => {
+    if (!reaberturaContexto) return;
+    const motivo = String(reaberturaMotivo || '').trim();
+    if (reaberturaContestar && !motivo) {
+      setReaberturaErro('Informe o motivo da contestacao para reabrir a OS.');
+      return;
+    }
+    const reopenMeta = {
+      contestada: reaberturaContestar,
+      motivo: reaberturaContestar ? motivo : '',
+      reabertaEm: new Date().toISOString(),
+      reabertaPor: {
+        uid: authUser?.uid || '',
+        email: authUser?.email || '',
+        nome: currentUserLabel,
+      },
+      statusDestino: reaberturaStatusDestino,
+    };
+
+    try {
+      if (reaberturaContexto.tipo === 'update') {
+        const { osId, updates } = reaberturaContexto;
+        fecharModalReabertura();
+        await atualizarOs(
+          osId,
+          { ...updates, status: reaberturaStatusDestino },
+          { allowReopen: true, reopenMeta }
+        );
+        return;
+      }
+
+      const { osId, payload, fotoUploadFalhou, ordem } = reaberturaContexto;
+      const payloadFinal = {
+        ...payload,
+        status: reaberturaStatusDestino,
+        fechadaEm: '',
+        reabertaEm: reopenMeta.reabertaEm,
+        reabertaPor: reopenMeta.reabertaPor,
+        ultimaContestacao: reopenMeta,
+        updatedAt: new Date().toISOString(),
+      };
+      fecharModalReabertura();
+      await persistirOs({
+        osId,
+        payload: payloadFinal,
+        fotoUploadFalhou,
+        logConfig: {
+          acao: 'os_reaberta',
+          statusAnterior: ordem?.status || 'Finalizada',
+          statusNovo: reaberturaStatusDestino,
+          descricao: reopenMeta.motivo
+            ? `Reabriu a OS com contestacao: ${reopenMeta.motivo}`
+            : 'Reabriu a OS sem contestacao.',
+          contestacao: reopenMeta,
+        },
+      });
+    } catch (err) {
+      setReaberturaErro('Nao foi possivel reabrir a OS agora.');
     }
   };
 
@@ -3241,6 +3602,38 @@ export default function App() {
       () => {
         setManutencaoOrdensError('Nao foi possivel carregar as ordens.');
         setManutencaoOrdensLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [authUser, isAllowedDomain]);
+
+  useEffect(() => {
+    if (!authUser || !isAllowedDomain) {
+      setManutencaoLogs([]);
+      setManutencaoLogsLoading(false);
+      setManutencaoLogsError('');
+      return;
+    }
+
+    setManutencaoLogsLoading(true);
+    setManutencaoLogsError('');
+    const logsQuery = query(
+      collection(db, 'manutencao_logs'),
+      orderBy('createdAt', 'desc'),
+      limit(200)
+    );
+
+    const unsubscribe = onSnapshot(
+      logsQuery,
+      (snap) => {
+        const items = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        setManutencaoLogs(items);
+        setManutencaoLogsLoading(false);
+      },
+      () => {
+        setManutencaoLogsError('Nao foi possivel carregar os logs da manutencao.');
+        setManutencaoLogsLoading(false);
       }
     );
 
@@ -9290,7 +9683,7 @@ const custoDetalheTitulo = custoDetalheItem
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-slate-800 text-slate-200 flex items-center justify-center text-xs font-black uppercase">
-                  {(authUser.displayName || authUser.email || '?')
+                  {(currentUserLabel || authUser.email || '?')
                     .trim()
                     .split(/\s+/)
                     .map((part) => part[0])
@@ -9299,7 +9692,7 @@ const custoDetalheTitulo = custoDetalheItem
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs font-bold text-slate-200 truncate">
-                    {authUser.displayName || (authUser.email ? authUser.email.split('@')[0] : 'Usuario')}
+                    {currentUserLabel || (authUser.email ? authUser.email.split('@')[0] : 'Usuario')}
                   </div>
                   <div className="text-[10px] text-slate-500 truncate">{authUser.email}</div>
                 </div>
@@ -12644,6 +13037,9 @@ const custoDetalheTitulo = custoDetalheItem
                       <button onClick={() => setSubAbaManutencao('relatorios')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'relatorios' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                         <BarChart3 size={13} />Relatórios
                       </button>
+                      <button onClick={() => setSubAbaManutencao('logs')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'logs' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                        <FileText size={13} />Logs
+                      </button>
                       {isManutencaoOperador && (
                         <button onClick={() => setSubAbaManutencao('operador')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
                           <UserCog size={13} />Operador
@@ -12980,11 +13376,12 @@ const custoDetalheTitulo = custoDetalheItem
                         )}
                       </div>
                       <div className="flex flex-wrap gap-1.5 text-xs">
-                        {['Todas', 'Aberta', 'Em andamento', 'Aguardando peca', 'Finalizada'].map((s) => {
+                        {['Todas', 'Aberta', 'Contestada', 'Em andamento', 'Aguardando peca', 'Finalizada'].map((s) => {
                           const isActive = manutencaoFiltroStatus === s;
                           const colorMap = {
                             'Todas': isActive ? 'bg-slate-700/60 text-slate-100 border-slate-500/50' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
                             'Aberta': isActive ? 'bg-blue-500/20 text-blue-200 border-blue-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
+                            'Contestada': isActive ? 'bg-rose-500/20 text-rose-200 border-rose-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
                             'Em andamento': isActive ? 'bg-amber-500/20 text-amber-200 border-amber-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
                             'Aguardando peca': isActive ? 'bg-purple-500/20 text-purple-200 border-purple-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
                             'Finalizada': isActive ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
@@ -12992,6 +13389,7 @@ const custoDetalheTitulo = custoDetalheItem
                           const countMap = {
                             'Todas': manutencaoOrdens.length,
                             'Aberta': manutencaoOrdens.filter(o => o.status === 'Aberta').length,
+                            'Contestada': manutencaoOrdens.filter(o => o.status === 'Contestada').length,
                             'Em andamento': manutencaoOrdens.filter(o => o.status === 'Em andamento').length,
                             'Aguardando peca': manutencaoOrdens.filter(o => o.status === 'Aguardando peca').length,
                             'Finalizada': manutencaoOrdens.filter(o => o.status === 'Finalizada').length,
@@ -13051,6 +13449,7 @@ const custoDetalheTitulo = custoDetalheItem
                               const prioridadeClass = prioridadeMap[prioridadeStr] || 'bg-slate-700/30 text-slate-300 border-slate-600/20';
                               const statusMap = {
                                 'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
+                                'contestada': 'bg-rose-500/12 text-rose-300 border-rose-400/20',
                                 'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
                                 'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
                                 'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
@@ -13093,6 +13492,15 @@ const custoDetalheTitulo = custoDetalheItem
                                       >
                                         Imprimir
                                       </button>
+                                      {ordem.status === 'Finalizada' && (
+                                        <button
+                                          type="button"
+                                          onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })}
+                                          className="text-[10px] font-bold text-rose-300 hover:text-rose-200 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
+                                        >
+                                          Reabrir
+                                        </button>
+                                      )}
                                       {canDeleteOs && (
                                         <button
                                           type="button"
@@ -13169,6 +13577,7 @@ const custoDetalheTitulo = custoDetalheItem
                             minhasSolicitacoes.map((ordem) => {
                               const statusMap = {
                                 'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
+                                'contestada': 'bg-rose-500/12 text-rose-300 border-rose-400/20',
                                 'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
                                 'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
                                 'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
@@ -13213,6 +13622,15 @@ const custoDetalheTitulo = custoDetalheItem
                                       >
                                         Imprimir
                                       </button>
+                                      {ordem.status === 'Finalizada' && (
+                                        <button
+                                          type="button"
+                                          onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })}
+                                          className="text-[10px] font-bold text-rose-300 hover:text-rose-200 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
+                                        >
+                                          Reabrir
+                                        </button>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>
@@ -13548,6 +13966,7 @@ const custoDetalheTitulo = custoDetalheItem
                               'Em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/25',
                               'Aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/25',
                               'Aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/25',
+                              'Contestada': 'bg-rose-500/12 text-rose-300 border-rose-400/25',
                             }[os.status] || 'bg-slate-700/20 text-slate-400 border-slate-600/20';
                             const maquinaParada = os.statusMaquina === 'Parada' || os.parada === 'Sim';
                             return (
@@ -13569,7 +13988,15 @@ const custoDetalheTitulo = custoDetalheItem
                                   </div>
                                 </div>
                                 <div data-tour="acoes-os" className="flex flex-wrap items-center gap-1.5 text-xs mt-3 pt-3 border-t border-slate-800/30">
-                                  {os.status !== 'Em andamento' && (
+                                  {os.status === 'Finalizada' ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => atualizarOs(os.id, { status: 'Contestada' })}
+                                      className="rounded-lg border border-rose-400/25 bg-rose-500/[0.06] px-2.5 py-1 font-bold text-rose-300 hover:bg-rose-500/15 transition-all"
+                                    >
+                                      Reabrir
+                                    </button>
+                                  ) : os.status !== 'Em andamento' && (
                                     <button
                                       type="button"
                                       onClick={() => atualizarOs(os.id, { status: 'Em andamento' })}
@@ -13578,7 +14005,7 @@ const custoDetalheTitulo = custoDetalheItem
                                       Iniciar
                                     </button>
                                   )}
-                                  {os.status !== 'Aguardando peca' && (
+                                  {os.status !== 'Finalizada' && os.status !== 'Aguardando peca' && (
                                     <button
                                       type="button"
                                       onClick={() => atualizarOs(os.id, { status: 'Aguardando peca' })}
@@ -13587,13 +14014,15 @@ const custoDetalheTitulo = custoDetalheItem
                                       Pausar
                                     </button>
                                   )}
-                                  <button
-                                    type="button"
-                                    onClick={() => atualizarOs(os.id, { status: 'Finalizada', fechadaEm: new Date().toISOString() })}
-                                    className="rounded-lg border border-emerald-400/25 bg-emerald-500/[0.06] px-2.5 py-1 font-bold text-emerald-300 hover:bg-emerald-500/15 transition-all"
-                                  >
-                                    Finalizar
-                                  </button>
+                                  {os.status !== 'Finalizada' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => atualizarOs(os.id, { status: 'Finalizada', fechadaEm: new Date().toISOString() })}
+                                      className="rounded-lg border border-emerald-400/25 bg-emerald-500/[0.06] px-2.5 py-1 font-bold text-emerald-300 hover:bg-emerald-500/15 transition-all"
+                                    >
+                                      Finalizar
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => handleVisualizarOs(os)}
@@ -13974,6 +14403,101 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
                 )}
 
+                {subAbaManutencao === 'logs' && (
+                  <div className="space-y-5">
+                    <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/70">Painel de logs</p>
+                          <h3 className="mt-1 text-lg font-black text-white">Rastreamento das ações da manutenção</h3>
+                          <p className="mt-1 text-xs text-slate-400">
+                            Mostra abertura, visualização, alteração de status, reabertura com contestação e ajustes de nome.
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-slate-700/50 bg-slate-900/40 px-4 py-3 text-xs text-slate-300">
+                          Últimos <span className="font-black text-white">{manutencaoLogs.length}</span> eventos
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
+                      <div className="border-b border-slate-800/40 bg-slate-900/30 px-5 py-4 flex items-center justify-between gap-3">
+                        <div>
+                          <h4 className="text-sm font-black uppercase tracking-wider text-slate-200">Linha do tempo</h4>
+                          <p className="text-[10px] text-slate-500 mt-0.5">Auditoria em tempo real do que cada usuário fez</p>
+                        </div>
+                        {manutencaoLogsLoading ? (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Atualizando...</span>
+                        ) : null}
+                      </div>
+
+                      {manutencaoLogsLoading ? (
+                        <div className="px-5 py-12 text-center text-sm text-slate-500">Carregando logs...</div>
+                      ) : manutencaoLogsError ? (
+                        <div className="px-5 py-12 text-center text-sm text-rose-300">{manutencaoLogsError}</div>
+                      ) : manutencaoLogs.length ? (
+                        <div className="divide-y divide-slate-800/30">
+                          {manutencaoLogs.map((log) => (
+                            <div key={log.id} className="px-5 py-4 hover:bg-slate-800/20 transition-colors">
+                              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                                <div className="min-w-0 space-y-2">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className={`rounded-md border px-2.5 py-1 text-[10px] font-bold ${getLogAcaoTone(log.acao)}`}>
+                                      {getLogAcaoLabel(log.acao)}
+                                    </span>
+                                    {log.ordemId ? (
+                                      <span className="text-[10px] font-bold text-slate-400">{log.ordemId}</span>
+                                    ) : null}
+                                    {log.statusNovo ? (
+                                      <span className="text-[10px] text-slate-500">
+                                        {log.statusAnterior ? `${log.statusAnterior} → ` : ''}
+                                        {log.statusNovo}
+                                      </span>
+                                    ) : null}
+                                  </div>
+
+                                  <div>
+                                    <p className="text-sm font-bold text-white">
+                                      {log.usuario?.nome || log.usuario?.email || 'Usuario'}
+                                    </p>
+                                    <p className="text-xs text-slate-400">
+                                      {log.ativo || 'Sem ativo'}{log.setor ? ` · ${log.setor}` : ''}
+                                    </p>
+                                  </div>
+
+                                  <p className="text-sm text-slate-300 leading-6 break-words">
+                                    {log.descricao || 'Acao registrada no painel de manutencao.'}
+                                  </p>
+
+                                  {log.contestacao?.motivo ? (
+                                    <div className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-100">
+                                      <span className="font-bold uppercase tracking-wider text-rose-300">Contestacao</span>
+                                      <div className="mt-1">{log.contestacao.motivo}</div>
+                                    </div>
+                                  ) : null}
+                                </div>
+
+                                <div className="shrink-0 text-right">
+                                  <p className="text-xs font-semibold text-slate-300">
+                                    {formatDateTimeRelatorio(log.createdAt)}
+                                  </p>
+                                  <p className="mt-1 text-[10px] text-slate-500">
+                                    {tempoDecorrido(log.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="px-5 py-12 text-center text-sm text-slate-500">
+                          Nenhuma ação registrada ainda.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {manutencaoDetalheModal && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 px-4 py-6">
                     <div className="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
@@ -14011,6 +14535,7 @@ const custoDetalheTitulo = custoDetalheItem
                               ['Status da maquina', manutencaoDetalheModal.statusMaquina],
                               ['Responsavel', manutencaoDetalheModal.responsavel],
                               ['Solicitante', manutencaoDetalheModal.solicitante],
+                              ['Aberta por', manutencaoDetalheModal.createdByName || manutencaoDetalheModal.createdByEmail],
                               ['Impacto', manutencaoDetalheModal.impacto],
                               ['Componente', manutencaoDetalheModal.componente],
                               ['Sintoma', manutencaoDetalheModal.sintoma],
@@ -14022,6 +14547,8 @@ const custoDetalheTitulo = custoDetalheItem
                               ['Data falha', formatDateTimeRelatorio(manutencaoDetalheModal.dataFalha)],
                               ['Criado em', formatDateTimeRelatorio(manutencaoDetalheModal.createdAt)],
                               ['Atualizado em', formatDateTimeRelatorio(manutencaoDetalheModal.updatedAt)],
+                              ['Reaberta em', formatDateTimeRelatorio(manutencaoDetalheModal.reabertaEm)],
+                              ['Reaberta por', manutencaoDetalheModal.reabertaPor?.nome || manutencaoDetalheModal.reabertaPor?.email],
                             ].map(([label, value]) => (
                               <div key={label} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
@@ -14039,6 +14566,18 @@ const custoDetalheTitulo = custoDetalheItem
                         </div>
 
                         <div className="border-t border-slate-800 px-6 py-5 lg:border-l lg:border-t-0">
+                          {manutencaoDetalheModal.ultimaContestacao?.motivo ? (
+                            <div className="mb-4 rounded-xl border border-rose-400/20 bg-rose-500/10 p-4">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-300">Contestacao registrada</p>
+                              <p className="mt-2 text-sm text-rose-50 leading-6">
+                                {manutencaoDetalheModal.ultimaContestacao.motivo}
+                              </p>
+                              <p className="mt-2 text-[11px] text-rose-200/70">
+                                {manutencaoDetalheModal.ultimaContestacao.reabertaPor?.nome || manutencaoDetalheModal.ultimaContestacao.reabertaPor?.email || 'Usuario'} · {formatDateTimeRelatorio(manutencaoDetalheModal.ultimaContestacao.reabertaEm)}
+                              </p>
+                            </div>
+                          ) : null}
+
                           <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Foto anexada</p>
                             {manutencaoDetalheModal.fotoUrl ? (
@@ -14062,6 +14601,30 @@ const custoDetalheTitulo = custoDetalheItem
                             ) : (
                               <p className="mt-3 text-sm text-slate-500">Sem foto anexada.</p>
                             )}
+                          </div>
+
+                          <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Últimos logs desta OS</p>
+                            <div className="mt-3 space-y-3">
+                              {manutencaoLogs
+                                .filter((log) => log.ordemId === manutencaoDetalheModal.id)
+                                .slice(0, 6)
+                                .map((log) => (
+                                  <div key={log.id} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className={`rounded-md border px-2 py-1 text-[10px] font-bold ${getLogAcaoTone(log.acao)}`}>
+                                        {getLogAcaoLabel(log.acao)}
+                                      </span>
+                                      <span className="text-[10px] text-slate-500">{formatDateTimeRelatorio(log.createdAt)}</span>
+                                    </div>
+                                    <p className="mt-2 text-xs font-semibold text-slate-200">{log.usuario?.nome || log.usuario?.email || 'Usuario'}</p>
+                                    <p className="mt-1 text-xs text-slate-400">{log.descricao || 'Sem descricao adicional.'}</p>
+                                  </div>
+                                ))}
+                              {!manutencaoLogs.filter((log) => log.ordemId === manutencaoDetalheModal.id).length ? (
+                                <p className="text-sm text-slate-500">Nenhum log específico encontrado para esta OS.</p>
+                              ) : null}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -14174,7 +14737,6 @@ const custoDetalheTitulo = custoDetalheItem
                               onChange={handleNovaOsChange}
                               data-tour="nova-os-ativo"
                               className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none md:hidden"
-                              required
                             >
                               <option value="">Selecione...</option>
                               {listaMaquinasMobile.map((item) => (
@@ -14192,7 +14754,6 @@ const custoDetalheTitulo = custoDetalheItem
                               data-tour="nova-os-ativo"
                               className="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none hidden md:block"
                               placeholder="Ex: Injetora 01"
-                              required
                             />
                             <datalist id="manutencao-ativos">
                               {listaMaquinasNovaOs.map((item) => (
@@ -14312,6 +14873,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <option>Aberta</option>
                               <option>Em andamento</option>
                               <option>Aguardando peca</option>
+                              <option>Contestada</option>
                               <option>Finalizada</option>
                               <option>Cancelada</option>
                             </select>
@@ -14622,6 +15184,142 @@ const custoDetalheTitulo = custoDetalheItem
                 </div>
              </div>
           )}
+
+          {perfilNomeModalOpen && authUser && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/85 px-4 py-6">
+              <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+                <div className="border-b border-slate-800 px-6 py-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Identificação</p>
+                  <h3 className="mt-2 text-lg font-black text-white">Como você quer aparecer na manutenção?</h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Esse nome será salvo no banco da manutenção para logs, contestação e histórico de OS.
+                  </p>
+                </div>
+                <div className="px-6 py-5 space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-2">Nome exibido</label>
+                    <input
+                      value={perfilNomeInput}
+                      onChange={(e) => setPerfilNomeInput(e.target.value)}
+                      className="w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
+                      placeholder="Ex: João Silva"
+                    />
+                    <p className="mt-2 text-[11px] text-slate-500">Login atual: {authUser.email}</p>
+                  </div>
+                  {perfilNomeErro ? (
+                    <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                      {perfilNomeErro}
+                    </div>
+                  ) : null}
+                </div>
+                <div className="border-t border-slate-800 px-6 py-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSalvarPerfilNome}
+                    className="rounded-full border border-amber-400/50 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/20"
+                  >
+                    Salvar nome
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {reaberturaContexto && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/85 px-4 py-6">
+              <div className="w-full max-w-xl rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+                <div className="border-b border-slate-800 px-6 py-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-rose-300">Reabertura de OS</p>
+                  <h3 className="mt-2 text-lg font-black text-white">Essa OS foi finalizada. Deseja contestar?</h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    A contestação segue junto no aviso para quem receber a informação da OS reaberta.
+                  </p>
+                </div>
+                <div className="px-6 py-5 space-y-4">
+                  <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                    <p className="text-xs text-slate-400">OS</p>
+                    <p className="text-sm font-bold text-white">
+                      {reaberturaContexto.ordem?.ativo || reaberturaContexto.ordem?.id || reaberturaContexto.osId}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Status atual: Finalizada · Novo status: {reaberturaStatusDestino}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setReaberturaStatusDestino('Aberta')}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${reaberturaStatusDestino === 'Aberta' ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30' : 'bg-slate-900 text-slate-400 border border-slate-800'}`}
+                    >
+                      Reabrir como Aberta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReaberturaStatusDestino('Contestada')}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${reaberturaStatusDestino === 'Contestada' ? 'bg-rose-500/20 text-rose-100 border border-rose-400/30' : 'bg-slate-900 text-slate-400 border border-slate-800'}`}
+                    >
+                      Reabrir como Contestada
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReaberturaStatusDestino('Em andamento')}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${reaberturaStatusDestino === 'Em andamento' ? 'bg-amber-500/20 text-amber-100 border border-amber-400/30' : 'bg-slate-900 text-slate-400 border border-slate-800'}`}
+                    >
+                      Reabrir em andamento
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-3">
+                    <input
+                      id="contestar-os"
+                      type="checkbox"
+                      checked={reaberturaContestar}
+                      onChange={(e) => setReaberturaContestar(e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-rose-400"
+                    />
+                    <label htmlFor="contestar-os" className="text-sm font-semibold text-slate-200">
+                      Marcar esta reabertura como contestação
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-2">Motivo da contestação</label>
+                    <textarea
+                      value={reaberturaMotivo}
+                      onChange={(e) => setReaberturaMotivo(e.target.value)}
+                      rows={4}
+                      className="w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-rose-400 focus:outline-none"
+                      placeholder="Ex: O serviço foi finalizado, mas a falha continuou no equipamento."
+                    />
+                  </div>
+
+                  {reaberturaErro ? (
+                    <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                      {reaberturaErro}
+                    </div>
+                  ) : null}
+                </div>
+                <div className="border-t border-slate-800 px-6 py-4 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={fecharModalReabertura}
+                    className="rounded-full border border-slate-700 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmarReaberturaOs}
+                    className="rounded-full border border-rose-400/60 bg-rose-500/10 px-4 py-2 text-xs font-bold text-rose-100 hover:bg-rose-500/20"
+                  >
+                    Reabrir OS
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ABA DE CONFIGURAÇÃO */}
           {abaAtiva === 'configuracao' && (
              <div className="space-y-8 animate-in slide-in-from-top duration-500">

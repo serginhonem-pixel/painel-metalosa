@@ -22,7 +22,11 @@ const buildNotification = (osId, after, eventLabel) => {
   const prioridade = after.prioridade || 'Sem prioridade';
   const responsavel = after.responsavel || 'Nao atribuido';
   const title = `OS ${osId} - ${eventLabel}`;
-  const body = `${ativo} · ${setor} · ${prioridade} · Resp: ${responsavel}`;
+  const contestacao = String(after.ultimaContestacao?.motivo || '').trim();
+  const contestacaoResumo = contestacao
+    ? ` · Contestacao: ${contestacao.slice(0, 120)}`
+    : '';
+  const body = `${ativo} · ${setor} · ${prioridade} · Resp: ${responsavel}${contestacaoResumo}`;
   return { title, body };
 };
 
@@ -31,7 +35,9 @@ const getEventLabel = (before, after) => {
   const beforeStatus = String(before.status || '').toLowerCase();
   const afterStatus = String(after.status || '').toLowerCase();
   if (beforeStatus === afterStatus) return null;
+  if (beforeStatus === 'finalizada' && afterStatus !== 'finalizada') return 'Reabriu';
   if (afterStatus === 'em andamento' && after.responsavel) return 'Assumiu';
+  if (afterStatus === 'contestada') return 'Contestou';
   if (afterStatus === 'finalizada') return 'Finalizou';
   return `Status: ${after.status || 'Atualizado'}`;
 };
