@@ -1,0 +1,224 @@
+{
+  "_info": {
+    "descricao": "BOM (Bill of Materials) — Carrinhos de Carga",
+    "versao": "1.0",
+    "referencia_componentes": "COMPONENTES_BASE em MrpAco.jsx (campo id)",
+    "observacao": "Quantidades por unidade produzida. Ajuste conforme engenharia."
+  },
+  "componentes": [
+    { "id": 1,  "nome": "Varal # 0,90 BF",              "familia": "Varal CC",   "tipo": "BF", "espessura_mm": 0.90, "peso_kg": 2.000 },
+    { "id": 2,  "nome": "Varal # 1,10 BF",              "familia": "Varal CC",   "tipo": "BF", "espessura_mm": 1.10, "peso_kg": 2.160 },
+    { "id": 3,  "nome": "Varal # 1,40 BF",              "familia": "Varal CC",   "tipo": "BF", "espessura_mm": 1.40, "peso_kg": 3.240 },
+    { "id": 6,  "nome": "Suporte # 0,90",               "familia": "Suporte",    "tipo": "BZ", "espessura_mm": 0.90, "peso_kg": 0.070 },
+    { "id": 7,  "nome": "Suporte # 1,10",               "familia": "Suporte",    "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 0.100 },
+    { "id": 8,  "nome": "Eixo (BF 0,9)",                "familia": "Rodas",      "tipo": "BF", "espessura_mm": 0.90, "peso_kg": 0.150 },
+    { "id": 9,  "nome": "Mancal # 1,50",                "familia": "Rodas",      "tipo": "BZ", "espessura_mm": 1.50, "peso_kg": 0.150 },
+    { "id": 10, "nome": "Rodas c/câmara",               "familia": "Rodas",      "tipo": "—",  "espessura_mm": 0,    "peso_kg": 0.604 },
+    { "id": 11, "nome": "Rodas maciças",                "familia": "Rodas",      "tipo": "—",  "espessura_mm": 0,    "peso_kg": 0     },
+    { "id": 12, "nome": "AROS",                         "familia": "Rodas",      "tipo": "—",  "espessura_mm": 0,    "peso_kg": 0     },
+    { "id": 13, "nome": "Travessão do Pé # 0,90",       "familia": "Pé",         "tipo": "BZ", "espessura_mm": 0.90, "peso_kg": 0.160 },
+    { "id": 14, "nome": "Pé # 1,10",                   "familia": "Pé",         "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 0.650 },
+    { "id": 15, "nome": "Travessão do Pé # 1,10",       "familia": "Pé",         "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 0.250 },
+    { "id": 16, "nome": "Pé # 1,50",                   "familia": "Pé",         "tipo": "BZ", "espessura_mm": 1.50, "peso_kg": 0.860 }
+  ],
+  "produtos": [
+    {
+      "codigo": "00174",
+      "descricao": "C.C. 180 Kg Câmara 3,00 – 18A",
+      "tipo": "18A",
+      "capacidade_kg": 180,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 1,  "nome": "Varal # 0,90 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 6,  "nome": "Suporte # 0,90",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 13, "nome": "Travessão do Pé # 0,90", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 14, "nome": "Pé # 1,10",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00175",
+      "descricao": "C.C. 180 Kg Pneu Maciço – 18A",
+      "tipo": "18A",
+      "capacidade_kg": 180,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 1,  "nome": "Varal # 0,90 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 6,  "nome": "Suporte # 0,90",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 13, "nome": "Travessão do Pé # 0,90", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 14, "nome": "Pé # 1,10",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00770",
+      "descricao": "C.C. 150 Kg Câmara 3,00 – 15A",
+      "tipo": "15A",
+      "capacidade_kg": 150,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 1,  "nome": "Varal # 0,90 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 6,  "nome": "Suporte # 0,90",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 13, "nome": "Travessão do Pé # 0,90", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 14, "nome": "Pé # 1,10",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00771",
+      "descricao": "C.C. 150 Kg Pneu Maciço – 15A",
+      "tipo": "15A",
+      "capacidade_kg": 150,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 1,  "nome": "Varal # 0,90 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 6,  "nome": "Suporte # 0,90",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 13, "nome": "Travessão do Pé # 0,90", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 14, "nome": "Pé # 1,10",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00774",
+      "descricao": "C.C. 200 Kg Câmara 3,00 – 20A",
+      "tipo": "20A",
+      "capacidade_kg": 200,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 2,  "nome": "Varal # 1,10 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00775",
+      "descricao": "C.C. 200 Kg Pneu Maciço – 20A",
+      "tipo": "20A",
+      "capacidade_kg": 200,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 2,  "nome": "Varal # 1,10 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00778",
+      "descricao": "C.C. 250 Kg Câmara 3,00x8 – 25A",
+      "tipo": "25A",
+      "capacidade_kg": 250,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 2,  "nome": "Varal # 1,10 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00779",
+      "descricao": "C.C. 250 Kg Pneu Maciço – 25A",
+      "tipo": "25A",
+      "capacidade_kg": 250,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 2,  "nome": "Varal # 1,10 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00780",
+      "descricao": "C.C. 300 Kg Câmara 3,00 – 30A",
+      "tipo": "30A",
+      "capacidade_kg": 300,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 3,  "nome": "Varal # 1,40 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00781",
+      "descricao": "C.C. 300 Kg Pneu Maciço – 30A",
+      "tipo": "30A",
+      "capacidade_kg": 300,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 3,  "nome": "Varal # 1,40 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00782",
+      "descricao": "C.C. 350 Kg Câmara 3,00 – 35A",
+      "tipo": "35A",
+      "capacidade_kg": 350,
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 3,  "nome": "Varal # 1,40 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",         "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                   "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "00783",
+      "descricao": "C.C. 350 Kg Pneu Maciço – 35A",
+      "tipo": "35A",
+      "capacidade_kg": 350,
+      "roda": "maciço",
+      "itens": [
+        { "componente_id": 3,  "nome": "Varal # 1,40 BF",        "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id": 7,  "nome": "Suporte # 1,10",         "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id": 8,  "nome": "Eixo (BF 0,9)",          "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id": 9,  "nome": "Mancal # 1,50",          "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 11, "nome": "Rodas maciças",          "qtd": 2, "obs": "Par de rodas maciças" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10", "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",              "qtd": 2, "obs": "Par de pés" }
+      ]
+    }
+  ]
+}

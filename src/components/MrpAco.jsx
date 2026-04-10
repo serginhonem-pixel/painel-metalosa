@@ -606,6 +606,292 @@ export default function MrpAco() {
     downloadCsv([header, ...familyRows, totRow, ccRow, mfRow, geralRow], 'simulador-plano-aco.csv');
   }
 
+  // ── PDF Simulador ────────────────────────────────────────────────────────────
+  function exportarSimuladorPDF() {
+    const dataEmissao = new Date().toLocaleString('pt-BR');
+    const n = (v) => (typeof v === 'number' ? v.toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : '—');
+
+    const TH  = 'padding:6px 10px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#1e293b;color:#94a3b8;white-space:nowrap;';
+    const THL = TH.replace('text-align:right', 'text-align:left');
+    const TD  = 'padding:5px 10px;text-align:right;font-size:11px;border-bottom:1px solid #1e293b;color:#cbd5e1;';
+    const TDL = TD.replace('text-align:right', 'text-align:left');
+    const TBL = 'width:100%;border-collapse:collapse;margin-bottom:20px;';
+
+    // Cards de parâmetros
+    const paramCards = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
+        <div style="flex:1;min-width:110px;background:#0f172a;border:1px solid #1e3a5f;border-radius:8px;padding:12px;">
+          <p style="font-size:9px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;">Carrinhos / Dia</p>
+          <p style="font-size:20px;font-weight:900;color:#93c5fd;margin:0;">${n(carrosDia)}</p>
+        </div>
+        ${MESES.map(({ id, label }) => `
+        <div style="flex:1;min-width:110px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;">
+          <p style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;">Dias Úteis — ${label}</p>
+          <p style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0;">${diasUteis[id] ?? 0}</p>
+          <p style="font-size:10px;color:#34d399;margin:4px 0 0;">Total: ${n(totalCarrosMes[id])} caç.</p>
+        </div>`).join('')}
+      </div>`;
+
+    // Linhas de famílias
+    const familyRows = FAMILIAS_SIM.map((f) => `
+      <tr>
+        <td style="${TDL}font-weight:700;">${f.nome}</td>
+        <td style="${TDL}font-size:10px;color:#64748b;">${f.desc}</td>
+        <td style="${TD}color:#34d399;font-weight:700;">${n(carteira[f.id] || 0)}</td>
+        <td style="${TD}color:#fbbf24;">${(pctEdit[f.id] || 0).toFixed(2)}%</td>
+        ${MESES.map(({ id }) => `<td style="${TD}color:#93c5fd;">${n(plano[f.id]?.[id] || 0)}</td>`).join('')}
+      </tr>`).join('');
+
+    const totalRow = `
+      <tr style="background:#0f172a;border-top:2px solid #334155;">
+        <td style="${TDL}font-weight:900;color:#f1f5f9;" colspan="2">Total Caçambas</td>
+        <td style="${TD}color:#34d399;font-weight:900;">${n(totalCarteira)}</td>
+        <td style="${TD}color:${Math.abs(totalPct - 100) > 0.1 ? '#f87171' : '#34d399'};font-weight:900;">${totalPct.toFixed(2)}%</td>
+        ${MESES.map(({ id }) => `<td style="${TD}color:#93c5fd;font-weight:900;">${n(totalCarrosMes[id])}</td>`).join('')}
+      </tr>
+      <tr>
+        <td style="${TDL}color:#94a3b8;">CC</td>
+        <td style="${TDL}font-size:10px;color:#475569;">Carro de Carga — PMP via Histórico</td>
+        <td style="${TD}" colspan="2"></td>
+        ${MESES.map(({ id }) => `<td style="${TD}color:#38bdf8;">${n(plano['CC']?.[id] || 0)}</td>`).join('')}
+      </tr>
+      <tr>
+        <td style="${TDL}color:#94a3b8;">Metalforte</td>
+        <td style="${TDL}font-size:10px;color:#475569;">Metalforte — PMP via Histórico</td>
+        <td style="${TD}" colspan="2"></td>
+        ${MESES.map(({ id }) => `<td style="${TD}color:#fbbf24;">${n(plano['METALFORTE']?.[id] || 0)}</td>`).join('')}
+      </tr>
+      <tr style="background:#0f172a;border-top:2px solid #475569;">
+        <td style="${TDL}font-weight:900;color:#fff;font-size:12px;" colspan="4">TOTAL GERAL</td>
+        ${MESES.map(({ id }) => {
+          const tot = totalCarrosMes[id] + (plano['CC']?.[id] || 0) + (plano['METALFORTE']?.[id] || 0);
+          return `<td style="${TD}color:#fff;font-weight:900;font-size:12px;">${n(tot)}</td>`;
+        }).join('')}
+      </tr>`;
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador — Plano por Família — ${dataEmissao}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 28px; background: #0f172a; color: #f1f5f9;
+           font-family: system-ui, -apple-system, Arial, sans-serif; }
+    @media print {
+      body { background: #fff !important; padding: 10px; }
+      .no-print { display: none !important; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align:right;margin-bottom:18px;">
+    <button onclick="window.print()"
+      style="background:#10b981;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">
+      ⬇&nbsp; Salvar como PDF
+    </button>
+  </div>
+
+  <div style="margin-bottom:24px;border-bottom:1px solid #1e293b;padding-bottom:16px;">
+    <h1 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 4px;">
+      Simulador — Plano por Família de Produto
+    </h1>
+    <p style="font-size:11px;color:#64748b;margin:0;">Emitido em ${dataEmissao} &nbsp;·&nbsp; Período: ${MESES.map((m) => m.label).join(', ')}</p>
+  </div>
+
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:13px;font-weight:900;color:#f1f5f9;margin:0 0 10px;border-left:3px solid #10b981;padding-left:10px;">Parâmetros de Produção</h2>
+    ${paramCards}
+  </div>
+
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:13px;font-weight:900;color:#f1f5f9;margin:0 0 10px;border-left:3px solid #10b981;padding-left:10px;">Plano por Família</h2>
+    <table style="${TBL}">
+      <thead><tr>
+        <th style="${THL}">Família</th>
+        <th style="${THL}">Produto</th>
+        <th style="${TH}">Carteira</th>
+        <th style="${TH}">Part. %</th>
+        ${MESES.map(({ label }) => `<th style="${TH}">Prog. ${label}</th>`).join('')}
+      </tr></thead>
+      <tbody>${familyRows}${totalRow}</tbody>
+    </table>
+  </div>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=1200,height=900');
+    if (!w) { alert('Permita pop-ups nesta página para gerar o PDF.'); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+  }
+
+  // ── PDF Carro de Carga ───────────────────────────────────────────────────────
+  function exportarCarrinhoPDF() {
+    const dataEmissao = new Date().toLocaleString('pt-BR');
+    const n = (v) => (typeof v === 'number' ? v.toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : '—');
+
+    const TH  = 'padding:6px 10px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#1e293b;color:#94a3b8;white-space:nowrap;';
+    const THL = TH.replace('text-align:right', 'text-align:left');
+    const TD  = 'padding:5px 10px;text-align:right;font-size:11px;border-bottom:1px solid #1e293b;color:#cbd5e1;';
+    const TDL = TD.replace('text-align:right', 'text-align:left');
+    const TBL = 'width:100%;border-collapse:collapse;margin-bottom:20px;';
+
+    // KPI cards
+    const kpiCards = [
+      { label: 'Carteira',   val: HIST_CARRO.total.cart,  color: '#38bdf8' },
+      { label: 'Méd. 12m',   val: HIST_CARRO.total.m12,   color: '#818cf8' },
+      { label: 'Méd. 6m',    val: HIST_CARRO.total.m06,   color: '#60a5fa' },
+      { label: 'Méd. 3m',    val: HIST_CARRO.total.m03,   color: '#34d399' },
+      { label: 'Fev/26',     val: HIST_CARRO.total.fev26, color: '#94a3b8' },
+      { label: 'Mar/26',     val: HIST_CARRO.total.mar26, color: '#34d399' },
+      { label: 'PMP Total',  val: totalPmpCC,              color: '#fbbf24' },
+    ].map(({ label, val, color }) => `
+      <div style="flex:1;min-width:110px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px;">
+        <p style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;">${label}</p>
+        <p style="font-size:20px;font-weight:900;color:${color};margin:0;">${n(val)}</p>
+      </div>`).join('');
+
+    // Linhas da tabela
+    const prodRows = HIST_CARRO.produtos.map((p) => `
+      <tr>
+        <td style="${TDL}font-weight:700;color:#94a3b8;">${p.cod}</td>
+        <td style="${TDL}font-weight:700;">${p.desc}</td>
+        <td style="${TD}color:#38bdf8;font-weight:700;">${p.tipo}</td>
+        <td style="${TD}color:#f1f5f9;font-weight:700;">${n(p.cart)}</td>
+        <td style="${TD}">${n(p.m12)}</td>
+        <td style="${TD}">${n(p.m06)}</td>
+        <td style="${TD}">${n(p.m03)}</td>
+        <td style="${TD}color:#94a3b8;">${n(p.fev26)}</td>
+        <td style="${TD}color:#34d399;font-weight:700;">${n(p.mar26)}</td>
+        <td style="${TD}color:#fbbf24;font-weight:700;">${n(pmpCC[p.cod] ?? 0)}</td>
+        <td style="${TD}">${p.dia != null ? n(p.dia) : '—'}</td>
+        <td style="${TD}">${p.semana != null ? n(p.semana) : '—'}</td>
+        <td style="${TD}">${p.sold != null ? p.sold : '—'}</td>
+      </tr>`).join('');
+
+    const totalRow = `
+      <tr style="background:#0f172a;border-top:2px solid #475569;">
+        <td style="${TDL}font-weight:900;color:#f1f5f9;font-size:11px;" colspan="3">TOTAL</td>
+        <td style="${TD}font-weight:900;color:#f1f5f9;">${n(HIST_CARRO.total.cart)}</td>
+        <td style="${TD}font-weight:900;color:#f1f5f9;">${n(HIST_CARRO.total.m12)}</td>
+        <td style="${TD}font-weight:900;color:#f1f5f9;">${n(HIST_CARRO.total.m06)}</td>
+        <td style="${TD}font-weight:900;color:#f1f5f9;">${n(HIST_CARRO.total.m03)}</td>
+        <td style="${TD}font-weight:900;color:#94a3b8;">${n(HIST_CARRO.total.fev26)}</td>
+        <td style="${TD}font-weight:900;color:#34d399;">${n(HIST_CARRO.total.mar26)}</td>
+        <td style="${TD}font-weight:900;color:#fbbf24;">${n(totalPmpCC)}</td>
+        <td style="${TD}" colspan="3"></td>
+      </tr>`;
+
+    // Componentes CC (varal + rodas)
+    const compCC = mrpResult.filter((c) => ['Varal CC', 'Rodas'].includes(c.familia));
+    const compRows = compCC.map((c) => {
+      const liqTotal = MESES.reduce((s, { id }) => s + Math.max(0, c.resultado[id].demanda_liquida), 0);
+      return `
+        <tr>
+          <td style="${TDL}">${c.nome}</td>
+          <td style="${TD}color:${c.tipo === 'BF' ? '#60a5fa' : '#22d3ee'};">${c.tipo}</td>
+          <td style="${TD}">${c.espessura || '—'} mm</td>
+          <td style="${TD}color:#f1f5f9;font-weight:700;">${n(c.total_disponivel)}</td>
+          ${MESES.map(({ id }) => {
+            const liq = c.resultado[id].demanda_liquida;
+            return `<td style="${TD}color:${liq > 0 ? '#f87171' : '#34d399'};">${n(liq)}</td>`;
+          }).join('')}
+          <td style="${TD}color:${liqTotal > 0 ? '#f87171' : '#34d399'};font-weight:700;">${c.status}</td>
+        </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Carro de Carga — Histórico de Vendas — ${dataEmissao}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 28px; background: #0f172a; color: #f1f5f9;
+           font-family: system-ui, -apple-system, Arial, sans-serif; }
+    @media print {
+      body { background: #fff !important; padding: 10px; }
+      .no-print { display: none !important; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align:right;margin-bottom:18px;">
+    <button onclick="window.print()"
+      style="background:#0ea5e9;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">
+      ⬇&nbsp; Salvar como PDF
+    </button>
+  </div>
+
+  <div style="margin-bottom:24px;border-bottom:1px solid #1e293b;padding-bottom:16px;">
+    <h1 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 4px;">
+      Carro de Carga — Histórico de Vendas
+    </h1>
+    <p style="font-size:11px;color:#64748b;margin:0;">Emitido em ${dataEmissao}</p>
+  </div>
+
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:13px;font-weight:900;color:#f1f5f9;margin:0 0 10px;border-left:3px solid #0ea5e9;padding-left:10px;">KPIs Resumo</h2>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">${kpiCards}</div>
+  </div>
+
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:13px;font-weight:900;color:#f1f5f9;margin:0 0 10px;border-left:3px solid #0ea5e9;padding-left:10px;">
+      Histórico por Produto
+    </h2>
+    <table style="${TBL}">
+      <thead><tr>
+        <th style="${THL}">Cód.</th>
+        <th style="${THL}">Descrição</th>
+        <th style="${TH}">Tipo</th>
+        <th style="${TH}">Carteira</th>
+        <th style="${TH}">Méd 12m</th>
+        <th style="${TH}">Méd 6m</th>
+        <th style="${TH}">Méd 3m</th>
+        <th style="${TH}">Fev/26</th>
+        <th style="${TH}">Mar/26</th>
+        <th style="${TH}">PMP</th>
+        <th style="${TH}">Dia</th>
+        <th style="${TH}">Semana</th>
+        <th style="${TH}">Sold.</th>
+      </tr></thead>
+      <tbody>${prodRows}${totalRow}</tbody>
+    </table>
+  </div>
+
+  ${compCC.length > 0 ? `
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:13px;font-weight:900;color:#f1f5f9;margin:0 0 10px;border-left:3px solid #0ea5e9;padding-left:10px;">
+      Componentes MRP — Varal CC &amp; Rodas
+    </h2>
+    <table style="${TBL}">
+      <thead><tr>
+        <th style="${THL}">Componente</th>
+        <th style="${TH}">Chapa</th>
+        <th style="${TH}">Esp.</th>
+        <th style="${TH}">Total Disp.</th>
+        ${MESES.map(({ label }) => `<th style="${TH}">Líq. ${label}</th>`).join('')}
+        <th style="${TH}">Status</th>
+      </tr></thead>
+      <tbody>${compRows}</tbody>
+    </table>
+  </div>` : ''}
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=1200,height=900');
+    if (!w) { alert('Permita pop-ups nesta página para gerar o PDF.'); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+  }
+
   // ── Relatório PDF (print HTML em nova janela) ────────────────────────────────
   function exportarPDF() {
     const dataEmissao = new Date().toLocaleString('pt-BR');
@@ -1105,13 +1391,22 @@ export default function MrpAco() {
           {/* Tabela: carteira por família → % participação → programado */}
           <div className="flex items-center justify-between mb-0.5">
             <p className="text-[11px] text-slate-500">Carteira e participação por família de produto</p>
-            <button
-              onClick={exportarSimuladorCSV}
-              className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/15"
-            >
-              <Download size={13} />
-              Exportar Plano (CSV)
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportarSimuladorPDF}
+                className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/15"
+              >
+                <Download size={13} />
+                Exportar Plano (PDF)
+              </button>
+              <button
+                onClick={exportarSimuladorCSV}
+                className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/15"
+              >
+                <Download size={13} />
+                Exportar Plano (CSV)
+              </button>
+            </div>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-slate-800/60 bg-slate-900/40">
             <table className="w-full text-left text-xs">
@@ -1651,6 +1946,13 @@ export default function MrpAco() {
             <div className="flex items-center gap-3">
               <TrendingUp size={16} className="text-sky-400" />
               <h3 className="text-sm font-black text-slate-100">Carro de Carga — Histórico de Vendas</h3>
+              <button
+                onClick={exportarCarrinhoPDF}
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-600/20 border border-sky-500/30 text-sky-300 hover:bg-sky-600/30 hover:text-sky-200 transition-all"
+              >
+                <Download size={12} />
+                PDF
+              </button>
             </div>
 
             {/* KPI Cards Carro */}
