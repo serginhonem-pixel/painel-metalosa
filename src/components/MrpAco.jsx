@@ -313,6 +313,7 @@ function StatusBadge({ status }) {
 
 // ─── Componente principal ───────────────────────────────────────────────────────
 const MRP_DOC = doc(db, 'mrp-aco', 'plano');
+const BOM_DOC = doc(db, 'mrp-aco', 'bom');
 const SENHA_CORRETA = 'planejamento';
 
 export default function MrpAco() {
@@ -327,6 +328,10 @@ export default function MrpAco() {
   const saveTimerRef = useRef(null);
   const [subAba, setSubAba] = useState('dashboard');
   const [bomCategoria, setBomCategoria] = useState('carrinhos');
+  const [bomOverrides, setBomOverrides] = useState({});
+  const [bomEditMode, setBomEditMode] = useState(false);
+  const [bomDraft, setBomDraft] = useState(null);
+  const [bomProdIdx, setBomProdIdx] = useState(0);
   const [plano, setPlano] = useState(
     () => JSON.parse(JSON.stringify(PLANO_INICIAL))
   );
@@ -433,7 +438,11 @@ export default function MrpAco() {
   async function loadFromFirestore() {
     setSyncStatus('loading');
     try {
-      const snap = await getDoc(MRP_DOC);
+      const [snap, bomSnap] = await Promise.all([getDoc(MRP_DOC), getDoc(BOM_DOC)]);
+      if (bomSnap.exists()) {
+        const { savedAt: _s, ...overrides } = bomSnap.data();
+        setBomOverrides(overrides);
+      }
       if (snap.exists()) {
         const d = snap.data();
         isLoadingRef.current = true;
@@ -465,6 +474,14 @@ export default function MrpAco() {
     } catch (e) {
       console.error('MRP save error:', e);
       setSyncStatus('error');
+    }
+  }
+
+  async function saveBomToFirestore(overrides) {
+    try {
+      await setDoc(BOM_DOC, { ...overrides, savedAt: new Date().toISOString() });
+    } catch (e) {
+      console.error('BOM save error:', e);
     }
   }
 
@@ -2190,7 +2207,7 @@ export default function MrpAco() {
 
       {/* ── ESTRUTURA BOM ──────────────────────────────────────────────────────── */}
       {subAba === 'bom' && (() => {
-        const bomAtual = BOM_CATALOGO[bomCategoria].data;
+        const bomAtual = bomOverrides[bomCategoria] ?? BOM_CATALOGO[bomCategoria].data;
         const corMap = {
           amber:  { btn: 'bg-amber-600/20 border-amber-500/30 text-amber-300 hover:bg-amber-600/30 hover:text-amber-200',   ativo: 'bg-amber-600/30 border-amber-400/50 text-amber-200',   icon: 'text-amber-400'  },
           indigo: { btn: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 hover:text-indigo-200', ativo: 'bg-indigo-600/30 border-indigo-400/50 text-indigo-200', icon: 'text-indigo-400' },
@@ -2198,6 +2215,271 @@ export default function MrpAco() {
           violet: { btn: 'bg-violet-600/20 border-violet-500/30 text-violet-300 hover:bg-violet-600/30 hover:text-violet-200',ativo: 'bg-violet-600/30 border-violet-400/50 text-violet-200',icon: 'text-violet-400' },
         };
         const corAtiva = corMap[BOM_CATALOGO[bomCategoria].cor];
+
+        // ── Helpers do editor ────────────────────────────────────────────────
+        const prodEdit = bomEditMode && bomDraft ? (bomDraft.produtos[bomProdIdx] ?? null) : null;
+
+        const updateProdField = (field, val) =>
+          setBomDraft(d => ({ ...d, produtos: d.produtos.map((p, i) => i === bomProdIdx ? { ...p, [field]: val } : p) }));
+
+        const updateItemField = (iIdx, field, val) =>
+          setBomDraft(d => ({
+            ...d,
+            produtos: d.produtos.map((p, i) => i !== bomProdIdx ? p : {
+              ...p, itens: p.itens.map((it, j) => j === iIdx ? { ...it, [field]: val } : it),
+            }),
+          }));
+
+        const addItem = () =>
+          setBomDraft(d => ({
+            ...d,
+            produtos: d.produtos.map((p, i) => i !== bomProdIdx ? p : {
+              ...p, itens: [...p.itens, { componente_id: null, nome: '', qtd: 1, obs: '' }],
+            }),
+          }));
+
+        const removeItem = (iIdx) =>
+          setBomDraft(d => ({
+            ...d,
+            produtos: d.produtos.map((p, i) => i !== bomProdIdx ? p : {
+              ...p, itens: p.itens.filter((_, j) => j !== iIdx),
+            }),
+          }));
+
+        const addProduto = () => {
+          const newIdx = bomDraft ? bomDraft.produtos.length : 0;
+          setBomDraft(d => ({ ...d, produtos: [...d.produtos, { codigo: '', descricao: '', itens: [] }] }));
+          setBomProdIdx(newIdx);
+        };
+
+        const removeProduto = (idx) => {
+          setBomDraft(d => ({ ...d, produtos: d.produtos.filter((_, i) => i !== idx) }));
+          setBomProdIdx(prev => Math.max(0, Math.min(prev, (bomDraft?.produtos.length ?? 2) - 2)));
+        };
+
+        const salvarDraft = () => {
+          if (!bomDraft) return;
+          const usedIds = new Set(bomDraft.produtos.flatMap(p => p.itens.map(it => it.componente_id).filter(Boolean)));
+          const componentesDerived = COMPONENTES_BASE
+            .filter(c => usedIds.has(c.id))
+            .map(c => ({ id: c.id, nome: c.nome, familia: c.familia || '', tipo: c.tipo, espessura_mm: c.espessura, peso_kg: c.peso_kg }));
+          const saved = { ...bomDraft, componentes: componentesDerived };
+          const newOverrides = { ...bomOverrides, [bomCategoria]: saved };
+          setBomOverrides(newOverrides);
+          saveBomToFirestore(newOverrides);
+          setBomEditMode(false);
+          setBomDraft(null);
+        };
+
+        const selCls  = 'bg-slate-900 border border-slate-700/60 text-slate-200 rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:border-blue-500/60 w-full';
+        const inpCls  = 'bg-slate-900 border border-slate-700/60 text-slate-200 rounded-lg text-xs px-2 py-1.5 w-full focus:outline-none focus:border-blue-500/60 placeholder:text-slate-600';
+
+        // ── MODO EDITOR ──────────────────────────────────────────────────────
+        if (bomEditMode && bomDraft) {
+          const compFamilias = {};
+          COMPONENTES_BASE.forEach(c => {
+            const fam = c.familia || 'Outros';
+            if (!compFamilias[fam]) compFamilias[fam] = [];
+            compFamilias[fam].push(c);
+          });
+          return (
+            <div className="space-y-4">
+              {/* Header editor */}
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
+                  <LayoutList size={15} className="text-blue-400" />
+                  Editor BOM — {BOM_CATALOGO[bomCategoria].label}
+                </h3>
+                <div className="ml-auto flex gap-2">
+                  <button
+                    onClick={salvarDraft}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-emerald-600/25 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/40 transition-all"
+                  >
+                    <CheckCircle2 size={12} /> Salvar estrutura
+                  </button>
+                  <button
+                    onClick={() => { setBomEditMode(false); setBomDraft(null); }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-slate-700/40 border border-slate-600/40 text-slate-400 hover:text-slate-200 transition-all"
+                  >
+                    <XCircle size={12} /> Descartar
+                  </button>
+                </div>
+              </div>
+
+              {/* Layout 2 colunas */}
+              <div className="flex gap-4 items-start">
+
+                {/* Coluna esquerda — lista de produtos */}
+                <div className="w-56 shrink-0 rounded-xl border border-slate-800/60 bg-slate-900/50 overflow-hidden">
+                  <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-800/40 bg-slate-950/40">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      Produtos ({bomDraft.produtos.length})
+                    </span>
+                    <button
+                      onClick={addProduto}
+                      title="Novo produto"
+                      className="w-5 h-5 rounded-md bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600/30 flex items-center justify-center text-xs font-black leading-none"
+                    >+</button>
+                  </div>
+                  <div className="divide-y divide-slate-800/30 max-h-[60vh] overflow-y-auto">
+                    {bomDraft.produtos.map((p, idx) => (
+                      <div
+                        key={idx}
+                        className={`group flex items-center gap-2 px-3 py-2.5 cursor-pointer transition-colors ${
+                          idx === bomProdIdx
+                            ? 'bg-blue-600/15 border-l-2 border-blue-500'
+                            : 'hover:bg-slate-800/40'
+                        }`}
+                        onClick={() => setBomProdIdx(idx)}
+                      >
+                        <span className={`flex-1 truncate text-[11px] font-bold ${idx === bomProdIdx ? 'text-slate-100' : 'text-slate-400'}`}>
+                          {p.descricao || <em className="font-normal text-slate-600">sem nome</em>}
+                        </span>
+                        <button
+                          title="Remover"
+                          onClick={(e) => { e.stopPropagation(); removeProduto(idx); }}
+                          className="opacity-0 group-hover:opacity-100 w-4 h-4 flex items-center justify-center text-red-400 hover:text-red-300 transition-all text-base leading-none"
+                        >×</button>
+                      </div>
+                    ))}
+                    {bomDraft.produtos.length === 0 && (
+                      <p className="px-3 py-6 text-[10px] text-slate-600 text-center">
+                        Nenhum produto.<br />Clique + para adicionar.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Coluna direita — formulário do produto */}
+                {!prodEdit ? (
+                  <div className="flex-1 rounded-xl border border-slate-800/60 bg-slate-900/20 flex items-center justify-center min-h-[200px]">
+                    <p className="text-[11px] text-slate-600">Selecione um produto à esquerda</p>
+                  </div>
+                ) : (
+                  <div className="flex-1 space-y-5 rounded-xl border border-slate-800/60 bg-slate-900/30 p-5">
+
+                    {/* Campos principais */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Código</label>
+                        <input className={inpCls} value={prodEdit.codigo || ''} placeholder="ex: 00174" onChange={(e) => updateProdField('codigo', e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Descrição</label>
+                        <input className={inpCls} value={prodEdit.descricao || ''} placeholder="Nome completo do produto" onChange={(e) => updateProdField('descricao', e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Grupo / Família</label>
+                        <input className={inpCls} value={prodEdit.grupo || ''} placeholder="ex: Premium, Standard, CC…" onChange={(e) => updateProdField('grupo', e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tag extra (roda / tipo / acabamento)</label>
+                        <input className={inpCls} value={prodEdit.roda || ''} placeholder="ex: câmara, M20, BF Cinza…" onChange={(e) => updateProdField('roda', e.target.value)} />
+                      </div>
+                      <div className="col-span-2 space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Observação (opcional)</label>
+                        <input className={inpCls} value={prodEdit.obs_familia || ''} placeholder="Anotações sobre este produto…" onChange={(e) => updateProdField('obs_familia', e.target.value)} />
+                      </div>
+                    </div>
+
+                    {/* Tabela de componentes */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Componentes</span>
+                        <span className="text-[10px] text-slate-600">{prodEdit.itens.length} iten{prodEdit.itens.length !== 1 ? 's' : ''}</span>
+                        {prodEdit.itens.length > 0 && (
+                          <span className="ml-auto text-[11px] font-bold text-emerald-400">
+                            ≈ {prodEdit.itens.reduce((acc, it) => {
+                              const c = COMPONENTES_BASE.find(x => x.id === it.componente_id);
+                              return acc + (c ? c.peso_kg * (Number(it.qtd) || 0) : 0);
+                            }, 0).toFixed(3)} kg
+                          </span>
+                        )}
+                      </div>
+                      {prodEdit.itens.length > 0 && (
+                        <table className="w-full text-xs mb-3">
+                          <thead>
+                            <tr className="border-b border-slate-800/40">
+                              <th className="pb-2 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Componente</th>
+                              <th className="pb-2 text-center w-16 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Qtd</th>
+                              <th className="pb-2 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Observação</th>
+                              <th className="pb-2 w-6"></th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/20">
+                            {prodEdit.itens.map((it, iIdx) => (
+                              <tr key={iIdx}>
+                                <td className="py-1.5 pr-2">
+                                  <select
+                                    className={selCls}
+                                    value={it.componente_id ?? ''}
+                                    onChange={(e) => {
+                                      const id = parseInt(e.target.value, 10);
+                                      const c = COMPONENTES_BASE.find(x => x.id === id);
+                                      setBomDraft(d => ({
+                                        ...d,
+                                        produtos: d.produtos.map((p, pi) => pi !== bomProdIdx ? p : {
+                                          ...p,
+                                          itens: p.itens.map((it2, j) => j !== iIdx ? it2 : {
+                                            ...it2,
+                                            componente_id: id || null,
+                                            nome: c ? c.nome : it2.nome,
+                                          }),
+                                        }),
+                                      }));
+                                    }}
+                                  >
+                                    <option value="">— selecionar —</option>
+                                    {Object.entries(compFamilias).map(([fam, comps]) => (
+                                      <optgroup key={fam} label={fam}>
+                                        {comps.map(c => (
+                                          <option key={c.id} value={c.id}>
+                                            {c.nome}{c.espessura ? ` · ${c.espessura}mm (${c.tipo})` : ''}
+                                          </option>
+                                        ))}
+                                      </optgroup>
+                                    ))}
+                                  </select>
+                                </td>
+                                <td className="py-1.5 px-2 text-center">
+                                  <input
+                                    type="number" min="1"
+                                    className="bg-slate-900 border border-slate-700/60 text-slate-200 rounded-lg text-xs px-2 py-1.5 w-14 text-center focus:outline-none focus:border-blue-500/60"
+                                    value={it.qtd}
+                                    onChange={(e) => updateItemField(iIdx, 'qtd', parseInt(e.target.value, 10) || 1)}
+                                  />
+                                </td>
+                                <td className="py-1.5 px-2">
+                                  <input
+                                    className={inpCls}
+                                    value={it.obs || ''}
+                                    placeholder="Observação…"
+                                    onChange={(e) => updateItemField(iIdx, 'obs', e.target.value)}
+                                  />
+                                </td>
+                                <td className="py-1.5 pl-2 text-center">
+                                  <button onClick={() => removeItem(iIdx)} className="text-red-400 hover:text-red-300 text-base leading-none font-black">×</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                      <button
+                        onClick={addItem}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800/50 border border-slate-700/40 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-all"
+                      >
+                        + Adicionar componente
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // ── MODO VISUALIZAÇÃO ────────────────────────────────────────────────
         return (
         <div className="space-y-6">
 
@@ -2207,18 +2489,34 @@ export default function MrpAco() {
               <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
                 <LayoutList size={15} className={corAtiva.icon} />
                 Estrutura BOM — {BOM_CATALOGO[bomCategoria].label}
+                {bomOverrides[bomCategoria] && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/25">personalizado</span>
+                )}
               </h3>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Bill of Materials por produto · {bomAtual.produtos.length} produtos · {bomAtual.componentes.length} componentes
+                Bill of Materials por produto · {bomAtual.produtos.length} produtos · {(bomAtual.componentes ?? []).length} componentes
               </p>
             </div>
-            <button
-              onClick={exportarBomPDF}
-              className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all ${corAtiva.btn}`}
-            >
-              <Download size={13} />
-              Exportar PDF
-            </button>
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={() => {
+                  setBomDraft(JSON.parse(JSON.stringify(bomAtual)));
+                  setBomProdIdx(0);
+                  setBomEditMode(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-slate-700/40 border border-slate-600/40 text-slate-300 hover:bg-slate-700/60 hover:text-slate-100 transition-all"
+              >
+                <LayoutList size={13} />
+                Editar estrutura
+              </button>
+              <button
+                onClick={exportarBomPDF}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all ${corAtiva.btn}`}
+              >
+                <Download size={13} />
+                Exportar PDF
+              </button>
+            </div>
           </div>
 
           {/* Seletor de categoria */}
@@ -2226,6 +2524,7 @@ export default function MrpAco() {
             {Object.entries(BOM_CATALOGO).map(([key, cat]) => {
               const cor = corMap[cat.cor];
               const ativo = bomCategoria === key;
+              const catData = bomOverrides[key] ?? cat.data;
               return (
                 <button
                   key={key}
@@ -2234,51 +2533,55 @@ export default function MrpAco() {
                 >
                   <Layers size={11} />
                   {cat.label}
-                  <span className="ml-1 opacity-60">{cat.data.produtos.length}</span>
+                  <span className="ml-1 opacity-60">{catData.produtos.length}</span>
+                  {bomOverrides[key] && <span className="ml-0.5 opacity-70">✎</span>}
                 </button>
               );
             })}
           </div>
 
           {/* Cards de componentes */}
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">Componentes cadastrados</p>
-            <div className="flex flex-wrap gap-2">
-              {bomAtual.componentes.map((c) => (
-                <span
-                  key={c.id}
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
-                    c.tipo === 'BF'
-                      ? 'border-blue-400/25 bg-blue-500/10 text-blue-300'
-                      : c.tipo === 'BZ'
-                      ? 'border-cyan-400/25 bg-cyan-500/10 text-cyan-300'
-                      : 'border-slate-600/25 bg-slate-700/20 text-slate-400'
-                  }`}
-                >
-                  {c.nome}
-                  {c.espessura_mm > 0 && <span className="ml-1 opacity-60">· {c.espessura_mm}mm</span>}
-                  {c.peso_kg > 0 && <span className="ml-1 opacity-60">· {c.peso_kg.toFixed(3)} kg</span>}
-                </span>
-              ))}
+          {(bomAtual.componentes ?? []).length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">Componentes cadastrados</p>
+              <div className="flex flex-wrap gap-2">
+                {(bomAtual.componentes ?? []).map((c) => (
+                  <span
+                    key={c.id}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
+                      c.tipo === 'BF'
+                        ? 'border-blue-400/25 bg-blue-500/10 text-blue-300'
+                        : c.tipo === 'BZ'
+                        ? 'border-cyan-400/25 bg-cyan-500/10 text-cyan-300'
+                        : 'border-slate-600/25 bg-slate-700/20 text-slate-400'
+                    }`}
+                  >
+                    {c.nome}
+                    {(c.espessura_mm ?? c.espessura ?? 0) > 0 && <span className="ml-1 opacity-60">· {c.espessura_mm ?? c.espessura}mm</span>}
+                    {c.peso_kg > 0 && <span className="ml-1 opacity-60">· {c.peso_kg.toFixed(3)} kg</span>}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Tabelas por produto */}
           <div className="space-y-5">
-            {bomAtual.produtos.map((prod) => {
+            {bomAtual.produtos.map((prod, pIdx) => {
               const pesoTotal = prod.itens.reduce((acc, it) => {
-                const comp = bomAtual.componentes.find((c) => c.id === it.componente_id);
+                const comp = COMPONENTES_BASE.find((c) => c.id === it.componente_id);
                 return acc + (comp ? comp.peso_kg * it.qtd : 0);
               }, 0);
-              // Tags extras (roda, linha, acabamento, tipo) — campos opcionais
               const tags = [prod.roda, prod.linha, prod.acabamento, prod.tipo].filter(Boolean);
               return (
-                <div key={prod.codigo} className="rounded-2xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
+                <div key={prod.codigo || pIdx} className="rounded-2xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
                   {/* Header produto */}
                   <div className="flex flex-wrap items-center gap-3 px-5 py-3 bg-slate-950/50 border-b border-slate-800/40">
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md border border-slate-600/40 bg-slate-700/30 text-slate-400">
-                      {prod.codigo}
-                    </span>
+                    {prod.codigo && (
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md border border-slate-600/40 bg-slate-700/30 text-slate-400">
+                        {prod.codigo}
+                      </span>
+                    )}
                     <span className="text-sm font-black text-slate-100">{prod.descricao}</span>
                     {tags.map((tag) => (
                       <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${corAtiva.ativo}`}>
@@ -2306,11 +2609,11 @@ export default function MrpAco() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/30">
-                      {prod.itens.map((it) => {
-                        const comp = bomAtual.componentes.find((c) => c.id === it.componente_id);
+                      {prod.itens.map((it, itIdx) => {
+                        const comp = COMPONENTES_BASE.find((c) => c.id === it.componente_id);
                         const pesoItem = comp ? (comp.peso_kg * it.qtd) : null;
                         return (
-                          <tr key={it.componente_id} className="hover:bg-slate-800/20 transition-colors">
+                          <tr key={itIdx} className="hover:bg-slate-800/20 transition-colors">
                             <td className="px-4 py-2.5 font-bold text-slate-200">{it.nome}</td>
                             <td className="px-4 py-2.5 text-center">
                               {comp && comp.tipo !== '—' ? (
@@ -2324,7 +2627,7 @@ export default function MrpAco() {
                               ) : <span className="text-slate-600">—</span>}
                             </td>
                             <td className="px-4 py-2.5 text-right text-slate-400">
-                              {comp && comp.espessura_mm ? `${comp.espessura_mm} mm` : '—'}
+                              {comp && comp.espessura ? `${comp.espessura} mm` : '—'}
                             </td>
                             <td className="px-4 py-2.5 text-right font-black text-slate-100">{it.qtd}</td>
                             <td className="px-4 py-2.5 text-right text-slate-400">
