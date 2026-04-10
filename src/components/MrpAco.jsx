@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import BOM_DATA from '../data/bom-carrinhos.json';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 const MESES = [
@@ -892,6 +893,105 @@ export default function MrpAco() {
     w.focus();
   }
 
+  // ── PDF Estrutura BOM ────────────────────────────────────────────────────────
+  function exportarBomPDF() {
+    const dataEmissao = new Date().toLocaleString('pt-BR');
+    const TH  = 'padding:6px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#1e293b;color:#94a3b8;white-space:nowrap;';
+    const THR = TH.replace('text-align:left', 'text-align:right');
+    const TD  = 'padding:5px 10px;text-align:left;font-size:11px;border-bottom:1px solid #1e293b;color:#cbd5e1;';
+    const TDR = TD.replace('text-align:left', 'text-align:right');
+    const TBL = 'width:100%;border-collapse:collapse;margin-bottom:28px;';
+
+    const tipoColor = (t) =>
+      t === 'BF' ? '#60a5fa' : t === 'BZ' ? '#22d3ee' : '#94a3b8';
+
+    const produtosHtml = BOM_DATA.produtos.map((prod) => {
+      const pesoTotal = prod.itens.reduce((acc, it) => {
+        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+        return acc + (comp ? comp.peso_kg * it.qtd : 0);
+      }, 0);
+
+      const rows = prod.itens.map((it) => {
+        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+        const pesoItem = comp ? (comp.peso_kg * it.qtd).toFixed(3) : '—';
+        const tipo = comp ? comp.tipo : '—';
+        const esp  = comp && comp.espessura_mm ? `${comp.espessura_mm} mm` : '—';
+        return `<tr>
+          <td style="${TD}">${it.nome}</td>
+          <td style="${TD}color:${tipoColor(tipo)};font-weight:700;">${tipo}</td>
+          <td style="${TDR}">${esp}</td>
+          <td style="${TDR}">${it.qtd}</td>
+          <td style="${TDR}">${comp ? comp.peso_kg.toFixed(3) : '—'} kg</td>
+          <td style="${TDR}font-weight:700;color:#f1f5f9;">${pesoItem} kg</td>
+          <td style="${TD}font-size:10px;color:#475569;">${it.obs || ''}</td>
+        </tr>`;
+      }).join('');
+
+      return `
+        <div style="margin-bottom:28px;break-inside:avoid;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;border-left:3px solid #3b82f6;padding-left:10px;">
+            <span style="font-size:13px;font-weight:900;color:#f1f5f9;">${prod.descricao}</span>
+            <span style="font-size:10px;font-weight:700;color:#94a3b8;background:#1e293b;padding:2px 8px;border-radius:4px;">${prod.codigo}</span>
+            <span style="font-size:10px;font-weight:700;color:#34d399;margin-left:auto;">Peso total est.: ${pesoTotal.toFixed(3)} kg</span>
+          </div>
+          <table style="${TBL}">
+            <thead><tr>
+              <th style="${TH}">Componente</th>
+              <th style="${TH}">Chapa</th>
+              <th style="${THR}">Espessura</th>
+              <th style="${THR}">Qtd</th>
+              <th style="${THR}">Peso unit.</th>
+              <th style="${THR}">Peso total</th>
+              <th style="${TH}">Observação</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Estrutura BOM — Carrinhos de Carga — ${dataEmissao}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 28px; background: #0f172a; color: #f1f5f9;
+           font-family: system-ui, -apple-system, Arial, sans-serif; }
+    @media print {
+      body { background: #fff !important; padding: 10px; }
+      .no-print { display: none !important; }
+      div { break-inside: avoid; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align:right;margin-bottom:18px;">
+    <button onclick="window.print()"
+      style="background:#3b82f6;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">
+      ⬇&nbsp; Salvar como PDF
+    </button>
+  </div>
+  <div style="margin-bottom:24px;border-bottom:1px solid #1e293b;padding-bottom:16px;">
+    <h1 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 4px;">
+      Estrutura BOM — Carrinhos de Carga
+    </h1>
+    <p style="font-size:11px;color:#64748b;margin:0;">
+      Emitido em ${dataEmissao} &nbsp;·&nbsp; ${BOM_DATA.produtos.length} produtos · ${BOM_DATA.componentes.length} componentes cadastrados
+    </p>
+  </div>
+  ${produtosHtml}
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=1100,height=900');
+    if (!w) { alert('Permita pop-ups nesta página para gerar o PDF.'); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+  }
+
   // ── Relatório PDF (print HTML em nova janela) ────────────────────────────────
   function exportarPDF() {
     const dataEmissao = new Date().toLocaleString('pt-BR');
@@ -1182,6 +1282,7 @@ export default function MrpAco() {
         {navBtn('simulador',   'Simulador',       <Layers size={13} />)}
         {navBtn('componentes', 'Componentes',     <Package size={13} />)}
         {navBtn('lista',       'Lista de Compra', <ShoppingCart size={13} />)}
+        {navBtn('bom',         'Estrutura BOM',   <LayoutList size={13} />)}
         {navBtn('historico',   'Histórico',       <History size={13} />)}
         <div className="ml-auto pl-2 border-l border-slate-700/50 flex items-center gap-2">
           {/* Indicador de sync */}
@@ -2070,6 +2171,143 @@ export default function MrpAco() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ── ESTRUTURA BOM ──────────────────────────────────────────────────────── */}
+      {subAba === 'bom' && (
+        <div className="space-y-6">
+
+          {/* Cabeçalho */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
+                <LayoutList size={15} className="text-indigo-400" />
+                Estrutura BOM — Carrinhos de Carga
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Bill of Materials por produto · {BOM_DATA.produtos.length} produtos · {BOM_DATA.componentes.length} componentes
+              </p>
+            </div>
+            <button
+              onClick={exportarBomPDF}
+              className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 hover:text-indigo-200 transition-all"
+            >
+              <Download size={13} />
+              Exportar PDF
+            </button>
+          </div>
+
+          {/* Cards de componentes */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">Componentes cadastrados</p>
+            <div className="flex flex-wrap gap-2">
+              {BOM_DATA.componentes.map((c) => (
+                <span
+                  key={c.id}
+                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
+                    c.tipo === 'BF'
+                      ? 'border-blue-400/25 bg-blue-500/10 text-blue-300'
+                      : c.tipo === 'BZ'
+                      ? 'border-cyan-400/25 bg-cyan-500/10 text-cyan-300'
+                      : 'border-slate-600/25 bg-slate-700/20 text-slate-400'
+                  }`}
+                >
+                  {c.nome}
+                  {c.espessura_mm > 0 && <span className="ml-1 opacity-60">· {c.espessura_mm}mm</span>}
+                  {c.peso_kg > 0 && <span className="ml-1 opacity-60">· {c.peso_kg.toFixed(3)} kg</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Tabelas por produto */}
+          <div className="space-y-5">
+            {BOM_DATA.produtos.map((prod) => {
+              const pesoTotal = prod.itens.reduce((acc, it) => {
+                const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+                return acc + (comp ? comp.peso_kg * it.qtd : 0);
+              }, 0);
+              return (
+                <div key={prod.codigo} className="rounded-2xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
+                  {/* Header produto */}
+                  <div className="flex flex-wrap items-center gap-3 px-5 py-3 bg-slate-950/50 border-b border-slate-800/40">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md border border-slate-600/40 bg-slate-700/30 text-slate-400">
+                      {prod.codigo}
+                    </span>
+                    <span className="text-sm font-black text-slate-100">{prod.descricao}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                      prod.roda === 'câmara'
+                        ? 'border-sky-400/25 bg-sky-500/10 text-sky-300'
+                        : 'border-violet-400/25 bg-violet-500/10 text-violet-300'
+                    }`}>
+                      {prod.roda}
+                    </span>
+                    <span className="ml-auto text-[11px] font-bold text-emerald-400">
+                      Peso est.: {pesoTotal.toFixed(3)} kg
+                    </span>
+                  </div>
+                  {/* Itens */}
+                  <table className="w-full text-left text-xs">
+                    <thead className="border-b border-slate-800/30">
+                      <tr>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider min-w-[200px]">Componente</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Chapa</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Espessura</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Qtd</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Peso unit.</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Peso total</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Obs.</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/30">
+                      {prod.itens.map((it) => {
+                        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+                        const pesoItem = comp ? (comp.peso_kg * it.qtd) : null;
+                        return (
+                          <tr key={it.componente_id} className="hover:bg-slate-800/20 transition-colors">
+                            <td className="px-4 py-2.5 font-bold text-slate-200">{it.nome}</td>
+                            <td className="px-4 py-2.5 text-center">
+                              {comp && comp.tipo !== '—' ? (
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${
+                                  comp.tipo === 'BF'
+                                    ? 'border-blue-400/25 bg-blue-500/10 text-blue-300'
+                                    : 'border-cyan-400/25 bg-cyan-500/10 text-cyan-300'
+                                }`}>
+                                  {comp.tipo}
+                                </span>
+                              ) : <span className="text-slate-600">—</span>}
+                            </td>
+                            <td className="px-4 py-2.5 text-right text-slate-400">
+                              {comp && comp.espessura_mm ? `${comp.espessura_mm} mm` : '—'}
+                            </td>
+                            <td className="px-4 py-2.5 text-right font-black text-slate-100">{it.qtd}</td>
+                            <td className="px-4 py-2.5 text-right text-slate-400">
+                              {comp && comp.peso_kg > 0 ? `${comp.peso_kg.toFixed(3)} kg` : '—'}
+                            </td>
+                            <td className="px-4 py-2.5 text-right font-bold text-slate-200">
+                              {pesoItem != null && pesoItem > 0 ? `${pesoItem.toFixed(3)} kg` : '—'}
+                            </td>
+                            <td className="px-4 py-2.5 text-[10px] text-slate-500">{it.obs}</td>
+                          </tr>
+                        );
+                      })}
+                      {/* Total por produto */}
+                      <tr className="bg-slate-950/40 border-t border-slate-700/40">
+                        <td className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-500" colSpan={5}>
+                          Total estimado
+                        </td>
+                        <td className="px-4 py-2.5 text-right font-black text-emerald-400">
+                          {pesoTotal.toFixed(3)} kg
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
