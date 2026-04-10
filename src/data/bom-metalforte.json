@@ -1,0 +1,76 @@
+{
+  "_info": {
+    "descricao": "BOM (Bill of Materials) — Carrinhos Metalforte (M16 / M18 / M20)",
+    "versao": "1.0",
+    "referencia_componentes": "COMPONENTES_BASE em MrpAco.jsx (campo id)",
+    "observacao": "Quantidades por unidade produzida. Ajuste conforme engenharia."
+  },
+  "componentes": [
+    { "id":  1, "nome": "Varal # 0,90 BF",              "familia": "Varal",    "tipo": "BF", "espessura_mm": 0.90, "peso_kg": 2.000 },
+    { "id":  2, "nome": "Varal # 1,10 BF",              "familia": "Varal",    "tipo": "BF", "espessura_mm": 1.10, "peso_kg": 2.160 },
+    { "id":  3, "nome": "Varal # 1,40 BF",              "familia": "Varal",    "tipo": "BF", "espessura_mm": 1.40, "peso_kg": 3.240 },
+    { "id":  7, "nome": "Suporte # 1,10",               "familia": "Suporte",  "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 0.100 },
+    { "id":  8, "nome": "Eixo (BF 0,9)",                "familia": "Rodas",    "tipo": "BF", "espessura_mm": 0.90, "peso_kg": 0.150 },
+    { "id":  9, "nome": "Mancal # 1,50",                "familia": "Rodas",    "tipo": "BZ", "espessura_mm": 1.50, "peso_kg": 0.150 },
+    { "id": 10, "nome": "Rodas c/câmara",               "familia": "Rodas",    "tipo": "—",  "espessura_mm": 0,    "peso_kg": 0.604 },
+    { "id": 12, "nome": "AROS",                         "familia": "Rodas",    "tipo": "—",  "espessura_mm": 0,    "peso_kg": 0     },
+    { "id": 15, "nome": "Travessão do Pé # 1,10",       "familia": "Pé",       "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 0.250 },
+    { "id": 16, "nome": "Pé # 1,50",                   "familia": "Pé",       "tipo": "BZ", "espessura_mm": 1.50, "peso_kg": 0.860 },
+    { "id": 17, "nome": "Caç. Metalf. M20 0,75",        "familia": "Metalforte","tipo": "BF", "espessura_mm": 0.75, "peso_kg": 5.680 },
+    { "id": 18, "nome": "Caç. Metalf. M18 1,10",        "familia": "Metalforte","tipo": "BF", "espessura_mm": 1.10, "peso_kg": 8.330 },
+    { "id": 19, "nome": "Caç. Metalf. M16 1,40",        "familia": "Metalforte","tipo": "BF", "espessura_mm": 1.40, "peso_kg": 10.603 }
+  ],
+  "produtos": [
+    {
+      "codigo": "MF-M20-CAM",
+      "descricao": "Car. METALF. M20 # 0,75 c/ Roda CÂM. 3,00",
+      "tipo": "M20",
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 17, "nome": "Caç. Metalf. M20 0,75",    "qtd": 1, "obs": "Caçamba Metalforte M20" },
+        { "componente_id":  1, "nome": "Varal # 0,90 BF",          "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id":  7, "nome": "Suporte # 1,10",           "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id":  8, "nome": "Eixo (BF 0,9)",            "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id":  9, "nome": "Mancal # 1,50",            "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",           "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                     "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10",   "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",                "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "MF-M18-CAM",
+      "descricao": "Car. METALF. M18 # 1,10 c/ Roda CÂM. 3,00",
+      "tipo": "M18",
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 18, "nome": "Caç. Metalf. M18 1,10",    "qtd": 1, "obs": "Caçamba Metalforte M18" },
+        { "componente_id":  2, "nome": "Varal # 1,10 BF",          "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id":  7, "nome": "Suporte # 1,10",           "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id":  8, "nome": "Eixo (BF 0,9)",            "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id":  9, "nome": "Mancal # 1,50",            "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",           "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                     "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10",   "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",                "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "MF-M16-CAM",
+      "descricao": "Car. METALF. M16 # 1,40 c/ Roda CÂM. 3,00",
+      "tipo": "M16",
+      "roda": "câmara",
+      "itens": [
+        { "componente_id": 19, "nome": "Caç. Metalf. M16 1,40",    "qtd": 1, "obs": "Caçamba Metalforte M16" },
+        { "componente_id":  3, "nome": "Varal # 1,40 BF",          "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id":  7, "nome": "Suporte # 1,10",           "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id":  8, "nome": "Eixo (BF 0,9)",            "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id":  9, "nome": "Mancal # 1,50",            "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",           "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                     "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10",   "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",                "qtd": 2, "obs": "Par de pés" }
+      ]
+    }
+  ]
+}

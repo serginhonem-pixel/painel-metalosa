@@ -12,6 +12,17 @@ import {
 import { db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import BOM_DATA from '../data/bom-carrinhos.json';
+import BOM_CACAMBAS from '../data/bom-cacambas.json';
+import BOM_METALFORTE from '../data/bom-metalforte.json';
+import BOM_FAMILIAS from '../data/bom-familias.json';
+
+// Catálogo de BOMs disponíveis
+const BOM_CATALOGO = {
+  familias:   { label: 'Por Família',        cor: 'amber',   data: BOM_FAMILIAS   },
+  carrinhos:  { label: 'Carrinhos de Carga', cor: 'indigo',  data: BOM_DATA       },
+  cacambas:   { label: 'Caçambas',           cor: 'sky',     data: BOM_CACAMBAS   },
+  metalforte: { label: 'Metalforte',         cor: 'violet',  data: BOM_METALFORTE },
+};
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 const MESES = [
@@ -315,6 +326,7 @@ export default function MrpAco() {
   const isLoadingRef = useRef(false);
   const saveTimerRef = useRef(null);
   const [subAba, setSubAba] = useState('dashboard');
+  const [bomCategoria, setBomCategoria] = useState('carrinhos');
   const [plano, setPlano] = useState(
     () => JSON.parse(JSON.stringify(PLANO_INICIAL))
   );
@@ -896,6 +908,8 @@ export default function MrpAco() {
   // ── PDF Estrutura BOM ────────────────────────────────────────────────────────
   function exportarBomPDF() {
     const dataEmissao = new Date().toLocaleString('pt-BR');
+    const catAtual    = BOM_CATALOGO[bomCategoria];
+    const bomExport   = catAtual.data;
     const TH  = 'padding:6px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#1e293b;color:#94a3b8;white-space:nowrap;';
     const THR = TH.replace('text-align:left', 'text-align:right');
     const TD  = 'padding:5px 10px;text-align:left;font-size:11px;border-bottom:1px solid #1e293b;color:#cbd5e1;';
@@ -905,14 +919,14 @@ export default function MrpAco() {
     const tipoColor = (t) =>
       t === 'BF' ? '#60a5fa' : t === 'BZ' ? '#22d3ee' : '#94a3b8';
 
-    const produtosHtml = BOM_DATA.produtos.map((prod) => {
+    const produtosHtml = bomExport.produtos.map((prod) => {
       const pesoTotal = prod.itens.reduce((acc, it) => {
-        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+        const comp = bomExport.componentes.find((c) => c.id === it.componente_id);
         return acc + (comp ? comp.peso_kg * it.qtd : 0);
       }, 0);
 
       const rows = prod.itens.map((it) => {
-        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+        const comp = bomExport.componentes.find((c) => c.id === it.componente_id);
         const pesoItem = comp ? (comp.peso_kg * it.qtd).toFixed(3) : '—';
         const tipo = comp ? comp.tipo : '—';
         const esp  = comp && comp.espessura_mm ? `${comp.espessura_mm} mm` : '—';
@@ -953,7 +967,7 @@ export default function MrpAco() {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Estrutura BOM — Carrinhos de Carga — ${dataEmissao}</title>
+  <title>Estrutura BOM — ${catAtual.label} — ${dataEmissao}</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; padding: 24px 28px; background: #0f172a; color: #f1f5f9;
@@ -975,10 +989,10 @@ export default function MrpAco() {
   </div>
   <div style="margin-bottom:24px;border-bottom:1px solid #1e293b;padding-bottom:16px;">
     <h1 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 4px;">
-      Estrutura BOM — Carrinhos de Carga
+      Estrutura BOM — ${catAtual.label}
     </h1>
     <p style="font-size:11px;color:#64748b;margin:0;">
-      Emitido em ${dataEmissao} &nbsp;·&nbsp; ${BOM_DATA.produtos.length} produtos · ${BOM_DATA.componentes.length} componentes cadastrados
+      Emitido em ${dataEmissao} &nbsp;·&nbsp; ${bomExport.produtos.length} produtos · ${bomExport.componentes.length} componentes cadastrados
     </p>
   </div>
   ${produtosHtml}
@@ -2175,34 +2189,62 @@ export default function MrpAco() {
       )}
 
       {/* ── ESTRUTURA BOM ──────────────────────────────────────────────────────── */}
-      {subAba === 'bom' && (
+      {subAba === 'bom' && (() => {
+        const bomAtual = BOM_CATALOGO[bomCategoria].data;
+        const corMap = {
+          amber:  { btn: 'bg-amber-600/20 border-amber-500/30 text-amber-300 hover:bg-amber-600/30 hover:text-amber-200',   ativo: 'bg-amber-600/30 border-amber-400/50 text-amber-200',   icon: 'text-amber-400'  },
+          indigo: { btn: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 hover:text-indigo-200', ativo: 'bg-indigo-600/30 border-indigo-400/50 text-indigo-200', icon: 'text-indigo-400' },
+          sky:    { btn: 'bg-sky-600/20 border-sky-500/30 text-sky-300 hover:bg-sky-600/30 hover:text-sky-200',               ativo: 'bg-sky-600/30 border-sky-400/50 text-sky-200',         icon: 'text-sky-400'    },
+          violet: { btn: 'bg-violet-600/20 border-violet-500/30 text-violet-300 hover:bg-violet-600/30 hover:text-violet-200',ativo: 'bg-violet-600/30 border-violet-400/50 text-violet-200',icon: 'text-violet-400' },
+        };
+        const corAtiva = corMap[BOM_CATALOGO[bomCategoria].cor];
+        return (
         <div className="space-y-6">
 
           {/* Cabeçalho */}
           <div className="flex flex-wrap items-center gap-3">
             <div>
               <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
-                <LayoutList size={15} className="text-indigo-400" />
-                Estrutura BOM — Carrinhos de Carga
+                <LayoutList size={15} className={corAtiva.icon} />
+                Estrutura BOM — {BOM_CATALOGO[bomCategoria].label}
               </h3>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Bill of Materials por produto · {BOM_DATA.produtos.length} produtos · {BOM_DATA.componentes.length} componentes
+                Bill of Materials por produto · {bomAtual.produtos.length} produtos · {bomAtual.componentes.length} componentes
               </p>
             </div>
             <button
               onClick={exportarBomPDF}
-              className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 hover:text-indigo-200 transition-all"
+              className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all ${corAtiva.btn}`}
             >
               <Download size={13} />
               Exportar PDF
             </button>
           </div>
 
+          {/* Seletor de categoria */}
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(BOM_CATALOGO).map(([key, cat]) => {
+              const cor = corMap[cat.cor];
+              const ativo = bomCategoria === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setBomCategoria(key)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${ativo ? cor.ativo : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:bg-slate-700/40 hover:text-slate-200'}`}
+                >
+                  <Layers size={11} />
+                  {cat.label}
+                  <span className="ml-1 opacity-60">{cat.data.produtos.length}</span>
+                </button>
+              );
+            })}
+          </div>
+
           {/* Cards de componentes */}
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">Componentes cadastrados</p>
             <div className="flex flex-wrap gap-2">
-              {BOM_DATA.componentes.map((c) => (
+              {bomAtual.componentes.map((c) => (
                 <span
                   key={c.id}
                   className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
@@ -2223,11 +2265,13 @@ export default function MrpAco() {
 
           {/* Tabelas por produto */}
           <div className="space-y-5">
-            {BOM_DATA.produtos.map((prod) => {
+            {bomAtual.produtos.map((prod) => {
               const pesoTotal = prod.itens.reduce((acc, it) => {
-                const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+                const comp = bomAtual.componentes.find((c) => c.id === it.componente_id);
                 return acc + (comp ? comp.peso_kg * it.qtd : 0);
               }, 0);
+              // Tags extras (roda, linha, acabamento, tipo) — campos opcionais
+              const tags = [prod.roda, prod.linha, prod.acabamento, prod.tipo].filter(Boolean);
               return (
                 <div key={prod.codigo} className="rounded-2xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
                   {/* Header produto */}
@@ -2236,13 +2280,14 @@ export default function MrpAco() {
                       {prod.codigo}
                     </span>
                     <span className="text-sm font-black text-slate-100">{prod.descricao}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
-                      prod.roda === 'câmara'
-                        ? 'border-sky-400/25 bg-sky-500/10 text-sky-300'
-                        : 'border-violet-400/25 bg-violet-500/10 text-violet-300'
-                    }`}>
-                      {prod.roda}
-                    </span>
+                    {tags.map((tag) => (
+                      <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${corAtiva.ativo}`}>
+                        {tag}
+                      </span>
+                    ))}
+                    {prod.obs_familia && (
+                      <span className="text-[10px] text-slate-500 italic">{prod.obs_familia}</span>
+                    )}
                     <span className="ml-auto text-[11px] font-bold text-emerald-400">
                       Peso est.: {pesoTotal.toFixed(3)} kg
                     </span>
@@ -2262,7 +2307,7 @@ export default function MrpAco() {
                     </thead>
                     <tbody className="divide-y divide-slate-800/30">
                       {prod.itens.map((it) => {
-                        const comp = BOM_DATA.componentes.find((c) => c.id === it.componente_id);
+                        const comp = bomAtual.componentes.find((c) => c.id === it.componente_id);
                         const pesoItem = comp ? (comp.peso_kg * it.qtd) : null;
                         return (
                           <tr key={it.componente_id} className="hover:bg-slate-800/20 transition-colors">
@@ -2309,7 +2354,8 @@ export default function MrpAco() {
             })}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

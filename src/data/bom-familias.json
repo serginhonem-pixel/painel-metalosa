@@ -1,0 +1,192 @@
+{
+  "_info": {
+    "descricao": "BOM (Bill of Materials) — Por Família de Produto (visão MRP)",
+    "versao": "1.0",
+    "referencia_componentes": "COMPONENTES_BASE em MrpAco.jsx (campo id)",
+    "observacao": "Uma entrada por família, usando produto representativo de maior volume. Ajuste conforme engenharia."
+  },
+  "componentes": [
+    { "id":  1, "nome": "Varal # 0,90 BF",               "familia": "Varal",     "tipo": "BF", "espessura_mm": 0.90, "peso_kg":  2.000 },
+    { "id":  3, "nome": "Varal # 1,40 BF",               "familia": "Varal",     "tipo": "BF", "espessura_mm": 1.40, "peso_kg":  3.240 },
+    { "id":  4, "nome": "Varal 0,75-0,90 BZ",            "familia": "Varal",     "tipo": "BZ", "espessura_mm": 0.75, "peso_kg":  1.870 },
+    { "id":  5, "nome": "Varal # 1,10 BZ",               "familia": "Varal",     "tipo": "BZ", "espessura_mm": 1.10, "peso_kg":  2.600 },
+    { "id":  7, "nome": "Suporte # 1,10",                "familia": "Suporte",   "tipo": "BZ", "espessura_mm": 1.10, "peso_kg":  0.100 },
+    { "id":  8, "nome": "Eixo (BF 0,9)",                 "familia": "Rodas",     "tipo": "BF", "espessura_mm": 0.90, "peso_kg":  0.150 },
+    { "id":  9, "nome": "Mancal # 1,50",                 "familia": "Rodas",     "tipo": "BZ", "espessura_mm": 1.50, "peso_kg":  0.150 },
+    { "id": 10, "nome": "Rodas c/câmara",                "familia": "Rodas",     "tipo": "—",  "espessura_mm": 0,    "peso_kg":  0.604 },
+    { "id": 12, "nome": "AROS",                          "familia": "Rodas",     "tipo": "—",  "espessura_mm": 0,    "peso_kg":  0     },
+    { "id": 15, "nome": "Travessão do Pé # 1,10",        "familia": "Pé",        "tipo": "BZ", "espessura_mm": 1.10, "peso_kg":  0.250 },
+    { "id": 16, "nome": "Pé # 1,50",                    "familia": "Pé",        "tipo": "BZ", "espessura_mm": 1.50, "peso_kg":  0.860 },
+    { "id": 17, "nome": "Caç. Metalf. M20 0,75",         "familia": "Metalforte","tipo": "BF", "espessura_mm": 0.75, "peso_kg":  5.680 },
+    { "id": 18, "nome": "Caç. Metalf. M18 1,10",         "familia": "Metalforte","tipo": "BF", "espessura_mm": 1.10, "peso_kg":  8.330 },
+    { "id": 19, "nome": "Caç. Metalf. M16 1,40",         "familia": "Metalforte","tipo": "BF", "espessura_mm": 1.40, "peso_kg": 10.603 },
+    { "id": 20, "nome": "Caçamba POP 0,40 BF (Cinza)",   "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.40, "peso_kg":  2.384 },
+    { "id": 21, "nome": "Caçamba POP 0,40 BF (Verm.)",   "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.40, "peso_kg":  2.384 },
+    { "id": 22, "nome": "Caçamba Constr. 0,40 BF (Verm.)","familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg":  2.364 },
+    { "id": 23, "nome": "Caçamba Constr. 0,40 BF (Cinza)","familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg":  2.364 },
+    { "id": 24, "nome": "Caçamba POP (GALV.)",            "familia": "Caçamba",   "tipo": "BZ", "espessura_mm": 0.40, "peso_kg":  2.384 },
+    { "id": 25, "nome": "Caçamba Constr. Galv. 0,40",    "familia": "Caçamba",   "tipo": "BZ", "espessura_mm": 0.40, "peso_kg":  2.364 },
+    { "id": 26, "nome": "Caçamba POP 5.0",               "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.50, "peso_kg":  3.204 },
+    { "id": 27, "nome": "Reforço # 0,50 BZ",             "familia": "Caçamba",   "tipo": "BZ", "espessura_mm": 0.50, "peso_kg":  0.050 },
+    { "id": 28, "nome": "Caçamba Super 0,60 BF",         "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.60, "peso_kg":  4.076 },
+    { "id": 29, "nome": "Caçamba Plus 0,75",             "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.75, "peso_kg":  5.056 },
+    { "id": 30, "nome": "Caçamba Master 0,75",           "familia": "Caçamba",   "tipo": "BF", "espessura_mm": 0.75, "peso_kg":  5.848 }
+  ],
+  "produtos": [
+    {
+      "codigo": "FAM-SUPER",
+      "descricao": "Família Super — Caçamba Super 0,60 BF",
+      "familia_id": "SUPER",
+      "grupo": "Premium",
+      "obs_familia": "Produto representativo de maior volume da família",
+      "itens": [
+        { "componente_id": 28, "nome": "Caçamba Super 0,60 BF",  "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",      "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",        "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-PLUS",
+      "descricao": "Família Plus — Caçamba Plus 0,75",
+      "familia_id": "PLUS",
+      "grupo": "Premium",
+      "obs_familia": "Produto representativo de maior volume da família",
+      "itens": [
+        { "componente_id": 29, "nome": "Caçamba Plus 0,75",      "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",      "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",        "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-MASTER",
+      "descricao": "Família Master — Caçamba Master 0,75",
+      "familia_id": "MASTER",
+      "grupo": "Premium",
+      "obs_familia": "Produto representativo de maior volume da família",
+      "itens": [
+        { "componente_id": 30, "nome": "Caçamba Master 0,75",    "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",      "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",        "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-METALF",
+      "descricao": "Família Metalforte — M20 # 0,75 c/ Roda CÂM. 3,00",
+      "familia_id": "METALFORTE",
+      "grupo": "Premium",
+      "obs_familia": "Ref. M20 (maior volume: ~10.000 pcs/mês). M18 e M16 diferem no varal e caçamba.",
+      "itens": [
+        { "componente_id": 17, "nome": "Caç. Metalf. M20 0,75",     "qtd": 1, "obs": "Caçamba Metalforte M20" },
+        { "componente_id":  1, "nome": "Varal # 0,90 BF",           "qtd": 1, "obs": "Estrutura principal" },
+        { "componente_id":  7, "nome": "Suporte # 1,10",            "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id":  8, "nome": "Eixo (BF 0,9)",             "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id":  9, "nome": "Mancal # 1,50",             "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",            "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                      "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10",    "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",                 "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "FAM-POP",
+      "descricao": "Família POP — Caçamba POP 0,40 BF Cinza",
+      "familia_id": "POP",
+      "grupo": "Standard",
+      "obs_familia": "Variante BF Cinza (maior volume). BF Verm. = família BEG2.",
+      "itens": [
+        { "componente_id": 20, "nome": "Caçamba POP 0,40 BF (Cinza)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",           "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",          "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-BEG",
+      "descricao": "Família Beginner — Caçamba POP (GALV.)",
+      "familia_id": "BEG",
+      "grupo": "Standard",
+      "obs_familia": "Linha galvanizada (BZ). Maior volume da linha POP.",
+      "itens": [
+        { "componente_id": 24, "nome": "Caçamba POP (GALV.)",        "qtd": 1, "obs": "Corpo da caçamba galvanizado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",          "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",         "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-50",
+      "descricao": "Família 5.0 — Caçamba POP 5.0",
+      "familia_id": "50",
+      "grupo": "Standard",
+      "obs_familia": "Linha POP com espessura 0,50 BF.",
+      "itens": [
+        { "componente_id": 26, "nome": "Caçamba POP 5.0",            "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",          "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",         "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-CONSTR",
+      "descricao": "Família Construtor — Caçamba Constr. 0,40 BF Cinza",
+      "familia_id": "CONSTR",
+      "grupo": "Standard",
+      "obs_familia": "Variante BF Cinza (maior volume). BF Verm. = família MINI. Galv. = família GCONSTR.",
+      "itens": [
+        { "componente_id": 23, "nome": "Caçamba Constr. 0,40 BF (Cinza)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",               "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",                 "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-MINI",
+      "descricao": "Família Mini — Caçamba Constr. 0,40 BF Vermelho",
+      "familia_id": "MINI",
+      "grupo": "Standard",
+      "obs_familia": "Variante BF Vermelha da linha Construtor.",
+      "itens": [
+        { "componente_id": 22, "nome": "Caçamba Constr. 0,40 BF (Verm.)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",               "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",                 "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-CC",
+      "descricao": "Família CC — Carrinho de Carga 350 Kg Câmara (ref.)",
+      "familia_id": "CC",
+      "grupo": "CC",
+      "obs_familia": "Ref. 350 Kg c/câmara (cód. 00782 — maior volume: ~3.500 un/mês). Varais mudam conforme capacidade.",
+      "itens": [
+        { "componente_id":  3, "nome": "Varal # 1,40 BF",             "qtd": 1, "obs": "Estrutura principal (350 Kg)" },
+        { "componente_id":  7, "nome": "Suporte # 1,10",              "qtd": 2, "obs": "Suporte lateral" },
+        { "componente_id":  8, "nome": "Eixo (BF 0,9)",               "qtd": 1, "obs": "Eixo das rodas" },
+        { "componente_id":  9, "nome": "Mancal # 1,50",               "qtd": 2, "obs": "Mancal por roda" },
+        { "componente_id": 10, "nome": "Rodas c/câmara",              "qtd": 2, "obs": "Par de rodas" },
+        { "componente_id": 12, "nome": "AROS",                        "qtd": 2, "obs": "Aro por roda câmara" },
+        { "componente_id": 15, "nome": "Travessão do Pé # 1,10",      "qtd": 2, "obs": "Travessão do pé" },
+        { "componente_id": 16, "nome": "Pé # 1,50",                   "qtd": 2, "obs": "Par de pés" }
+      ]
+    },
+    {
+      "codigo": "FAM-BEG2",
+      "descricao": "Família POP BF Verm. — Caçamba POP 0,40 BF Vermelho",
+      "familia_id": "BEG2",
+      "grupo": "Standard",
+      "obs_familia": "Variante BF Vermelha da linha POP (baixo volume).",
+      "itens": [
+        { "componente_id": 21, "nome": "Caçamba POP 0,40 BF (Verm.)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",           "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",          "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "FAM-GCONSTR",
+      "descricao": "Família Constr. Galv. — Caçamba Constr. Galv. 0,40",
+      "familia_id": "GCONSTR",
+      "grupo": "Standard",
+      "obs_familia": "Linha galvanizada (BZ) da família Construtor. Maior volume individual do portfólio.",
+      "itens": [
+        { "componente_id": 25, "nome": "Caçamba Constr. Galv. 0,40",  "qtd": 1, "obs": "Corpo da caçamba galvanizado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",           "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",             "qtd": 2, "obs": "Varais laterais" }
+      ]
+    }
+  ]
+}

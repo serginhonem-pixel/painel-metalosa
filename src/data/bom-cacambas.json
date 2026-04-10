@@ -1,0 +1,135 @@
+{
+  "_info": {
+    "descricao": "BOM (Bill of Materials) — Caçambas (POP / Construtor / Super / Plus / Master)",
+    "versao": "1.0",
+    "referencia_componentes": "COMPONENTES_BASE em MrpAco.jsx (campo id)",
+    "observacao": "Quantidades por unidade produzida. Ajuste conforme engenharia."
+  },
+  "componentes": [
+    { "id":  4, "nome": "Varal 0,75-0,90 BZ",              "familia": "Varal",    "tipo": "BZ", "espessura_mm": 0.75, "peso_kg": 1.870 },
+    { "id":  5, "nome": "Varal # 1,10 BZ",                 "familia": "Varal",    "tipo": "BZ", "espessura_mm": 1.10, "peso_kg": 2.600 },
+    { "id": 20, "nome": "Caçamba POP 0,40 BF (Cinza)",      "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg": 2.384 },
+    { "id": 21, "nome": "Caçamba POP 0,40 BF (Verm.)",      "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg": 2.384 },
+    { "id": 22, "nome": "Caçamba Constr. 0,40 BF (Verm.)",  "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg": 2.364 },
+    { "id": 23, "nome": "Caçamba Constr. 0,40 BF (Cinza)",  "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.40, "peso_kg": 2.364 },
+    { "id": 24, "nome": "Caçamba POP (GALV.)",               "familia": "Caçamba",  "tipo": "BZ", "espessura_mm": 0.40, "peso_kg": 2.384 },
+    { "id": 25, "nome": "Caçamba Constr. Galv. 0,40",        "familia": "Caçamba",  "tipo": "BZ", "espessura_mm": 0.40, "peso_kg": 2.364 },
+    { "id": 26, "nome": "Caçamba POP 5.0",                   "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.50, "peso_kg": 3.204 },
+    { "id": 27, "nome": "Reforço # 0,50 BZ",                 "familia": "Caçamba",  "tipo": "BZ", "espessura_mm": 0.50, "peso_kg": 0.050 },
+    { "id": 28, "nome": "Caçamba Super 0,60 BF",             "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.60, "peso_kg": 4.076 },
+    { "id": 29, "nome": "Caçamba Plus 0,75",                 "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.75, "peso_kg": 5.056 },
+    { "id": 30, "nome": "Caçamba Master 0,75",               "familia": "Caçamba",  "tipo": "BF", "espessura_mm": 0.75, "peso_kg": 5.848 }
+  ],
+  "produtos": [
+    {
+      "codigo": "CAÇ-POP-BFC",
+      "descricao": "Caçamba POP 0,40 BF – Cinza",
+      "linha": "POP",
+      "acabamento": "BF Cinza",
+      "itens": [
+        { "componente_id": 20, "nome": "Caçamba POP 0,40 BF (Cinza)",  "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",            "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",           "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-POP-BFV",
+      "descricao": "Caçamba POP 0,40 BF – Vermelho",
+      "linha": "POP",
+      "acabamento": "BF Verm.",
+      "itens": [
+        { "componente_id": 21, "nome": "Caçamba POP 0,40 BF (Verm.)",  "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",            "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",           "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-POP-GALV",
+      "descricao": "Caçamba POP (GALV.)",
+      "linha": "POP",
+      "acabamento": "Galv.",
+      "itens": [
+        { "componente_id": 24, "nome": "Caçamba POP (GALV.)",          "qtd": 1, "obs": "Corpo da caçamba galvanizado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",            "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",           "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-POP-50",
+      "descricao": "Caçamba POP 5.0",
+      "linha": "POP",
+      "acabamento": "BF",
+      "itens": [
+        { "componente_id": 26, "nome": "Caçamba POP 5.0",              "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",            "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  4, "nome": "Varal 0,75-0,90 BZ",           "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-CON-BFC",
+      "descricao": "Caçamba Construtor 0,40 BF – Cinza",
+      "linha": "Construtor",
+      "acabamento": "BF Cinza",
+      "itens": [
+        { "componente_id": 23, "nome": "Caçamba Constr. 0,40 BF (Cinza)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",               "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",                 "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-CON-BFV",
+      "descricao": "Caçamba Construtor 0,40 BF – Vermelho",
+      "linha": "Construtor",
+      "acabamento": "BF Verm.",
+      "itens": [
+        { "componente_id": 22, "nome": "Caçamba Constr. 0,40 BF (Verm.)", "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",               "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",                 "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-CON-GALV",
+      "descricao": "Caçamba Construtor Galv. 0,40",
+      "linha": "Construtor",
+      "acabamento": "Galv.",
+      "itens": [
+        { "componente_id": 25, "nome": "Caçamba Constr. Galv. 0,40",    "qtd": 1, "obs": "Corpo da caçamba galvanizado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",             "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",               "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-SUPER",
+      "descricao": "Caçamba Super 0,60 BF",
+      "linha": "Premium",
+      "acabamento": "BF",
+      "itens": [
+        { "componente_id": 28, "nome": "Caçamba Super 0,60 BF",         "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",             "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",               "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-PLUS",
+      "descricao": "Caçamba Plus 0,75",
+      "linha": "Premium",
+      "acabamento": "BF",
+      "itens": [
+        { "componente_id": 29, "nome": "Caçamba Plus 0,75",             "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",             "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",               "qtd": 2, "obs": "Varais laterais" }
+      ]
+    },
+    {
+      "codigo": "CAÇ-MASTER",
+      "descricao": "Caçamba Master 0,75",
+      "linha": "Premium",
+      "acabamento": "BF",
+      "itens": [
+        { "componente_id": 30, "nome": "Caçamba Master 0,75",           "qtd": 1, "obs": "Corpo da caçamba estampado" },
+        { "componente_id": 27, "nome": "Reforço # 0,50 BZ",             "qtd": 1, "obs": "Reforço interno" },
+        { "componente_id":  5, "nome": "Varal # 1,10 BZ",               "qtd": 2, "obs": "Varais laterais" }
+      ]
+    }
+  ]
+}
