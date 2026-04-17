@@ -26,6 +26,162 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
+        /* ============================
+           ESTILOS DE IMPRESSÃO / PDF
+           ============================ */
+        @media print {
+            /* Oculta tudo do dashboard interativo */
+            #interaction-overlay,
+            #app,
+            #notification-container,
+            #btn-imprimir {
+                display: none !important;
+            }
+
+            /* Exibe o relatório de impressão */
+            #relatorio-print {
+                display: block !important;
+            }
+
+            body {
+                background: #fff !important;
+                color: #111 !important;
+                font-family: 'Inter', sans-serif;
+                margin: 0;
+                padding: 0;
+                overflow: auto !important;
+                height: auto !important;
+            }
+
+            @page {
+                size: A4 landscape;
+                margin: 15mm 12mm;
+            }
+
+            .print-break { page-break-before: always; }
+        }
+
+        /* Relatório só aparece ao imprimir */
+        #relatorio-print {
+            display: none;
+        }
+
+        /* Estilos visuais do relatório (usados tanto na prévia quanto no print) */
+        .rpt-page {
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            color: #111;
+        }
+        .rpt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        .rpt-logo-box {
+            background: #1e40af;
+            color: #fff;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .rpt-title { font-size: 18px; font-weight: 800; color: #1e3a8a; margin: 0; }
+        .rpt-subtitle { font-size: 11px; color: #6b7280; margin-top: 2px; }
+        .rpt-meta { font-size: 10px; color: #374151; text-align: right; }
+        .rpt-meta span { display: block; }
+        .rpt-meta strong { color: #111; }
+
+        /* KPI Cards */
+        .rpt-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .rpt-kpi {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: #f9fafb;
+        }
+        .rpt-kpi-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 4px; }
+        .rpt-kpi-value { font-size: 28px; font-weight: 900; line-height: 1; color: #111; }
+        .rpt-kpi.critico .rpt-kpi-value { color: #dc2626; }
+        .rpt-kpi.andamento .rpt-kpi-value { color: #2563eb; }
+        .rpt-kpi.pendente .rpt-kpi-value { color: #d97706; }
+        .rpt-kpi.liberadas .rpt-kpi-value { color: #16a34a; }
+
+        /* Tabela de OS */
+        .rpt-section-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #374151;
+            border-left: 4px solid #1e40af;
+            padding-left: 8px;
+            margin-bottom: 8px;
+        }
+        .rpt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+        }
+        .rpt-table th {
+            background: #1e40af;
+            color: #fff;
+            font-weight: 700;
+            text-align: left;
+            padding: 6px 8px;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .rpt-table td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .rpt-table tr:nth-child(even) td { background: #f9fafb; }
+        .rpt-table tr:last-child td { border-bottom: 2px solid #1e40af; }
+
+        .badge-critico  { background:#fee2e2; color:#b91c1c; font-weight:700; font-size:8px; padding:2px 6px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
+        .badge-corretiva{ background:#fef3c7; color:#b45309; font-weight:700; font-size:8px; padding:2px 6px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
+        .badge-preventiva{ background:#dbeafe; color:#1d4ed8; font-weight:700; font-size:8px; padding:2px 6px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
+        .time-col { font-weight: 800; font-size: 13px; color: #b91c1c; font-family: ui-monospace, monospace; white-space: nowrap; }
+        .time-col.warn { color: #b45309; }
+
+        .rpt-footer {
+            margin-top: 18px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #9ca3af;
+        }
+        .rpt-assinaturas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 28px;
+        }
+        .rpt-assinatura-box {
+            border-top: 1.5px solid #374151;
+            padding-top: 6px;
+            font-size: 10px;
+            color: #374151;
+        }
+        .rpt-assinatura-box .cargo { font-size: 9px; color: #6b7280; }
+
+        /* ============================
+           ANIMAÇÃO DO POPUP
+           ============================ */
         /* Animação do Popup */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -201,15 +357,149 @@
         </div>
     </div>
 
+    <!-- RELATÓRIO DE IMPRESSÃO (só aparece ao imprimir / PDF) -->
+    <div id="relatorio-print">
+        <div class="rpt-page">
+            <!-- Cabeçalho -->
+            <div class="rpt-header">
+                <div>
+                    <div class="rpt-logo-box">Luminary OS</div>
+                    <p class="rpt-title" style="margin-top:6px">Relatório de Manutenção</p>
+                    <p class="rpt-subtitle">Dashboard de Ocorrências e Ordens de Serviço</p>
+                </div>
+                <div class="rpt-meta">
+                    <span><strong>Data de emissão:</strong> <span id="rpt-data-emissao"></span></span>
+                    <span><strong>Hora:</strong> <span id="rpt-hora-emissao"></span></span>
+                    <span style="margin-top:4px;display:block">Gerado automaticamente pelo sistema</span>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="rpt-kpis">
+                <div class="rpt-kpi critico">
+                    <div class="rpt-kpi-label">Paradas Críticas</div>
+                    <div class="rpt-kpi-value" id="rpt-kpi-critico">0</div>
+                </div>
+                <div class="rpt-kpi andamento">
+                    <div class="rpt-kpi-label">Em Andamento</div>
+                    <div class="rpt-kpi-value" id="rpt-kpi-andamento">0</div>
+                </div>
+                <div class="rpt-kpi pendente">
+                    <div class="rpt-kpi-label">Sem Responsável</div>
+                    <div class="rpt-kpi-value" id="rpt-kpi-pendente">0</div>
+                </div>
+                <div class="rpt-kpi liberadas">
+                    <div class="rpt-kpi-label">Total de OS</div>
+                    <div class="rpt-kpi-value" id="rpt-kpi-total">0</div>
+                </div>
+            </div>
+
+            <!-- Tabela de OS Abertas -->
+            <div class="rpt-section-title">Ocorrências Abertas / Em Atendimento</div>
+            <table class="rpt-table" id="rpt-tabela-os">
+                <thead>
+                    <tr>
+                        <th style="width:70px">Nº OS</th>
+                        <th>Equipamento / Máquina</th>
+                        <th style="width:90px">Setor</th>
+                        <th style="width:75px">Tipo</th>
+                        <th>Motivo / Defeito</th>
+                        <th style="width:80px">Prioridade</th>
+                        <th style="width:100px">Data/Hora Falha</th>
+                        <th style="width:80px">Tempo Parada</th>
+                        <th style="width:110px">Responsável</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody id="rpt-tbody">
+                    <!-- preenchido via JS -->
+                </tbody>
+            </table>
+
+            <!-- Rodapé e Assinaturas -->
+            <div class="rpt-assinaturas">
+                <div class="rpt-assinatura-box">
+                    _______________________________
+                    <div class="cargo">Responsável de Manutenção</div>
+                </div>
+                <div class="rpt-assinatura-box">
+                    _______________________________
+                    <div class="cargo">Supervisor de Produção</div>
+                </div>
+                <div class="rpt-assinatura-box">
+                    _______________________________
+                    <div class="cargo">Gerência Industrial</div>
+                </div>
+            </div>
+
+            <div class="rpt-footer">
+                <span>LUMINARY OS — Sistema de Monitoração Industrial</span>
+                <span>Documento gerado em <span id="rpt-footer-data"></span> — Uso interno</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÃO FLUTUANTE IMPRIMIR (visível no modo TV) -->
+    <button id="btn-imprimir"
+        onclick="prepararImpressao()"
+        style="position:fixed;bottom:28px;right:28px;z-index:200;background:#1e40af;color:#fff;border:none;border-radius:50px;padding:12px 22px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.5);display:flex;align-items:center;gap:8px;letter-spacing:0.04em">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir Relatório
+    </button>
+
     <script>
         const staticMachines = [
-            { id: 1, name: "Conformadora Telha Marafon", type: "CRÍTICO", reason: "Quebra de Correia", time: "66h 24m", tech: "Carlos Alberto", status: "error" },
-            { id: 2, name: "Prensa Hidráulica L-02", type: "PREVENTIVA", reason: "Troca de Fluido", time: "02h 15m", tech: "Roberto S.", status: "warning" },
-            { id: 3, name: "Injetora Plástica 500T", type: "CORRETIVA", reason: "Aquecimento Motor", time: "04h 12m", tech: "Pendente", status: "error" },
-            { id: 4, name: "Esteira Transportadora C-01", type: "CRÍTICO", reason: "Alinhamento Eixo", time: "01h 20m", tech: "Marcos P.", status: "error" }
+            { id: 1, os: "OS-0421", name: "Conformadora Telha Marafon", setor: "Conformação", type: "CRÍTICO", reason: "Quebra de Correia", time: "66h 24m", tech: "Carlos Alberto", status: "error", dataFalha: "17/04/2026 08:30", prioridade: "Alta", obs: "Aguardando peça do fornecedor." },
+            { id: 2, os: "OS-0422", name: "Prensa Hidráulica L-02", setor: "Estamparia", type: "PREVENTIVA", reason: "Troca de Fluido", time: "02h 15m", tech: "Roberto S.", status: "warning", dataFalha: "17/04/2026 14:45", prioridade: "Média", obs: "Manutenção programada conforme plano." },
+            { id: 3, os: "OS-0423", name: "Injetora Plástica 500T", setor: "Injeção", type: "CORRETIVA", reason: "Aquecimento Motor", time: "04h 12m", tech: "Pendente", status: "error", dataFalha: "17/04/2026 12:10", prioridade: "Alta", obs: "Sem técnico alocado. Verificar disponibilidade." },
+            { id: 4, os: "OS-0424", name: "Esteira Transportadora C-01", setor: "Expedição", type: "CRÍTICO", reason: "Alinhamento Eixo", time: "01h 20m", tech: "Marcos P.", status: "error", dataFalha: "17/04/2026 15:40", prioridade: "Alta", obs: "" }
         ];
 
         let systemStarted = false;
+
+        function prepararImpressao() {
+            const agora = new Date();
+            const dataStr = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            document.getElementById('rpt-data-emissao').textContent = dataStr;
+            document.getElementById('rpt-hora-emissao').textContent = horaStr;
+            document.getElementById('rpt-footer-data').textContent = `${dataStr} às ${horaStr}`;
+
+            const criticos = staticMachines.filter(m => m.status === 'error').length;
+            const semResponsavel = staticMachines.filter(m => !m.tech || m.tech === 'Pendente').length;
+
+            document.getElementById('rpt-kpi-critico').textContent = criticos;
+            document.getElementById('rpt-kpi-andamento').textContent = staticMachines.filter(m => m.type === 'CORRETIVA').length;
+            document.getElementById('rpt-kpi-pendente').textContent = semResponsavel;
+            document.getElementById('rpt-kpi-total').textContent = staticMachines.length;
+
+            const badgeClass = (type) => {
+                if (type === 'CRÍTICO') return 'badge-critico';
+                if (type === 'PREVENTIVA') return 'badge-preventiva';
+                return 'badge-corretiva';
+            };
+
+            const tbody = document.getElementById('rpt-tbody');
+            tbody.innerHTML = staticMachines.map(m => {
+                const semResp = !m.tech || m.tech === 'Pendente';
+                const timeClass = m.status === 'warning' ? 'time-col warn' : 'time-col';
+                return `<tr>
+                    <td style="font-weight:700;color:#374151">${m.os || '—'}</td>
+                    <td style="font-weight:600">${m.name}</td>
+                    <td>${m.setor || '—'}</td>
+                    <td><span class="${badgeClass(m.type)}">${m.type}</span></td>
+                    <td>${m.reason}</td>
+                    <td style="font-weight:700;color:${m.prioridade === 'Alta' ? '#b91c1c' : '#b45309'}">${m.prioridade || '—'}</td>
+                    <td style="font-size:9.5px;color:#374151">${m.dataFalha || '—'}</td>
+                    <td class="${timeClass}">${m.time}</td>
+                    <td style="${semResp ? 'color:#b91c1c;font-weight:700' : ''}">${m.tech}</td>
+                    <td style="font-size:9px;color:#6b7280;font-style:italic">${m.obs || ''}</td>
+                </tr>`;
+            }).join('');
+
+            window.print();
+        }
 
         function startSystem() {
             systemStarted = true;
