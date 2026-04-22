@@ -6167,12 +6167,19 @@ export default function App() {
         },
       ])
     );
+    const vendedorFilialVendMapDash = new Map(
+      (vendedoresData || []).map((v) => [
+        normalizarCodigoVendedor(v.Codigo),
+        String(v['Filial Vend.'] || '').trim() || '',
+      ])
+    );
 
     if (!faturamentoLinhas.length) {
       return {
         linhasMes: [],
         linhasTodas: [],
         filiais: [],
+        filiaisVend: [],
         mes: '',
         produtosPorCodigo,
         municipiosPorChave,
@@ -6183,6 +6190,9 @@ export default function App() {
     const normalizadas = faturamentoLinhas.map((row) => {
       const mesInfo = obterMesKey(row);
       const tipoMovimento = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento);
+      const vendedorCodigo = normalizarCodigoVendedor(
+        row?.Vendedor1 ?? row?.vendedor1 ?? row?.Vendedor ?? row?.vendedor ?? ''
+      );
       return {
         cliente: row?.Cliente ?? row?.cliente ?? 'Sem cliente',
         grupo: row?.Grupo ?? row?.grupo ?? 'Sem grupo',
@@ -6199,6 +6209,7 @@ export default function App() {
         mesDisplay: mesInfo?.display,
         tipoMovimento,
         cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
+        filialVend: vendedorFilialVendMapDash.get(vendedorCodigo) || '',
       };
     });
 
@@ -6218,18 +6229,23 @@ export default function App() {
       new Set(linhasMes.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
     ).sort((a, b) => String(a).localeCompare(String(b)));
 
+    const filiaisVend = Array.from(
+      new Set(linhasMes.map((row) => row.filialVend).filter((f) => !!f))
+    ).sort();
+
     return {
       linhasMes,
       linhasTodas: normalizadas,
       filiais,
+      filiaisVend,
       mes: mesAtualDisplay,
       produtosPorCodigo,
       municipiosPorChave,
       clientesPorCodigo,
     };
-  }, [faturamentoLinhas, produtosData, municipiosLatLong, clientesData]);
+  }, [faturamentoLinhas, produtosData, municipiosLatLong, clientesData, vendedoresData]);
 
-  const dashboardFiliais = dashboardFaturamentoBase.filiais;
+  const dashboardFiliais = dashboardFaturamentoBase.filiaisVend || [];
   const dashboardFilialAtual =
     dashboardFiliais.length > 0
       ? dashboardFiliais[Math.min(dashboardFilialIndex, dashboardFiliais.length - 1)]
@@ -6297,10 +6313,10 @@ export default function App() {
       municipiosPorChave,
     } = dashboardFaturamentoBase;
     const linhasBase = dashboardFilialAtual
-      ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
+      ? linhasMes.filter((row) => row.filialVend === dashboardFilialAtual)
       : linhasMes;
     const linhasBaseDia = dashboardFilialAtual
-      ? linhasMes.filter((row) => row.filial === dashboardFilialAtual)
+      ? linhasMes.filter((row) => row.filialVend === dashboardFilialAtual)
       : linhasMes;
     const linhasFiltradas =
       filtroCfops.length === 0
@@ -6516,7 +6532,7 @@ export default function App() {
     const hojeISO = new Date().toISOString().slice(0, 10);
     const linhasHoje = (linhasMes || []).filter((row) => {
       if (!row.emissao) return false;
-      if (dashboardFilialAtual && row.filial !== dashboardFilialAtual) return false;
+      if (dashboardFilialAtual && row.filialVend !== dashboardFilialAtual) return false;
       return obterDataIsoUtc(row.emissao) === hojeISO;
     });
     const linhasFiltradas =
@@ -10808,7 +10824,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="rounded-2xl bg-slate-950/60 px-3 py-1.5 overflow-hidden">
                     <div className="flex items-center justify-between mb-0.5">
                       <p className="text-[10px] uppercase tracking-[0.35em] text-emerald-300 font-bold">
-                        Faturado hoje · {dashboardFilialAtual ? `Filial ${dashboardFilialAtual}` : 'Todas as filiais'}
+                        Faturado hoje · {dashboardFilialAtual ? dashboardFilialAtual : 'Todas as filiais'}
                       </p>
                       <span className="text-[10px] text-slate-500">
                         {agora.toLocaleDateString('pt-BR')}
@@ -10821,7 +10837,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">
-                        Faturamento total {dashboardFilialAtual ? `· Filial ${dashboardFilialAtual}` : ''}
+                        Faturamento total {dashboardFilialAtual ? `· ${dashboardFilialAtual}` : ''}
                       </p>
                       <p className="text-3xl font-black text-blue-300 mt-2">
                         {formatarMoeda(dashboardFaturamentoFilial.total || 0)}
@@ -10831,7 +10847,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento hoje da filial</p>
                       <p className="text-3xl font-black text-emerald-300 mt-2">{formatarMoeda(faturamentoHojeDashboard)}</p>
-                      <p className="text-base text-slate-400 mt-2">{dashboardFilialAtual ? `Filial ${dashboardFilialAtual}` : 'Filial atual'}</p>
+                      <p className="text-base text-slate-400 mt-2">{dashboardFilialAtual ? dashboardFilialAtual : 'Todas as filiais'}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-[0_16px_32px_-30px_rgba(15,23,42,0.9)]">
                       <p className="text-sm uppercase tracking-[0.4em] text-slate-400 font-bold">Ticket medio</p>
