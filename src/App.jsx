@@ -914,6 +914,7 @@ export default function App() {
   const [tourOperadorStep, setTourOperadorStep] = useState(0);
   const [tourOperadorPos, setTourOperadorPos] = useState(null);
   const [filtroFilial, setFiltroFilial] = useState('08');
+  const [filtroFilialVend, setFiltroFilialVend] = useState('Todas');
   const [filtroCfops, setFiltroCfops] = useState(CFOP_DEFAULTS);
   const [mostrarFiltroCfop, setMostrarFiltroCfop] = useState(false);
   const [mostrarFiltroFaturamento, setMostrarFiltroFaturamento] = useState(false);
@@ -5786,6 +5787,12 @@ export default function App() {
         },
       ])
     );
+    const vendedorFilialVendMap = new Map(
+      (vendedoresData || []).map((v) => [
+        normalizarCodigoVendedor(v.Codigo),
+        String(v['Filial Vend.'] || '').trim() || '',
+      ])
+    );
 
     if (!faturamentoLinhas.length) {
       return {
@@ -5799,6 +5806,7 @@ export default function App() {
         porDia: [],
         porDiaFilial: [],
         filiais: [],
+        filiaisVend: [],
         porFilial: [],
         clientesAtivos: 0,
         movimentos: 0,
@@ -5836,6 +5844,7 @@ export default function App() {
         tipoMovimento,
         cfop: row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '',
         vendedorCodigo,
+        filialVend: vendedorFilialVendMap.get(vendedorCodigo) || '',
       };
     });
 
@@ -5865,14 +5874,22 @@ export default function App() {
       new Set(linhasPeriodo.map((row) => row.filial).filter((item) => item && item !== 'Sem filial'))
     ).sort((a, b) => String(a).localeCompare(String(b)));
 
+    const filiaisVend = Array.from(
+      new Set(linhasPeriodo.map((row) => row.filialVend).filter((f) => !!f))
+    ).sort();
+
     const filtradasPorFilial =
       filtroFilial === 'Todas'
         ? linhasPeriodo
         : linhasPeriodo.filter((row) => row.filial === filtroFilial);
+    const filtradasPorFilialVend =
+      filtroFilialVend === 'Todas'
+        ? filtradasPorFilial
+        : filtradasPorFilial.filter((row) => row.filialVend === filtroFilialVend);
     const linhasFiltradas =
       filtroCfops.length === 0
-        ? filtradasPorFilial
-        : filtradasPorFilial.filter((row) => {
+        ? filtradasPorFilialVend
+        : filtradasPorFilialVend.filter((row) => {
             if (row.tipoMovimento === 'devolucao') return true;
             const cfop = String(row.cfop || '').trim();
             return cfop ? filtroCfops.includes(cfop) : false;
@@ -6103,6 +6120,7 @@ export default function App() {
       porDiaFilial,
       porFilial,
       filiais,
+      filiaisVend,
       clientesAtivos,
       movimentos,
       ticketMedio,
@@ -6116,7 +6134,7 @@ export default function App() {
       estadosTodos,
       municipiosMapa,
     };
-  }, [faturamentoLinhas, filtroFilial, filtroCfops, faturamentoInicio, faturamentoFim]);
+  }, [faturamentoLinhas, filtroFilial, filtroFilialVend, filtroCfops, faturamentoInicio, faturamentoFim, vendedoresData]);
 
   const dashboardFaturamentoBase = useMemo(() => {
     const produtosPorCodigo = new Map(
@@ -7495,6 +7513,12 @@ export default function App() {
     if (faturamentoAtual.filiais.includes(filtroFilial)) return;
     setFiltroFilial('Todas');
   }, [faturamentoAtual.filiais, filtroFilial]);
+
+  useEffect(() => {
+    if (filtroFilialVend === 'Todas') return;
+    if (faturamentoAtual.filiaisVend?.includes(filtroFilialVend)) return;
+    setFiltroFilialVend('Todas');
+  }, [faturamentoAtual.filiaisVend, filtroFilialVend]);
 
   const faturamento2025 = useMemo(() => {
     const clientesPorCodigo = new Map(
@@ -9889,6 +9913,25 @@ const custoDetalheTitulo = custoDetalheItem
                         </button>
                       ))}
                     </div>
+                    {(faturamentoAtual.filiaisVend?.length ?? 0) > 0 && (
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        <span className="mr-2">Filial Vend.</span>
+                        {['Todas', ...faturamentoAtual.filiaisVend].map((fv) => (
+                          <button
+                            key={fv}
+                            type="button"
+                            onClick={() => setFiltroFilialVend(fv)}
+                            className={`rounded-full px-3 py-1.5 transition-all ${
+                              filtroFilialVend === fv
+                                ? 'bg-blue-600 text-white shadow'
+                                : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                            }`}
+                          >
+                            {fv}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <div
                       className="text-[10px] text-slate-500"
                       title={filtroCfops.length ? filtroCfops.join(", ") : "Todos"}
@@ -11846,7 +11889,7 @@ const custoDetalheTitulo = custoDetalheItem
                             Filtros (Filiais/CFOP)
                           </button>
                           <span className="text-[10px] text-slate-400">
-                            {filtroFilial} | {filtroCfops.length} CFOPs
+                            {filtroFilial} | {filtroFilialVend !== 'Todas' ? filtroFilialVend + ' | ' : ''}{filtroCfops.length} CFOPs
                           </span>
                         </div>
                         {mostrarFiltroFaturamento && (
@@ -11868,6 +11911,25 @@ const custoDetalheTitulo = custoDetalheItem
                                 </button>
                               ))}
                             </div>
+                            {(faturamentoAtual.filiaisVend?.length ?? 0) > 0 && (
+                              <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                <span className="mr-2">Filial Vend.</span>
+                                {['Todas', ...faturamentoAtual.filiaisVend].map((fv) => (
+                                  <button
+                                    key={fv}
+                                    type="button"
+                                    onClick={() => setFiltroFilialVend(fv)}
+                                    className={`rounded-full px-3 py-2 transition-all ${
+                                      filtroFilialVend === fv
+                                        ? 'bg-blue-600 text-white shadow'
+                                        : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                                    }`}
+                                  >
+                                    {fv}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                             <div>
                               <CfopFilterSelector
                                 selected={filtroCfops}
