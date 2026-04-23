@@ -14239,7 +14239,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <>
                             <ResponsiveContainer width="100%" height={200}>
                               <PieChart>
-                                <Pie data={relatorioStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                <Pie data={relatorioStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none" label={({ percent }) => percent > 0.04 ? `${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                                   {relatorioStatusData.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
                                 </Pie>
                                 <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
@@ -14266,7 +14266,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <>
                             <ResponsiveContainer width="100%" height={200}>
                               <PieChart>
-                                <Pie data={relatorioPorTipo} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                <Pie data={relatorioPorTipo} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none" label={({ percent }) => percent > 0.04 ? `${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                                   {relatorioPorTipo.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
                                 </Pie>
                                 <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
@@ -14293,7 +14293,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <>
                             <ResponsiveContainer width="100%" height={200}>
                               <PieChart>
-                                <Pie data={relatorioPorPrioridade} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none">
+                                <Pie data={relatorioPorPrioridade} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" stroke="none" label={({ percent }) => percent > 0.04 ? `${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                                   {relatorioPorPrioridade.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
                                 </Pie>
                                 <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
@@ -14342,7 +14342,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <>
                             <ResponsiveContainer width="100%" height={220}>
                               <PieChart>
-                                <Pie data={relatorioPorCategoria} cx="50%" cy="50%" outerRadius={85} paddingAngle={2} dataKey="value" stroke="none">
+                                <Pie data={relatorioPorCategoria} cx="50%" cy="50%" outerRadius={85} paddingAngle={2} dataKey="value" stroke="none" label={({ percent }) => percent > 0.04 ? `${(percent * 100).toFixed(0)}%` : ''} labelLine={false}>
                                   {relatorioPorCategoria.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
                                 </Pie>
                                 <RechartsTooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', fontSize: '11px', color: '#e2e8f0' }} />
