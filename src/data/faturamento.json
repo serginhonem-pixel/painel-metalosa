@@ -12410,6 +12410,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "033852",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01382C         ",
+    "Descricao": "TUBO QD 50X30X1,20 GALV                           ",
+    "Quantidade": 17.78,
+    "Unidade": "KG",
+    "ValorUnitario": 8.96,
+    "ValorTotal": 159.3,
+    "Emissao": "2026-04-23T00:00:00.000Z",
+    "Vendedor1": "C12   ",
+    "NF": 342854,
+    "CodFiscal": "5101",
+    "MesEmissao": "04/2026",
+    "TipoMovimento": "N"
+  },
+  {
     "Cliente": "033919",
     "Filial": "01",
     "Grupo": "G130",
@@ -287606,6 +287623,23 @@
     "TipoMovimento": "N"
   },
   {
+    "Cliente": "057870",
+    "Filial": "01",
+    "Grupo": "G130",
+    "Codigo": "01332E         ",
+    "Descricao": "TUBO RED 7/8X1,90 GALV                           ;23/04/2026;04;342855   ;       6,0000;KG;       54,24;        9,04;N;5101 ;C06   ;ES",
+    "Quantidade": "",
+    "Unidade": "",
+    "ValorUnitario": "",
+    "ValorTotal": "",
+    "Emissao": "",
+    "Vendedor1": "",
+    "NF": "",
+    "CodFiscal": "",
+    "MesEmissao": "",
+    "TipoMovimento": "venda"
+  },
+  {
     "Cliente": "0967  ",
     "Filial": "01",
     "Grupo": "0090",
@@ -415135,6 +415169,23 @@
     "Emissao": "2026-04-20T00:00:00.000Z",
     "Vendedor1": "C12   ",
     "NF": 254910,
+    "CodFiscal": "5102",
+    "MesEmissao": "04/2026",
+    "TipoMovimento": "N"
+  },
+  {
+    "Cliente": "C22933",
+    "Filial": "04",
+    "Grupo": "0055",
+    "Codigo": "09020D         ",
+    "Descricao": "****",
+    "Quantidade": 40,
+    "Unidade": "PC",
+    "ValorUnitario": 37.13,
+    "ValorTotal": 1485.2,
+    "Emissao": "2026-04-23T00:00:00.000Z",
+    "Vendedor1": "C12   ",
+    "NF": 255074,
     "CodFiscal": "5102",
     "MesEmissao": "04/2026",
     "TipoMovimento": "N"
