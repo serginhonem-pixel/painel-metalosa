@@ -34,6 +34,8 @@ import {
   Layers,
   Warehouse,
   Cog,
+  SlidersHorizontal,
+  PackagePlus,
 } from 'lucide-react';
 
 const MP_CODIGO = {
@@ -1139,6 +1141,318 @@ function ConsultarEscada({ ordens }) {
   );
 }
 
+// ---------- AJUSTE DE ESTOQUE ----------------------------------------
+function AjusteEstoque({ lotes }) {
+  const todos = lotes.filter((l) => l.ativo);
+  const [loteId,     setLoteId]     = useState('');
+  const [tipoAjuste, setTipoAjuste] = useState('inventario');
+  const [novaQtd,    setNovaQtd]    = useState('');
+  const [motivo,     setMotivo]     = useState('');
+  const [saving,     setSaving]     = useState(false);
+  const [feedback,   setFeedback]   = useState(null);
+
+  const lote = todos.find((l) => l.id === loteId);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!loteId || novaQtd === '') {
+      setFeedback({ tipo: 'erro', msg: 'Selecione o lote e informe a nova quantidade.' });
+      return;
+    }
+    const novaQtdNum = Number(novaQtd);
+    if (novaQtdNum < 0) {
+      setFeedback({ tipo: 'erro', msg: 'Quantidade nao pode ser negativa.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const batch = writeBatch(db);
+      const delta = novaQtdNum - (lote?.qtdDisponivel ?? 0);
+      batch.update(doc(db, 'rastreabilidade_lotes', loteId), {
+        qtdDisponivel: novaQtdNum,
+      });
+      // Registra historico do ajuste
+      batch.set(doc(collection(db, 'rastreabilidade_ajustes')), {
+        loteId,
+        tipo: lote?.tipo ?? '',
+        mp: lote?.mp ?? lote?.codigoPi ?? lote?.nomeComp ?? '',
+        nroLote: lote?.nroLoteFornecedor ?? lote?.nroOP ?? '',
+        qtdAntes: lote?.qtdDisponivel ?? 0,
+        qtdDepois: novaQtdNum,
+        delta,
+        tipoAjuste,
+        motivo: motivo.trim(),
+        ajustadoEm: new Date().toISOString(),
+      });
+      await batch.commit();
+      setFeedback({ tipo: 'ok', msg: `Saldo ajustado de ${lote?.qtdDisponivel ?? 0} para ${novaQtdNum} (${delta >= 0 ? '+' : ''}${delta}).` });
+      setLoteId(''); setNovaQtd(''); setMotivo('');
+    } catch {
+      setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setFeedback(null), 5000);
+    }
+  };
+
+  const tiposAjuste = [
+    { v: 'inventario', label: 'Inventario fisico' },
+    { v: 'correcao',   label: 'Correcao de lancamento' },
+    { v: 'perda',      label: 'Perda / Avaria' },
+    { v: 'retorno',    label: 'Retorno / Devolucao' },
+    { v: 'outro',      label: 'Outro' },
+  ];
+
+  // Agrupa para exibir no select por tipo
+  const gruposMp   = todos.filter((l) => l.tipo === 'MP');
+  const gruposPi   = todos.filter((l) => l.tipo === 'PI');
+  const gruposComp = todos.filter((l) => l.tipo === 'COMPRADO');
+
+  return (
+    <Card>
+      <SectionTitle icon={SlidersHorizontal}>Ajuste de Estoque</SectionTitle>
+      <Feedback feedback={feedback} />
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <Label>Selecione o Lote *</Label>
+            <select value={loteId} onChange={(e) => { setLoteId(e.target.value); setNovaQtd(''); }} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-amber-500 transition">
+              <option value="">-- selecionar lote --</option>
+              {gruposMp.length > 0 && (
+                <optgroup label="Materia-Prima (MP)">
+                  {gruposMp.map((l) => <option key={l.id} value={l.id}>{MP_CODIGO[l.mp]?.label ?? l.mp} | Lote {l.nroLoteFornecedor} | Saldo: {l.qtdDisponivel}</option>)}
+                </optgroup>
+              )}
+              {gruposPi.length > 0 && (
+                <optgroup label="Produto Intermediario (PI)">
+                  {gruposPi.map((l) => <option key={l.id} value={l.id}>{l.descricaoPi ?? l.codigoPi} | OP {l.nroOP || '--'} | Saldo: {l.qtdDisponivel}</option>)}
+                </optgroup>
+              )}
+              {gruposComp.length > 0 && (
+                <optgroup label="Comprado">
+                  {gruposComp.map((l) => <option key={l.id} value={l.id}>{l.nomeComp} | Lote {l.nroLoteFornecedor} | Saldo: {l.qtdDisponivel}</option>)}
+                </optgroup>
+              )}
+            </select>
+          </div>
+          <div>
+            <Label>Tipo de Ajuste *</Label>
+            <Select value={tipoAjuste} onChange={(e) => setTipoAjuste(e.target.value)}>
+              {tiposAjuste.map((t) => <option key={t.v} value={t.v}>{t.label}</option>)}
+            </Select>
+          </div>
+        </div>
+        {lote && (
+          <div className="rounded-2xl border border-amber-100 bg-amber-50/40 p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo</p>
+              <p className="text-sm font-bold text-slate-700 mt-1">{lote.tipo}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Material</p>
+              <p className="text-sm font-bold text-slate-700 mt-1">{MP_CODIGO[lote.mp]?.label ?? lote.descricaoPi ?? lote.nomeComp ?? lote.mp ?? '--'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Saldo Atual</p>
+              <p className={`text-2xl font-black mt-1 ${lote.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{lote.qtdDisponivel}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">DANFE / OP</p>
+              <p className="text-sm font-mono text-slate-600 mt-1">{lote.danfe || lote.nroOP || '--'}</p>
+            </div>
+          </div>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <Label>Nova Quantidade (saldo correto) *</Label>
+            <Input type="number" min="0" value={novaQtd} onChange={(e) => setNovaQtd(e.target.value)} placeholder="Ex: 250" disabled={!loteId} />
+            {lote && novaQtd !== '' && (
+              <p className={`text-[10px] font-black mt-1 ${Number(novaQtd) > lote.qtdDisponivel ? 'text-emerald-600' : Number(novaQtd) < lote.qtdDisponivel ? 'text-rose-500' : 'text-slate-400'}`}>
+                Diferenca: {Number(novaQtd) - lote.qtdDisponivel >= 0 ? '+' : ''}{Number(novaQtd) - lote.qtdDisponivel} unidades
+              </p>
+            )}
+          </div>
+          <div>
+            <Label>Motivo / Observacao</Label>
+            <Input value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex: Contagem fisica em 27/04/2026" disabled={!loteId} />
+          </div>
+        </div>
+        <div className="flex justify-end pt-1">
+          <button type="submit" disabled={saving || !loteId || novaQtd === ''} className="bg-amber-500 hover:bg-amber-400 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-amber-200 hover:shadow-md">
+            <SlidersHorizontal size={15} /> {saving ? 'Salvando...' : 'Confirmar Ajuste'}
+          </button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// ---------- PRODUTO ACABADO -------------------------------------------
+function RegistroProdutoAcabado({ ordens, lotes }) {
+  const modelos = BOM_ESCADAS.bom_escadas_rastreados;
+  const [form, setForm] = useState({
+    nroSerie: '',
+    nroOP: '',
+    modeloCod: '',
+    dataProd: today(),
+    dataInspecao: today(),
+    inspetor: '',
+    statusQC: 'aprovado',
+    nroLacre: '',
+    observacao: '',
+  });
+  const [saving,   setSaving]   = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.nroSerie.trim() || !form.modeloCod || !form.inspetor.trim()) {
+      setFeedback({ tipo: 'erro', msg: 'Preencha: Nr Serie, Modelo e Inspetor.' });
+      return;
+    }
+    const duplicado = ordens.find((o) => o.nroSerie?.trim() === form.nroSerie.trim() && o.tipo === 'PA');
+    if (duplicado) {
+      setFeedback({ tipo: 'erro', msg: `Nr de serie ${form.nroSerie.trim()} ja registrado.` });
+      return;
+    }
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'rastreabilidade_ordens'), {
+        tipo: 'PA',
+        nroSerie: form.nroSerie.trim(),
+        nroOP: form.nroOP.trim(),
+        modeloCod: form.modeloCod,
+        descricaoModelo: modelos.find((m) => m.codigo_produto === form.modeloCod)?.descricao ?? '',
+        dataProd: form.dataProd,
+        dataInspecao: form.dataInspecao,
+        inspetor: form.inspetor.trim(),
+        statusQC: form.statusQC,
+        nroLacre: form.nroLacre.trim(),
+        observacao: form.observacao.trim(),
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
+      setFeedback({ tipo: 'ok', msg: `Escada ${form.nroSerie.trim()} registrada como PA.` });
+      setForm({ nroSerie: '', nroOP: '', modeloCod: '', dataProd: today(), dataInspecao: today(), inspetor: '', statusQC: 'aprovado', nroLacre: '', observacao: '' });
+    } catch {
+      setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setFeedback(null), 5000);
+    }
+  };
+
+  const paRegistrados = ordens.filter((o) => o.tipo === 'PA' && o.ativo).slice(0, 50);
+
+  return (
+    <div className="space-y-5">
+      <Card>
+        <SectionTitle icon={PackagePlus}>Registrar Produto Acabado (PA)</SectionTitle>
+        <Feedback feedback={feedback} />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 p-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <Label>Numero de Serie *</Label>
+                <Input value={form.nroSerie} onChange={(e) => set('nroSerie', e.target.value)} placeholder="Ex: ESC-2026-0001" />
+              </div>
+              <div>
+                <Label>Numero da OP</Label>
+                <Input value={form.nroOP} onChange={(e) => set('nroOP', e.target.value)} placeholder="Ex: OP-2026-0001" />
+              </div>
+              <div>
+                <Label>Modelo *</Label>
+                <Select value={form.modeloCod} onChange={(e) => set('modeloCod', e.target.value)}>
+                  <option value="">-- selecione --</option>
+                  {modelos.map((m) => <option key={m.codigo_produto} value={m.codigo_produto}>{m.codigo_produto} — {m.descricao}</option>)}
+                </Select>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>Data de Producao</Label>
+              <Input type="date" value={form.dataProd} onChange={(e) => set('dataProd', e.target.value)} />
+            </div>
+            <div>
+              <Label>Data da Inspecao</Label>
+              <Input type="date" value={form.dataInspecao} onChange={(e) => set('dataInspecao', e.target.value)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <Label>Inspetor / Responsavel *</Label>
+              <Input value={form.inspetor} onChange={(e) => set('inspetor', e.target.value)} placeholder="Nome do inspetor" />
+            </div>
+            <div>
+              <Label>Status QC *</Label>
+              <Select value={form.statusQC} onChange={(e) => set('statusQC', e.target.value)}>
+                <option value="aprovado">Aprovado</option>
+                <option value="reprovado">Reprovado</option>
+                <option value="pendente">Pendente de inspecao</option>
+              </Select>
+            </div>
+            <div>
+              <Label>Nr Lacre / Etiqueta INMETRO</Label>
+              <Input value={form.nroLacre} onChange={(e) => set('nroLacre', e.target.value)} placeholder="Ex: LAC-2026-0001" />
+            </div>
+          </div>
+          <div>
+            <Label>Observacoes</Label>
+            <Input value={form.observacao} onChange={(e) => set('observacao', e.target.value)} placeholder="Observacoes adicionais" />
+          </div>
+          <div className="flex justify-end pt-1">
+            <button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-emerald-200 hover:shadow-md">
+              <PackagePlus size={15} /> {saving ? 'Salvando...' : 'Registrar Produto Acabado'}
+            </button>
+          </div>
+        </form>
+      </Card>
+      {paRegistrados.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Produtos Acabados Registrados</p>
+            <Badge color="emerald">{paRegistrados.length} registros</Badge>
+          </div>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[900px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  {['Nr Serie','OP','Modelo','Prod.','Inspecao','Inspetor','Status QC','Lacre INMETRO'].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {paRegistrados.map((o) => (
+                  <tr key={o.id} className="row-hover transition-colors">
+                    <td className="py-3 px-2 font-bold text-slate-800 font-mono whitespace-nowrap">{o.nroSerie}</td>
+                    <td className="py-3 px-2 font-mono text-slate-500">{o.nroOP || '--'}</td>
+                    <td className="py-3 px-2">
+                      <p className="font-semibold text-slate-700">{o.modeloCod}</p>
+                      <p className="text-[10px] text-slate-400">{o.descricaoModelo}</p>
+                    </td>
+                    <td className="py-3 px-2 font-mono text-slate-500 whitespace-nowrap">{o.dataProd}</td>
+                    <td className="py-3 px-2 font-mono text-slate-500 whitespace-nowrap">{o.dataInspecao}</td>
+                    <td className="py-3 px-2 text-slate-600">{o.inspetor}</td>
+                    <td className="py-3 px-2">
+                      {o.statusQC === 'aprovado'  && <Badge color="emerald">Aprovado</Badge>}
+                      {o.statusQC === 'reprovado' && <Badge color="rose">Reprovado</Badge>}
+                      {o.statusQC === 'pendente'  && <Badge color="amber">Pendente</Badge>}
+                    </td>
+                    <td className="py-3 px-2 font-mono text-slate-500">{o.nroLacre || '--'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 function ExportarInmetro({ ordens }) {
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim]       = useState('');
@@ -1688,12 +2002,14 @@ function EstoqueAtual({ lotes }) {
 }
 
 const ABAS = [
-  { id: 'estoque',   label: 'Estoque',             icon: Warehouse     },
-  { id: 'lote',      label: 'Entrada de Lotes',     icon: Package       },
-  { id: 'producaopi',label: 'Producao de PI',       icon: Cog           },
-  { id: 'ordem',     label: 'Ordem de Producao',   icon: ClipboardList },
-  { id: 'consultar', label: 'Rastreabilidade',     icon: ArrowUpDown   },
-  { id: 'exportar',  label: 'Exportar INMETRO',    icon: Download      },
+  { id: 'estoque',    label: 'Estoque',             icon: Warehouse         },
+  { id: 'lote',       label: 'Entrada de Lotes',    icon: Package           },
+  { id: 'producaopi', label: 'Producao de PI',      icon: Cog               },
+  { id: 'ordem',      label: 'Ordem de Producao',   icon: ClipboardList     },
+  { id: 'pa',         label: 'Produto Acabado',     icon: PackagePlus       },
+  { id: 'ajuste',     label: 'Ajuste de Estoque',   icon: SlidersHorizontal },
+  { id: 'consultar',  label: 'Rastreabilidade',     icon: ArrowUpDown       },
+  { id: 'exportar',   label: 'Exportar INMETRO',    icon: Download          },
 ];
 
 const SENHA_ACESSO = 'escada';
@@ -1857,6 +2173,8 @@ export default function Rastreabilidade() {
       {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
       {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
       {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
+      {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
+      {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
       {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} />}
       {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
     </div>
