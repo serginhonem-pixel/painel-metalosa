@@ -15,6 +15,7 @@ import { maquinasBaseData, setoresBaseData } from './data/maquinasBase';
 import DashboardManutencaoTV from './components/DashboardManutencaoTV';
 import PainelOperacaoDiaria from './components/PainelOperacaoDiaria';
 import MrpAco from './components/MrpAco';
+import Rastreabilidade from './components/Rastreabilidade';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
@@ -58,7 +59,8 @@ import {
   Briefcase,
   Target,
   ShoppingCart,
-  Zap
+  Zap,
+  ScanLine
 } from 'lucide-react';
 
 // --- Constantes e Dados Iniciais ---
@@ -72,6 +74,7 @@ const ITENS_MENU = [
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
   { id: 'mrp-aco', label: 'Planejamento Aço', icon: ShoppingCart },
+  { id: 'rastreabilidade', label: 'Rastreabilidade', icon: ScanLine },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
 
@@ -15422,6 +15425,13 @@ const custoDetalheTitulo = custoDetalheItem
           {abaAtiva === 'mrp-aco' && (
             <div className="animate-in slide-in-from-top duration-500">
               <MrpAco />
+            </div>
+          )}
+
+          {/* ABA RASTREABILIDADE */}
+          {abaAtiva === 'rastreabilidade' && (
+            <div className="animate-in slide-in-from-top duration-500">
+              <Rastreabilidade />
             </div>
           )}
 
