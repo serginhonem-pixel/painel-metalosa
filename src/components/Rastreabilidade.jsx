@@ -1933,13 +1933,13 @@ function EstoqueAtual({ lotes }) {
           </div>
           <div className="mt-4 space-y-1">
             {gruposMp.map((g) =>
-              g.lotes.map((l) => (
+              g.lotes.filter((l) => l.qtdDisponivel > 0).map((l) => (
                 <div key={l.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2 text-xs">
                   <span className="font-bold text-slate-600 w-24 shrink-0">{g.label}</span>
                   <span className="font-mono text-slate-400">{l.nroLoteFornecedor}</span>
                   <span className="text-slate-400">DANFE {l.danfe || '--'}</span>
                   <span className="text-slate-400">{l.fornecedor}</span>
-                  <span className="ml-auto font-black text-sm" style={{ color: l.qtdDisponivel === 0 ? '#ef4444' : '#059669' }}>{l.qtdDisponivel}</span>
+                  <span className="ml-auto font-black text-sm text-emerald-600">{l.qtdDisponivel}</span>
                 </div>
               ))
             )}
