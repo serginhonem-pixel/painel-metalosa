@@ -193,6 +193,8 @@ function SectionTitle({ icon: Icon, children }) {
 function EntradaLoteMP({ lotes }) {
   const [form, setForm] = useState({
     mp: Object.keys(MP_CODIGO)[0],
+    origemTubo: 'comprado', // 'comprado' | 'producao'
+    nroOPTubo: '',
     danfe: '',
     nroLoteFornecedor: '',
     certificadoQualidade: '',
@@ -208,6 +210,13 @@ function EntradaLoteMP({ lotes }) {
   const [feedback, setFeedback] = useState(null);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+  const handleMpChange = (v) => setForm((p) => ({ ...p, mp: v, origemTubo: 'comprado', nroOPTubo: '' }));
+
+  const isProducao = form.origemTubo === 'producao';
+  const danfeLabel = isProducao ? 'DANFE da Materia-Prima Mae *'     : 'DANFE / Numero Nota Fiscal *';
+  const loteLabel  = isProducao ? 'Lote da MP Mae'                   : 'Numero Lote do Fornecedor *';
+  const certLabel  = isProducao ? 'Certificado da MP Mae (Usina)'    : 'Certificado de Qualidade';
+  const fornLabel  = isProducao ? 'Fornecedor da MP Mae *'           : 'Fornecedor *';
 
   const percPerda =
     form.pesoBrutoKg && form.pesoLiquidoKg && Number(form.pesoBrutoKg) > 0
@@ -229,6 +238,8 @@ function EntradaLoteMP({ lotes }) {
         tipo: 'MP',
         mp: form.mp,
         mpCodigo: MP_CODIGO[form.mp]?.codigo ?? '',
+        origemTubo: form.origemTubo,
+        ...(isProducao && form.nroOPTubo.trim() && { nroOPTubo: form.nroOPTubo.trim() }),
         danfe: form.danfe.trim(),
         nroLoteFornecedor: form.nroLoteFornecedor.trim(),
         certificadoQualidade: form.certificadoQualidade.trim(),
@@ -246,7 +257,8 @@ function EntradaLoteMP({ lotes }) {
       });
       setFeedback({ tipo: 'ok', msg: `Lote de ${MP_CODIGO[form.mp]?.label} registrado!` });
       setForm({
-        mp: Object.keys(MP_CODIGO)[0], danfe: '', nroLoteFornecedor: '',
+        mp: Object.keys(MP_CODIGO)[0], origemTubo: 'comprado', nroOPTubo: '',
+        danfe: '', nroLoteFornecedor: '',
         certificadoQualidade: '', fornecedor: '',
         qtdRecebida: '', qtdAprovada: '', qtdReprovada: '',
         pesoBrutoKg: '', pesoLiquidoKg: '', dataEntrada: today(),
@@ -283,35 +295,52 @@ function EntradaLoteMP({ lotes }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <Label>Materia-Prima *</Label>
-              <Select value={form.mp} onChange={(e) => set('mp', e.target.value)}>
+              <Select value={form.mp} onChange={(e) => handleMpChange(e.target.value)}>
                 {Object.keys(MP_CODIGO).map((k) => <option key={k} value={k}>{MP_CODIGO[k].label}</option>)}
               </Select>
             </div>
             <div>
-              <Label>DANFE / Numero Nota Fiscal *</Label>
+              <Label>{danfeLabel}</Label>
               <Input value={form.danfe} onChange={(e) => set('danfe', e.target.value)} placeholder="Ex: 000123456" />
             </div>
           </div>
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">Origem:</p>
+              {[{v:'comprado',label:'Comprado (por NF)'},{v:'producao',label:'Produzido aqui'}].map(({v,label})=>(
+                <button key={v} type="button" onClick={() => set('origemTubo', v)}
+                  className={`rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${form.origemTubo===v ? 'bg-blue-600 text-white shadow-md' : 'bg-white border border-blue-200 text-blue-500 hover:bg-blue-50'}`}>
+                  {label}
+                </button>
+              ))}
+              {isProducao && <p className="w-full text-[10px] text-blue-500 font-semibold mt-0.5">Informe os dados da materia-prima mae + a OP interna que gerou este material.</p>}
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <Label>Numero Lote do Fornecedor *</Label>
+              <Label>{loteLabel}</Label>
               <Input value={form.nroLoteFornecedor} onChange={(e) => set('nroLoteFornecedor', e.target.value)} placeholder="Ex: LOT-2026-001" />
             </div>
             <div>
-              <Label>Certificado de Qualidade</Label>
+              <Label>{certLabel}</Label>
               <Input value={form.certificadoQualidade} onChange={(e) => set('certificadoQualidade', e.target.value)} placeholder="Ex: CERT-2026-XYZ" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <Label>Fornecedor *</Label>
+              <Label>{fornLabel}</Label>
               <Input value={form.fornecedor} onChange={(e) => set('fornecedor', e.target.value)} placeholder="Razao social" />
             </div>
             <div>
-              <Label>Data de Entrada *</Label>
+              <Label>Data de {isProducao ? 'Producao' : 'Entrada'} *</Label>
               <Input type="date" value={form.dataEntrada} onChange={(e) => set('dataEntrada', e.target.value)} />
             </div>
           </div>
+          {isProducao && (
+            <div className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4">
+              <Label>OP de Producao *</Label>
+              <Input value={form.nroOPTubo} onChange={(e) => set('nroOPTubo', e.target.value)} placeholder="Ex: OP-2026-0001" />
+              <p className="text-[10px] text-violet-500 font-semibold mt-1.5">Numero da ordem interna que transformou a MP mae neste material.</p>
+            </div>
+          )}
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 space-y-4">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-2">
               <BarChart3 size={13} /> Metricas de Producao / Recebimento
@@ -374,9 +403,16 @@ function EntradaLoteMP({ lotes }) {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {lotesMP.map((l) => (
-                  <tr key={l.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-2 font-bold text-slate-800 whitespace-nowrap">{MP_CODIGO[l.mp]?.label ?? l.mp}</td>
-                    <td className="py-3 px-2"><span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{l.danfe || '--'}</span></td>
+                  <tr key={l.id} className="row-hover transition-colors">
+                    <td className="py-3 px-2 whitespace-nowrap">
+                      <p className="font-bold text-slate-800">{MP_CODIGO[l.mp]?.label ?? l.mp}</p>
+                      {l.origemTubo === 'producao' && <span className="text-[9px] font-black uppercase tracking-widest bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded mt-0.5 inline-block">Produzido aqui</span>}
+                      {l.origemTubo === 'comprado' && <span className="text-[9px] font-black uppercase tracking-widest bg-blue-100 text-blue-500 px-1.5 py-0.5 rounded mt-0.5 inline-block">Comprado</span>}
+                    </td>
+                    <td className="py-3 px-2">
+                      <span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{l.danfe || '--'}</span>
+                      {l.nroOPTubo && <p className="text-[10px] font-mono text-violet-500 mt-0.5">OP {l.nroOPTubo}</p>}
+                    </td>
                     <td className="py-3 px-2"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{l.nroLoteFornecedor}</span></td>
                     <td className="py-3 px-2">
                       {l.certificadoQualidade
@@ -602,7 +638,7 @@ function ProducaoPI({ lotes }) {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {lotesPi.map((l) => (
-                  <tr key={l.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={l.id} className="row-hover transition-colors">
                     <td className="py-3 px-2 font-bold text-slate-800 whitespace-nowrap">{l.descricaoPi}</td>
                     <td className="py-3 px-2"><span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{l.codigoPi}</span></td>
                     <td className="py-3 px-2 font-mono text-slate-500">{l.nroOP || '--'}</td>
@@ -1192,7 +1228,7 @@ function ExportarInmetro({ ordens }) {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filtradas.map((o) => (
-                <tr key={o.id} className={`hover:bg-slate-50 transition-colors cursor-pointer ${selecionados.has(o.id) ? 'bg-blue-50/40' : ''}`} onClick={() => toggle(o.id)}>
+                <tr key={o.id} className={`row-hover transition-colors cursor-pointer ${selecionados.has(o.id) ? 'bg-blue-50/40' : ''}`} onClick={() => toggle(o.id)}>
                   <td className="py-3 px-3">
                     <input type="checkbox" checked={selecionados.has(o.id)} onChange={() => toggle(o.id)} onClick={(e) => e.stopPropagation()} className="rounded accent-blue-600" />
                   </td>
@@ -1449,7 +1485,7 @@ function EntradaLoteComprado({ lotes }) {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {lotesComp.map((l) => (
-                  <tr key={l.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={l.id} className="row-hover transition-colors">
                     <td className="py-3 px-2 font-bold text-slate-800 whitespace-nowrap">{l.nomeComp}</td>
                     <td className="py-3 px-2"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{l.codigo || '--'}</span></td>
                     <td className="py-3 px-2"><span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{l.danfe || '--'}</span></td>
@@ -1528,7 +1564,7 @@ function EstoqueAtual({ lotes }) {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {gruposPi.map((g) => (
-                    <tr key={g.cod} className="hover:bg-slate-50 transition-colors">
+                    <tr key={g.cod} className="row-hover transition-colors">
                       <td className="py-3 px-3 font-black text-slate-800">{g.descricao}</td>
                       <td className="py-3 px-3"><span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{g.cod}</span></td>
                       <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
@@ -1550,16 +1586,18 @@ function EstoqueAtual({ lotes }) {
             <table className="w-full text-xs min-w-[640px]">
               <thead>
                 <tr className="border-b-2 border-slate-100">
-                  {['Material', 'Codigo', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
+                  {['Material', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
                     <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {gruposMp.map((g) => (
-                  <tr key={g.mpKey} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-3 font-black text-slate-800">{g.label}</td>
-                    <td className="py-3 px-3"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{g.codigo}</span></td>
+                  <tr key={g.mpKey} className="row-hover transition-colors">
+                    <td className="py-3 px-3">
+                      <p className="font-black text-slate-800 leading-tight">{g.label}</p>
+                      <span className="font-mono text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded mt-0.5 inline-block">{g.codigo}</span>
+                    </td>
                     <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                     <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
                     <td className="py-3 px-3 text-right">
@@ -1609,7 +1647,7 @@ function EstoqueAtual({ lotes }) {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {gruposComp.map((g) => (
-                  <tr key={g.nome} className="hover:bg-slate-50 transition-colors">
+                  <tr key={g.nome} className="row-hover transition-colors">
                     <td className="py-3 px-3 font-black text-slate-800">{g.nome}</td>
                     <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                     <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
