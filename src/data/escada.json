@@ -1,0 +1,405 @@
+{
+  "sistema": {
+    "nome": "Rastreabilidade de Lotes - Escadas Domésticas",
+    "versao": "1.0",
+    "descricao": "Sistema de rastreio de lotes de produção de escadas domésticas, cobrindo matérias-primas, cortes, produção e perdas por componente."
+  },
+  "produto_final": {
+    "codigo": "81700-81710",
+    "descricao": "Escada Doméstica",
+    "componentes_principais": [
+      "Montantes e Travessas (Tubo)",
+      "Patamar",
+      "Degrau",
+      "Articulador",
+      "Dobradiça",
+      "Arame Sustentador de Patamar",
+      "Reforço Montante Frontal"
+    ]
+  },
+  "estrutura_lote": {
+    "cabecalho": {
+      "codigo_PI": "Código do produto intermediário (ex: 81700-81710)",
+      "codigo_MP": "Código da matéria-prima (ex: 11307)",
+      "produto_PI": "Descrição do produto intermediário",
+      "produto_MP": "Descrição da matéria-prima",
+      "peso_liquido_PI_kg": "Peso líquido padrão do PI por peça (kg)",
+      "peso_MP_kg": "Peso da matéria-prima por unidade (kg ou por 6m tubo)",
+      "lote": "Identificador do lote (ex: TUB0001)",
+      "fornecedor": "Nome do fornecedor",
+      "danfe": "Número da DANFE (nota fiscal)",
+      "bobina_certificado": "Número da bobina ou certificado de qualidade",
+      "data": "Data de entrada/corte (número serial Excel — base 1899-12-30)",
+      "quantidade_MP": "Quantidade de matéria-prima recebida (peças ou rolos)",
+      "corte_kg": "Peso total cortado (kg)"
+    },
+    "linhas_producao": {
+      "data": "Data da operação (número serial Excel)",
+      "op": "Número da Ordem de Produção",
+      "pecas_produzidas": "Total de peças produzidas",
+      "reprovadas": "Peças reprovadas/sucata",
+      "aprovadas": "Peças aprovadas",
+      "percentual_perda_processo": "% perda no processo de fabricação",
+      "peso_bruto_kg": "Peso bruto consumido (kg)",
+      "peso_liquido_kg": "Peso líquido aprovado (kg)",
+      "percentual_perda_total": "% perda total acumulada"
+    }
+  },
+  "lotes_por_componente": {
+    "11307_Tubo": {
+      "produto_MP": "TUBO RED 1\"x1,20 ESC",
+      "produto_PI": "MONTANTES E TRAVESSAS (81700-81710)",
+      "subprodutos": [
+        {"codigo":"81700","descricao":"M FRONT 3D","medida_mm":2500,"peso_padrao_kg":1.85},
+        {"codigo":"81701","descricao":"M FRONT 4D","medida_mm":2960,"peso_padrao_kg":2.15},
+        {"codigo":"81702","descricao":"M FRONT 5D","medida_mm":3420,"peso_padrao_kg":2.50},
+        {"codigo":"81703","descricao":"M FRONT 6D","medida_mm":3880,"peso_padrao_kg":2.85},
+        {"codigo":"81704","descricao":"M FRONT 7D","medida_mm":4340,"peso_padrao_kg":3.15},
+        {"codigo":"81705","descricao":"M TRAS 3D","medida_mm":855,"peso_padrao_kg":0.65},
+        {"codigo":"81706","descricao":"M TRAS 4D","medida_mm":1085,"peso_padrao_kg":0.80},
+        {"codigo":"81707","descricao":"M TRAS 5D","medida_mm":1315,"peso_padrao_kg":0.95},
+        {"codigo":"81708","descricao":"M TRAS 6D","medida_mm":1545,"peso_padrao_kg":1.15},
+        {"codigo":"81709","descricao":"M TRAS 7D","medida_mm":1775,"peso_padrao_kg":1.30},
+        {"codigo":"81710","descricao":"TRAV","medida_mm":332,"peso_padrao_kg":0.25}
+      ],
+      "lotes": [
+        {
+          "lote": "TUB0001",
+          "fornecedor": "DOX (BELOAÇO)",
+          "danfe": "000019207 (000077574)",
+          "data_serial": 45341,
+          "data_iso": "2024-03-13",
+          "quantidade_MP": 651,
+          "corte_kg": 2738,
+          "total_producao": {
+            "pecas": 2806,
+            "peso_bruto_kg": 2738,
+            "sucata_kg": 71.7,
+            "peso_liquido_kg": 2666.3,
+            "perda_pct": 0.0262
+          }
+        },
+        {
+          "lote": "TUB0002",
+          "fornecedor": "DOX (BELOAÇO)",
+          "danfe": "000019643 (000077977)",
+          "data_serial": 45363,
+          "data_iso": "2024-04-04",
+          "quantidade_MP": 434,
+          "corte_kg": 1892,
+          "total_producao": {
+            "pecas": 1873.5,
+            "peso_bruto_kg": 1892,
+            "sucata_kg": 45,
+            "peso_liquido_kg": 1847,
+            "perda_pct": 0.0238
+          }
+        },
+        {
+          "lote": "TUB0003",
+          "fornecedor": "CSN (BELOAÇO)",
+          "danfe": "006838003 (000078421)",
+          "bobina": "D283940204",
+          "data_serial": 45473,
+          "data_iso": "2024-07-23",
+          "quantidade_MP": 428,
+          "corte_kg": 1819,
+          "total_producao": {
+            "obs": "Lote em andamento — produção parcial registrada"
+          }
+        },
+        {
+          "lote": "TUB0004",
+          "fornecedor": "DOX (BELOAÇO)",
+          "danfe": "000021373 (000079052)",
+          "data_serial": 45436,
+          "data_iso": "2024-05-26",
+          "quantidade_MP": 869,
+          "corte_kg": 3624,
+          "total_producao": {
+            "obs": "Sem produção registrada ainda"
+          }
+        }
+      ]
+    },
+    "81730_Chapa_Patamar_Degrau_Dobradica": {
+      "produto_MP": "CH ACO BF 1,20 2,00x1,20 ESC",
+      "lotes_patamar": [
+        {
+          "lote": "PAT0001",
+          "produto_PI": "PATAMAR # 1,20 ED (81711)",
+          "fornecedor": "CSN",
+          "danfe": "007012435",
+          "certificado": "D61101-1001",
+          "data_serial": 45345,
+          "data_iso": "2024-03-17",
+          "quantidade_chapas": 198,
+          "corte_kg": 1027.73,
+          "total_producao": {
+            "pecas": 993,
+            "reprovadas": 111,
+            "aprovadas": 882,
+            "perda_pct_processo": 0.1118,
+            "peso_bruto_kg": 1027.73,
+            "peso_liquido_kg": 723.24,
+            "perda_pct_total": 0.2963
+          }
+        },
+        {
+          "lote": "PAT0002",
+          "produto_PI": "PATAMAR # 1,20 ED (81711)",
+          "fornecedor": "USIMINAS (CORTE EM LASER)",
+          "danfe": "005290443 (800)",
+          "certificado": "2222765",
+          "data_serial": 45433,
+          "data_iso": "2024-05-23",
+          "quantidade_chapas": 8,
+          "corte_kg": 92.2,
+          "total_producao": {
+            "pecas": 100,
+            "reprovadas": 18,
+            "aprovadas": 82,
+            "perda_pct_processo": 0.18,
+            "peso_bruto_kg": 92.2,
+            "peso_liquido_kg": 67.24,
+            "perda_pct_total": 0.2707
+          }
+        }
+      ],
+      "lotes_degrau": [
+        {
+          "lote": "DEG0001",
+          "produto_PI": "DEGRAU # 1,20 ED (81712)",
+          "fornecedor": "CSN",
+          "danfe": "007012435",
+          "certificado": "D61101-1001",
+          "data_serial": 45345,
+          "data_iso": "2024-03-17",
+          "quantidade_chapas": 198,
+          "corte_kg": 3380.08,
+          "total_producao": {
+            "pecas": 5122,
+            "reprovadas": 75,
+            "aprovadas": 5047,
+            "perda_pct_processo": 0.0146,
+            "peso_bruto_kg": 3380.08,
+            "peso_liquido_kg": 2775.85,
+            "perda_pct_total": 0.1788
+          }
+        },
+        {
+          "lote": "DEG0002",
+          "produto_PI": "DEGRAU # 1,20 ED (81712)",
+          "fornecedor": "USIMINAS (CORTE EM LASER)",
+          "danfe": "005290443 (800)",
+          "certificado": "2222765",
+          "data_serial": 45433,
+          "data_iso": "2024-05-23",
+          "quantidade_chapas": 8,
+          "corte_kg": 92.2,
+          "total_producao": {
+            "pecas": 100,
+            "reprovadas": 4,
+            "aprovadas": 96,
+            "perda_pct_processo": 0.04,
+            "peso_bruto_kg": 92.2,
+            "peso_liquido_kg": 52.8,
+            "perda_pct_total": 0.4273
+          }
+        }
+      ],
+      "lotes_dobradica": [
+        {
+          "lote": "DOB0001",
+          "produto_PI": "DOBRADICA # 1,20 ED (81714)",
+          "fornecedor": "CSN",
+          "danfe": "007012435",
+          "certificado": "D61101-1001",
+          "data_serial": 45345,
+          "data_iso": "2024-03-17",
+          "quantidade_chapas": 198,
+          "corte_kg": 114.19,
+          "total_producao": {
+            "pecas": 1960,
+            "reprovadas": 94,
+            "aprovadas": 1866,
+            "perda_pct_processo": 0.048,
+            "peso_bruto_kg": 114.19,
+            "peso_liquido_kg": 83.97,
+            "perda_pct_total": 0.2647
+          }
+        }
+      ]
+    },
+    "81731_Chapa_Articulador": {
+      "produto_MP": "CH ACO BF 1,40 2,00x1,00 ESC",
+      "lotes": [
+        {
+          "lote": "ART0001",
+          "produto_PI": "ARTICULADOR # 1,40 ED (81713)",
+          "fornecedor": "CSN",
+          "danfe": "006944758",
+          "certificado": "D51330-0302",
+          "data_serial": 45348,
+          "data_iso": "2024-03-20",
+          "quantidade_chapas": 10,
+          "corte_kg": 220,
+          "total_producao": {
+            "pecas": 6685,
+            "reprovadas": 418,
+            "aprovadas": 6267,
+            "perda_pct_processo": 0.0625,
+            "peso_bruto_kg": 220,
+            "peso_liquido_kg": 94.005,
+            "perda_pct_total": 0.5727
+          }
+        }
+      ]
+    },
+    "11308_Arame": {
+      "produto_MP": "ARAME GALV 5,15MM ESC",
+      "produto_PI": "ARAME SUST PATAMAR Ø5MM ED (81715)",
+      "lotes": [
+        {
+          "lote": "ARA0001",
+          "fornecedor": "MACCAFERRI",
+          "danfe": "000311028",
+          "data_serial": 45348,
+          "data_iso": "2024-03-20",
+          "corte_kg": 94.38,
+          "total_producao": {
+            "pecas": 1650,
+            "reprovadas": 0,
+            "aprovadas": 1650,
+            "perda_pct_processo": 0,
+            "peso_bruto_kg": 94.38,
+            "peso_liquido_kg": 94.38,
+            "perda_pct_total": 0
+          }
+        },
+        {
+          "lote": "ARA0002",
+          "fornecedor": "MACCAFERRI",
+          "danfe": "000316083",
+          "data_serial": 45440,
+          "data_iso": "2024-05-30",
+          "quantidade_rolos": 2,
+          "corte_kg": 1235,
+          "saldo_kg": 935,
+          "total_producao": {
+            "pecas": 5000,
+            "reprovadas": 0,
+            "aprovadas": 5000,
+            "perda_pct_processo": 0,
+            "peso_bruto_kg": 300,
+            "peso_liquido_kg": 300,
+            "perda_pct_total": 0
+          }
+        }
+      ]
+    },
+    "11300_Barra_Chata": {
+      "produto_MP": "BARRA CHATA 3/8\"x1/8\" ESC",
+      "produto_PI": "REFORCO MONT. FRONTAL ED (81721)",
+      "lotes": [
+        {
+          "lote": "BAR0001",
+          "fornecedor": "ARCELOR MITTAL",
+          "danfe": "001468944",
+          "data_serial": 45343,
+          "data_iso": "2024-03-15",
+          "quantidade_barras": 60,
+          "corte_kg": 84.6,
+          "saldo_pcs": 0,
+          "saldo_kg": 0,
+          "total_producao": {
+            "pecas": 480,
+            "reprovadas": 0,
+            "aprovadas": 480,
+            "perda_pct_processo": 0,
+            "peso_bruto_kg": 84.6,
+            "peso_liquido_kg": 81.216,
+            "perda_pct_total": 0.04
+          }
+        },
+        {
+          "lote": "BAR0002",
+          "fornecedor": "ARCELOR MITTAL",
+          "danfe": "001490153",
+          "data_serial": 45437,
+          "data_iso": "2024-05-27",
+          "quantidade_barras": 690,
+          "corte_kg": 1000,
+          "producao_pcs": 140,
+          "producao_kg": 202.9,
+          "saldo_pcs": 550,
+          "saldo_kg": 797.1,
+          "total_producao": {
+            "pecas": 1120,
+            "reprovadas": 0,
+            "aprovadas": 1120,
+            "perda_pct_processo": 0,
+            "peso_bruto_kg": 202.9,
+            "peso_liquido_kg": 194.78,
+            "perda_pct_total": 0.04
+          }
+        }
+      ]
+    }
+  },
+  "estoque_componentes_por_lote": {
+    "descricao": "Tabela cruzada: para cada lote de produção final, quais fornecedores e DANFEs foram usados em cada componente",
+    "colunas": [
+      "lote_producao",
+      "tubo_montantes_travessas_81700-81710",
+      "patamar_81711",
+      "degrau_81712",
+      "articulador_81713",
+      "dobradica_81714",
+      "arame_sust_patamar_81715",
+      "reforco_montante_81721",
+      "arruela_lisa_3/16",
+      "rebite_R512A",
+      "rebite_R519A",
+      "rebite_R612",
+      "cinta_seguranca"
+    ],
+    "lotes": [
+      {
+        "lote_producao": "0001",
+        "tubo_montantes_travessas": {"fornecedor":"DOX","danfe":"000.019.207"},
+        "patamar_degrau_dobradica": {"fornecedor":"CSN","danfe":"007.012.435","certificado":"D61101-1001"},
+        "articulador": {"fornecedor":"CSN","danfe":"006.944.758","certificado":"D51330-0302"},
+        "arame_sust_patamar": {"fornecedor":"MACCAFERRI","danfe":"000.311.028"},
+        "reforco_montante": {"fornecedor":"ARCELOR MITTAL","danfe":"001.468.944"},
+        "arruela_lisa": {"fornecedor":"RENA","danfe":"000.086.702"},
+        "rebite_R512A": {"fornecedor":"RENA","danfe":"000.086.702"},
+        "rebite_R519A": {"fornecedor":"BELENUS","danfe":"000.897.898"},
+        "rebite_R612": {"fornecedor":"BELENUS","danfe":"000.897.898"},
+        "cinta_seguranca": {"fornecedor":"TUDO DE BOM","danfe":"000.000.217"}
+      },
+      {
+        "lote_producao": "0002",
+        "tubo_montantes_travessas": {"fornecedor":"DOX","danfe":"000.019.643"},
+        "patamar_degrau_dobradica": {"fornecedor":"USIMINAS","danfe":"005.290.443","certificado":"2222765"},
+        "arame_sust_patamar": {"fornecedor":"MACCAFERRI","danfe":"000.316.083"},
+        "reforco_montante": {"fornecedor":"ARCELOR MITTAL","danfe":"001.490.153"},
+        "arruela_lisa": {"fornecedor":"BELENUS","danfe":"000.948.526"},
+        "rebite_R512A": {"fornecedor":"RENA","danfe":"000.090.334"},
+        "rebite_R519A": {"fornecedor":"RENA","danfe":"000.090.334"},
+        "rebite_R612": {"fornecedor":"BELENUS","danfe":"000.948.526"},
+        "cinta_seguranca": {"fornecedor":"TUDO DE BOM","danfe":"000.000.224"}
+      },
+      {
+        "lote_producao": "0003",
+        "tubo_montantes_travessas": {"fornecedor":"ARCELOR MITTAL","danfe":"001566592"},
+        "arruela_lisa": {"fornecedor":"BELENUS","danfe":"000.987.273"},
+        "rebite_R612": {"fornecedor":"RENA","danfe":"000.090.334"}
+      },
+      {
+        "lote_producao": "0004",
+        "arruela_lisa": {"fornecedor":"RENA","danfe":"000.090.334"}
+      }
+    ]
+  }
+}

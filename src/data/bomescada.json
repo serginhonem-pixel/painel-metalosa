@@ -1,0 +1,115 @@
+{
+  "bom_escadas_rastreados": [
+    {
+      "codigo_produto": "00185",
+      "descricao": "ESCADA DOMEST C/ 03 DEGR S/ PISO",
+      "componentes_rastreados": [
+        { "nivel": 2, "tipo": "PI", "codigo": "81715", "descricao": "ARAME SUST PATAMAR Ø5MM ED",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11302", "descricao": "ARRUELA LISA 3/16\" FE ZB ESC",     "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81713", "descricao": "ARTICULADOR # 1,40 ED",             "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81712", "descricao": "DEGRAU # 1,20 ED",                 "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81714", "descricao": "DOBRADICA # 1,20 ED",              "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81700", "descricao": "MONT FRONTAL ED 03 DEGRAUS",        "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81705", "descricao": "MONT TRASEIRO ED 03 DEGRAUS",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81711", "descricao": "PATAMAR # 1,20 ED",                "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11303", "descricao": "REBITE REPUXO R-512A ESC",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11304", "descricao": "REBITE REPUXO R-519A ESC",          "quantidade_por_escada": 8 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11305", "descricao": "REBITE REPUXO R-612 ESC",           "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81710", "descricao": "TRAVESSA # 1,20 ED",               "quantidade_por_escada": 1 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11307", "descricao": "TUBO RED 1\"X1,20 ESC",            "quantidade_por_escada": 2.749992 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11308", "descricao": "ARAME GALV 5,15MM ESC",            "quantidade_por_escada": 0.06 },
+        { "nivel": 3, "tipo": "PI", "codigo": "81731", "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",    "quantidade_por_escada": 0.015 }
+      ]
+    },
+    {
+      "codigo_produto": "00186",
+      "descricao": "ESCADA DOMEST C/ 04 DEGR S/ PISO",
+      "componentes_rastreados": [
+        { "nivel": 2, "tipo": "PI", "codigo": "81715", "descricao": "ARAME SUST PATAMAR Ø5MM ED",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11302", "descricao": "ARRUELA LISA 3/16\" FE ZB ESC",     "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81713", "descricao": "ARTICULADOR # 1,40 ED",             "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81712", "descricao": "DEGRAU # 1,20 ED",                 "quantidade_por_escada": 3 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81714", "descricao": "DOBRADICA # 1,20 ED",              "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81701", "descricao": "MONT FRONTAL ED 04 DEGRAUS",        "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81706", "descricao": "MONT TRASEIRO ED 04 DEGRAUS",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81711", "descricao": "PATAMAR # 1,20 ED",                "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11303", "descricao": "REBITE REPUXO R-512A ESC",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11304", "descricao": "REBITE REPUXO R-519A ESC",          "quantidade_por_escada": 8 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11305", "descricao": "REBITE REPUXO R-612 ESC",           "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81710", "descricao": "TRAVESSA # 1,20 ED",               "quantidade_por_escada": 2 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11307", "descricao": "TUBO RED 1\"X1,20 ESC",            "quantidade_por_escada": 3.199979 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11308", "descricao": "ARAME GALV 5,15MM ESC",            "quantidade_por_escada": 0.06 },
+        { "nivel": 3, "tipo": "PI", "codigo": "81731", "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",    "quantidade_por_escada": 0.015 }
+      ]
+    },
+    {
+      "codigo_produto": "00187",
+      "descricao": "ESCADA DOMEST C/ 05 DEGR S/ PISO",
+      "componentes_rastreados": [
+        { "nivel": 2, "tipo": "PI", "codigo": "81715", "descricao": "ARAME SUST PATAMAR Ø5MM ED",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11302", "descricao": "ARRUELA LISA 3/16\" FE ZB ESC",     "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81713", "descricao": "ARTICULADOR # 1,40 ED",             "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81712", "descricao": "DEGRAU # 1,20 ED",                 "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81714", "descricao": "DOBRADICA # 1,20 ED",              "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81702", "descricao": "MONT FRONTAL ED 05 DEGRAUS",        "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81707", "descricao": "MONT TRASEIRO ED 05 DEGRAUS",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81711", "descricao": "PATAMAR # 1,20 ED",                "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11303", "descricao": "REBITE REPUXO R-512A ESC",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11304", "descricao": "REBITE REPUXO R-519A ESC",          "quantidade_por_escada": 8 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11305", "descricao": "REBITE REPUXO R-612 ESC",           "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81721", "descricao": "REFORCO MONT. FRONTAL ED",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81710", "descricao": "TRAVESSA # 1,20 ED",               "quantidade_por_escada": 2 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11307", "descricao": "TUBO RED 1\"X1,20 ESC",            "quantidade_por_escada": 3.699996 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11308", "descricao": "ARAME GALV 5,15MM ESC",            "quantidade_por_escada": 0.06 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11300", "descricao": "BARRA CHATA 3/8\"X1/8\" ESC",      "quantidade_por_escada": 0.175001 },
+        { "nivel": 3, "tipo": "PI", "codigo": "81731", "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",    "quantidade_por_escada": 0.015 }
+      ]
+    },
+    {
+      "codigo_produto": "00188",
+      "descricao": "ESCADA DOMEST C/ 06 DEGR S/ PISO",
+      "componentes_rastreados": [
+        { "nivel": 2, "tipo": "PI", "codigo": "81715", "descricao": "ARAME SUST PATAMAR Ø5MM ED",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11302", "descricao": "ARRUELA LISA 3/16\" FE ZB ESC",     "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81713", "descricao": "ARTICULADOR # 1,40 ED",             "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81712", "descricao": "DEGRAU # 1,20 ED",                 "quantidade_por_escada": 5 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81714", "descricao": "DOBRADICA # 1,20 ED",              "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81703", "descricao": "MONT FRONTAL ED 06 DEGRAUS",        "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81708", "descricao": "MONT TRASEIRO ED 06 DEGRAUS",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81711", "descricao": "PATAMAR # 1,20 ED",                "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11303", "descricao": "REBITE REPUXO R-512A ESC",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11304", "descricao": "REBITE REPUXO R-519A ESC",          "quantidade_por_escada": 8 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11305", "descricao": "REBITE REPUXO R-612 ESC",           "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81721", "descricao": "REFORCO MONT. FRONTAL ED",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81710", "descricao": "TRAVESSA # 1,20 ED",               "quantidade_por_escada": 2 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11307", "descricao": "TUBO RED 1\"X1,20 ESC",            "quantidade_por_escada": 4.249998 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11308", "descricao": "ARAME GALV 5,15MM ESC",            "quantidade_por_escada": 0.06 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11300", "descricao": "BARRA CHATA 3/8\"X1/8\" ESC",      "quantidade_por_escada": 0.175001 },
+        { "nivel": 3, "tipo": "PI", "codigo": "81731", "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",    "quantidade_por_escada": 0.015 }
+      ]
+    },
+    {
+      "codigo_produto": "00189",
+      "descricao": "ESCADA DOMEST C/ 07 DEGR S/ PISO",
+      "componentes_rastreados": [
+        { "nivel": 2, "tipo": "PI", "codigo": "81715", "descricao": "ARAME SUST PATAMAR Ø5MM ED",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11302", "descricao": "ARRUELA LISA 3/16\" FE ZB ESC",     "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81713", "descricao": "ARTICULADOR # 1,40 ED",             "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81712", "descricao": "DEGRAU # 1,20 ED",                 "quantidade_por_escada": 6 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81714", "descricao": "DOBRADICA # 1,20 ED",              "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81704", "descricao": "MONT FRONTAL ED 07 DEGRAUS",        "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81709", "descricao": "MONT TRASEIRO ED 07 DEGRAUS",       "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81711", "descricao": "PATAMAR # 1,20 ED",                "quantidade_por_escada": 1 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11303", "descricao": "REBITE REPUXO R-512A ESC",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11304", "descricao": "REBITE REPUXO R-519A ESC",          "quantidade_por_escada": 8 },
+        { "nivel": 2, "tipo": "MP", "codigo": "11305", "descricao": "REBITE REPUXO R-612 ESC",           "quantidade_por_escada": 4 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81721", "descricao": "REFORCO MONT. FRONTAL ED",          "quantidade_por_escada": 2 },
+        { "nivel": 2, "tipo": "PI", "codigo": "81710", "descricao": "TRAVESSA # 1,20 ED",               "quantidade_por_escada": 2 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11307", "descricao": "TUBO RED 1\"X1,20 ESC",            "quantidade_por_escada": 4.699982 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11308", "descricao": "ARAME GALV 5,15MM ESC",            "quantidade_por_escada": 0.06 },
+        { "nivel": 3, "tipo": "MP", "codigo": "11300", "descricao": "BARRA CHATA 3/8\"X1/8\" ESC",      "quantidade_por_escada": 0.175001 },
+        { "nivel": 3, "tipo": "PI", "codigo": "81731", "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",    "quantidade_por_escada": 0.015 }
+      ]
+    }
+  ]
+}
