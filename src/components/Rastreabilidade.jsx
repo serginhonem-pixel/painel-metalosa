@@ -1827,8 +1827,9 @@ function EntradaLoteComprado({ lotes }) {
 
 function EstoqueAtual({ lotes }) {
   const ativos = lotes.filter((l) => l.ativo);
+  const [expandidos, setExpandidos] = useState({});
+  const toggle = (key) => setExpandidos((p) => ({ ...p, [key]: !p[key] }));
 
-  // Agrupar MP por chave de material
   const gruposMp = Object.keys(MP_CODIGO).map((mpKey) => {
     const lotesDaMp = ativos.filter((l) => l.tipo === 'MP' && l.mp === mpKey);
     const totalDisp = lotesDaMp.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0);
@@ -1836,7 +1837,6 @@ function EstoqueAtual({ lotes }) {
     return { mpKey, label: MP_CODIGO[mpKey].label, codigo: MP_CODIGO[mpKey].codigo, lotes: lotesDaMp, totalDisp, totalRec };
   }).filter((g) => g.lotes.length > 0);
 
-  // Agrupar Comprados por nome
   const nomesComp = [...new Set(ativos.filter((l) => l.tipo === 'COMPRADO').map((l) => l.nomeComp))].sort();
   const gruposComp = nomesComp.map((nome) => {
     const ls = ativos.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome);
@@ -1846,6 +1846,24 @@ function EstoqueAtual({ lotes }) {
   });
 
   const semLotes = gruposMp.length === 0 && gruposComp.length === 0;
+
+  const ColsLote = ({ l, danfeColor = 'amber' }) => (
+    <>
+      <td className="py-2.5 px-3 font-mono text-[10px] text-slate-400">{l.nroLoteFornecedor || '--'}</td>
+      <td className="py-2.5 px-3">
+        <span className={`font-mono text-[10px] bg-${danfeColor}-50 border border-${danfeColor}-100 text-${danfeColor}-700 px-1.5 py-0.5 rounded`}>{l.danfe || '--'}</span>
+        {l.nroOPTubo && <span className="ml-1 font-mono text-[10px] text-violet-500">OP {l.nroOPTubo}</span>}
+      </td>
+      <td className="py-2.5 px-3 text-[10px] text-slate-400 whitespace-nowrap">{l.fornecedor || '--'}</td>
+      <td className="py-2.5 px-3 text-[10px] text-slate-400 text-right whitespace-nowrap">{l.dataEntrada || '--'}</td>
+      <td className="py-2.5 px-3 text-right">
+        <span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span>
+        {l.origemTubo === 'producao' && <span className="ml-1 text-[9px] font-black uppercase text-violet-500">Prod.</span>}
+      </td>
+    </>
+  );
+
+  const thCls = 'text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap';
 
   return (
     <div className="space-y-5">
@@ -1867,28 +1885,41 @@ function EstoqueAtual({ lotes }) {
         return (
           <Card>
             <SectionTitle icon={Cog}>Produtos Intermediarios (PI) em Estoque</SectionTitle>
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-xs min-w-[640px]">
-                <thead>
-                  <tr className="border-b-2 border-slate-100">
-                    {['PI', 'Codigo', 'Lotes', 'Saldo Disponivel', 'Status'].map((h) => (
-                      <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {gruposPi.map((g) => (
-                    <tr key={g.cod} className="row-hover transition-colors">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  <th className={thCls} style={{width:32}} />
+                  <th className={thCls}>PI</th>
+                  <th className={thCls}>Codigo</th>
+                  <th className={thCls}>Lotes</th>
+                  <th className={`${thCls} text-right`}>Saldo</th>
+                  <th className={thCls}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gruposPi.map((g) => (
+                  <React.Fragment key={g.cod}>
+                    <tr className="row-hover transition-colors cursor-pointer border-b border-slate-50" onClick={() => toggle('pi_' + g.cod)}>
+                      <td className="py-3 px-2 text-slate-400 text-center">{expandidos['pi_' + g.cod] ? '▾' : '▸'}</td>
                       <td className="py-3 px-3 font-black text-slate-800">{g.descricao}</td>
-                      <td className="py-3 px-3"><span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{g.cod}</span></td>
+                      <td className="py-3 px-3"><span className="font-mono text-[10px] bg-violet-50 border border-violet-100 text-violet-700 px-1.5 py-0.5 rounded">{g.cod}</span></td>
                       <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                       <td className="py-3 px-3 text-right"><span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 10 ? 'text-amber-500' : 'text-emerald-600'}`}>{g.totalDisp.toLocaleString('pt-BR')}</span></td>
                       <td className="py-3 px-3">{g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 10 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                    {expandidos['pi_' + g.cod] && g.lotes.map((l) => (
+                      <tr key={l.id} className="bg-violet-50/30 border-b border-violet-100/50">
+                        <td />
+                        <td colSpan={2} className="py-2 px-3 text-[10px] text-slate-500">OP <span className="font-mono font-bold">{l.nroOP || '--'}</span> &mdash; {l.dataEntrada}</td>
+                        <td className="py-2 px-3 text-[10px] text-slate-400">{l.mpKey}</td>
+                        <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
+                        <td />
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </Card>
         );
       })()}
@@ -1896,18 +1927,22 @@ function EstoqueAtual({ lotes }) {
       {gruposMp.length > 0 && (
         <Card>
           <SectionTitle icon={Package}>Materia-Prima (MP)</SectionTitle>
-          <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-xs min-w-[640px]">
-              <thead>
-                <tr className="border-b-2 border-slate-100">
-                  {['Material', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
-                    <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {gruposMp.map((g) => (
-                  <tr key={g.mpKey} className="row-hover transition-colors">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b-2 border-slate-100">
+                <th className={thCls} style={{width:32}} />
+                <th className={thCls}>Material</th>
+                <th className={thCls}>Lotes</th>
+                <th className={`${thCls} text-right`}>Qtd Recebida</th>
+                <th className={`${thCls} text-right`}>Saldo Disponivel</th>
+                <th className={thCls}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gruposMp.map((g) => (
+                <React.Fragment key={g.mpKey}>
+                  <tr className="row-hover transition-colors cursor-pointer border-b border-slate-50" onClick={() => toggle('mp_' + g.mpKey)}>
+                    <td className="py-3 px-2 text-slate-400 text-center">{expandidos['mp_' + g.mpKey] ? '▾' : '▸'}</td>
                     <td className="py-3 px-3">
                       <p className="font-black text-slate-800 leading-tight">{g.label}</p>
                       <span className="font-mono text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded mt-0.5 inline-block">{g.codigo}</span>
@@ -1920,48 +1955,55 @@ function EstoqueAtual({ lotes }) {
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      {g.totalDisp === 0
-                        ? <Badge color="rose">Zerado</Badge>
-                        : g.totalDisp < 50
-                        ? <Badge color="amber">Baixo</Badge>
-                        : <Badge color="emerald">OK</Badge>}
+                      {g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 50 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 space-y-1">
-            {gruposMp.map((g) =>
-              g.lotes.filter((l) => l.qtdDisponivel > 0).map((l) => (
-                <div key={l.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2 text-xs">
-                  <span className="font-bold text-slate-600 w-24 shrink-0">{g.label}</span>
-                  <span className="font-mono text-slate-400">{l.nroLoteFornecedor}</span>
-                  <span className="text-slate-400">DANFE {l.danfe || '--'}</span>
-                  <span className="text-slate-400">{l.fornecedor}</span>
-                  <span className="ml-auto font-black text-sm text-emerald-600">{l.qtdDisponivel}</span>
-                </div>
-              ))
-            )}
-          </div>
+                  {expandidos['mp_' + g.mpKey] && (
+                    <>
+                      <tr className="bg-slate-50/60">
+                        <td />
+                        <th className={thCls}>Lote</th>
+                        <th className={thCls}>Nr Lote Forn.</th>
+                        <th className={thCls}>DANFE</th>
+                        <th className={thCls}>Fornecedor</th>
+                        <th className={thCls}>Entrada</th>
+                        <th className={`${thCls} text-right`}>Disponivel</th>
+                      </tr>
+                      {g.lotes.map((l) => (
+                        <tr key={l.id} className="bg-slate-50/40 border-b border-slate-100">
+                          <td />
+                          <td className="py-2 px-3 font-mono text-[10px] text-blue-600 font-bold">{l.nroLoteFornecedor}</td>
+                          <ColsLote l={l} />
+                        </tr>
+                      ))}
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </Card>
       )}
 
       {gruposComp.length > 0 && (
         <Card>
           <SectionTitle icon={Layers}>Componentes Comprados</SectionTitle>
-          <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-xs min-w-[640px]">
-              <thead>
-                <tr className="border-b-2 border-slate-100">
-                  {['Componente', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
-                    <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {gruposComp.map((g) => (
-                  <tr key={g.nome} className="row-hover transition-colors">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b-2 border-slate-100">
+                <th className={thCls} style={{width:32}} />
+                <th className={thCls}>Componente</th>
+                <th className={thCls}>Lotes</th>
+                <th className={`${thCls} text-right`}>Qtd Recebida</th>
+                <th className={`${thCls} text-right`}>Saldo Disponivel</th>
+                <th className={thCls}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gruposComp.map((g) => (
+                <React.Fragment key={g.nome}>
+                  <tr className="row-hover transition-colors cursor-pointer border-b border-slate-50" onClick={() => toggle('comp_' + g.nome)}>
+                    <td className="py-3 px-2 text-slate-400 text-center">{expandidos['comp_' + g.nome] ? '▾' : '▸'}</td>
                     <td className="py-3 px-3 font-black text-slate-800">{g.nome}</td>
                     <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                     <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
@@ -1971,30 +2013,33 @@ function EstoqueAtual({ lotes }) {
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      {g.totalDisp === 0
-                        ? <Badge color="rose">Zerado</Badge>
-                        : g.totalDisp < 100
-                        ? <Badge color="amber">Baixo</Badge>
-                        : <Badge color="emerald">OK</Badge>}
+                      {g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 100 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 space-y-1">
-            {gruposComp.map((g) =>
-              g.lotes.map((l) => (
-                <div key={l.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2 text-xs">
-                  <span className="font-bold text-slate-600 w-36 shrink-0 truncate">{g.nome}</span>
-                  <span className="font-mono text-slate-400">{l.nroLoteFornecedor}</span>
-                  <span className="text-slate-400">DANFE {l.danfe || '--'}</span>
-                  <span className="text-slate-400">{l.fornecedor}</span>
-                  <span className="ml-auto font-black text-sm" style={{ color: l.qtdDisponivel === 0 ? '#ef4444' : '#059669' }}>{l.qtdDisponivel}</span>
-                </div>
-              ))
-            )}
-          </div>
+                  {expandidos['comp_' + g.nome] && (
+                    <>
+                      <tr className="bg-slate-50/60">
+                        <td />
+                        <th className={thCls}>Lote</th>
+                        <th className={thCls}>Nr Lote Forn.</th>
+                        <th className={thCls}>DANFE</th>
+                        <th className={thCls}>Fornecedor</th>
+                        <th className={thCls}>Entrada</th>
+                        <th className={`${thCls} text-right`}>Disponivel</th>
+                      </tr>
+                      {g.lotes.map((l) => (
+                        <tr key={l.id} className="bg-slate-50/40 border-b border-slate-100">
+                          <td />
+                          <td className="py-2 px-3 font-mono text-[10px] text-blue-600 font-bold">{l.nroLoteFornecedor}</td>
+                          <ColsLote l={l} danfeColor="cyan" />
+                        </tr>
+                      ))}
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </Card>
       )}
     </div>
