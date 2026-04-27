@@ -642,10 +642,13 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
 }
 
 function ConsultarEscada({ ordens }) {
-  const [busca, setBusca]         = useState('');
-  const [resultado, setResultado] = useState(null);
-  const [buscou, setBuscou]       = useState(false);
-  const [modo, setModo]           = useState('serie');
+  const [busca, setBusca]               = useState('');
+  const [resultado, setResultado]       = useState(null);
+  const [buscou, setBuscou]             = useState(false);
+  const [modo, setModo]                 = useState('serie');
+  const [estornando, setEstornando]     = useState(false);
+  const [feedbackEstorno, setFeedbackEstorno] = useState(null);
+  const [confirmEstorno, setConfirmEstorno]   = useState(false);
 
   const buscar = () => {
     const t = busca.trim().toLowerCase();
@@ -658,6 +661,40 @@ function ConsultarEscada({ ordens }) {
     }
     setResultado(found);
     setBuscou(true);
+    setConfirmEstorno(false);
+    setFeedbackEstorno(null);
+  };
+
+  const estornar = async () => {
+    if (!resultado) return;
+    setEstornando(true);
+    try {
+      const batch = writeBatch(db);
+      for (const c of resultado.componentesFabricados ?? []) {
+        if (!c.loteId || !c.qtdConsumida) continue;
+        batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
+          qtdDisponivel: increment(+c.qtdConsumida),
+        });
+      }
+      for (const c of resultado.componentesComprados ?? []) {
+        if (!c.loteId || !c.qtdConsumida) continue;
+        batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
+          qtdDisponivel: increment(+c.qtdConsumida),
+        });
+      }
+      batch.update(doc(db, 'rastreabilidade_ordens', resultado.id), { ativo: false });
+      await batch.commit();
+      setFeedbackEstorno({ tipo: 'ok', msg: `Ordem da escada ${resultado.nroSerie} estornada. Saldos restaurados.` });
+      setResultado(null);
+      setBuscou(false);
+      setBusca('');
+    } catch {
+      setFeedbackEstorno({ tipo: 'erro', msg: 'Erro ao estornar. Tente novamente.' });
+    } finally {
+      setEstornando(false);
+      setConfirmEstorno(false);
+      setTimeout(() => setFeedbackEstorno(null), 5000);
+    }
   };
 
   const allComps = resultado
@@ -684,6 +721,12 @@ function ConsultarEscada({ ordens }) {
           </button>
         </div>
       </Card>
+      {feedbackEstorno && (
+        <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 text-sm font-semibold ${feedbackEstorno.tipo === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
+          {feedbackEstorno.tipo === 'ok' ? <CheckCircle2 size={18} className="shrink-0" /> : <AlertTriangle size={18} className="shrink-0" />}
+          {feedbackEstorno.msg}
+        </div>
+      )}
       {buscou && !resultado && (
         <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-700">
           <AlertTriangle size={18} className="shrink-0" />
@@ -706,6 +749,34 @@ function ConsultarEscada({ ordens }) {
             <div className="flex flex-col items-end gap-2">
               <Badge color="emerald">Rastreada</Badge>
               <p className="text-xs text-slate-400 font-mono">Produzida em {excelSerialToISO(resultado.dataProd)}</p>
+              {!confirmEstorno ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmEstorno(true)}
+                  className="mt-1 flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-600 transition hover:bg-rose-100"
+                >
+                  <AlertTriangle size={11} /> Estornar Ordem
+                </button>
+              ) : (
+                <div className="mt-1 flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-50 px-3 py-2">
+                  <span className="text-[10px] font-black text-rose-600 uppercase tracking-wide">Confirmar estorno?</span>
+                  <button
+                    type="button"
+                    onClick={estornar}
+                    disabled={estornando}
+                    className="rounded-lg bg-rose-600 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-500 disabled:opacity-60 transition"
+                  >
+                    {estornando ? 'Estornando...' : 'Sim'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmEstorno(false)}
+                    className="rounded-lg bg-slate-200 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-300 transition"
+                  >
+                    Nao
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           {(resultado.componentesFabricados ?? []).length > 0 && (
