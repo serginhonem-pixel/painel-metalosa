@@ -31,6 +31,7 @@ import {
   BarChart3,
   ArrowUpDown,
   Layers,
+  Warehouse,
 } from 'lucide-react';
 
 const MP_CODIGO = {
@@ -1004,11 +1005,149 @@ async function seedMocks(setSeedStatus) {
   }
 }
 
+function EstoqueAtual({ lotes }) {
+  const ativos = lotes.filter((l) => l.ativo);
+
+  // Agrupar MP por chave de material
+  const gruposMp = Object.keys(MP_CODIGO).map((mpKey) => {
+    const lotesDaMp = ativos.filter((l) => l.tipo === 'MP' && l.mp === mpKey);
+    const totalDisp = lotesDaMp.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0);
+    const totalRec  = lotesDaMp.reduce((s, l) => s + (l.qtdRecebida  ?? 0), 0);
+    return { mpKey, label: MP_CODIGO[mpKey].label, codigo: MP_CODIGO[mpKey].codigo, lotes: lotesDaMp, totalDisp, totalRec };
+  }).filter((g) => g.lotes.length > 0);
+
+  // Agrupar Comprados por nome
+  const nomesComp = [...new Set(ativos.filter((l) => l.tipo === 'COMPRADO').map((l) => l.nomeComp))].sort();
+  const gruposComp = nomesComp.map((nome) => {
+    const ls = ativos.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome);
+    const totalDisp = ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0);
+    const totalRec  = ls.reduce((s, l) => s + (l.qtdRecebida  ?? 0), 0);
+    return { nome, lotes: ls, totalDisp, totalRec };
+  });
+
+  const semLotes = gruposMp.length === 0 && gruposComp.length === 0;
+
+  return (
+    <div className="space-y-5">
+      {semLotes && (
+        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-700">
+          <AlertTriangle size={18} className="shrink-0" />
+          Nenhum lote cadastrado ainda. Clique em <strong>"Dados de teste"</strong> no topo para inserir exemplos, ou registre lotes na aba <strong>Entrada de MP</strong>.
+        </div>
+      )}
+
+      {gruposMp.length > 0 && (
+        <Card>
+          <SectionTitle icon={Package}>Materia-Prima (MP)</SectionTitle>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[640px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  {['Material', 'Codigo', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {gruposMp.map((g) => (
+                  <tr key={g.mpKey} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-3 font-black text-slate-800">{g.label}</td>
+                    <td className="py-3 px-3"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{g.codigo}</span></td>
+                    <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
+                    <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
+                    <td className="py-3 px-3 text-right">
+                      <span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 50 ? 'text-amber-500' : 'text-emerald-600'}`}>
+                        {g.totalDisp.toLocaleString('pt-BR')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      {g.totalDisp === 0
+                        ? <Badge color="rose">Zerado</Badge>
+                        : g.totalDisp < 50
+                        ? <Badge color="amber">Baixo</Badge>
+                        : <Badge color="emerald">OK</Badge>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 space-y-1">
+            {gruposMp.map((g) =>
+              g.lotes.map((l) => (
+                <div key={l.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2 text-xs">
+                  <span className="font-bold text-slate-600 w-24 shrink-0">{g.label}</span>
+                  <span className="font-mono text-slate-400">{l.nroLoteFornecedor}</span>
+                  <span className="text-slate-400">DANFE {l.danfe || '--'}</span>
+                  <span className="text-slate-400">{l.fornecedor}</span>
+                  <span className="ml-auto font-black text-sm" style={{ color: l.qtdDisponivel === 0 ? '#ef4444' : '#059669' }}>{l.qtdDisponivel}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      )}
+
+      {gruposComp.length > 0 && (
+        <Card>
+          <SectionTitle icon={Layers}>Componentes Comprados</SectionTitle>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[640px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  {['Componente', 'Lotes', 'Qtd Recebida', 'Saldo Disponivel', 'Status'].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {gruposComp.map((g) => (
+                  <tr key={g.nome} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-3 font-black text-slate-800">{g.nome}</td>
+                    <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
+                    <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
+                    <td className="py-3 px-3 text-right">
+                      <span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 100 ? 'text-amber-500' : 'text-emerald-600'}`}>
+                        {g.totalDisp.toLocaleString('pt-BR')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      {g.totalDisp === 0
+                        ? <Badge color="rose">Zerado</Badge>
+                        : g.totalDisp < 100
+                        ? <Badge color="amber">Baixo</Badge>
+                        : <Badge color="emerald">OK</Badge>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 space-y-1">
+            {gruposComp.map((g) =>
+              g.lotes.map((l) => (
+                <div key={l.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2 text-xs">
+                  <span className="font-bold text-slate-600 w-36 shrink-0 truncate">{g.nome}</span>
+                  <span className="font-mono text-slate-400">{l.nroLoteFornecedor}</span>
+                  <span className="text-slate-400">DANFE {l.danfe || '--'}</span>
+                  <span className="text-slate-400">{l.fornecedor}</span>
+                  <span className="ml-auto font-black text-sm" style={{ color: l.qtdDisponivel === 0 ? '#ef4444' : '#059669' }}>{l.qtdDisponivel}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 const ABAS = [
-  { id: 'lote',      label: 'Entrada de MP',      icon: Package       },
-  { id: 'ordem',     label: 'Ordem de Producao',  icon: ClipboardList },
-  { id: 'consultar', label: 'Rastreabilidade',     icon: ArrowUpDown   },
-  { id: 'exportar',  label: 'Exportar INMETRO',   icon: Download      },
+  { id: 'estoque',   label: 'Estoque',             icon: Warehouse     },
+  { id: 'lote',      label: 'Entrada de MP',        icon: Package       },
+  { id: 'ordem',     label: 'Ordem de Producao',    icon: ClipboardList },
+  { id: 'consultar', label: 'Rastreabilidade',      icon: ArrowUpDown   },
+  { id: 'exportar',  label: 'Exportar INMETRO',     icon: Download      },
 ];
 
 const SENHA_ACESSO = 'escada';
@@ -1073,7 +1212,7 @@ function TelaLogin({ onLogin }) {
 
 export default function Rastreabilidade() {
   const [autenticado, setAutenticado]   = useState(false);
-  const [subAba, setSubAba]             = useState('lote');
+  const [subAba, setSubAba]             = useState('estoque');
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
   const [seedStatus, setSeedStatus]     = useState(null);
@@ -1156,6 +1295,7 @@ export default function Rastreabilidade() {
           </button>
         ))}
       </div>
+      {subAba === 'estoque'   && <EstoqueAtual lotes={lotes} />}
       {subAba === 'lote'      && <EntradaLoteMP lotes={lotes} />}
       {subAba === 'ordem'     && <OrdemProducao lotes={lotes} lotesDisponiveisMp={lotesDisponiveisMp} />}
       {subAba === 'consultar' && <ConsultarEscada ordens={ordens} />}
