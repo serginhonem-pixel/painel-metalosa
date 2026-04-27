@@ -1007,9 +1007,8 @@ export default function Rastreabilidade() {
   const [ordens, setOrdens]             = useState([]);
   const [seedStatus, setSeedStatus]     = useState(null);
 
-  if (!autenticado) return <TelaLogin onLogin={() => setAutenticado(true)} />;
-
   useEffect(() => {
+    if (!autenticado) return;
     const u1 = onSnapshot(
       query(collection(db, 'rastreabilidade_lotes'),  orderBy('criadoEm', 'desc')),
       (s) => setLotes(s.docs.map((d) => ({ id: d.id, ...d.data() }))),
@@ -1019,7 +1018,7 @@ export default function Rastreabilidade() {
       (s) => setOrdens(s.docs.map((d) => ({ id: d.id, ...d.data() }))),
     );
     return () => { u1(); u2(); };
-  }, []);
+  }, [autenticado]);
 
   const lotesDisponiveisMp = useCallback(
     (mpKey) => lotes.filter((l) => l.tipo === 'MP' && l.mp === mpKey && l.ativo && l.qtdDisponivel > 0),
@@ -1029,6 +1028,8 @@ export default function Rastreabilidade() {
   const totalLotesMP = lotes.filter((l) => l.tipo === 'MP' && l.ativo).length;
   const totalOrdens  = ordens.filter((o) => o.ativo).length;
   const totalComps   = lotes.filter((l) => l.tipo === 'COMPRADO' && l.ativo).length;
+
+  if (!autenticado) return <TelaLogin onLogin={() => setAutenticado(true)} />;
 
   return (
     <div className="space-y-6 animate-in slide-in-from-right duration-700">
