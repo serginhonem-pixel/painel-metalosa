@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../firebase';
 import BOM_ESCADAS from '../data/bomescada.json';
+import ESCADA_JSON from '../data/escada.json';
 import {
   collection,
   addDoc,
@@ -32,6 +33,7 @@ import {
   ArrowUpDown,
   Layers,
   Warehouse,
+  Cog,
 } from 'lucide-react';
 
 const MP_CODIGO = {
@@ -70,6 +72,7 @@ const CODIGO_PARA_COMPRADO = {
   '11303': 'REBITE R-512A',
   '11304': 'REBITE R-519A',
   '11305': 'REBITE R-612',
+  '11306': 'CINTA DE SEGURANCA',
 };
 
 // Constrói listas de componentes a partir de um modelo do BOM
@@ -402,24 +405,255 @@ function EntradaLoteMP({ lotes }) {
   );
 }
 
-function OrdemProducao({ lotes, lotesDisponiveisMp }) {
-  const modelos = BOM_ESCADAS.bom_escadas_rastreados;
+// ---------- MAPA DE PIs -----------------------------------------------
+const LOTES_PI_MAP = Object.fromEntries(
+  (ESCADA_JSON.lotes_PI ?? []).map((p) => [p.codigo_pi, p.descricao_pi])
+);
 
-  const [modeloCod, setModeloCod]   = useState('');
+// ---------- PRODUCAO DE PI --------------------------------------------
+function ProducaoPI({ lotes }) {
+  const piOpcoes = ESCADA_JSON.lotes_PI ?? [];
+
+  const [codigoPi, setCodigoPi]     = useState(piOpcoes[0]?.codigo_pi ?? '');
   const [nroOP, setNroOP]           = useState('');
-  const [nroSerie, setNroSerie]     = useState('');
   const [dataProd, setDataProd]     = useState(today());
-  const [compFab, setCompFab]       = useState([]);
-  const [comprado, setComprado]     = useState([]);
+  const [qtdProduzida, setQtdProd]  = useState('');
+  const [qtdAprovada, setQtdAprov]  = useState('');
+  const [qtdReprovada, setQtdRep]   = useState('');
+  // consumo de MP: array de { loteId, qtdConsumida }
+  const [consumoMp, setConsumoMp]   = useState([{ loteId: '', qtdConsumida: '' }]);
   const [saving, setSaving]         = useState(false);
   const [feedback, setFeedback]     = useState(null);
 
-  // Ao trocar o modelo, reconstrói as listas com quantidades do BOM
+  const piSel    = piOpcoes.find((p) => p.codigo_pi === codigoPi);
+  const mpKey    = piSel?.mp_key ?? '';
+  const mpDisp   = lotes.filter((l) => l.tipo === 'MP' && l.mp === mpKey && l.ativo && l.qtdDisponivel > 0)
+                        .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada)); // FIFO order for display
+
+  const addLinhaMp    = () => setConsumoMp((p) => [...p, { loteId: '', qtdConsumida: '' }]);
+  const removeLinhaMp = (i) => setConsumoMp((p) => p.filter((_, idx) => idx !== i));
+  const setLinhaMp    = (i, k, v) => setConsumoMp((p) => p.map((r, idx) => idx === i ? { ...r, [k]: v } : r));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const aprov = Number(qtdAprovada || qtdProduzida);
+    if (!codigoPi || !aprov) {
+      setFeedback({ tipo: 'erro', msg: 'Informe o PI e a quantidade aprovada.' });
+      return;
+    }
+    const linhasValidas = consumoMp.filter((r) => r.loteId && r.qtdConsumida);
+    for (const r of linhasValidas) {
+      const lote = lotes.find((l) => l.id === r.loteId);
+      if (lote && lote.qtdDisponivel < Number(r.qtdConsumida)) {
+        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente no lote "${lote.nroLoteFornecedor}". Disponivel: ${lote.qtdDisponivel}.` });
+        return;
+      }
+    }
+    setSaving(true);
+    try {
+      const batch = writeBatch(db);
+      // Gera lote PI
+      const loteRef = doc(collection(db, 'rastreabilidade_lotes'));
+      const mpLotesConsumidos = linhasValidas.map((r) => {
+        const l = lotes.find((x) => x.id === r.loteId);
+        return {
+          loteId: r.loteId,
+          nroLoteFornecedor: l?.nroLoteFornecedor ?? '',
+          danfe: l?.danfe ?? '',
+          certificadoQualidade: l?.certificadoQualidade ?? '',
+          fornecedor: l?.fornecedor ?? '',
+          dataEntrada: l?.dataEntrada ?? '',
+          mpKey,
+          qtdConsumida: Number(r.qtdConsumida),
+        };
+      });
+      batch.set(loteRef, {
+        tipo: 'PI',
+        codigoPi,
+        descricaoPi: LOTES_PI_MAP[codigoPi] ?? codigoPi,
+        mpKey,
+        mpCodigo: MP_CODIGO[mpKey]?.codigo ?? '',
+        nroOP: nroOP.trim(),
+        qtdProduzida: Number(qtdProduzida || qtdAprovada),
+        qtdAprovada: aprov,
+        qtdReprovada: Number(qtdReprovada || 0),
+        qtdDisponivel: aprov,
+        mpLotesConsumidos,
+        dataEntrada: dataProd,
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
+      // Desconta MP consumida
+      for (const r of linhasValidas) {
+        batch.update(doc(db, 'rastreabilidade_lotes', r.loteId), {
+          qtdDisponivel: increment(-Number(r.qtdConsumida)),
+        });
+      }
+      await batch.commit();
+      setFeedback({ tipo: 'ok', msg: `Lote de PI (${codigoPi}) registrado — ${aprov} pcs aprovadas.` });
+      setNroOP(''); setQtdProd(''); setQtdAprov(''); setQtdRep('');
+      setConsumoMp([{ loteId: '', qtdConsumida: '' }]);
+      setDataProd(today());
+    } catch {
+      setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setFeedback(null), 5000);
+    }
+  };
+
+  const lotesPi = lotes.filter((l) => l.tipo === 'PI' && l.ativo);
+
+  return (
+    <div className="space-y-5">
+      <Card>
+        <SectionTitle icon={Cog}>Registrar Producao de PI (Produto Intermediario)</SectionTitle>
+        <Feedback feedback={feedback} />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="rounded-2xl border-2 border-violet-100 bg-violet-50/40 p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <Label>Produto Intermediario (PI) *</Label>
+                <Select value={codigoPi} onChange={(e) => { setCodigoPi(e.target.value); setConsumoMp([{ loteId: '', qtdConsumida: '' }]); }}>
+                  {piOpcoes.map((p) => (
+                    <option key={p.codigo_pi} value={p.codigo_pi}>{p.codigo_pi} — {p.descricao_pi}</option>
+                  ))}
+                </Select>
+                {mpKey && <p className="text-[10px] text-violet-600 font-bold mt-1.5 uppercase tracking-widest">MP: {mpKey}</p>}
+              </div>
+              <div>
+                <Label>Numero da OP</Label>
+                <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Ex: OP-2026-0001" />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label>Data de Producao</Label>
+              <Input type="date" value={dataProd} onChange={(e) => setDataProd(e.target.value)} />
+            </div>
+            <div>
+              <Label>Qtd Produzida</Label>
+              <Input type="number" min="1" value={qtdProduzida} onChange={(e) => setQtdProd(e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <Label>Qtd Aprovada *</Label>
+              <Input type="number" min="1" value={qtdAprovada} onChange={(e) => setQtdAprov(e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <Label>Qtd Reprovada</Label>
+              <Input type="number" min="0" value={qtdReprovada} onChange={(e) => setQtdRep(e.target.value)} placeholder="0" />
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Consumo de MP ({MP_CODIGO[mpKey]?.label ?? mpKey})</p>
+              <button type="button" onClick={addLinhaMp} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-violet-600 hover:text-violet-700 transition">
+                <Plus size={11} /> Adicionar lote
+              </button>
+            </div>
+            {consumoMp.map((r, i) => (
+              <div key={i} className="grid grid-cols-12 items-center gap-3">
+                <div className="col-span-7">
+                  <select value={r.loteId} onChange={(e) => setLinhaMp(i, 'loteId', e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-violet-500 transition">
+                    <option value="">-- selecionar lote de MP --</option>
+                    {mpDisp.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.nroLoteFornecedor} | DANFE {l.danfe} | {l.fornecedor} | Disp: {l.qtdDisponivel}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-3">
+                  <Input type="number" min="1" value={r.qtdConsumida} onChange={(e) => setLinhaMp(i, 'qtdConsumida', e.target.value)} placeholder="Qtd consumida" disabled={!r.loteId} />
+                </div>
+                <div className="col-span-2 flex justify-end">
+                  {consumoMp.length > 1 && (
+                    <button type="button" onClick={() => removeLinhaMp(i)} className="text-rose-400 hover:text-rose-600 text-[10px] font-black uppercase tracking-widest transition">Remover</button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {mpDisp.length === 0 && (
+              <p className="text-xs text-amber-600 font-semibold">Sem lotes de MP disponivel para {mpKey}. Registre o recebimento primeiro.</p>
+            )}
+          </div>
+          <div className="flex justify-end pt-1">
+            <button type="submit" disabled={saving} className="bg-violet-600 hover:bg-violet-500 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-violet-200 hover:shadow-md">
+              <Plus size={15} /> {saving ? 'Salvando...' : 'Registrar Producao de PI'}
+            </button>
+          </div>
+        </form>
+      </Card>
+      {lotesPi.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Lotes de PI em Estoque</p>
+            <Badge color="violet">{lotesPi.length} lotes</Badge>
+          </div>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[800px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  {['PI', 'Codigo', 'OP', 'Aprovadas', 'Reprovadas', 'Disponivel', 'MP Origem', 'Data'].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {lotesPi.map((l) => (
+                  <tr key={l.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-2 font-bold text-slate-800 whitespace-nowrap">{l.descricaoPi}</td>
+                    <td className="py-3 px-2"><span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{l.codigoPi}</span></td>
+                    <td className="py-3 px-2 font-mono text-slate-500">{l.nroOP || '--'}</td>
+                    <td className="py-3 px-2 text-right text-emerald-600 font-bold">{l.qtdAprovada}</td>
+                    <td className="py-3 px-2 text-right"><span className={l.qtdReprovada > 0 ? 'text-rose-500 font-bold' : 'text-slate-300'}>{l.qtdReprovada ?? 0}</span></td>
+                    <td className="py-3 px-2 text-right"><span className={`font-black ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
+                    <td className="py-3 px-2 text-slate-500">{MP_CODIGO[l.mpKey]?.label ?? l.mpKey}</td>
+                    <td className="py-3 px-2 font-mono text-slate-500 whitespace-nowrap">{excelSerialToISO(l.dataEntrada)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ---------- ORDEM DE PRODUCAO (consome lotes PI via FIFO) -------------
+function OrdemProducao({ lotes }) {
+  const modelos = BOM_ESCADAS.bom_escadas_rastreados;
+
+  const [modeloCod, setModeloCod] = useState('');
+  const [nroOP, setNroOP]         = useState('');
+  const [nroSerie, setNroSerie]   = useState('');
+  const [dataProd, setDataProd]   = useState(today());
+  const [compFab, setCompFab]     = useState([]);
+  const [comprado, setComprado]   = useState([]);
+  const [saving, setSaving]       = useState(false);
+  const [feedback, setFeedback]   = useState(null);
+
+  // Retorna lotes PI disponíveis para um código de PI, ordenados FIFO
+  const piDisponiveis = (codigoPi) =>
+    lotes
+      .filter((l) => l.tipo === 'PI' && l.codigoPi === codigoPi && l.ativo && l.qtdDisponivel > 0)
+      .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+
+  // Ao trocar o modelo, reconstrói listas com FIFO automático para PI
   const handleModelo = (cod) => {
     setModeloCod(cod);
     const modelo = modelos.find((m) => m.codigo_produto === cod);
     const { fab, comp } = buildCompsFromBom(modelo);
-    setCompFab(fab);
+    // Pré-seleciona lote PI mais antigo disponível (FIFO)
+    const fabComFifo = fab.map((c) => {
+      const fifo = lotes
+        .filter((l) => l.tipo === 'PI' && l.codigoPi === c.codigo && l.ativo && l.qtdDisponivel > 0)
+        .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+      return { ...c, loteId: fifo[0]?.id ?? '' };
+    });
+    setCompFab(fabComFifo);
     setComprado(comp);
   };
 
@@ -438,7 +672,7 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
       if (!cf.loteId) continue;
       const lote = lotes.find((l) => l.id === cf.loteId);
       if (lote && lote.qtdDisponivel < cf.qtdConsumida) {
-        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente no lote de ${cf.mp}: "${lote.nroLoteFornecedor}". Disponivel: ${lote.qtdDisponivel}.` });
+        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente no lote de PI "${lote.descricaoPi ?? lote.nroLoteFornecedor}". Disponivel: ${lote.qtdDisponivel}.` });
         return;
       }
     }
@@ -449,17 +683,25 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
         .filter((cf) => cf.loteId)
         .map((cf) => {
           const l = lotes.find((x) => x.id === cf.loteId);
+          // Rastreabilidade completa: PI → MP de origem
+          const mpOrigem = l?.mpLotesConsumidos?.[0] ?? {};
           return {
             componente: cf.nome,
             codigoComp: cf.codigo,
-            mp: cf.mp,
-            mpCodigo: MP_CODIGO[cf.mp]?.codigo ?? '',
-            loteId: cf.loteId,
-            nroLoteFornecedor: l?.nroLoteFornecedor ?? '',
-            danfe: l?.danfe ?? '',
-            certificadoQualidade: l?.certificadoQualidade ?? '',
-            fornecedor: l?.fornecedor ?? '',
-            dataEntrada: l?.dataEntrada ?? '',
+            tipoPeca: 'PI',
+            // Dados do lote PI
+            lotePiId: cf.loteId,
+            codigoPi: l?.codigoPi ?? cf.codigo,
+            descricaoPi: l?.descricaoPi ?? cf.nome,
+            // Dados da MP de origem (rastreabilidade)
+            mp: l?.mpKey ?? cf.mp,
+            mpCodigo: l?.mpCodigo ?? MP_CODIGO[cf.mp]?.codigo ?? '',
+            danfe: mpOrigem.danfe ?? '',
+            certificadoQualidade: mpOrigem.certificadoQualidade ?? '',
+            nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? '',
+            fornecedor: mpOrigem.fornecedor ?? '',
+            dataEntrada: mpOrigem.dataEntrada ?? '',
+            mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
             qtdConsumida: cf.qtdConsumida,
           };
         });
@@ -502,14 +744,17 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
         });
       }
       await batch.commit();
-      setFeedback({ tipo: 'ok', msg: `Ordem registrada - Escada ${nroSerie.trim()}` });
-      setNroOP('');
-      setNroSerie('');
-      setDataProd(today());
-      // Recarrega as quantidades do BOM mantendo o modelo selecionado
+      setFeedback({ tipo: 'ok', msg: `Ordem registrada — Escada ${nroSerie.trim()}` });
+      setNroOP(''); setNroSerie(''); setDataProd(today());
       const modelo = modelos.find((m) => m.codigo_produto === modeloCod);
       const { fab, comp } = buildCompsFromBom(modelo);
-      setCompFab(fab.map((c) => ({ ...c, loteId: '' })));
+      const fabComFifo = fab.map((c) => {
+        const fifo = lotes
+          .filter((l) => l.tipo === 'PI' && l.codigoPi === c.codigo && l.ativo && l.qtdDisponivel > 0)
+          .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+        return { ...c, loteId: fifo[0]?.id ?? '' };
+      });
+      setCompFab(fabComFifo);
       setComprado(comp.map((c) => ({ ...c, loteId: '' })));
     } catch {
       setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
@@ -521,15 +766,13 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
 
   const vinculadosFab  = compFab.filter((c) => c.loteId).length;
   const vinculadosComp = comprado.filter((c) => c.loteId).length;
-
-  const modeloSel = modelos.find((m) => m.codigo_produto === modeloCod);
+  const modeloSel      = modelos.find((m) => m.codigo_produto === modeloCod);
 
   return (
     <Card>
       <SectionTitle icon={ClipboardList}>Registrar Montagem de Escada</SectionTitle>
       <Feedback feedback={feedback} />
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Seletor de modelo */}
         <div className="rounded-2xl border-2 border-blue-100 bg-blue-50/40 p-5">
           <Label>Modelo da Escada (BOM) *</Label>
           <Select value={modeloCod} onChange={(e) => handleModelo(e.target.value)}>
@@ -542,11 +785,10 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
           </Select>
           {modeloSel && (
             <p className="text-[10px] text-blue-600 font-bold mt-2 uppercase tracking-widest">
-              BOM carregado: {compFab.length} fabricados + {comprado.length} comprados — quantidades pre-preenchidas
+              BOM carregado: {compFab.length} fabricados + {comprado.length} comprados — FIFO pre-selecionado
             </p>
           )}
         </div>
-        {/* Identificacao */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-6 border-b border-slate-100">
           <div>
             <Label>Numero da OP</Label>
@@ -568,25 +810,25 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
             </div>
           )}
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Fabricados (MP)</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Fabricados — Lotes PI (FIFO)</p>
             <Badge color={vinculadosFab > 0 ? 'blue' : 'slate'}>{vinculadosFab}/{compFab.length} vinculados</Badge>
           </div>
           <div className="space-y-2">
             {compFab.map((cf, idx) => {
-              const disp = lotesDisponiveisMp(cf.mp);
+              const disp = piDisponiveis(cf.codigo);
               return (
                 <div key={cf.codigo} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${cf.loteId ? 'bg-blue-50/60 border border-blue-100' : 'bg-slate-50 border border-transparent'}`}>
                   <div className="col-span-3">
                     <p className="text-xs font-bold text-slate-700 leading-tight">{cf.nome}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">MP: {MP_CODIGO[cf.mp]?.label ?? cf.mp}</p>
-                    {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote de MP</p>}
+                    <p className="text-[10px] text-slate-400 mt-0.5">PI {cf.codigo}</p>
+                    {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote PI — produza antes</p>}
                   </div>
                   <div className="col-span-7">
                     <select value={cf.loteId} onChange={(e) => setLoteFab(idx, e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition">
-                      <option value="">-- selecionar lote de MP --</option>
+                      <option value="">-- lote PI (FIFO) --</option>
                       {disp.map((l) => (
                         <option key={l.id} value={l.id}>
-                          {l.nroLoteFornecedor} | DANFE {l.danfe} | {l.fornecedor} | Disp: {l.qtdDisponivel}
+                          {l.nroOP ? `OP ${l.nroOP} | ` : ''}{l.dataEntrada} | Disp: {l.qtdDisponivel} pcs
                         </option>
                       ))}
                     </select>
@@ -606,7 +848,8 @@ function OrdemProducao({ lotes, lotesDisponiveisMp }) {
           </div>
           <div className="space-y-2">
             {comprado.map((c, idx) => {
-              const disp = lotes.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === c.nome && l.ativo && l.qtdDisponivel > 0);
+              const disp = lotes.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === c.nome && l.ativo && l.qtdDisponivel > 0)
+                                .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
               return (
                 <div key={c.nome} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${c.loteId ? 'bg-cyan-50/60 border border-cyan-100' : 'bg-slate-50 border border-transparent'}`}>
                   <div className="col-span-3">
@@ -984,6 +1227,69 @@ const MOCK_LOTES_COMPRADOS = [
   { tipo: 'COMPRADO', nomeComp: 'CINTA DE SEGURANCA',  danfe: '000200003', nroLoteFornecedor: 'LOT-CINTA-001', certificadoQualidade: 'CERT-CIN-001', fornecedor: 'Rebites e Fix. Ltda',     qtdRecebida: 800,  qtdAprovada: 800,  qtdReprovada: 0, qtdDisponivel: 800,  dataEntrada: '2026-04-12' },
 ];
 
+async function seedFromEscadaJson(setStatus) {
+  setStatus('loading');
+  try {
+    const batch = writeBatch(db);
+
+    // Seção A: Matérias-Primas
+    for (const mp of ESCADA_JSON.rastreabilidade_mp) {
+      for (const l of mp.lotes) {
+        const r = doc(collection(db, 'rastreabilidade_lotes'));
+        batch.set(r, {
+          tipo: 'MP',
+          mp: mp.mp_key,
+          mpCodigo: mp.codigo_mp,
+          nroLoteFornecedor: l.lote,
+          danfe: l.danfe ?? '',
+          certificadoQualidade: l.certificado ?? '',
+          fornecedor: l.fornecedor ?? '',
+          qtdRecebida: l.qtd_recebida ?? 0,
+          qtdAprovada: l.qtd_aprovada ?? 0,
+          qtdReprovada: l.qtd_reprovada ?? 0,
+          pesoBrutoKg: l.kg_bruto ?? null,
+          pesoLiquidoKg: l.kg_liquido ?? null,
+          percPerda: l.perc_perda ?? null,
+          qtdDisponivel: l.saldo_pcs ?? l.qtd_aprovada ?? 0,
+          dataEntrada: l.data_iso ?? '',
+          ativo: true,
+          criadoEm: new Date().toISOString(),
+        });
+      }
+    }
+
+    // Seção C: Componentes Comprados
+    for (const item of ESCADA_JSON.estoque_componentes_comprados) {
+      for (const l of item.lotes) {
+        const r = doc(collection(db, 'rastreabilidade_lotes'));
+        batch.set(r, {
+          tipo: 'COMPRADO',
+          nomeComp: item.nome_controle,
+          codigo: item.codigo,
+          danfe: l.danfe ?? '',
+          nroLoteFornecedor: l.lote,
+          certificadoQualidade: '',
+          fornecedor: l.fornecedor ?? '',
+          qtdRecebida: l.qtd_recebida ?? 0,
+          qtdAprovada: l.qtd_aprovada ?? 0,
+          qtdReprovada: 0,
+          qtdDisponivel: l.qtd_aprovada ?? 0,
+          dataEntrada: l.data_iso ?? '',
+          ativo: true,
+          criadoEm: new Date().toISOString(),
+        });
+      }
+    }
+
+    await batch.commit();
+    setStatus('ok');
+    setTimeout(() => setStatus(null), 4000);
+  } catch {
+    setStatus('erro');
+    setTimeout(() => setStatus(null), 4000);
+  }
+}
+
 async function seedMocks(setSeedStatus) {
   setSeedStatus('loading');
   try {
@@ -1003,6 +1309,170 @@ async function seedMocks(setSeedStatus) {
     setSeedStatus('erro');
     setTimeout(() => setSeedStatus(null), 4000);
   }
+}
+
+function EntradaLoteComprado({ lotes }) {
+  const [form, setForm] = useState({
+    codigo: Object.keys(CODIGO_PARA_COMPRADO)[0],
+    danfe: '',
+    nroLoteFornecedor: '',
+    certificadoQualidade: '',
+    fornecedor: '',
+    qtdRecebida: '',
+    qtdAprovada: '',
+    qtdReprovada: '',
+    dataEntrada: today(),
+  });
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.danfe.trim() || !form.nroLoteFornecedor.trim() || !form.fornecedor.trim() || !form.qtdRecebida) {
+      setFeedback({ tipo: 'erro', msg: 'Preencha todos os campos obrigatorios (DANFE, Lote, Fornecedor, Qtd).' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const qtdRec   = Number(form.qtdRecebida);
+      const qtdAprov = form.qtdAprovada  ? Number(form.qtdAprovada)  : qtdRec;
+      const qtdRep   = form.qtdReprovada ? Number(form.qtdReprovada) : 0;
+      await addDoc(collection(db, 'rastreabilidade_lotes'), {
+        tipo: 'COMPRADO',
+        nomeComp: CODIGO_PARA_COMPRADO[form.codigo],
+        codigo: form.codigo,
+        danfe: form.danfe.trim(),
+        nroLoteFornecedor: form.nroLoteFornecedor.trim(),
+        certificadoQualidade: form.certificadoQualidade.trim(),
+        fornecedor: form.fornecedor.trim(),
+        qtdRecebida: qtdRec,
+        qtdAprovada: qtdAprov,
+        qtdReprovada: qtdRep,
+        qtdDisponivel: qtdAprov,
+        dataEntrada: form.dataEntrada,
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
+      setFeedback({ tipo: 'ok', msg: `Lote de ${CODIGO_PARA_COMPRADO[form.codigo]} registrado!` });
+      setForm({
+        codigo: Object.keys(CODIGO_PARA_COMPRADO)[0], danfe: '', nroLoteFornecedor: '',
+        certificadoQualidade: '', fornecedor: '',
+        qtdRecebida: '', qtdAprovada: '', qtdReprovada: '', dataEntrada: today(),
+      });
+    } catch {
+      setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setFeedback(null), 4000);
+    }
+  };
+
+  const lotesComp = lotes.filter((l) => l.tipo === 'COMPRADO' && l.ativo);
+
+  return (
+    <div className="space-y-5">
+      <Card>
+        <SectionTitle icon={Package}>Recebimento de Componentes Comprados</SectionTitle>
+        <Feedback feedback={feedback} />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>Componente *</Label>
+              <Select value={form.codigo} onChange={(e) => set('codigo', e.target.value)}>
+                {Object.entries(CODIGO_PARA_COMPRADO).map(([cod, nome]) => (
+                  <option key={cod} value={cod}>{cod} — {nome}</option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label>DANFE / Numero Nota Fiscal *</Label>
+              <Input value={form.danfe} onChange={(e) => set('danfe', e.target.value)} placeholder="Ex: 000123456" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>Numero Lote do Fornecedor *</Label>
+              <Input value={form.nroLoteFornecedor} onChange={(e) => set('nroLoteFornecedor', e.target.value)} placeholder="Ex: LOT-2026-001" />
+            </div>
+            <div>
+              <Label>Certificado de Qualidade</Label>
+              <Input value={form.certificadoQualidade} onChange={(e) => set('certificadoQualidade', e.target.value)} placeholder="Ex: CERT-2026-XYZ" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>Fornecedor *</Label>
+              <Input value={form.fornecedor} onChange={(e) => set('fornecedor', e.target.value)} placeholder="Razao social" />
+            </div>
+            <div>
+              <Label>Data de Entrada *</Label>
+              <Input type="date" value={form.dataEntrada} onChange={(e) => set('dataEntrada', e.target.value)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>Qtd Recebida *</Label>
+              <Input type="number" min="1" value={form.qtdRecebida} onChange={(e) => set('qtdRecebida', e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <Label>Qtd Aprovada</Label>
+              <Input type="number" min="0" value={form.qtdAprovada} onChange={(e) => set('qtdAprovada', e.target.value)} placeholder="= Recebida" />
+            </div>
+            <div>
+              <Label>Qtd Reprovada</Label>
+              <Input type="number" min="0" value={form.qtdReprovada} onChange={(e) => set('qtdReprovada', e.target.value)} placeholder="0" />
+            </div>
+          </div>
+          <div className="flex justify-end pt-1">
+            <button type="submit" disabled={saving} className="bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-cyan-200 hover:shadow-md">
+              <Plus size={15} /> {saving ? 'Salvando...' : 'Registrar Lote Comprado'}
+            </button>
+          </div>
+        </form>
+      </Card>
+      {lotesComp.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Historico de Componentes Comprados</p>
+            <Badge color="cyan">{lotesComp.length} registros</Badge>
+          </div>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[700px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  {['Componente', 'Codigo', 'DANFE', 'Lote Forn.', 'Cert. Qual.', 'Fornecedor', 'Receb.', 'Aprov.', 'Disponivel', 'Entrada'].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {lotesComp.map((l) => (
+                  <tr key={l.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-2 font-bold text-slate-800 whitespace-nowrap">{l.nomeComp}</td>
+                    <td className="py-3 px-2"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{l.codigo || '--'}</span></td>
+                    <td className="py-3 px-2"><span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{l.danfe || '--'}</span></td>
+                    <td className="py-3 px-2"><span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">{l.nroLoteFornecedor}</span></td>
+                    <td className="py-3 px-2">
+                      {l.certificadoQualidade
+                        ? <span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{l.certificadoQualidade}</span>
+                        : <span className="text-slate-300">--</span>}
+                    </td>
+                    <td className="py-3 px-2 text-slate-600 whitespace-nowrap">{l.fornecedor}</td>
+                    <td className="py-3 px-2 text-slate-500 text-right">{l.qtdRecebida}</td>
+                    <td className="py-3 px-2 text-right"><span className="text-emerald-600 font-bold">{l.qtdAprovada ?? '--'}</span></td>
+                    <td className="py-3 px-2 text-right"><span className={`font-black ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
+                    <td className="py-3 px-2 text-slate-500 font-mono whitespace-nowrap">{excelSerialToISO(l.dataEntrada)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
 }
 
 function EstoqueAtual({ lotes }) {
@@ -1035,6 +1505,43 @@ function EstoqueAtual({ lotes }) {
           Nenhum lote cadastrado ainda. Clique em <strong>"Dados de teste"</strong> no topo para inserir exemplos, ou registre lotes na aba <strong>Entrada de MP</strong>.
         </div>
       )}
+
+      {/* Estoque PI */}
+      {(() => {
+        const lotesPi = ativos.filter((l) => l.tipo === 'PI');
+        if (lotesPi.length === 0) return null;
+        const gruposPi = [...new Set(lotesPi.map((l) => l.codigoPi))].sort().map((cod) => {
+          const ls = lotesPi.filter((l) => l.codigoPi === cod);
+          return { cod, descricao: ls[0]?.descricaoPi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
+        });
+        return (
+          <Card>
+            <SectionTitle icon={Cog}>Produtos Intermediarios (PI) em Estoque</SectionTitle>
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-xs min-w-[640px]">
+                <thead>
+                  <tr className="border-b-2 border-slate-100">
+                    {['PI', 'Codigo', 'Lotes', 'Saldo Disponivel', 'Status'].map((h) => (
+                      <th key={h} className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {gruposPi.map((g) => (
+                    <tr key={g.cod} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-3 font-black text-slate-800">{g.descricao}</td>
+                      <td className="py-3 px-3"><span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{g.cod}</span></td>
+                      <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
+                      <td className="py-3 px-3 text-right"><span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 10 ? 'text-amber-500' : 'text-emerald-600'}`}>{g.totalDisp.toLocaleString('pt-BR')}</span></td>
+                      <td className="py-3 px-3">{g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 10 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        );
+      })()}
 
       {gruposMp.length > 0 && (
         <Card>
@@ -1144,10 +1651,11 @@ function EstoqueAtual({ lotes }) {
 
 const ABAS = [
   { id: 'estoque',   label: 'Estoque',             icon: Warehouse     },
-  { id: 'lote',      label: 'Entrada de MP',        icon: Package       },
-  { id: 'ordem',     label: 'Ordem de Producao',    icon: ClipboardList },
-  { id: 'consultar', label: 'Rastreabilidade',      icon: ArrowUpDown   },
-  { id: 'exportar',  label: 'Exportar INMETRO',     icon: Download      },
+  { id: 'lote',      label: 'Entrada de Lotes',     icon: Package       },
+  { id: 'producaopi',label: 'Producao de PI',       icon: Cog           },
+  { id: 'ordem',     label: 'Ordem de Producao',   icon: ClipboardList },
+  { id: 'consultar', label: 'Rastreabilidade',     icon: ArrowUpDown   },
+  { id: 'exportar',  label: 'Exportar INMETRO',    icon: Download      },
 ];
 
 const SENHA_ACESSO = 'escada';
@@ -1215,7 +1723,8 @@ export default function Rastreabilidade() {
   const [subAba, setSubAba]             = useState('estoque');
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
-  const [seedStatus, setSeedStatus]     = useState(null);
+  const [seedStatus, setSeedStatus]         = useState(null);
+  const [importStatus, setImportStatus]     = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -1238,6 +1747,7 @@ export default function Rastreabilidade() {
   const totalLotesMP = lotes.filter((l) => l.tipo === 'MP' && l.ativo).length;
   const totalOrdens  = ordens.filter((o) => o.ativo).length;
   const totalComps   = lotes.filter((l) => l.tipo === 'COMPRADO' && l.ativo).length;
+  const totalPI      = lotes.filter((l) => l.tipo === 'PI' && l.ativo).length;
 
   if (!autenticado) return <TelaLogin onLogin={() => setAutenticado(true)} />;
 
@@ -1263,6 +1773,7 @@ export default function Rastreabilidade() {
           <div className="flex flex-wrap items-center gap-6">
             {[
               { label: 'Lotes de MP',     value: totalLotesMP },
+              { label: 'Lotes PI',        value: totalPI      },
               { label: 'Escadas',         value: totalOrdens  },
               { label: 'Lotes Comprados', value: totalComps   },
             ].map(({ label, value }) => (
@@ -1271,6 +1782,15 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
               </div>
             ))}
+            <button
+              type="button"
+              disabled={importStatus === 'loading'}
+              onClick={() => seedFromEscadaJson(setImportStatus)}
+              className="flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-blue-300 transition hover:bg-blue-600/20 disabled:opacity-50"
+            >
+              <FileText size={14} />
+              {importStatus === 'loading' ? 'Importando...' : importStatus === 'ok' ? 'Importado!' : importStatus === 'erro' ? 'Erro' : 'Importar escada.json'}
+            </button>
             <button
               type="button"
               disabled={seedStatus === 'loading'}
@@ -1295,11 +1815,12 @@ export default function Rastreabilidade() {
           </button>
         ))}
       </div>
-      {subAba === 'estoque'   && <EstoqueAtual lotes={lotes} />}
-      {subAba === 'lote'      && <EntradaLoteMP lotes={lotes} />}
-      {subAba === 'ordem'     && <OrdemProducao lotes={lotes} lotesDisponiveisMp={lotesDisponiveisMp} />}
-      {subAba === 'consultar' && <ConsultarEscada ordens={ordens} />}
-      {subAba === 'exportar'  && <ExportarInmetro ordens={ordens} />}
+      {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
+      {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
+      {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
+      {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
+      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} />}
+      {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
     </div>
   );
 }

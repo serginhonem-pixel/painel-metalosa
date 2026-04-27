@@ -1,0 +1,50 @@
+{
+  "rastreabilidade_mp": [
+    {
+      "codigo": "11307",
+      "descricao": "TUBO RED 1\"X1,20 ESC",
+      "unidade": "pç (6m)",
+      "lotes": [
+        {"lote":"TUB0001","fornecedor":"DOX (BELOAÇO)","danfe":"000019207 (000077574)","certificado":null,"data":"2024-02-19","qtd_mp_pcs":651,"corte_kg":2738,"PIs_gerados":[{"codigo_PI":"81700","descricao":"M FRONT 3D","op":"021469","pecas_prod":49},{"codigo_PI":"81702","descricao":"M FRONT 5D","op":"021470","pecas_prod":297},{"codigo_PI":"81704","descricao":"M FRONT 7D","op":"021471","pecas_prod":129},{"codigo_PI":"81705","descricao":"M TRAS 3D","op":"021472","pecas_prod":102},{"codigo_PI":"81707","descricao":"M TRAS 5D","op":"021473","pecas_prod":601},{"codigo_PI":"81709","descricao":"M TRAS 7D","op":"021474","pecas_prod":300},{"codigo_PI":"81710","descricao":"TRAVESSA","op":"021489","pecas_prod":2157}]},
+        {"lote":"TUB0002","fornecedor":"DOX (BELOAÇO)","danfe":"000019643 (000077977)","certificado":null,"data":"2024-03-12","qtd_mp_pcs":434,"corte_kg":1892,"PIs_gerados":[{"codigo_PI":"81701","descricao":"M FRONT 4D","op":"021476","pecas_prod":83},{"codigo_PI":"81703","descricao":"M FRONT 6D","op":"021477","pecas_prod":28},{"codigo_PI":"81704","descricao":"M FRONT 7D","op":"021478","pecas_prod":173},{"codigo_PI":"81706","descricao":"M TRAS 4D","op":"021479","pecas_prod":167},{"codigo_PI":"81708","descricao":"M TRAS 6D","op":"021480","pecas_prod":178},{"codigo_PI":"81709","descricao":"M TRAS 7D","op":"021481","pecas_prod":300},{"codigo_PI":"81710","descricao":"TRAVESSA","op":"021482","pecas_prod":1368}]},
+        {"lote":"TUB0003","fornecedor":"CSN (BELOAÇO)","danfe":"006838003 (000078421)","certificado":"D283940204","data":"2024-06-30","qtd_mp_pcs":428,"corte_kg":1819,"obs":"Lote em andamento","PIs_gerados":[{"codigo_PI":"81703","descricao":"M FRONT 6D","op":null,"pecas_prod":62},{"codigo_PI":"81710","descricao":"TRAVESSA","op":null,"pecas_prod":372}]},
+        {"lote":"TUB0004","fornecedor":"DOX (BELOAÇO)","danfe":"000021373 (000079052)","certificado":null,"data":"2024-05-24","qtd_mp_pcs":869,"corte_kg":3624,"obs":"Sem produção registrada","PIs_gerados":[]}
+      ]
+    },
+    {
+      "codigo": "81730",
+      "descricao": "CH ACO BF 1,20 2,00X1,20 ESC",
+      "unidade": "chapa",
+      "lotes": [
+        {"lote":"PAT0001_DEG0001_DOB0001","obs_lote":"Mesma chapa usada para Patamar, Degrau e Dobradica","fornecedor":"CSN","danfe":"007012435","certificado":"D61101-1001","data":"2024-02-23","qtd_chapas":198,"corte_kg_total":4522,"PIs_gerados":[{"codigo_PI":"81711","descricao":"PATAMAR","lote_PI":"PAT0001","op":"015560","pecas_aprovadas":882,"corte_kg":1027.73},{"codigo_PI":"81712","descricao":"DEGRAU","lote_PI":"DEG0001","op":"015560","pecas_aprovadas":5047,"corte_kg":3380.08},{"codigo_PI":"81714","descricao":"DOBRADICA","lote_PI":"DOB0001","op":"015560","pecas_aprovadas":1866,"corte_kg":114.19}]},
+        {"lote":"PAT0002_DEG0002","obs_lote":"Mesma chapa usada para Patamar e Degrau","fornecedor":"USIMINAS (CORTE EM LASER)","danfe":"005290443 (800)","certificado":"2222765","data":"2024-05-21","qtd_chapas":8,"corte_kg_total":184.4,"PIs_gerados":[{"codigo_PI":"81711","descricao":"PATAMAR","lote_PI":"PAT0002","op":"018996","pecas_aprovadas":82,"corte_kg":92.2},{"codigo_PI":"81712","descricao":"DEGRAU","lote_PI":"DEG0002","op":"018996","pecas_aprovadas":96,"corte_kg":92.2}]}
+      ]
+    },
+    {
+      "codigo": "81731",
+      "descricao": "CH ACO BF 1,40 2,00X1,00 ESC",
+      "unidade": "chapa",
+      "lotes": [
+        {"lote":"ART0001","fornecedor":"CSN","danfe":"006944758","certificado":"D51330-0302","data":"2024-02-26","qtd_chapas":10,"corte_kg":220,"PIs_gerados":[{"codigo_PI":"81713","descricao":"ARTICULADOR","op":"015592","pecas_aprovadas":6267}]}
+      ]
+    },
+    {
+      "codigo": "11308",
+      "descricao": "ARAME GALV 5,15MM ESC",
+      "unidade": "metro",
+      "lotes": [
+        {"lote":"ARA0001","fornecedor":"MACCAFERRI","danfe":"000311028","certificado":null,"data":"2024-02-26","corte_kg":94.38,"PIs_gerados":[{"codigo_PI":"81715","descricao":"ARAME SUST PATAMAR","op":"019140","pecas_aprovadas":1650}]},
+        {"lote":"ARA0002","fornecedor":"MACCAFERRI","danfe":"000316083","certificado":null,"data":"2024-05-28","qtd_rolos":2,"corte_kg":1235,"saldo_kg":935,"PIs_gerados":[{"codigo_PI":"81715","descricao":"ARAME SUST PATAMAR","op":"021936","pecas_aprovadas":5000}]}
+      ]
+    },
+    {
+      "codigo": "11300",
+      "descricao": "BARRA CHATA 3/8\"X1/8\" ESC",
+      "unidade": "barra",
+      "lotes": [
+        {"lote":"BAR0001","fornecedor":"ARCELOR MITTAL","danfe":"001468944","certificado":null,"data":"2024-02-21","qtd_barras":60,"corte_kg":84.6,"saldo_kg":0,"PIs_gerados":[{"codigo_PI":"81721","descricao":"REFORCO MONT FRONTAL","op":"019066","pecas_aprovadas":480}]},
+        {"lote":"BAR0002","fornecedor":"ARCELOR MITTAL","danfe":"001490153","certificado":null,"data":"2024-05-25","qtd_barras":690,"corte_kg":1000,"saldo_kg":797.1,"PIs_gerados":[{"codigo_PI":"81721","descricao":"REFORCO MONT FRONTAL","op":"021596/021906/021907","pecas_aprovadas":1120}]}
+      ]
+    }
+  ]
+}
