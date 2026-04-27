@@ -37,11 +37,11 @@ import {
 } from 'lucide-react';
 
 const MP_CODIGO = {
-  'TUBO (11307)':       { label: 'TUBO',        codigo: '11307' },
-  'CHAPA 1,20 (81730)': { label: 'CHAPA 1,20',  codigo: '81730' },
-  'CHAPA 1,40 (81731)': { label: 'CHAPA 1,40',  codigo: '81731' },
-  'ARAME (11308)':      { label: 'ARAME',        codigo: '11308' },
-  'BARRA CHATA (11300)':{ label: 'BARRA CHATA',  codigo: '11300' },
+  'TUBO (11307)':       { label: 'TUBO RED 1"X1,20 ESC',           codigo: '11307' },
+  'CHAPA 1,20 (81730)': { label: 'CH ACO 1,20 ESC',                  codigo: '81730' },
+  'CHAPA 1,40 (81731)': { label: 'CH ACO BF 1,40 2,00X1,00 ESC',    codigo: '81731' },
+  'ARAME (11308)':      { label: 'ARAME GALV 5,15MM ESC',            codigo: '11308' },
+  'BARRA CHATA (11300)':{ label: 'BARRA CHATA 3/8"X1/8" ESC',       codigo: '11300' },
 };
 
 // Mapeamento: código do componente (PI) → chave de MP no estoque
@@ -284,7 +284,7 @@ function EntradaLoteMP({ lotes }) {
             <div>
               <Label>Materia-Prima *</Label>
               <Select value={form.mp} onChange={(e) => set('mp', e.target.value)}>
-                {Object.keys(MP_CODIGO).map((k) => <option key={k} value={k}>{k}</option>)}
+                {Object.keys(MP_CODIGO).map((k) => <option key={k} value={k}>{MP_CODIGO[k].label}</option>)}
               </Select>
             </div>
             <div>
