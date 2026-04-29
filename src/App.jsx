@@ -5901,7 +5901,9 @@ export default function App() {
     const filtradasPorFilialVend =
       filtroFilialVend === 'Todas'
         ? filtradasPorFilial
-        : filtradasPorFilial.filter((row) => row.filialVend === filtroFilialVend);
+        : filtradasPorFilial.filter(
+            (row) => row.tipoMovimento === 'devolucao' || row.filialVend === filtroFilialVend
+          );
     const linhasFiltradas =
       filtroCfops.length === 0
         ? filtradasPorFilialVend
@@ -6329,10 +6331,14 @@ export default function App() {
       municipiosPorChave,
     } = dashboardFaturamentoBase;
     const linhasBase = dashboardFilialAtual
-      ? linhasMes.filter((row) => row.filialVend === dashboardFilialAtual)
+      ? linhasMes.filter(
+          (row) => row.tipoMovimento === 'devolucao' || row.filialVend === dashboardFilialAtual
+        )
       : linhasMes;
     const linhasBaseDia = dashboardFilialAtual
-      ? linhasMes.filter((row) => row.filialVend === dashboardFilialAtual)
+      ? linhasMes.filter(
+          (row) => row.tipoMovimento === 'devolucao' || row.filialVend === dashboardFilialAtual
+        )
       : linhasMes;
     const linhasFiltradas =
       filtroCfops.length === 0
@@ -6548,7 +6554,7 @@ export default function App() {
     const hojeISO = new Date().toISOString().slice(0, 10);
     const linhasHoje = (linhasMes || []).filter((row) => {
       if (!row.emissao) return false;
-      if (dashboardFilialAtual && row.filialVend !== dashboardFilialAtual) return false;
+      if (dashboardFilialAtual && row.tipoMovimento !== 'devolucao' && row.filialVend !== dashboardFilialAtual) return false;
       return obterDataIsoUtc(row.emissao) === hojeISO;
     });
     const linhasFiltradas =
