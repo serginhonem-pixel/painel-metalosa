@@ -25,11 +25,21 @@ const BOM_CATALOGO = {
 };
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
-const MESES = [
-  { id: 'abr', label: 'Abr/26' },
-  { id: 'mai', label: 'Mai/26' },
-  { id: 'jun', label: 'Jun/26' },
+const DEFAULT_MESES = [
+  { id: 'abr26', label: 'Abr/26' },
+  { id: 'mai26', label: 'Mai/26' },
+  { id: 'jun26', label: 'Jun/26' },
 ];
+
+const MESES_OPCOES = (() => {
+  const nomes = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const labels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const opts = [];
+  for (let ano = 25; ano <= 28; ano++) {
+    nomes.forEach((m, i) => opts.push({ id: `${m}${ano}`, label: `${labels[i]}/${ano}` }));
+  }
+  return opts;
+})();
 
 const FAMILIAS = [
   { id: 'SUPER',      nome: 'Super',       grupo: 'Premium' },
@@ -201,9 +211,9 @@ const HIST_METALFORTE = {
  * Primeiro mês (Abr): abate o estoque disponível do CSV.
  * Meses seguintes: aplica carryover (sobra de estoque anterior).
  */
-function calcMRP(plano, componentes) {
+function calcMRP(plano, componentes, meses) {
   const totalPlano = {};
-  MESES.forEach(({ id }) => {
+  meses.forEach(({ id }) => {
     totalPlano[id] = FAMILIAS.reduce((s, f) => s + (plano[f.id]?.[id] || 0), 0);
   });
 
@@ -211,7 +221,7 @@ function calcMRP(plano, componentes) {
     let carryover = 0;
     const resultado = {};
 
-    MESES.forEach(({ id }, idx) => {
+    meses.forEach(({ id }, idx) => {
       // Escala a demanda de referência (março) proporcionalmente ao plano do mês
       const escala = TOTAL_PLANO_REF > 0 ? totalPlano[id] / TOTAL_PLANO_REF : 1;
       const programado = Math.round(comp.demanda_mar * escala);
@@ -237,8 +247,8 @@ function calcMRP(plano, componentes) {
       carryover = Math.min(0, demanda_liquida);
     });
 
-    // Status recalculado com base na demanda líquida de abril
-    const liqAbr = resultado[MESES[0].id]?.demanda_liquida ?? 0;
+    // Status recalculado com base na demanda líquida do primeiro mês
+    const liqAbr = resultado[meses[0].id]?.demanda_liquida ?? 0;
     const status = comp.status_csv === 'VERIFICAR'
       ? 'VERIFICAR'
       : liqAbr > 0 ? 'COMPRAR' : 'OK';
@@ -247,10 +257,10 @@ function calcMRP(plano, componentes) {
   });
 }
 
-function calcListaCompra(mrpResult) {
+function calcListaCompra(mrpResult, meses) {
   const mapa = {};
   mrpResult.forEach((comp) => {
-    MESES.forEach(({ id }) => {
+    meses.forEach(({ id }) => {
       const { demanda_liquida, demanda_kg } = comp.resultado[id];
       if (demanda_liquida > 0) {
         const key = `${comp.tipo}|${comp.espessura}|${id}`;
@@ -274,8 +284,8 @@ function calcListaCompra(mrpResult) {
     if (a.tipo !== b.tipo) return a.tipo.localeCompare(b.tipo);
     if (a.espessura !== b.espessura) return a.espessura - b.espessura;
     return (
-      MESES.findIndex((m) => m.id === a.mes) -
-      MESES.findIndex((m) => m.id === b.mes)
+      meses.findIndex((m) => m.id === a.mes) -
+      meses.findIndex((m) => m.id === b.mes)
     );
   });
 }
@@ -375,8 +385,11 @@ export default function MrpAco() {
   const totalPmpCC = useMemo(() => Object.values(pmpCC).reduce((s, v) => s + (v || 0), 0), [pmpCC]);
 
   // ── Simulador: carros/dia + dias úteis + carteira ───────────────────────
+  const [mesesConfig, setMesesConfig] = useState(DEFAULT_MESES);
+  // Sombra local para que todo o JSX do componente use o estado dinâmico
+  const MESES = mesesConfig;
   const [carrosDia, setCarrosDia] = useState(3300);
-  const [diasUteis, setDiasUteis] = useState({ abr: 20, mai: 21, jun: 21 });
+  const [diasUteis, setDiasUteis] = useState({ abr26: 20, mai26: 21, jun26: 21 });
   const [carteira, setCarteira] = useState(() =>
     Object.fromEntries(FAMILIAS_SIM.map((f) => [f.id, f.cart]))
   );
@@ -446,6 +459,7 @@ export default function MrpAco() {
       if (snap.exists()) {
         const d = snap.data();
         isLoadingRef.current = true;
+        if (d.mesesConfig !== undefined) setMesesConfig(d.mesesConfig);
         if (d.carrosDia   !== undefined) setCarrosDia(d.carrosDia);
         if (d.diasUteis   !== undefined) setDiasUteis(d.diasUteis);
         if (d.carteira    !== undefined) setCarteira(d.carteira);
@@ -496,15 +510,15 @@ export default function MrpAco() {
     if (!unlocked || isLoadingRef.current) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      saveToFirestore({ carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC });
+      saveToFirestore({ mesesConfig, carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC });
     }, 1500);
     return () => clearTimeout(saveTimerRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC]);
+  }, [mesesConfig, carrosDia, diasUteis, carteira, pctEdit, estoqueEdit, pmpMf, pmpCC]);
 
   // ── Cálculo MRP (memoizado) ──────────────────────────────────────────────────
-  const mrpResult = useMemo(() => calcMRP(plano, componentesEfetivos), [plano, componentesEfetivos]);
-  const listaCompra = useMemo(() => calcListaCompra(mrpResult), [mrpResult]);
+  const mrpResult = useMemo(() => calcMRP(plano, componentesEfetivos, mesesConfig), [plano, componentesEfetivos, mesesConfig]);
+  const listaCompra = useMemo(() => calcListaCompra(mrpResult, mesesConfig), [mrpResult, mesesConfig]);
 
   // ── Totais para o dashboard ──────────────────────────────────────────────────
   const dashKpis = useMemo(() => {
@@ -1467,7 +1481,8 @@ export default function MrpAco() {
                   const novaCarteira = Object.fromEntries(FAMILIAS_SIM.map((f) => [f.id, f.cart]));
                   const total = FAMILIAS_SIM.reduce((s, f) => s + f.cart, 0);
                   setCarrosDia(3300);
-                  setDiasUteis({ abr: 20, mai: 21, jun: 21 });
+                  setMesesConfig(DEFAULT_MESES);
+                  setDiasUteis({ abr26: 20, mai26: 21, jun26: 21 });
                   setCarteira(novaCarteira);
                   setPctEdit(Object.fromEntries(
                     FAMILIAS_SIM.map((f) => [f.id, total > 0 ? parseFloat((f.cart / total * 100).toFixed(2)) : 0])
@@ -1492,10 +1507,24 @@ export default function MrpAco() {
                 />
               </div>
               {/* Dias úteis por mês */}
-              {MESES.map(({ id, label }) => (
+              {MESES.map(({ id, label }, slotIdx) => (
                 <div key={id} className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-4">
+                  <select
+                    value={id}
+                    onChange={(e) => {
+                      const novoMes = MESES_OPCOES.find((m) => m.id === e.target.value);
+                      if (!novoMes) return;
+                      setMesesConfig((prev) => prev.map((m, i) => i === slotIdx ? novoMes : m));
+                      setDiasUteis((prev) => ({ ...prev, [e.target.value]: prev[e.target.value] ?? 21 }));
+                    }}
+                    className="w-full rounded-lg border border-slate-600/60 bg-slate-800/80 px-2 py-1 text-[11px] font-bold text-slate-300 outline-none focus:border-blue-500 mb-2"
+                  >
+                    {MESES_OPCOES.map((op) => (
+                      <option key={op.id} value={op.id}>{op.label}</option>
+                    ))}
+                  </select>
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-2">
-                    Dias Úteis — {label}
+                    Dias Úteis
                   </label>
                   <input
                     type="number" min={0} max={31}
