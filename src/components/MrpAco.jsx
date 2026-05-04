@@ -459,7 +459,7 @@ export default function MrpAco() {
       if (snap.exists()) {
         const d = snap.data();
         isLoadingRef.current = true;
-        if (d.mesesConfig !== undefined) setMesesConfig(d.mesesConfig);
+        if (Array.isArray(d.mesesConfig) && d.mesesConfig.length === 3) setMesesConfig(d.mesesConfig);
         if (d.carrosDia   !== undefined) setCarrosDia(d.carrosDia);
         if (d.diasUteis   !== undefined) setDiasUteis(d.diasUteis);
         if (d.carteira    !== undefined) setCarteira(d.carteira);
