@@ -109,6 +109,29 @@ body {
   background-color: #111827 !important;
 }
 
+.app-dark .bg-blue-50 {
+  background: linear-gradient(145deg, #0d1f38 0%, #091628 100%);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.app-dark .border-blue-200 {
+  border-color: #1e3a5c;
+}
+
+.app-dark .text-blue-700 {
+  color: #60a5fa;
+}
+
+.app-dark .text-blue-500 {
+  color: #93c5fd;
+}
+
+.app-dark .text-blue-400 {
+  color: #bfdbfe;
+}
+
 .row-hover:hover {
   background-color: #1e2330;
 }
