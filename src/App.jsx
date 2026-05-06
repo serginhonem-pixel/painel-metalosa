@@ -12026,70 +12026,68 @@ const custoDetalheTitulo = custoDetalheItem
                           </button>
                         </div>
                       )}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento do periodo</p>
-                          <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {(kpisFiltradosProduto?.total ?? faturamentoAtual.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Liquido no periodo.</p>
-                        </div>
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Devolucoes (CFOP)</p>
-                            {!kpisFiltradosProduto && (
-                              <span
-                                title={[
-                                  'Situacao CFOP',
-                                  ...Object.entries(CFOP_DEVOLUCAO_LABELS).map(([cfop, label]) => {
-                                    const valor = faturamentoAtual.devolucoesPorCfop?.[cfop] || 0;
-                                    return `${label} (${cfop}): ${formatarMoeda(valor)}`;
-                                  }),
-                                ].join('\n')}
-                                className="text-slate-400"
-                              >
-                                <Info size={14} />
-                              </span>
-                            )}
+                      {(() => {
+                        const k = kpisFiltradosProduto;
+                        const ativo = !!k;
+                        const total       = Number(ativo ? k.total            : faturamentoAtual.total)            || 0;
+                        const totalDev    = Number(ativo ? k.totalDevolucao   : faturamentoAtual.totalDevolucao)   || 0;
+                        const dias        = Number(ativo ? k.diasAtivos       : faturamentoAtual.diasAtivos)       || 0;
+                        const clientes    = Number(ativo ? k.clientesAtivos   : faturamentoAtual.clientesAtivos)   || 0;
+                        const ticket      = Number(ativo ? k.ticketMedio      : faturamentoAtual.ticketMedio)      || 0;
+                        const mediaDia    = dias > 0 ? total / dias : 0;
+                        const bg          = ativo ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200';
+                        const fmt = (v) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                        return (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento do periodo</p>
+                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(total)}</p>
+                              <p className="text-xs text-slate-400 mt-1">Liquido no periodo.</p>
+                            </div>
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Devolucoes (CFOP)</p>
+                                {!ativo && (
+                                  <span
+                                    title={[
+                                      'Situacao CFOP',
+                                      ...Object.entries(CFOP_DEVOLUCAO_LABELS).map(([cfop, label]) => {
+                                        const valor = faturamentoAtual.devolucoesPorCfop?.[cfop] || 0;
+                                        return `${label} (${cfop}): ${formatarMoeda(valor)}`;
+                                      }),
+                                    ].join('\n')}
+                                    className="text-slate-400"
+                                  >
+                                    <Info size={14} />
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(totalDev)}</p>
+                              <p className="text-xs text-slate-400 mt-1">Valores de devolucao no periodo.</p>
+                            </div>
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
+                              <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">{fmt(mediaDia)}</p>
+                              <p className="text-xs text-slate-400 mt-1">Media nos dias com faturamento.</p>
+                            </div>
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
+                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(ticket)}</p>
+                              <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
+                            </div>
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
+                              <p className="text-2xl font-bold text-slate-900 mt-2">{clientes}</p>
+                              <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
+                            </div>
+                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
+                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>
+                              <p className="text-2xl font-bold text-slate-900 mt-2">{dias}</p>
+                              <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
+                            </div>
                           </div>
-                          <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {(kpisFiltradosProduto?.totalDevolucao ?? faturamentoAtual.totalDevolucao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Valores de devolucao no periodo.</p>
-                        </div>
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
-                          <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">
-                            {(() => {
-                              const t = kpisFiltradosProduto?.total ?? faturamentoAtual.total;
-                              const d = kpisFiltradosProduto?.diasAtivos ?? faturamentoAtual.diasAtivos;
-                              return `R$ ${(d > 0 ? t / d : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-                            })()}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Media nos dias com faturamento.</p>
-                        </div>
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
-                          <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {(kpisFiltradosProduto?.ticketMedio ?? faturamentoAtual.ticketMedio).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
-                        </div>
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
-                          <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {kpisFiltradosProduto?.clientesAtivos ?? faturamentoAtual.clientesAtivos}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
-                        </div>
-                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
-                          <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>
-                          <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {kpisFiltradosProduto?.diasAtivos ?? faturamentoAtual.diasAtivos}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
-                        </div>
-                      </div>
+                        );
+                      })()}
 
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-3">
