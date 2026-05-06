@@ -6873,15 +6873,10 @@ export default function App() {
   const kpisFiltradosProduto = useMemo(() => {
     const termo = filtroGraficoProduto.trim().toLowerCase();
     if (!termo) return null;
-    const prefixo = `${faturamentoAno}-${faturamentoMes}`;
-    const linhas = (faturamentoAtual.linhas || []).filter((row) => {
-      const diaISO = obterDataIsoUtc(row.emissao);
-      if (!String(diaISO || '').startsWith(prefixo)) return false;
-      return (
-        String(row.codigo || '').toLowerCase().includes(termo) ||
-        String(row.descricao || '').toLowerCase().includes(termo)
-      );
-    });
+    const linhas = (faturamentoAtual.linhas || []).filter((row) =>
+      String(row.codigo || '').toLowerCase().includes(termo) ||
+      String(row.descricao || '').toLowerCase().includes(termo)
+    );
     let total = 0, totalDevolucao = 0, movimentos = 0;
     const clientesSet = new Set();
     const diasSet = new Set();
@@ -6905,7 +6900,7 @@ export default function App() {
       diasAtivos: diasSet.size,
       ticketMedio: movimentos > 0 ? total / movimentos : 0,
     };
-  }, [filtroGraficoProduto, faturamentoAtual.linhas, faturamentoAno, faturamentoMes]);
+  }, [filtroGraficoProduto, faturamentoAtual.linhas]);
 
   const faturamentoPorVendedor = useMemo(() => {
     const mapa = new Map();
