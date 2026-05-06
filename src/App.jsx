@@ -944,6 +944,7 @@ export default function App() {
   );
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
+  const [filtroGraficoProduto, setFiltroGraficoProduto] = useState('');
   const [faturamentoAtualizadoEm, setFaturamentoAtualizadoEm] = useState(null);
   const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);
   const [popupIndex, setPopupIndex] = useState(0);
@@ -12040,9 +12041,9 @@ const custoDetalheTitulo = custoDetalheItem
 
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm xl:col-span-3">
-                          <div className="flex items-center justify-between mb-4 gap-3">
+                          <div className="flex flex-wrap items-center justify-between mb-4 gap-3">
                             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500">Faturamento por dia</h4>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                               <div className="flex items-center gap-2">
                                 <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Mes</span>
                                 <select
@@ -12057,6 +12058,24 @@ const custoDetalheTitulo = custoDetalheItem
                                   ))}
                                 </select>
                               </div>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Filtrar por produto ou código..."
+                                  value={filtroGraficoProduto}
+                                  onChange={(e) => setFiltroGraficoProduto(e.target.value)}
+                                  className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 w-52"
+                                />
+                                {filtroGraficoProduto && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setFiltroGraficoProduto('')}
+                                    className="text-[10px] font-bold text-slate-400 hover:text-slate-700"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
                               <span className="text-xs text-slate-400">
                                 {faturamentoAtual.porDia.filter((item) =>
                                   String(item.dia || '').startsWith(`${faturamentoAno}-${faturamentoMes}`)
@@ -12066,9 +12085,58 @@ const custoDetalheTitulo = custoDetalheItem
                             </div>
                           </div>
                           {(() => {
-                            const dadosMes = faturamentoAtual.porDia.filter((item) =>
-                              String(item.dia || '').startsWith(`${faturamentoAno}-${faturamentoMes}`)
-                            );
+                            const prefixoMes = `${faturamentoAno}-${faturamentoMes}`;
+                            const termoBusca = filtroGraficoProduto.trim().toLowerCase();
+                            let dadosMes;
+                            let linhasMesFiltradas = [];
+                            if (termoBusca) {
+                              linhasMesFiltradas = (faturamentoAtual.linhas || []).filter((row) => {
+                                const diaISO = obterDataIsoUtc(row.emissao);
+                                if (!String(diaISO || '').startsWith(prefixoMes)) return false;
+                                const codigo = String(row.codigo || '').toLowerCase();
+                                const descricao = String(row.descricao || '').toLowerCase();
+                                return codigo.includes(termoBusca) || descricao.includes(termoBusca);
+                              });
+                              const diaMap = new Map();
+                              linhasMesFiltradas.forEach((row) => {
+                                const diaISO = obterDataIsoUtc(row.emissao);
+                                const val = row.tipoMovimento === 'devolucao' ? -Math.abs(row.valorTotal || 0) : (row.valorTotal || 0);
+                                diaMap.set(diaISO, (diaMap.get(diaISO) || 0) + val);
+                              });
+                              dadosMes = Array.from(diaMap.entries())
+                                .map(([dia, valor]) => ({ dia, valor }))
+                                .sort((a, b) => a.dia.localeCompare(b.dia));
+                            } else {
+                              dadosMes = faturamentoAtual.porDia.filter((item) =>
+                                String(item.dia || '').startsWith(prefixoMes)
+                              );
+                            }
+                            const handleExportarGraficoExcel = () => {
+                              const linhasExport = (termoBusca ? linhasMesFiltradas : (faturamentoAtual.linhas || []).filter((row) => {
+                                const diaISO = obterDataIsoUtc(row.emissao);
+                                return String(diaISO || '').startsWith(prefixoMes);
+                              })).map((row) => ({
+                                Data: formatarDataUtcPtBr(row.emissao) || '',
+                                Tipo: row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda',
+                                Cliente: row.cliente || '',
+                                Nome: row.clienteNome || '',
+                                Vendedor: row.vendedorNome || '',
+                                Filial: row.filial || '',
+                                Grupo: row.grupo || '',
+                                Codigo: row.codigo || '',
+                                Descricao: normalizarDescricaoProduto(row.descricao) || '',
+                                Quantidade: row.quantidade ?? 0,
+                                Unidade: row.unidade || '',
+                                Valor: row.valorTotal ?? 0,
+                                NF: row.nf || '',
+                              }));
+                              if (!linhasExport.length) return;
+                              const wb = XLSX.utils.book_new();
+                              const ws = XLSX.utils.json_to_sheet(linhasExport);
+                              XLSX.utils.book_append_sheet(wb, ws, 'Faturamento');
+                              const sufixo = termoBusca ? `_${termoBusca.replace(/\s+/g, '_')}` : '';
+                              XLSX.writeFile(wb, `faturamento_${prefixoMes}${sufixo}.xlsx`);
+                            };
                             const dados = dadosMes;
                             if (!dados.length) {
                               return (
@@ -12217,6 +12285,32 @@ const custoDetalheTitulo = custoDetalheItem
                                 })}
                                   </svg>
                                 </div>
+                                {termoBusca && (
+                                  <div className="flex items-center justify-between px-1">
+                                    <p className="text-[11px] text-slate-400">
+                                      Filtro: <span className="font-bold text-blue-600">"{filtroGraficoProduto}"</span>
+                                      {' '}— {dadosMes.length} dia(s) com resultado
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={handleExportarGraficoExcel}
+                                      className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
+                                    >
+                                      ↓ Baixar Excel filtrado
+                                    </button>
+                                  </div>
+                                )}
+                                {!termoBusca && (
+                                  <div className="flex justify-end px-1">
+                                    <button
+                                      type="button"
+                                      onClick={handleExportarGraficoExcel}
+                                      className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 transition"
+                                    >
+                                      ↓ Baixar Excel do mês
+                                    </button>
+                                  </div>
+                                )}
                               <div className="rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                   <div>
