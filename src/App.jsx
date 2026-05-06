@@ -6870,6 +6870,43 @@ export default function App() {
     setDiasFaturamentoSelecionados([]);
   };
 
+  const kpisFiltradosProduto = useMemo(() => {
+    const termo = filtroGraficoProduto.trim().toLowerCase();
+    if (!termo) return null;
+    const prefixo = `${faturamentoAno}-${faturamentoMes}`;
+    const linhas = (faturamentoAtual.linhas || []).filter((row) => {
+      const diaISO = obterDataIsoUtc(row.emissao);
+      if (!String(diaISO || '').startsWith(prefixo)) return false;
+      return (
+        String(row.codigo || '').toLowerCase().includes(termo) ||
+        String(row.descricao || '').toLowerCase().includes(termo)
+      );
+    });
+    let total = 0, totalDevolucao = 0, movimentos = 0;
+    const clientesSet = new Set();
+    const diasSet = new Set();
+    linhas.forEach((row) => {
+      const val = row.valorTotal || 0;
+      if (row.tipoMovimento === 'devolucao') {
+        totalDevolucao += Math.abs(val);
+        total -= Math.abs(val);
+      } else {
+        total += val;
+        movimentos++;
+      }
+      if (row.cliente) clientesSet.add(row.cliente);
+      const diaISO = obterDataIsoUtc(row.emissao);
+      if (diaISO) diasSet.add(diaISO);
+    });
+    return {
+      total,
+      totalDevolucao,
+      clientesAtivos: clientesSet.size,
+      diasAtivos: diasSet.size,
+      ticketMedio: movimentos > 0 ? total / movimentos : 0,
+    };
+  }, [filtroGraficoProduto, faturamentoAtual.linhas, faturamentoAno, faturamentoMes]);
+
   const faturamentoPorVendedor = useMemo(() => {
     const mapa = new Map();
     faturamentoLinhasFiltradas.forEach((row) => {
@@ -11980,60 +12017,80 @@ const custoDetalheTitulo = custoDetalheItem
                   </>
                         )}
                       </div>
+                      {kpisFiltradosProduto && (
+                        <div className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-700">
+                          <span>Filtro ativo:</span>
+                          <span className="font-black">"{filtroGraficoProduto}"</span>
+                          <span className="font-normal text-blue-500">— cards e gráfico refletem apenas este produto</span>
+                          <button
+                            type="button"
+                            onClick={() => setFiltroGraficoProduto('')}
+                            className="ml-auto text-blue-400 hover:text-blue-700 font-black"
+                          >
+                            ✕ Limpar
+                          </button>
+                        </div>
+                      )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento do periodo</p>
                           <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {faturamentoAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {(kpisFiltradosProduto?.total ?? faturamentoAtual.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Liquido no periodo.</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <div className="flex items-center gap-2">
                             <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Devolucoes (CFOP)</p>
-                            <span
-                              title={[
-                                'Situacao CFOP',
-                                ...Object.entries(CFOP_DEVOLUCAO_LABELS).map(([cfop, label]) => {
-                                  const valor = faturamentoAtual.devolucoesPorCfop?.[cfop] || 0;
-                                  return `${label} (${cfop}): ${formatarMoeda(valor)}`;
-                                }),
-                              ].join('\n')}
-                              className="text-slate-400"
-                            >
-                              <Info size={14} />
-                            </span>
+                            {!kpisFiltradosProduto && (
+                              <span
+                                title={[
+                                  'Situacao CFOP',
+                                  ...Object.entries(CFOP_DEVOLUCAO_LABELS).map(([cfop, label]) => {
+                                    const valor = faturamentoAtual.devolucoesPorCfop?.[cfop] || 0;
+                                    return `${label} (${cfop}): ${formatarMoeda(valor)}`;
+                                  }),
+                                ].join('\n')}
+                                className="text-slate-400"
+                              >
+                                <Info size={14} />
+                              </span>
+                            )}
                           </div>
                           <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {faturamentoAtual.totalDevolucao.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {(kpisFiltradosProduto?.totalDevolucao ?? faturamentoAtual.totalDevolucao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Valores de devolucao no periodo.</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
                           <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">
-                            R$ {(faturamentoAtual.diasAtivos > 0 ? faturamentoAtual.total / faturamentoAtual.diasAtivos : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            {(() => {
+                              const t = kpisFiltradosProduto?.total ?? faturamentoAtual.total;
+                              const d = kpisFiltradosProduto?.diasAtivos ?? faturamentoAtual.diasAtivos;
+                              return `R$ ${(d > 0 ? t / d : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                            })()}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Media nos dias com faturamento.</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
                           <p className="text-xl font-bold text-slate-900 mt-2">
-                            R$ {faturamentoAtual.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {(kpisFiltradosProduto?.ticketMedio ?? faturamentoAtual.ticketMedio).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
                           <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {faturamentoAtual.clientesAtivos}
+                            {kpisFiltradosProduto?.clientesAtivos ?? faturamentoAtual.clientesAtivos}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`border rounded-2xl p-5 shadow-sm ${kpisFiltradosProduto ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200'}`}>
                           <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>
                           <p className="text-2xl font-bold text-slate-900 mt-2">
-                            {faturamentoAtual.diasAtivos}
+                            {kpisFiltradosProduto?.diasAtivos ?? faturamentoAtual.diasAtivos}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
                         </div>
