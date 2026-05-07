@@ -945,6 +945,7 @@ export default function App() {
   const [faturamentoInicio, setFaturamentoInicio] = useState('');
   const [faturamentoFim, setFaturamentoFim] = useState('');
   const [filtroGraficoProduto, setFiltroGraficoProduto] = useState('');
+  const [filtroGrupo, setFiltroGrupo] = useState('Todos');
   const [faturamentoAtualizadoEm, setFaturamentoAtualizadoEm] = useState(null);
   const [faturamentoArquivoEm, setFaturamentoArquivoEm] = useState(null);
   const [popupIndex, setPopupIndex] = useState(0);
@@ -5895,6 +5896,10 @@ export default function App() {
       new Set(linhasPeriodo.map((row) => row.filialVend).filter((f) => !!f))
     ).sort();
 
+    const gruposDisponiveis = Array.from(
+      new Set(linhasPeriodo.map((row) => row.grupo).filter((g) => !!g))
+    ).sort();
+
     const filtradasPorFilial =
       filtroFilial === 'Todas'
         ? linhasPeriodo
@@ -5905,7 +5910,7 @@ export default function App() {
         : filtradasPorFilial.filter(
             (row) => row.tipoMovimento === 'devolucao' || row.filialVend === filtroFilialVend
           );
-    const linhasFiltradas =
+    const filtradasPorCfop =
       filtroCfops.length === 0
         ? filtradasPorFilialVend
         : filtradasPorFilialVend.filter((row) => {
@@ -5913,6 +5918,10 @@ export default function App() {
             const cfop = String(row.cfop || '').trim();
             return cfop ? filtroCfops.includes(cfop) : false;
           });
+    const linhasFiltradas =
+      filtroGrupo === 'Todos'
+        ? filtradasPorCfop
+        : filtradasPorCfop.filter((row) => row.grupo === filtroGrupo);
 
     const total = linhasFiltradas.reduce((acc, row) => acc + row.valorTotal, 0);
     const totalBruto = linhasFiltradas
@@ -6140,6 +6149,7 @@ export default function App() {
       porFilial,
       filiais,
       filiaisVend,
+      gruposDisponiveis,
       clientesAtivos,
       movimentos,
       ticketMedio,
@@ -6153,7 +6163,7 @@ export default function App() {
       estadosTodos,
       municipiosMapa,
     };
-  }, [faturamentoLinhas, filtroFilial, filtroFilialVend, filtroCfops, faturamentoInicio, faturamentoFim, vendedoresData]);
+  }, [faturamentoLinhas, filtroFilial, filtroFilialVend, filtroCfops, filtroGrupo, faturamentoInicio, faturamentoFim, vendedoresData]);
 
   const dashboardFaturamentoBase = useMemo(() => {
     const produtosPorCodigo = new Map(
@@ -7590,6 +7600,12 @@ export default function App() {
     if (faturamentoAtual.filiaisVend?.includes(filtroFilialVend)) return;
     setFiltroFilialVend('Todas');
   }, [faturamentoAtual.filiaisVend, filtroFilialVend]);
+
+  useEffect(() => {
+    if (filtroGrupo === 'Todos') return;
+    if (faturamentoAtual.gruposDisponiveis?.includes(filtroGrupo)) return;
+    setFiltroGrupo('Todos');
+  }, [faturamentoAtual.gruposDisponiveis, filtroGrupo]);
 
   const faturamento2025 = useMemo(() => {
     const clientesPorCodigo = new Map(
@@ -10003,6 +10019,25 @@ const custoDetalheTitulo = custoDetalheItem
                         ))}
                       </div>
                     )}
+                    {(faturamentoAtual.gruposDisponiveis?.length ?? 0) > 0 && (
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        <span className="mr-2">Grupo</span>
+                        {['Todos', ...faturamentoAtual.gruposDisponiveis].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => setFiltroGrupo(g)}
+                            className={`rounded-full px-3 py-1.5 transition-all ${
+                              filtroGrupo === g
+                                ? 'bg-violet-600 text-white shadow'
+                                : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                            }`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <div
                       className="text-[10px] text-slate-500"
                       title={filtroCfops.length ? filtroCfops.join(", ") : "Todos"}
@@ -11957,10 +11992,10 @@ const custoDetalheTitulo = custoDetalheItem
                               size={12}
                               className={`transition-transform ${mostrarFiltroFaturamento ? 'rotate-90' : ''}`}
                             />
-                            Filtros (Filiais/CFOP)
+                            Filtros (Filiais/Grupo/CFOP)
                           </button>
                           <span className="text-[10px] text-slate-400">
-                            {filtroFilial} | {filtroFilialVend !== 'Todas' ? filtroFilialVend + ' | ' : ''}{filtroCfops.length} CFOPs
+                            {filtroFilial} | {filtroFilialVend !== 'Todas' ? filtroFilialVend + ' | ' : ''}{filtroGrupo !== 'Todos' ? filtroGrupo + ' | ' : ''}{filtroCfops.length} CFOPs
                           </span>
                         </div>
                         {mostrarFiltroFaturamento && (
@@ -11997,6 +12032,25 @@ const custoDetalheTitulo = custoDetalheItem
                                     }`}
                                   >
                                     {fv}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {(faturamentoAtual.gruposDisponiveis?.length ?? 0) > 0 && (
+                              <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                <span className="mr-2">Grupo</span>
+                                {['Todos', ...faturamentoAtual.gruposDisponiveis].map((g) => (
+                                  <button
+                                    key={g}
+                                    type="button"
+                                    onClick={() => setFiltroGrupo(g)}
+                                    className={`rounded-full px-3 py-2 transition-all ${
+                                      filtroGrupo === g
+                                        ? 'bg-violet-600 text-white shadow'
+                                        : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                                    }`}
+                                  >
+                                    {g}
                                   </button>
                                 ))}
                               </div>
