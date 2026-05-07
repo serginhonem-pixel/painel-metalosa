@@ -2561,6 +2561,615 @@ export default function App() {
     printHtmlRelatorio(html);
   };
 
+  // ── EXPORTAR RELATÓRIO FILTRADO — PDF (monocromático profissional) ──────────
+  const handleExportarRelatorioManutencaoPdf = () => {
+    const now = new Date();
+    const r = relatorioResumoGeral;
+
+    const periodoStr = relatorioInicio && relatorioFim
+      ? `${relatorioInicio.split('-').reverse().join('/')} a ${relatorioFim.split('-').reverse().join('/')}`
+      : relatorioInicio
+        ? `A partir de ${relatorioInicio.split('-').reverse().join('/')}`
+        : relatorioFim
+          ? `Até ${relatorioFim.split('-').reverse().join('/')}`
+          : 'Todo o período';
+
+    // ── helpers ─────────────────────────────────────────────────────────────
+    const barSection = (title, data) => {
+      if (!data.length) return `<div class="bc-card"><div class="bc-ttl">${escapeHtmlRelatorio(title)}</div><div style="color:#9ca3af;font-size:9px;padding:6px 0">Sem dados</div></div>`;
+      const mx = Math.max(...data.map((d) => d.value), 1);
+      return `<div class="bc-card"><div class="bc-ttl">${escapeHtmlRelatorio(title)}</div>${data.map((d) => `
+        <div class="bc-row">
+          <div class="bc-lbl" title="${escapeHtmlRelatorio(d.name)}">${escapeHtmlRelatorio(d.name)}</div>
+          <div class="bc-track"><div class="bc-bar" style="width:${Math.round((d.value / mx) * 100)}%"></div></div>
+          <div class="bc-n">${d.value}</div>
+          <div class="bc-p">${pct(d.value)}</div>
+        </div>`).join('')}</div>`;
+    };
+
+    const maxSetorTotal = Math.max(...relatorioPorSetor.map((s) => s.total), 1);
+    const setorTblRows = relatorioPorSetor.slice(0, 14).map((s, i) => {
+      const tm = s.tempoCount > 0 ? Math.round(s.tempoTotal / s.tempoCount / 3600000) : 0;
+      const tmStr = tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`;
+      const barW = Math.round((s.total / maxSetorTotal) * 100);
+      const pctRes = s.total > 0 ? Math.round((s.finalizadas / s.total) * 100) : 0;
+      const rk = i < 3 ? `rk-${i + 1}` : '';
+      return `<tr>
+        <td><span class="rk ${rk}">${i + 1}</span></td>
+        <td class="b">${escapeHtmlRelatorio(s.setor)}</td>
+        <td class="r">${s.total}</td>
+        <td class="r" style="color:#92400e">${s.abertas}</td>
+        <td class="r" style="color:#14532d">${s.finalizadas}</td>
+        <td class="r">${tmStr}</td>
+        <td><div class="pb"><div class="pb-tr"><div class="pb-fl" style="width:${barW}%"></div></div><span class="pb-p">${pct(s.total)}</span></div></td>
+        <td class="r">${pctRes}%</td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="8" class="z">Sem dados</td></tr>`;
+
+    const maxAtivoTotal = Math.max(...relatorioTopAtivos.map((a) => a.total), 1);
+    const ativoRows = relatorioTopAtivos.map((item, i) => {
+      const barW = Math.round((item.total / maxAtivoTotal) * 100);
+      const pctRes = item.total > 0 ? Math.round((item.finalizadas / item.total) * 100) : 0;
+      const rk = i < 3 ? `rk-${i + 1}` : '';
+      return `<tr>
+        <td><span class="rk ${rk}">${i + 1}</span></td>
+        <td class="b" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtmlRelatorio(item.ativo)}</td>
+        <td class="r">${item.total}</td>
+        <td class="r" style="color:#92400e">${item.abertas}</td>
+        <td class="r" style="color:#14532d">${item.finalizadas}</td>
+        <td><div class="pb"><div class="pb-tr"><div class="pb-fl" style="width:${barW}%"></div></div></div></td>
+        <td class="r">${pctRes}%</td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" class="z">Sem dados</td></tr>`;
+
+    const respRows = relatorioPorResponsavel.slice(0, 14).map((item) => {
+      const tm = item.tempoCount > 0 ? Math.round(item.tempoTotal / item.tempoCount / 3600000) : 0;
+      const tmStr = tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`;
+      const pctRes = item.total > 0 ? Math.round((item.finalizadas / item.total) * 100) : 0;
+      const bdg = pctRes >= 70 ? 'bdg-ok' : pctRes >= 40 ? 'bdg-md' : 'bdg-lo';
+      return `<tr>
+        <td class="b">${escapeHtmlRelatorio(item.responsavel)}</td>
+        <td class="r">${item.total}</td>
+        <td class="r" style="color:#14532d">${item.finalizadas}</td>
+        <td class="r" style="color:#1d4ed8">${item.emAndamento}</td>
+        <td class="r">${tmStr}</td>
+        <td><div class="pb"><div class="pb-tr"><div class="pb-fl" style="width:${Math.min(100, pctRes)}%"></div></div><span class="bdg ${bdg}">${pctRes}%</span></div></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="6" class="z">Sem dados</td></tr>`;
+
+    const maxMes = Math.max(...relatorioPorMes.map((m) => m.total), 1);
+    const mesRows = relatorioPorMes.map((m) => {
+      const barW = Math.round((m.total / maxMes) * 100);
+      const pctFin = m.total > 0 ? Math.round((m.Finalizadas / m.total) * 100) : 0;
+      return `<tr>
+        <td class="b">${m.label}</td>
+        <td class="r">${m.total}</td>
+        <td class="r">${m.Abertas}</td>
+        <td class="r" style="color:#14532d">${m.Finalizadas}</td>
+        <td class="r">${pctFin}%</td>
+        <td><div class="pb"><div class="pb-tr"><div class="pb-fl" style="width:${barW}%"></div></div></div></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="6" class="z">Sem dados</td></tr>`;
+
+    const pctCorretiva = pctNum(r.corretivas);
+    const pctPreventiva = pctNum(r.preventivas);
+
+    const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"/><title>Relatorio de Manutencao — Metalosa</title><style>
+/* ── BASE ─────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4 portrait;margin:0}
+@media print{.page{page-break-after:always}.no-break{page-break-inside:avoid}}
+
+/* ── CAPA ─────────────────────────────────────────────────────── */
+.cover{width:210mm;height:297mm;background:#0B0F1A;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cv-panel{position:absolute;top:0;right:0;width:68mm;height:100%;background:#0e1423;border-left:1px solid #1a2236}
+.cv-strip{position:absolute;top:0;left:0;width:5px;height:100%;background:#fff}
+.cv-body{position:relative;z-index:1;padding:50px 52px;display:flex;flex-direction:column;height:100%}
+.cv-logo{width:42px;height:42px;object-fit:contain;filter:brightness(0)invert(1);margin-bottom:5px}
+.cv-brand{font-size:7.5px;font-weight:700;letter-spacing:.46em;text-transform:uppercase;color:#2c3d51;margin-bottom:60px}
+.cv-ey{font-size:7.5px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#243244;margin-bottom:9px}
+.cv-title{font-size:58px;font-weight:900;line-height:1.01;letter-spacing:-.03em;color:#edf1f6;margin-bottom:12px;max-width:116mm}
+.cv-desc{font-size:12px;color:#3d5068;line-height:1.6;margin-bottom:26px;max-width:104mm}
+.cv-period{display:inline-flex;align-items:center;gap:10px;border:1px solid #18263a;border-radius:6px;padding:8px 15px;width:fit-content;margin-bottom:auto}
+.cv-pl{font-size:6.5px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#1e2f42}
+.cv-pv{font-size:11px;font-weight:700;color:#b8c8db}
+.cv-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:30px}
+.cv-kpi{background:#101826;border:1px solid #1a2438;border-radius:10px;padding:17px 15px}
+.cv-kl{font-size:6.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#243547;margin-bottom:7px}
+.cv-kv{font-size:38px;font-weight:900;color:#e6ecf3;line-height:1}
+.cv-ft{margin-top:20px;padding-top:13px;border-top:1px solid #131f2d;display:flex;justify-content:space-between;font-size:7.5px;color:#1a2a3a}
+
+/* ── CONTENT PAGES ─────────────────────────────────────────────── */
+.pg{width:210mm;min-height:297mm;padding:11mm 13mm 9mm;display:flex;flex-direction:column}
+.ph{display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;margin-bottom:17px;border-bottom:2.5px solid #0b0f1a}
+.ph-brand{display:flex;align-items:center;gap:8px}
+.ph-logo{width:26px;height:26px;object-fit:contain}
+.ph-name{font-size:11.5px;font-weight:900;color:#0b0f1a}
+.ph-doc{font-size:6.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#9ca3af;margin-top:1px}
+.ph-meta{text-align:right;font-size:7.5px;color:#6b7280;line-height:1.7}
+.ph-meta b{color:#374151}
+.sh{border-left:3.5px solid #0b0f1a;padding-left:9px;margin-bottom:3px}
+.sh-t{font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#0b0f1a}
+.sh-s{font-size:7px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:#9ca3af;margin-top:2px}
+.sec{margin-bottom:18px}
+
+/* ── KPI TILES ─────────────────────────────────────────────────── */
+.kg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.kt{border:1px solid #e8ecf0;border-radius:9px;padding:13px 13px 10px;background:#fafbfc}
+.kt-l{font-size:6.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:5px}
+.kt-v{font-size:32px;font-weight:900;color:#0b0f1a;line-height:1;margin-bottom:2px}
+.kt-s{font-size:7.5px;color:#6b7280}
+
+/* ── RESOLUTION BLOCK ──────────────────────────────────────────── */
+.res{display:flex;align-items:stretch;gap:15px;border:1px solid #e8ecf0;border-radius:11px;padding:16px 18px;margin-bottom:16px;background:#fafbfc}
+.res-left{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:108px;border-right:1px solid #e8ecf0;padding-right:15px}
+.res-pct{font-size:66px;font-weight:900;color:#0b0f1a;line-height:1}
+.res-lbl{font-size:7px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-top:4px}
+.res-right{flex:1;display:flex;flex-direction:column;justify-content:center;gap:11px}
+.res-bar-bg{height:8px;background:#e8ecf0;border-radius:4px;overflow:hidden}
+.res-bar{height:100%;background:#0b0f1a;border-radius:4px}
+.res-split{display:flex;gap:0}
+.rsi{flex:1;padding:0 11px;border-right:1px solid #e8ecf0}
+.rsi:first-child{padding-left:0}
+.rsi:last-child{border-right:none}
+.rsi-l{font-size:6.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:2px}
+.rsi-v{font-size:21px;font-weight:900;color:#0b0f1a}
+.rsi-p{font-size:7.5px;color:#6b7280;margin-top:1px}
+
+/* ── BAR CHARTS ─────────────────────────────────────────────────── */
+.bc-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.bc-card{border:1px solid #f0f4f8;border-radius:8px;padding:11px 12px}
+.bc-ttl{font-size:7px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#374151;padding-bottom:8px;margin-bottom:9px;border-bottom:1px solid #f0f4f8}
+.bc-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.bc-lbl{font-size:8.5px;color:#374151;min-width:70px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-track{flex:1;height:6px;background:#f0f4f8;border-radius:3px;overflow:hidden}
+.bc-bar{height:100%;background:#0b0f1a;border-radius:3px}
+.bc-n{font-size:9px;font-weight:700;color:#0b0f1a;min-width:18px;text-align:right}
+.bc-p{font-size:7.5px;color:#9ca3af;min-width:26px;text-align:right}
+
+/* ── TABLES ─────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;font-size:9px}
+.tbl thead tr{background:#0b0f1a}
+.tbl th{padding:6.5px 7px;color:#fff;font-size:7px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:left}
+.tbl th.r{text-align:right}
+.tbl td{padding:5px 7px;border-bottom:1px solid #f6f8fa;color:#374151;vertical-align:middle}
+.tbl tbody tr:nth-child(even) td{background:#f9fafb}
+.b{font-weight:700;color:#0b0f1a!important}
+.r{text-align:right!important;font-weight:700;color:#0b0f1a}
+.z{color:#9ca3af!important;text-align:center!important;padding:14px!important}
+
+/* ── PROGRESS BARS IN CELLS ─────────────────────────────────────── */
+.pb{display:flex;align-items:center;gap:5px}
+.pb-tr{flex:1;height:5px;background:#f0f4f8;border-radius:3px;overflow:hidden;min-width:36px}
+.pb-fl{height:100%;background:#0b0f1a;border-radius:3px}
+.pb-p{font-size:7.5px;color:#6b7280;min-width:26px}
+
+/* ── RANK / BADGE ───────────────────────────────────────────────── */
+.rk{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:7.5px;font-weight:700;background:#f0f4f8;color:#374151}
+.rk-1{background:#0b0f1a;color:#fff}
+.rk-2{background:#1e2d3c;color:#cbd5e1}
+.rk-3{background:#374151;color:#cbd5e1}
+.bdg{display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700}
+.bdg-ok{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+.bdg-md{background:#fffbeb;color:#92400e;border:1px solid #fcd34d}
+.bdg-lo{background:#fff1f2;color:#9f1239;border:1px solid #fca5a5}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+.div{height:1px;background:#f0f4f8;margin:13px 0}
+.pf{margin-top:auto;padding-top:7px;border-top:1px solid #f0f4f8;display:flex;justify-content:space-between;font-size:7px;color:#d1d5db}
+</style></head><body>
+
+<!-- ═══════ CAPA ══════════════════════════════════════════════ -->
+<div class="cover page">
+  <div class="cv-panel"></div><div class="cv-strip"></div>
+  <div class="cv-body">
+    <img class="cv-logo" src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa"/>
+    <div class="cv-brand">Metalosa</div>
+    <div style="flex:1"></div>
+    <div class="cv-ey">Departamento de Manutenção</div>
+    <div class="cv-title">Relatório de<br/>Manutenção</div>
+    <div class="cv-desc">Análise de desempenho, indicadores operacionais<br/>e gestão de ordens de serviço</div>
+    <div class="cv-period">
+      <span class="cv-pl">Período</span>
+      <span class="cv-pv">${escapeHtmlRelatorio(periodoStr)}</span>
+    </div>
+    <div class="cv-kpis">
+      <div class="cv-kpi"><div class="cv-kl">Total OS</div><div class="cv-kv">${r.total}</div></div>
+      <div class="cv-kpi"><div class="cv-kl">Finalizadas</div><div class="cv-kv">${r.finalizadas}</div></div>
+      <div class="cv-kpi"><div class="cv-kl">% Resolvidas</div><div class="cv-kv">${r.pctResolvidas}%</div></div>
+      <div class="cv-kpi"><div class="cv-kl">Em Aberto</div><div class="cv-kv">${r.abertas}</div></div>
+      <div class="cv-kpi"><div class="cv-kl">Em Andamento</div><div class="cv-kv">${r.emAndamento}</div></div>
+      <div class="cv-kpi"><div class="cv-kl">Tempo Médio</div><div class="cv-kv">${r.tempoMedioStr}</div></div>
+    </div>
+    <div class="cv-ft">
+      <span>Confidencial · Uso interno</span>
+      <span>Gerado em ${escapeHtmlRelatorio(dateStr)}</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PÁG 2: RESUMO EXECUTIVO ══════════════════════════ -->
+<div class="pg page">
+  <div class="ph">
+    <div class="ph-brand"><img class="ph-logo" src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa"/><div><div class="ph-name">Metalosa</div><div class="ph-doc">Relatório de Manutenção</div></div></div>
+    <div class="ph-meta"><b>${escapeHtmlRelatorio(periodoStr)}</b><br/>Gerado em ${escapeHtmlRelatorio(dateStr)}</div>
+  </div>
+  <div class="sec"><div class="sh"><div class="sh-t">Resumo Executivo</div><div class="sh-s">Indicadores consolidados do período</div></div></div>
+  <div class="kg">
+    <div class="kt"><div class="kt-l">Total de OS</div><div class="kt-v">${r.total}</div><div class="kt-s">Ordens no período</div></div>
+    <div class="kt"><div class="kt-l">Finalizadas</div><div class="kt-v">${r.finalizadas}</div><div class="kt-s">OS encerradas</div></div>
+    <div class="kt"><div class="kt-l">Tempo Médio</div><div class="kt-v">${r.tempoMedioStr}</div><div class="kt-s">Por OS finalizada</div></div>
+    <div class="kt"><div class="kt-l">Em Aberto</div><div class="kt-v">${r.abertas}</div><div class="kt-s">Pendentes</div></div>
+    <div class="kt"><div class="kt-l">Em Andamento</div><div class="kt-v">${r.emAndamento}</div><div class="kt-s">Em execução</div></div>
+    <div class="kt"><div class="kt-l">Canceladas</div><div class="kt-v">${r.canceladas}</div><div class="kt-s">OS canceladas</div></div>
+  </div>
+  <div class="sec"><div class="sh"><div class="sh-t">Taxa de Resolução</div><div class="sh-s">Eficiência operacional do período</div></div></div>
+  <div class="res">
+    <div class="res-left">
+      <div class="res-pct">${r.pctResolvidas}%</div>
+      <div class="res-lbl">Resolvidas</div>
+    </div>
+    <div class="res-right">
+      <div class="res-bar-bg"><div class="res-bar" style="width:${r.pctResolvidas}%"></div></div>
+      <div class="res-split">
+        <div class="rsi"><div class="rsi-l">Corretiva</div><div class="rsi-v">${r.corretivas}</div><div class="rsi-p">${pctCorretiva}% do total</div></div>
+        <div class="rsi"><div class="rsi-l">Preventiva</div><div class="rsi-v">${r.preventivas}</div><div class="rsi-p">${pctPreventiva}% do total</div></div>
+        <div class="rsi"><div class="rsi-l">Críticas</div><div class="rsi-v">${r.criticas}</div><div class="rsi-p">${pctNum(r.criticas)}% do total</div></div>
+        <div class="rsi"><div class="rsi-l">Paradas Prod.</div><div class="rsi-v">${r.paradasProd}</div><div class="rsi-p">${pctNum(r.paradasProd)}% do total</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="pf"><span>Metalosa · Relatório de Manutenção</span><span>${escapeHtmlRelatorio(periodoStr)}</span></div>
+</div>
+
+<!-- ═══════ PÁG 3: DISTRIBUIÇÕES ═════════════════════════════ -->
+<div class="pg page">
+  <div class="ph">
+    <div class="ph-brand"><img class="ph-logo" src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa"/><div><div class="ph-name">Metalosa</div><div class="ph-doc">Relatório de Manutenção</div></div></div>
+    <div class="ph-meta"><b>${escapeHtmlRelatorio(periodoStr)}</b></div>
+  </div>
+  <div class="sec"><div class="sh"><div class="sh-t">Distribuições</div><div class="sh-s">Análise por status, prioridade, tipo e categoria</div></div></div>
+  <div class="bc-grid">
+    ${barSection('Status das Ordens', relatorioStatusData)}
+    ${barSection('Por Prioridade', relatorioPorPrioridade)}
+  </div>
+  <div class="bc-grid">
+    ${barSection('Por Tipo', relatorioPorTipo)}
+    ${barSection('Por Categoria', relatorioPorCategoria.slice(0, 8))}
+  </div>
+  <div class="pf"><span>Metalosa · Relatório de Manutenção</span><span>${escapeHtmlRelatorio(periodoStr)}</span></div>
+</div>
+
+<!-- ═══════ PÁG 4: ANÁLISE OPERACIONAL ═══════════════════════ -->
+<div class="pg page">
+  <div class="ph">
+    <div class="ph-brand"><img class="ph-logo" src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa"/><div><div class="ph-name">Metalosa</div><div class="ph-doc">Relatório de Manutenção</div></div></div>
+    <div class="ph-meta"><b>${escapeHtmlRelatorio(periodoStr)}</b></div>
+  </div>
+  <div class="sec"><div class="sh"><div class="sh-t">Análise por Setor</div><div class="sh-s">Performance de cada setor no período</div></div></div>
+  <table class="tbl no-break" style="margin-bottom:13px">
+    <thead><tr>
+      <th>#</th><th>Setor</th><th class="r">Total</th><th class="r">Abertas</th><th class="r">Finalizadas</th><th class="r">T. Médio</th><th>Participação</th><th class="r">% Res.</th>
+    </tr></thead>
+    <tbody>${setorTblRows}</tbody>
+  </table>
+  <div class="div"></div>
+  <div class="sec"><div class="sh"><div class="sh-t">Evolução Mensal</div><div class="sh-s">Abertas vs finalizadas por mês</div></div></div>
+  <table class="tbl no-break">
+    <thead><tr>
+      <th>Mês</th><th class="r">Total</th><th class="r">Abertas</th><th class="r">Finalizadas</th><th class="r">% Fin.</th><th>Volume</th>
+    </tr></thead>
+    <tbody>${mesRows}</tbody>
+  </table>
+  <div class="pf"><span>Metalosa · Relatório de Manutenção</span><span>${escapeHtmlRelatorio(periodoStr)}</span></div>
+</div>
+
+<!-- ═══════ PÁG 5: EQUIPAMENTOS & EQUIPE ═════════════════════ -->
+<div class="pg page">
+  <div class="ph">
+    <div class="ph-brand"><img class="ph-logo" src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa"/><div><div class="ph-name">Metalosa</div><div class="ph-doc">Relatório de Manutenção</div></div></div>
+    <div class="ph-meta"><b>${escapeHtmlRelatorio(periodoStr)}</b></div>
+  </div>
+  <div class="sec"><div class="sh"><div class="sh-t">Top 15 Ativos com Mais OS</div><div class="sh-s">Equipamentos que mais demandam manutenção</div></div></div>
+  <table class="tbl no-break" style="margin-bottom:13px">
+    <thead><tr>
+      <th>#</th><th>Ativo</th><th class="r">Total</th><th class="r">Abertas</th><th class="r">Finalizadas</th><th>Volume</th><th class="r">% Res.</th>
+    </tr></thead>
+    <tbody>${ativoRows}</tbody>
+  </table>
+  <div class="div"></div>
+  <div class="sec"><div class="sh"><div class="sh-t">Performance por Responsável</div><div class="sh-s">Ranking de resolução no período</div></div></div>
+  <table class="tbl no-break">
+    <thead><tr>
+      <th>Responsável</th><th class="r">Total</th><th class="r">Fin.</th><th class="r">Andamento</th><th class="r">T. Médio</th><th>% Resolução</th>
+    </tr></thead>
+    <tbody>${respRows}</tbody>
+  </table>
+  <div class="pf"><span>Metalosa · Relatório de Manutenção</span><span>${escapeHtmlRelatorio(periodoStr)}</span></div>
+</div>
+</body></html>`;
+
+    printHtmlRelatorio(html);
+  };
+
+  // ── EXPORTAR RELATÓRIO FILTRADO — PPT (executivo, visual, monocromático) ──
+  const handleExportarRelatorioManutencaoPpt = () => {
+    const pptx = new pptxgen();
+    pptx.layout = 'LAYOUT_WIDE';
+    pptx.author = 'Painel Metalosa';
+    pptx.company = 'Metalosa';
+    const now = new Date();
+    const fileDate = now.toISOString().slice(0, 10);
+    const r = relatorioResumoGeral;
+
+    const periodoStr = relatorioInicio && relatorioFim
+      ? `${relatorioInicio.split('-').reverse().join('/')} a ${relatorioFim.split('-').reverse().join('/')}`
+      : relatorioInicio
+        ? `A partir de ${relatorioInicio.split('-').reverse().join('/')}`
+        : relatorioFim
+          ? `Ate ${relatorioFim.split('-').reverse().join('/')}`
+          : 'Todo o periodo';
+
+    // ── Paleta monocromática ──────────────────────────────────────────────
+    const BG   = '0B0F1A';
+    const BG2  = '0F172A';
+    const CARD = '18243A';
+    const CARD2= '1E2D3D';
+    const BORD = '2D3E50';
+    const W    = 'EDF1F6';
+    const MID  = '94A3B8';
+    const DIM  = '4B6071';
+
+    const setBg = (sl) =>
+      sl.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.33, h: 7.5, fill: { color: BG }, line: { color: BG } });
+
+    // left accent line + slide title block
+    const addHdr = (sl, title, sub) => {
+      sl.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.06, h: 7.5, fill: { color: W }, line: { color: W } });
+      sl.addText(title, { x: 0.5, y: 0.3, w: 12.3, h: 0.5, fontSize: 24, bold: true, color: W });
+      if (sub) sl.addText(sub, { x: 0.5, y: 0.86, w: 12.3, h: 0.2, fontSize: 7.5, bold: true, color: DIM, charSpacing: 2.5 });
+      sl.addShape(pptx.ShapeType.rect, { x: 0.5, y: 1.12, w: 12.33, h: 0.012, fill: { color: BORD }, line: { color: BORD } });
+    };
+
+    // ── Table helpers ─────────────────────────────────────────────────────
+    const tblHdr = (cols) => cols.map((t) => ({
+      text: t, options: { bold: true, color: W, fill: { color: BG2 }, fontSize: 8 }
+    }));
+    const tblRows = (rows) => rows.map((row, ri) =>
+      row.map((cell, ci) => ({
+        text: String(cell ?? '-'),
+        options: { color: W, fill: { color: ri % 2 === 0 ? CARD : CARD2 }, fontSize: 9.5, bold: ci > 0 }
+      }))
+    );
+    const addTbl = (sl, hdrs, rows, cfg) => {
+      const data = [tblHdr(hdrs), ...(rows.length ? tblRows(rows) : [hdrs.map(() => ({ text: 'Sem dados', options: { color: DIM, fill: { color: CARD }, fontSize: 9.5 } }))])];
+      sl.addTable(data, { border: { type: 'solid', color: BORD, pt: 0.4 }, rowH: 0.3, valign: 'middle', ...cfg });
+    };
+
+    // ── Visual bar chart (horizontal) using shapes ────────────────────────
+    const addBarViz = (sl, x, y, w, title, data, total) => {
+      const maxVal = Math.max(...data.map((d) => d.value), 1);
+      const lblW = 1.65;
+      const barMaxW = w - lblW - 1.2;
+      sl.addText(title.toUpperCase(), { x, y, w, h: 0.22, fontSize: 7.5, bold: true, color: DIM, charSpacing: 2 });
+      sl.addShape(pptx.ShapeType.rect, { x, y: y + 0.24, w, h: 0.01, fill: { color: BORD }, line: { color: BORD } });
+      data.slice(0, 7).forEach((item, idx) => {
+        const iy = y + 0.36 + idx * 0.5;
+        const barW = (item.value / maxVal) * barMaxW;
+        const pctVal = total > 0 ? Math.round((item.value / total) * 100) : 0;
+        // label
+        sl.addText(String(item.name || '-'), { x, y: iy + 0.05, w: lblW, h: 0.38, fontSize: 10, color: W, valign: 'middle' });
+        // track bg
+        sl.addShape(pptx.ShapeType.rect, { x: x + lblW, y: iy + 0.15, w: barMaxW, h: 0.18, fill: { color: CARD2 }, line: { color: BORD } });
+        // fill
+        if (barW > 0.02) sl.addShape(pptx.ShapeType.rect, { x: x + lblW, y: iy + 0.15, w: barW, h: 0.18, fill: { color: W }, line: { color: W } });
+        // number
+        sl.addText(String(item.value), { x: x + lblW + barMaxW + 0.06, y: iy + 0.05, w: 0.6, h: 0.38, fontSize: 11, bold: true, color: W, align: 'right', valign: 'middle' });
+        // pct
+        sl.addText(`${pctVal}%`, { x: x + lblW + barMaxW + 0.7, y: iy + 0.05, w: 0.45, h: 0.38, fontSize: 8.5, color: DIM, align: 'right', valign: 'middle' });
+      });
+    };
+
+    const pctOf = (v) => r.total > 0 ? Math.round((v / r.total) * 100) : 0;
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 1 — CAPA
+    // ════════════════════════════════════════════════════════════════
+    const s1 = pptx.addSlide();
+    setBg(s1);
+    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.06, h: 7.5, fill: { color: W }, line: { color: W } });
+    s1.addText('METALOSA', { x: 0.5, y: 0.52, w: 9, h: 0.26, fontSize: 8, bold: true, color: DIM, charSpacing: 6 });
+    s1.addText('Relatorio de\nManutencao', { x: 0.5, y: 0.9, w: 9.5, h: 1.9, fontSize: 50, bold: true, color: W, lineSpacingMultiple: 1.06 });
+    s1.addText('Analise de desempenho e indicadores operacionais', { x: 0.5, y: 2.95, w: 9, h: 0.3, fontSize: 11, color: MID });
+    s1.addShape(pptx.ShapeType.rect, { x: 0.5, y: 3.38, w: 4.8, h: 0.01, fill: { color: BORD }, line: { color: BORD } });
+    s1.addText(`Periodo: ${periodoStr}`, { x: 0.5, y: 3.5, w: 9, h: 0.28, fontSize: 9.5, color: DIM });
+
+    const kv = [
+      { l: 'Total OS', v: r.total }, { l: 'Finalizadas', v: r.finalizadas }, { l: '% Resolvidas', v: `${r.pctResolvidas}%` },
+      { l: 'Em Aberto', v: r.abertas }, { l: 'Andamento', v: r.emAndamento }, { l: 'Tempo Medio', v: r.tempoMedioStr },
+    ];
+    const cW = 2.04, cH = 1.1, cGap = 0.09;
+    kv.forEach((k, i) => {
+      const cx = 0.5 + i * (cW + cGap);
+      s1.addShape(pptx.ShapeType.roundRect, { x: cx, y: 4.15, w: cW, h: cH, fill: { color: CARD }, line: { color: BORD }, radius: 0.05 });
+      s1.addText(k.l, { x: cx + 0.14, y: 4.28, w: cW - 0.28, h: 0.24, fontSize: 7.5, color: DIM });
+      s1.addText(String(k.v ?? '-'), { x: cx + 0.14, y: 4.54, w: cW - 0.28, h: 0.56, fontSize: 24, bold: true, color: W });
+    });
+    s1.addText(`Gerado em ${now.toLocaleString('pt-BR')} · Painel Industrial Metalosa`, { x: 0.5, y: 7.15, w: 12.3, h: 0.2, fontSize: 7.5, color: DIM });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 2 — INDICADORES EXECUTIVOS (KPI cards grandes)
+    // ════════════════════════════════════════════════════════════════
+    const s2 = pptx.addSlide();
+    setBg(s2);
+    addHdr(s2, 'Indicadores do Periodo', `PERIODO: ${periodoStr.toUpperCase()}`);
+
+    const kpis2 = [
+      { l: 'Total de OS', v: r.total, d: 'Ordens no periodo' },
+      { l: 'Finalizadas', v: r.finalizadas, d: 'OS encerradas' },
+      { l: 'Taxa de Resolucao', v: `${r.pctResolvidas}%`, d: 'Eficiencia operacional' },
+      { l: 'Em Aberto', v: r.abertas, d: 'Pendentes' },
+      { l: 'Em Andamento', v: r.emAndamento, d: 'Em execucao' },
+      { l: 'Tempo Medio', v: r.tempoMedioStr, d: 'Por OS finalizada' },
+    ];
+    const kW2 = 3.9, kH2 = 2.4, kG2 = 0.18, kX2 = 0.5, kY2 = 1.3;
+    kpis2.forEach((k, i) => {
+      const col = i % 3, row = Math.floor(i / 3);
+      const kx = kX2 + col * (kW2 + kG2);
+      const ky = kY2 + row * (kH2 + kG2);
+      s2.addShape(pptx.ShapeType.roundRect, { x: kx, y: ky, w: kW2, h: kH2, fill: { color: CARD }, line: { color: BORD }, radius: 0.07 });
+      s2.addText(k.l.toUpperCase(), { x: kx + 0.22, y: ky + 0.22, w: kW2 - 0.44, h: 0.22, fontSize: 7.5, bold: true, color: DIM, charSpacing: 1.5 });
+      s2.addText(String(k.v ?? '-'), { x: kx + 0.22, y: ky + 0.52, w: kW2 - 0.44, h: 1.3, fontSize: 56, bold: true, color: W, valign: 'middle' });
+      s2.addText(k.d, { x: kx + 0.22, y: ky + kH2 - 0.42, w: kW2 - 0.44, h: 0.28, fontSize: 9, color: MID });
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 3 — TAXA DE RESOLUÇÃO (slide focal)
+    // ════════════════════════════════════════════════════════════════
+    const s3 = pptx.addSlide();
+    setBg(s3);
+    addHdr(s3, 'Taxa de Resolucao', 'EFICIENCIA OPERACIONAL DO PERIODO');
+
+    // Big percentage left
+    s3.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 1.3, w: 5.5, h: 5.5, fill: { color: CARD }, line: { color: BORD }, radius: 0.1 });
+    s3.addText(`${r.pctResolvidas}%`, { x: 0.5, y: 1.8, w: 5.5, h: 3.2, fontSize: 110, bold: true, color: W, align: 'center', valign: 'middle' });
+    s3.addText('das OS foram resolvidas', { x: 0.5, y: 5.1, w: 5.5, h: 0.4, fontSize: 11, color: MID, align: 'center' });
+    s3.addText(`no periodo: ${periodoStr}`, { x: 0.5, y: 5.55, w: 5.5, h: 0.28, fontSize: 8.5, color: DIM, align: 'center' });
+
+    // Progress bar
+    const barBgW = 7.0, barBgX = 6.3, barBgY = 1.6, barH3 = 0.32;
+    s3.addShape(pptx.ShapeType.roundRect, { x: barBgX, y: barBgY, w: barBgW, h: barH3, fill: { color: CARD2 }, line: { color: BORD }, radius: 0.04 });
+    const fillW3 = barBgW * (r.pctResolvidas / 100);
+    if (fillW3 > 0.1) s3.addShape(pptx.ShapeType.roundRect, { x: barBgX, y: barBgY, w: fillW3, h: barH3, fill: { color: W }, line: { color: W }, radius: 0.04 });
+
+    // Right stats
+    const stats3 = [
+      { l: 'Finalizadas', v: r.finalizadas, p: `${pctOf(r.finalizadas)}% do total` },
+      { l: 'Em Aberto', v: r.abertas, p: `${pctOf(r.abertas)}% do total` },
+      { l: 'Corretiva', v: r.corretivas, p: `${pctOf(r.corretivas)}% do total` },
+      { l: 'Preventiva', v: r.preventivas, p: `${pctOf(r.preventivas)}% do total` },
+      { l: 'Criticas', v: r.criticas, p: `${pctOf(r.criticas)}% do total` },
+      { l: 'Paradas Prod.', v: r.paradasProd, p: `${pctOf(r.paradasProd)}% do total` },
+    ];
+    stats3.forEach((st, i) => {
+      const sy = 2.1 + i * 0.75;
+      s3.addShape(pptx.ShapeType.roundRect, { x: 6.3, y: sy, w: 6.7, h: 0.62, fill: { color: CARD }, line: { color: BORD }, radius: 0.05 });
+      s3.addText(st.l.toUpperCase(), { x: 6.5, y: sy + 0.06, w: 3.0, h: 0.22, fontSize: 7.5, bold: true, color: DIM, charSpacing: 1.5 });
+      s3.addText(String(st.v ?? '-'), { x: 6.5, y: sy + 0.26, w: 3.0, h: 0.3, fontSize: 16, bold: true, color: W });
+      s3.addText(st.p, { x: 9.6, y: sy + 0.2, w: 3.2, h: 0.3, fontSize: 10, color: MID, align: 'right' });
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 4 — STATUS & PRIORIDADE (barras visuais)
+    // ════════════════════════════════════════════════════════════════
+    const s4 = pptx.addSlide();
+    setBg(s4);
+    addHdr(s4, 'Status & Prioridade', 'DISTRIBUICAO DAS ORDENS POR STATUS E NIVEL DE PRIORIDADE');
+    addBarViz(s4, 0.5, 1.25, 5.9, 'Status das Ordens', relatorioStatusData, r.total);
+    addBarViz(s4, 7.0, 1.25, 6.0, 'Por Prioridade', relatorioPorPrioridade, r.total);
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 5 — TIPO & CATEGORIA (barras visuais)
+    // ════════════════════════════════════════════════════════════════
+    const s5 = pptx.addSlide();
+    setBg(s5);
+    addHdr(s5, 'Tipo & Categoria', 'DISTRIBUICAO DAS ORDENS POR TIPO DE INTERVENCAO E CATEGORIA');
+    addBarViz(s5, 0.5, 1.25, 5.9, 'Por Tipo de Intervencao', relatorioPorTipo, r.total);
+    addBarViz(s5, 7.0, 1.25, 6.0, 'Por Categoria', relatorioPorCategoria.slice(0, 7), r.total);
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 6 — POR SETOR
+    // ════════════════════════════════════════════════════════════════
+    const s6 = pptx.addSlide();
+    setBg(s6);
+    addHdr(s6, 'Analise por Setor', 'PERFORMANCE DE CADA SETOR NO PERIODO');
+    const setorData = relatorioPorSetor.slice(0, 14).map((s) => {
+      const tm = s.tempoCount > 0 ? Math.round(s.tempoTotal / s.tempoCount / 3600000) : 0;
+      return [s.setor, s.total, s.abertas, s.finalizadas, tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`, r.total > 0 ? `${Math.round((s.total / r.total) * 100)}%` : '0%'];
+    });
+    addTbl(s6, ['Setor', 'Total', 'Abertas', 'Finalizadas', 'T. Medio', 'Part.%'],
+      setorData.length ? setorData : [['-', '-', '-', '-', '-', '-']],
+      { x: 0.5, y: 1.28, w: 12.33, colW: [4.6, 1.5, 1.5, 1.8, 1.5, 1.43] });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 7 — TOP ATIVOS (barra visual horizontal ranking)
+    // ════════════════════════════════════════════════════════════════
+    const s7 = pptx.addSlide();
+    setBg(s7);
+    addHdr(s7, 'Top Ativos com Mais OS', 'EQUIPAMENTOS QUE MAIS DEMANDAM MANUTENCAO NO PERIODO');
+    const maxAtivo = Math.max(...relatorioTopAtivos.map((a) => a.total), 1);
+    const barMaxWA = 8.8, lblWA = 2.7, numW = 0.7, x0a = 0.5;
+    const topCount = Math.min(relatorioTopAtivos.length, 12);
+    relatorioTopAtivos.slice(0, topCount).forEach((item, idx) => {
+      const iy = 1.28 + idx * 0.48;
+      const bw = (item.total / maxAtivo) * barMaxWA;
+      // rank
+      s7.addShape(pptx.ShapeType.rect, { x: x0a, y: iy + 0.05, w: 0.3, h: 0.32, fill: { color: idx < 3 ? W : CARD2 }, line: { color: BORD } });
+      s7.addText(String(idx + 1), { x: x0a, y: iy + 0.05, w: 0.3, h: 0.32, fontSize: 9, bold: true, color: idx < 3 ? BG : DIM, align: 'center', valign: 'middle' });
+      // label
+      s7.addText(item.ativo, { x: x0a + 0.38, y: iy + 0.05, w: lblWA, h: 0.32, fontSize: 10, color: W, valign: 'middle' });
+      // bar track
+      s7.addShape(pptx.ShapeType.rect, { x: x0a + 0.38 + lblWA, y: iy + 0.14, w: barMaxWA, h: 0.14, fill: { color: CARD2 }, line: { color: BORD } });
+      // bar fill
+      if (bw > 0.05) s7.addShape(pptx.ShapeType.rect, { x: x0a + 0.38 + lblWA, y: iy + 0.14, w: bw, h: 0.14, fill: { color: W }, line: { color: W } });
+      // number
+      s7.addText(String(item.total), { x: x0a + 0.38 + lblWA + barMaxWA + 0.08, y: iy + 0.05, w: numW, h: 0.32, fontSize: 11, bold: true, color: W, align: 'right', valign: 'middle' });
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 8 — PERFORMANCE POR RESPONSÁVEL
+    // ════════════════════════════════════════════════════════════════
+    const s8 = pptx.addSlide();
+    setBg(s8);
+    addHdr(s8, 'Performance por Responsavel', 'RANKING DE RESOLUCAO DA EQUIPE NO PERIODO');
+    const respData = relatorioPorResponsavel.slice(0, 14).map((item) => {
+      const tm = item.tempoCount > 0 ? Math.round(item.tempoTotal / item.tempoCount / 3600000) : 0;
+      const pRes = item.total > 0 ? `${Math.round((item.finalizadas / item.total) * 100)}%` : '0%';
+      return [item.responsavel, item.total, item.finalizadas, item.emAndamento, tm === 0 ? '-' : tm < 24 ? `${tm}h` : `${Math.round(tm / 24)}d`, pRes];
+    });
+    addTbl(s8, ['Responsavel', 'Total', 'Finalizadas', 'Andamento', 'T. Medio', '% Res.'],
+      respData.length ? respData : [['-', '-', '-', '-', '-', '-']],
+      { x: 0.5, y: 1.28, w: 12.33, colW: [4.5, 1.5, 1.7, 1.7, 1.5, 1.43] });
+
+    // ════════════════════════════════════════════════════════════════
+    // SLIDE 9 — EVOLUÇÃO MENSAL (barras visuais verticais)
+    // ════════════════════════════════════════════════════════════════
+    const s9 = pptx.addSlide();
+    setBg(s9);
+    addHdr(s9, 'Evolucao Mensal', 'TOTAL DE ORDENS E TAXA DE FINALIZACAO POR MES');
+    if (relatorioPorMes.length > 0) {
+      const maxMT = Math.max(...relatorioPorMes.map((m) => m.total), 1);
+      const barH9 = 3.8, baseY9 = 5.5;
+      const totalW = 12.33, usedX = 0.5;
+      const itemW = totalW / Math.max(relatorioPorMes.length, 1);
+      relatorioPorMes.forEach((m, idx) => {
+        const ix = usedX + idx * itemW;
+        const bwAll = itemW * 0.55;
+        const bwFin = itemW * 0.3;
+        const hAll = (m.total / maxMT) * barH9;
+        const hFin = (m.Finalizadas / maxMT) * barH9;
+        // Total bar (background)
+        if (hAll > 0.05) s9.addShape(pptx.ShapeType.rect, { x: ix + (itemW - bwAll) / 2, y: baseY9 - hAll, w: bwAll, h: hAll, fill: { color: CARD2 }, line: { color: BORD } });
+        // Finalizadas bar (overlay)
+        if (hFin > 0.05) s9.addShape(pptx.ShapeType.rect, { x: ix + (itemW - bwFin) / 2, y: baseY9 - hFin, w: bwFin, h: hFin, fill: { color: W }, line: { color: W } });
+        // Value
+        s9.addText(String(m.total), { x: ix, y: baseY9 - hAll - 0.3, w: itemW, h: 0.28, fontSize: 10, bold: true, color: W, align: 'center' });
+        // Month label
+        s9.addText(m.label, { x: ix, y: baseY9 + 0.1, w: itemW, h: 0.28, fontSize: 8.5, color: MID, align: 'center' });
+      });
+      // Legend
+      s9.addShape(pptx.ShapeType.rect, { x: 0.5, y: 6.0, w: 0.22, h: 0.14, fill: { color: CARD2 }, line: { color: BORD } });
+      s9.addText('Total', { x: 0.77, y: 5.96, w: 1.2, h: 0.22, fontSize: 9, color: MID });
+      s9.addShape(pptx.ShapeType.rect, { x: 2.0, y: 6.0, w: 0.22, h: 0.14, fill: { color: W }, line: { color: W } });
+      s9.addText('Finalizadas', { x: 2.27, y: 5.96, w: 1.5, h: 0.22, fontSize: 9, color: MID });
+    } else {
+      s9.addText('Sem dados mensais para o periodo selecionado.', { x: 0.5, y: 3.5, w: 12.33, h: 0.4, fontSize: 14, color: DIM, align: 'center' });
+    }
+
+    pptx.writeFile({ fileName: `relatorio_manutencao_${fileDate}.pptx` });
+  };
+
   const handleExportarManutencaoPdf = () => {
     const now = new Date();
 
@@ -13360,17 +13969,17 @@ const custoDetalheTitulo = custoDetalheItem
                       )}
                     </div>
                     <div className="ml-auto flex gap-2">
-                      {!isManutencaoOnly && (
+                      {!isManutencaoOnly && subAbaManutencao === 'relatorios' && (
                         <button
-                          onClick={handleExportarManutencaoPdf}
+                          onClick={handleExportarRelatorioManutencaoPdf}
                           className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
                         >
                           Exportar PDF
                         </button>
                       )}
-                      {!isManutencaoOnly && (
+                      {!isManutencaoOnly && subAbaManutencao === 'relatorios' && (
                         <button
-                          onClick={handleExportarManutencaoPpt}
+                          onClick={handleExportarRelatorioManutencaoPpt}
                           className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
                         >
                           Exportar PPT
