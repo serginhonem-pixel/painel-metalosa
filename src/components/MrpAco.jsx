@@ -362,32 +362,68 @@ export default function MrpAco() {
     [componentes, estoqueEdit]
   );
 
-  // ── PMP editável (Histórico) ─────────────────────────────────────────────────
+  // ── Simulador: meses configuráveis (deve ser declarado antes dos efeitos que o usam) ──
+  const [mesesConfig, setMesesConfig] = useState(DEFAULT_MESES);
+  const MESES = mesesConfig;
+
+  // ── PMP editável (Histórico + Simulador por mês) ────────────────────────────
+  // Formato: { idx: { mesId: qty } } — suporta quantidade diferente por mês
   const [pmpMf, setPmpMf] = useState(() =>
-    Object.fromEntries(HIST_METALFORTE.produtos.map((p, i) => [i, p.pmp || 0]))
+    Object.fromEntries(
+      HIST_METALFORTE.produtos.map((p, i) => [
+        i,
+        Object.fromEntries(DEFAULT_MESES.map((m) => [m.id, p.pmp || 0])),
+      ])
+    )
   );
   const [pmpCC, setPmpCC] = useState(() =>
-    Object.fromEntries(HIST_CARRO.produtos.map((p) => [p.cod, p.prog || 0]))
+    Object.fromEntries(
+      HIST_CARRO.produtos.map((p) => [
+        p.cod,
+        Object.fromEntries(DEFAULT_MESES.map((m) => [m.id, p.prog || 0])),
+      ])
+    )
   );
 
-  // PMP → plano METALFORTE + CC (todos os 3 meses)
+  // Expand/collapse das linhas CC e Metalforte no simulador
+  const [expandCC, setExpandCC] = useState(false);
+  const [expandMF, setExpandMF] = useState(false);
+
+  // PMP → plano METALFORTE + CC (por mês, usando os ids dinâmicos do MESES)
   useEffect(() => {
-    const totalMf = Object.values(pmpMf).reduce((s, v) => s + (v || 0), 0);
-    const totalCC = Object.values(pmpCC).reduce((s, v) => s + (v || 0), 0);
-    setPlano((prev) => ({
-      ...prev,
-      METALFORTE: { abr: totalMf, mai: totalMf, jun: totalMf },
-      CC:         { abr: totalCC, mai: totalCC, jun: totalCC },
-    }));
-  }, [pmpMf, pmpCC]);
+    setPlano((prev) => {
+      const mfByMes = Object.fromEntries(
+        MESES.map(({ id }) => [
+          id,
+          HIST_METALFORTE.produtos.reduce((s, _, i) => s + (pmpMf[i]?.[id] || 0), 0),
+        ])
+      );
+      const ccByMes = Object.fromEntries(
+        MESES.map(({ id }) => [
+          id,
+          HIST_CARRO.produtos.reduce((s, p) => s + (pmpCC[p.cod]?.[id] || 0), 0),
+        ])
+      );
+      return { ...prev, METALFORTE: mfByMes, CC: ccByMes };
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pmpMf, pmpCC, mesesConfig]);
 
-  const totalPmpMf = useMemo(() => Object.values(pmpMf).reduce((s, v) => s + (v || 0), 0), [pmpMf]);
-  const totalPmpCC = useMemo(() => Object.values(pmpCC).reduce((s, v) => s + (v || 0), 0), [pmpCC]);
-
-  // ── Simulador: carros/dia + dias úteis + carteira ───────────────────────
-  const [mesesConfig, setMesesConfig] = useState(DEFAULT_MESES);
-  // Sombra local para que todo o JSX do componente use o estado dinâmico
-  const MESES = mesesConfig;
+  // Totais para exibição no Histórico (soma o primeiro valor de cada SKU)
+  const totalPmpMf = useMemo(
+    () => Object.values(pmpMf).reduce((s, monthMap) => {
+      const v = typeof monthMap === 'object' ? Object.values(monthMap)[0] || 0 : monthMap || 0;
+      return s + v;
+    }, 0),
+    [pmpMf]
+  );
+  const totalPmpCC = useMemo(
+    () => Object.values(pmpCC).reduce((s, monthMap) => {
+      const v = typeof monthMap === 'object' ? Object.values(monthMap)[0] || 0 : monthMap || 0;
+      return s + v;
+    }, 0),
+    [pmpCC]
+  );
   const [carrosDia, setCarrosDia] = useState(3300);
   const [diasUteis, setDiasUteis] = useState({ abr26: 20, mai26: 21, jun26: 21 });
   const [carteira, setCarteira] = useState(() =>
@@ -465,8 +501,27 @@ export default function MrpAco() {
         if (d.carteira    !== undefined) setCarteira(d.carteira);
         if (d.pctEdit     !== undefined) setPctEdit(d.pctEdit);
         if (d.estoqueEdit !== undefined) setEstoqueEdit(d.estoqueEdit);
-        if (d.pmpMf       !== undefined) setPmpMf(d.pmpMf);
-        if (d.pmpCC       !== undefined) setPmpCC(d.pmpCC);
+        if (d.pmpMf !== undefined) {
+          // Migra formato antigo {idx: qty} → novo {idx: {mesId: qty}}
+          const mesesRef = (Array.isArray(d.mesesConfig) && d.mesesConfig.length ? d.mesesConfig : DEFAULT_MESES);
+          const migMf = {};
+          for (const [k, v] of Object.entries(d.pmpMf)) {
+            migMf[k] = typeof v === 'number'
+              ? Object.fromEntries(mesesRef.map((m) => [m.id, v]))
+              : v;
+          }
+          setPmpMf(migMf);
+        }
+        if (d.pmpCC !== undefined) {
+          const mesesRef = (Array.isArray(d.mesesConfig) && d.mesesConfig.length ? d.mesesConfig : DEFAULT_MESES);
+          const migCC = {};
+          for (const [k, v] of Object.entries(d.pmpCC)) {
+            migCC[k] = typeof v === 'number'
+              ? Object.fromEntries(mesesRef.map((m) => [m.id, v]))
+              : v;
+          }
+          setPmpCC(migCC);
+        }
         // aguarda um tick para os estados serem aplicados antes de limpar a flag
         setTimeout(() => { isLoadingRef.current = false; }, 100);
       } else {
@@ -1628,10 +1683,23 @@ export default function MrpAco() {
                     </td>
                   ))}
                 </tr>
-                {/* CC (somente leitura — vem do PMP Histórico) */}
-                <tr className="bg-slate-950/20">
-                  <td className="px-4 py-2.5 font-black text-slate-400">CC</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-[10px]">Carro de Carga — PMP via Histórico</td>
+                {/* ── CC: linha header + sub-linhas expansíveis por SKU ── */}
+                <tr
+                  className="bg-slate-950/20 cursor-pointer select-none hover:bg-slate-800/25 transition-colors"
+                  onClick={() => setExpandCC((v) => !v)}
+                >
+                  <td className="px-4 py-2.5 font-black text-slate-300">
+                    <span className="inline-flex items-center gap-1">
+                      <ChevronRight
+                        size={12}
+                        className={`transition-transform duration-150 ${expandCC ? 'rotate-90' : ''}`}
+                      />
+                      CC
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-slate-400 text-[10px]">
+                    Carro de Carga — {expandCC ? 'por SKU ✏' : 'clique para expandir'}
+                  </td>
                   <td className="px-4 py-2.5 text-right text-slate-500" colSpan={2}>—</td>
                   {MESES.map(({ id }) => (
                     <td key={id} className="px-4 py-2.5 text-right font-bold text-sky-400">
@@ -1639,9 +1707,51 @@ export default function MrpAco() {
                     </td>
                   ))}
                 </tr>
-                <tr className="bg-slate-950/20">
-                  <td className="px-4 py-2.5 font-black text-slate-400">Metalforte</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-[10px]">Metalforte — PMP via Histórico</td>
+                {expandCC && HIST_CARRO.produtos.map((p) => (
+                  <tr key={p.cod} className="bg-slate-950/10 border-t border-slate-800/20">
+                    <td className="px-4 py-1.5 pl-9 text-slate-500 text-[10px] font-bold">{p.cod}</td>
+                    <td className="px-4 py-1.5 text-slate-500 text-[10px]">{p.desc}</td>
+                    <td className="px-4 py-1.5 text-right text-slate-600 text-[10px]" colSpan={2}>
+                      cart: {p.cart ? fmtNum(p.cart) : '—'}
+                    </td>
+                    {MESES.map(({ id }) => (
+                      <td key={id} className="px-4 py-1.5 text-right">
+                        <input
+                          type="number" min={0}
+                          value={pmpCC[p.cod]?.[id] ?? 0}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setPmpCC((prev) => ({
+                              ...prev,
+                              [p.cod]: { ...(prev[p.cod] || {}), [id]: val },
+                            }));
+                          }}
+                          className="w-20 rounded border border-sky-500/40 bg-sky-500/10 px-1.5 py-0.5 text-xs font-bold text-sky-300 text-right outline-none focus:border-sky-400"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+
+                {/* ── Metalforte: linha header + sub-linhas expansíveis por SKU ── */}
+                <tr
+                  className="bg-slate-950/20 cursor-pointer select-none hover:bg-slate-800/25 transition-colors"
+                  onClick={() => setExpandMF((v) => !v)}
+                >
+                  <td className="px-4 py-2.5 font-black text-slate-300">
+                    <span className="inline-flex items-center gap-1">
+                      <ChevronRight
+                        size={12}
+                        className={`transition-transform duration-150 ${expandMF ? 'rotate-90' : ''}`}
+                      />
+                      Metalforte
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-slate-400 text-[10px]">
+                    Metalforte — {expandMF ? 'por SKU ✏' : 'clique para expandir'}
+                  </td>
                   <td className="px-4 py-2.5 text-right text-slate-500" colSpan={2}>—</td>
                   {MESES.map(({ id }) => (
                     <td key={id} className="px-4 py-2.5 text-right font-bold text-amber-400">
@@ -1649,6 +1759,37 @@ export default function MrpAco() {
                     </td>
                   ))}
                 </tr>
+                {expandMF && HIST_METALFORTE.produtos.map((p, i) => (
+                  <tr key={i} className="bg-slate-950/10 border-t border-slate-800/20">
+                    <td className="px-4 py-1.5 pl-9 text-slate-500 text-[10px] font-bold">
+                      <span className="px-1.5 py-0.5 rounded border border-amber-400/20 bg-amber-500/10 text-amber-400">
+                        {p.tipo}
+                      </span>
+                    </td>
+                    <td className="px-4 py-1.5 text-slate-500 text-[10px]">{p.desc}</td>
+                    <td className="px-4 py-1.5 text-right text-slate-600 text-[10px]" colSpan={2}>
+                      cart: {p.cart ? fmtNum(p.cart) : '—'}
+                    </td>
+                    {MESES.map(({ id }) => (
+                      <td key={id} className="px-4 py-1.5 text-right">
+                        <input
+                          type="number" min={0}
+                          value={pmpMf[i]?.[id] ?? 0}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setPmpMf((prev) => ({
+                              ...prev,
+                              [i]: { ...(prev[i] || {}), [id]: val },
+                            }));
+                          }}
+                          className="w-20 rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-xs font-bold text-amber-300 text-right outline-none focus:border-amber-400"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
                 {/* Total geral */}
                 <tr className="bg-slate-950/60 border-t-2 border-slate-600/50">
                   <td className="px-4 py-3 font-black text-[11px] uppercase tracking-wider text-white" colSpan={4}>
@@ -2073,8 +2214,14 @@ export default function MrpAco() {
                       <td className="px-4 py-2.5 text-right">
                         <input
                           type="number" min={0}
-                          value={pmpMf[i] ?? 0}
-                          onChange={(e) => setPmpMf((prev) => ({ ...prev, [i]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                          value={pmpMf[i]?.[MESES[0]?.id] ?? 0}
+                          onChange={(e) => {
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setPmpMf((prev) => ({
+                              ...prev,
+                              [i]: Object.fromEntries(MESES.map((m) => [m.id, val])),
+                            }));
+                          }}
                           className="w-24 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-black text-amber-300 text-right outline-none focus:border-amber-400"
                         />
                       </td>
@@ -2204,8 +2351,14 @@ export default function MrpAco() {
                       <td className="px-4 py-2.5 text-right">
                         <input
                           type="number" min={0}
-                          value={pmpCC[p.cod] ?? 0}
-                          onChange={(e) => setPmpCC((prev) => ({ ...prev, [p.cod]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                          value={pmpCC[p.cod]?.[MESES[0]?.id] ?? 0}
+                          onChange={(e) => {
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setPmpCC((prev) => ({
+                              ...prev,
+                              [p.cod]: Object.fromEntries(MESES.map((m) => [m.id, val])),
+                            }));
+                          }}
                           className="w-24 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-black text-amber-300 text-right outline-none focus:border-amber-400"
                         />
                       </td>
