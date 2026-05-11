@@ -136,6 +136,22 @@ body {
   background-color: #1e2330;
 }
 
+/* Tailwind opacity-variant classes are separate selectors and bypass the
+   .app-dark .bg-slate-50 override, blending light colors over the dark card
+   and producing medium-gray backgrounds that clash with dark-mode text. */
+.app-dark .bg-slate-50\/40 {
+  background-color: #0c0c0c !important;
+}
+.app-dark .bg-slate-50\/60 {
+  background-color: #111216 !important;
+}
+.app-dark .bg-violet-50\/30 {
+  background-color: #14121f !important;
+}
+.app-dark .border-violet-100\/50 {
+  border-color: #2a1f45 !important;
+}
+
 .map-base {
   filter: brightness(0.95) contrast(1.1) saturate(1.1);
 }
