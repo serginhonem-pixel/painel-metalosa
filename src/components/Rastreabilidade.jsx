@@ -2112,7 +2112,7 @@ function EstoqueAtual({ lotes }) {
     const ls = ativos.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome);
     const totalDisp = ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0);
     const totalRec  = ls.reduce((s, l) => s + (l.qtdRecebida  ?? 0), 0);
-    return { nome, lotes: ls, totalDisp, totalRec };
+    return { nome, codigo: ls[0]?.codigo ?? '', lotes: ls, totalDisp, totalRec };
   });
 
   const semLotes = gruposMp.length === 0 && gruposComp.length === 0;
@@ -2284,7 +2284,10 @@ function EstoqueAtual({ lotes }) {
                 <React.Fragment key={g.nome}>
                   <tr className="row-hover transition-colors cursor-pointer border-b border-slate-50" onClick={() => toggle('comp_' + g.nome)}>
                     <td className="py-3 px-2 text-slate-400 text-center">{expandidos['comp_' + g.nome] ? '▾' : '▸'}</td>
-                    <td className="py-3 px-3 font-black text-slate-800">{g.nome}</td>
+                    <td className="py-3 px-3">
+                      {g.codigo && <span className="font-mono text-[10px] bg-cyan-50 border border-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded mr-2">{g.codigo}</span>}
+                      <span className="font-black text-slate-800">{g.nome}</span>
+                    </td>
                     <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                     <td className="py-3 px-3 text-slate-600 text-right">{g.totalRec.toLocaleString('pt-BR')}</td>
                     <td className="py-3 px-3 text-right">
