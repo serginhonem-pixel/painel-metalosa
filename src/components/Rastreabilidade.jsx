@@ -8,6 +8,7 @@ import {
   query,
   orderBy,
   doc,
+  getDocs,
   onSnapshot,
   writeBatch,
   increment,
@@ -1908,6 +1909,28 @@ async function seedInventarioReal(setStatus) {
   }
 }
 
+async function limparEReimportar(setStatus) {
+  setStatus('loading');
+  try {
+    // Apaga todos os lotes em batches de 400
+    const snap = await getDocs(collection(db, 'rastreabilidade_lotes'));
+    const ids = snap.docs.map((d) => d.id);
+    for (let i = 0; i < ids.length; i += 400) {
+      const batch = writeBatch(db);
+      ids.slice(i, i + 400).forEach((id) => batch.delete(doc(db, 'rastreabilidade_lotes', id)));
+      await batch.commit();
+    }
+    // Reimporta inventário real
+    await seedInventarioReal(() => {});
+    setStatus('ok');
+    setTimeout(() => setStatus(null), 5000);
+  } catch (err) {
+    console.error(err);
+    setStatus('erro');
+    setTimeout(() => setStatus(null), 5000);
+  }
+}
+
 function EntradaLoteComprado({ lotes }) {
   const [form, setForm] = useState({
     codigo: Object.keys(CODIGO_PARA_COMPRADO)[0],
@@ -2727,6 +2750,7 @@ export default function Rastreabilidade() {
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
   const [saidas, setSaidas]             = useState([]);
+  const [resetStatus, setResetStatus]   = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -2788,6 +2812,18 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
               </div>
             ))}
+            <button
+              type="button"
+              disabled={resetStatus === 'loading'}
+              onClick={() => {
+                if (window.confirm('Isso vai apagar TODOS os lotes e reimportar só o inventário real. Continua?'))
+                  limparEReimportar(setResetStatus);
+              }}
+              className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-rose-300 transition hover:bg-rose-600/20 disabled:opacity-50"
+            >
+              <ArrowUpDown size={14} />
+              {resetStatus === 'loading' ? 'Limpando...' : resetStatus === 'ok' ? 'Reimportado!' : resetStatus === 'erro' ? 'Erro — ver console' : 'Resetar e reimportar'}
+            </button>
           </div>
         </div>
       </div>
