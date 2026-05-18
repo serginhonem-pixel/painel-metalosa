@@ -1264,7 +1264,7 @@ function AjusteEstoque({ lotes }) {
               )}
               {gruposPi.length > 0 && (
                 <optgroup label="Produto Intermediario (PI)">
-                  {gruposPi.map((l) => <option key={l.id} value={l.id}>{l.descricaoPi ?? l.codigoPi} | OP {l.nroOP || '--'} | Saldo: {l.qtdDisponivel}</option>)}
+                  {gruposPi.map((l) => <option key={l.id} value={l.id}>{l.descricaoPi ?? l.nomePi ?? l.codigoPi} | OP {l.nroOP || '--'} | Saldo: {l.qtdDisponivel}</option>)}
                 </optgroup>
               )}
               {gruposComp.length > 0 && (
@@ -1866,19 +1866,21 @@ async function seedInventarioReal(setStatus) {
       batch.set(r, {
         tipo: 'PI',
         codigoPi: p.codigo,
-        nomePi: p.nome,
-        mpOrigem: p.mp_key,
+        descricaoPi: p.nome,
+        mpKey: p.mp_key,
+        mpCodigo: MP_CODIGO[p.mp_key]?.codigo ?? '',
         mpLoteId: p.mpLoteId,
-        nroLotePi: p.loteId,
+        nroOP: p.op,
         danfe: p.danfe,
         certificadoQualidade: p.certificado,
         fornecedor: p.fornecedor,
-        nroOP: p.op,
         qtdProduzida: total,
+        qtdAprovada: total,
+        qtdReprovada: 0,
         qtdDisponivel: total,
         qtdAvulso: p.avulso,
         qtdSoldado: p.soldado,
-        dataProducao: '2024-01-01',
+        dataEntrada: '2024-01-01',
         ativo: true,
         criadoEm: now,
         origem: 'inventario_inicial',
@@ -2136,7 +2138,7 @@ function EstoqueAtual({ lotes }) {
         if (lotesPi.length === 0) return null;
         const gruposPi = [...new Set(lotesPi.map((l) => l.codigoPi))].sort().map((cod) => {
           const ls = lotesPi.filter((l) => l.codigoPi === cod);
-          return { cod, descricao: ls[0]?.descricaoPi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
+          return { cod, descricao: ls[0]?.descricaoPi ?? ls[0]?.nomePi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
         });
         return (
           <Card>
