@@ -181,6 +181,18 @@ function Select({ className = '', children, ...props }) {
   );
 }
 
+function Tooltip({ text, children }) {
+  return (
+    <div className="relative group/tip">
+      {children}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2.5 w-60 rounded-2xl bg-slate-900 text-white text-[11px] font-medium px-4 py-3 leading-relaxed opacity-0 group-hover/tip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl border border-white/10">
+        {text}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900" />
+      </div>
+    </div>
+  );
+}
+
 function Card({ children, className = '' }) {
   return (
     <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -2389,16 +2401,46 @@ function FichaTecnica() {
 }
 
 const ABAS = [
-  { id: 'estoque',    label: 'Estoque',             icon: Warehouse         },
-  { id: 'lote',       label: 'Entrada de Lotes',    icon: Package           },
-  { id: 'producaopi', label: 'Producao de PI',      icon: Cog               },
-  { id: 'ordem',      label: 'Ordem de Producao',   icon: ClipboardList     },
-  { id: 'pa',         label: 'Produto Acabado',     icon: PackagePlus       },
-  { id: 'ajuste',     label: 'Ajuste de Estoque',   icon: SlidersHorizontal },
-  { id: 'consultar',  label: 'Rastreabilidade',     icon: ArrowUpDown       },
-  { id: 'saida',      label: 'Saída / Venda',        icon: Truck             },
-  { id: 'exportar',   label: 'Exportar INMETRO',    icon: Download          },
-  { id: 'ficha',      label: 'Ficha Técnica',        icon: Layers            },
+  {
+    id: 'estoque', label: 'Estoque', icon: Warehouse,
+    tooltip: 'Mostra o saldo atual de todos os lotes — matéria-prima, peças intermediárias (PI) e componentes comprados. Veja o que está disponível para produção.',
+  },
+  {
+    id: 'lote', label: 'Entrada de Lotes', icon: Package,
+    tooltip: '1ª etapa — Registra o recebimento de matéria-prima (tubo, chapa, arame) e componentes comprados (rebites, arruelas, fita). Informe DANFE, fornecedor e certificado de qualidade.',
+  },
+  {
+    id: 'producaopi', label: 'Producao de PI', icon: Cog,
+    tooltip: '2ª etapa — Transforma matéria-prima em peças intermediárias. Ex: lote de tubo → montantes e travessas. O saldo da MP diminui e o saldo do PI é criado com rastreio de origem.',
+  },
+  {
+    id: 'ordem', label: 'Ordem de Producao', icon: ClipboardList,
+    tooltip: '3ª etapa — Registra a montagem de uma escada. O BOM é carregado automaticamente pelo modelo e os lotes de PI são pré-selecionados em ordem FIFO.',
+  },
+  {
+    id: 'pa', label: 'Produto Acabado', icon: PackagePlus,
+    tooltip: '4ª etapa — Atribui o número de série à escada finalizada, fechando o vínculo com todos os componentes e lotes utilizados na montagem.',
+  },
+  {
+    id: 'ajuste', label: 'Ajuste de Estoque', icon: SlidersHorizontal,
+    tooltip: 'Corrige saldos por diferença de inventário, quebra ou recontagem. Toda correção fica registrada com motivo e data.',
+  },
+  {
+    id: 'consultar', label: 'Rastreabilidade', icon: ArrowUpDown,
+    tooltip: 'Consulta qualquer escada pelo número de série ou OP. Exibe todos os componentes, lotes de PI, DANFEs e certificados de qualidade usados. Também mostra se a escada já foi entregue e para qual cliente.',
+  },
+  {
+    id: 'saida', label: 'Saída / Venda', icon: Truck,
+    tooltip: '5ª etapa — Registra a entrega ao cliente vinculando a NF de saída aos números de série das escadas. Fecha o ciclo completo do rastreio: MP → PI → PA → Cliente.',
+  },
+  {
+    id: 'exportar', label: 'Exportar INMETRO', icon: Download,
+    tooltip: 'Gera o relatório de rastreabilidade no formato exigido pelo INMETRO para auditoria ou situação de recall de produto.',
+  },
+  {
+    id: 'ficha', label: 'Ficha Técnica', icon: Layers,
+    tooltip: 'Exibe o BOM completo de cada modelo de escada com cotas dimensionais (mm) e o fluxo de processo de fabricação por componente.',
+  },
 ];
 
 const SENHA_ACESSO = 'escada';
@@ -2552,15 +2594,16 @@ export default function Rastreabilidade() {
         </div>
       </div>
       <div className="flex gap-1.5 flex-wrap">
-        {ABAS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setSubAba(id)}
-            className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all ${subAba === id ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'}`}
-          >
-            <Icon size={14} /> {label}
-          </button>
+        {ABAS.map(({ id, label, icon: Icon, tooltip }) => (
+          <Tooltip key={id} text={tooltip}>
+            <button
+              type="button"
+              onClick={() => setSubAba(id)}
+              className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all ${subAba === id ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'}`}
+            >
+              <Icon size={14} /> {label}
+            </button>
+          </Tooltip>
         ))}
       </div>
       {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
