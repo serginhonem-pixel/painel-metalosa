@@ -36,6 +36,8 @@ import {
   Cog,
   SlidersHorizontal,
   PackagePlus,
+  Truck,
+  X,
 } from 'lucide-react';
 
 const MP_CODIGO = {
@@ -929,7 +931,7 @@ function OrdemProducao({ lotes }) {
   );
 }
 
-function ConsultarEscada({ ordens }) {
+function ConsultarEscada({ ordens, saidas = [] }) {
   const [busca, setBusca]               = useState('');
   const [resultado, setResultado]       = useState(null);
   const [buscou, setBuscou]             = useState(false);
@@ -988,6 +990,10 @@ function ConsultarEscada({ ordens }) {
   const allComps = resultado
     ? [...(resultado.componentesFabricados ?? []), ...(resultado.componentesComprados ?? [])]
     : [];
+
+  const saidaVinculada = resultado
+    ? saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(resultado.nroSerie))
+    : null;
 
   return (
     <div className="space-y-5">
@@ -1067,6 +1073,21 @@ function ConsultarEscada({ ordens }) {
               )}
             </div>
           </div>
+          <div className={`flex items-center gap-3 rounded-2xl px-4 py-3 mb-5 ${saidaVinculada ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+            <Truck size={16} className={saidaVinculada ? 'text-emerald-600 shrink-0' : 'text-amber-500 shrink-0'} />
+            {saidaVinculada ? (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs">
+                <span className="font-black text-emerald-700 uppercase tracking-widest">Entregue</span>
+                <span className="text-emerald-700"><span className="font-semibold">NF:</span> {saidaVinculada.nfSaida}</span>
+                <span className="text-emerald-700"><span className="font-semibold">Cliente:</span> {saidaVinculada.cliente}</span>
+                <span className="text-emerald-700"><span className="font-semibold">Data:</span> {saidaVinculada.dataEntrega}</span>
+                {saidaVinculada.observacao && <span className="text-emerald-600 italic">{saidaVinculada.observacao}</span>}
+              </div>
+            ) : (
+              <span className="text-xs font-semibold text-amber-700">Em estoque — nenhuma saída registrada</span>
+            )}
+          </div>
+
           {(resultado.componentesFabricados ?? []).length > 0 && (
             <div className="mb-5">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 flex items-center gap-2">
@@ -2052,6 +2073,177 @@ function EstoqueAtual({ lotes }) {
   );
 }
 
+function SaidaVenda({ ordens, saidas }) {
+  const [form, setForm] = useState({ nfSaida: '', cliente: '', dataEntrega: today(), observacao: '' });
+  const [selecionadas, setSelecionadas] = useState([]);
+  const [saving, setSaving]             = useState(false);
+  const [feedback, setFeedback]         = useState(null);
+
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  const seriesJaSaidas = new Set(saidas.flatMap((s) => s.numerosSerieVinculados ?? []));
+  const ordensDisponiveis = ordens
+    .filter((o) => o.ativo && !seriesJaSaidas.has(o.nroSerie))
+    .sort((a, b) => (b.dataProd ?? '').localeCompare(a.dataProd ?? ''));
+
+  const adicionar = (nroSerie) => {
+    if (!nroSerie || selecionadas.includes(nroSerie)) return;
+    setSelecionadas((p) => [...p, nroSerie]);
+  };
+
+  const remover = (nroSerie) => setSelecionadas((p) => p.filter((s) => s !== nroSerie));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.nfSaida.trim() || !form.cliente.trim()) {
+      setFeedback({ tipo: 'erro', msg: 'Preencha NF de saída e cliente.' });
+      return;
+    }
+    if (selecionadas.length === 0) {
+      setFeedback({ tipo: 'erro', msg: 'Selecione pelo menos uma escada.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'rastreabilidade_saidas'), {
+        nfSaida: form.nfSaida.trim(),
+        cliente: form.cliente.trim(),
+        dataEntrega: form.dataEntrega,
+        observacao: form.observacao.trim(),
+        numerosSerieVinculados: selecionadas,
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
+      setFeedback({ tipo: 'ok', msg: `Saída registrada — ${selecionadas.length} escada(s) vinculadas à NF ${form.nfSaida.trim()}` });
+      setForm({ nfSaida: '', cliente: '', dataEntrega: today(), observacao: '' });
+      setSelecionadas([]);
+    } catch {
+      setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setFeedback(null), 5000);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <SectionTitle icon={Truck}>Registrar Saída / Venda</SectionTitle>
+        <Feedback feedback={feedback} />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>NF de Saída *</Label>
+              <Input value={form.nfSaida} onChange={(e) => set('nfSaida', e.target.value)} placeholder="Ex: 000123456" />
+            </div>
+            <div>
+              <Label>Cliente *</Label>
+              <Input value={form.cliente} onChange={(e) => set('cliente', e.target.value)} placeholder="Razão social ou nome" />
+            </div>
+            <div>
+              <Label>Data de Entrega *</Label>
+              <Input type="date" value={form.dataEntrega} onChange={(e) => set('dataEntrega', e.target.value)} />
+            </div>
+            <div>
+              <Label>Observação</Label>
+              <Input value={form.observacao} onChange={(e) => set('observacao', e.target.value)} placeholder="Pedido, romaneio, etc." />
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Escadas nesta saída</p>
+            <div className="flex gap-3">
+              <Select
+                value=""
+                onChange={(e) => adicionar(e.target.value)}
+                className="max-w-sm"
+              >
+                <option value="">-- adicionar escada --</option>
+                {ordensDisponiveis.map((o) => (
+                  <option key={o.id} value={o.nroSerie}>
+                    {o.nroSerie} · {o.dataProd}
+                  </option>
+                ))}
+              </Select>
+              <span className="text-[10px] font-semibold text-slate-400 self-center">
+                {ordensDisponiveis.length} em estoque disponíveis
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2 min-h-[2rem]">
+              {selecionadas.length === 0 && (
+                <span className="text-xs text-slate-400 italic self-center">Nenhuma escada selecionada</span>
+              )}
+              {selecionadas.map((s) => (
+                <span key={s} className="inline-flex items-center gap-1.5 bg-blue-100 border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">
+                  {s}
+                  <button type="button" onClick={() => remover(s)} className="text-blue-400 hover:text-blue-700 transition">
+                    <X size={11} />
+                  </button>
+                </span>
+              ))}
+            </div>
+            {selecionadas.length > 0 && (
+              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                {selecionadas.length} escada(s) selecionada(s)
+              </p>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-1">
+            <button
+              type="submit"
+              disabled={saving}
+              className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-blue-200 hover:shadow-md"
+            >
+              <Truck size={15} /> {saving ? 'Salvando...' : 'Registrar Saída'}
+            </button>
+          </div>
+        </form>
+      </Card>
+
+      <Card>
+        <SectionTitle icon={BarChart3}>Histórico de Saídas</SectionTitle>
+        {saidas.filter((s) => s.ativo).length === 0 ? (
+          <p className="text-sm text-slate-400 italic">Nenhuma saída registrada ainda.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left font-black text-slate-400">NF Saída</th>
+                  <th className="px-4 py-2.5 text-left font-black text-slate-400">Cliente</th>
+                  <th className="px-4 py-2.5 text-left font-black text-slate-400">Data Entrega</th>
+                  <th className="px-4 py-2.5 text-center font-black text-slate-400">Qtd</th>
+                  <th className="px-4 py-2.5 text-left font-black text-slate-400">Números de Série</th>
+                  <th className="px-4 py-2.5 text-left font-black text-slate-400">Obs.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {saidas.filter((s) => s.ativo).map((s) => (
+                  <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 font-mono font-bold text-amber-700">{s.nfSaida}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-800">{s.cliente}</td>
+                    <td className="px-4 py-3 text-slate-600">{s.dataEntrega}</td>
+                    <td className="px-4 py-3 text-center font-black text-blue-600">{(s.numerosSerieVinculados ?? []).length}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {(s.numerosSerieVinculados ?? []).map((nr) => (
+                          <span key={nr} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold">{nr}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-400 italic">{s.observacao || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 const STEP_COLORS = {
   'Formação Tubo':  'bg-blue-100 text-blue-700',
   'Corte Tubo':     'bg-sky-100 text-sky-700',
@@ -2204,6 +2396,7 @@ const ABAS = [
   { id: 'pa',         label: 'Produto Acabado',     icon: PackagePlus       },
   { id: 'ajuste',     label: 'Ajuste de Estoque',   icon: SlidersHorizontal },
   { id: 'consultar',  label: 'Rastreabilidade',     icon: ArrowUpDown       },
+  { id: 'saida',      label: 'Saída / Venda',        icon: Truck             },
   { id: 'exportar',   label: 'Exportar INMETRO',    icon: Download          },
   { id: 'ficha',      label: 'Ficha Técnica',        icon: Layers            },
 ];
@@ -2273,6 +2466,7 @@ export default function Rastreabilidade() {
   const [subAba, setSubAba]             = useState('estoque');
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
+  const [saidas, setSaidas]             = useState([]);
   const [seedStatus, setSeedStatus]         = useState(null);
   const [importStatus, setImportStatus]     = useState(null);
 
@@ -2286,7 +2480,11 @@ export default function Rastreabilidade() {
       query(collection(db, 'rastreabilidade_ordens'), orderBy('criadoEm', 'desc')),
       (s) => setOrdens(s.docs.map((d) => ({ id: d.id, ...d.data() }))),
     );
-    return () => { u1(); u2(); };
+    const u3 = onSnapshot(
+      query(collection(db, 'rastreabilidade_saidas'), orderBy('criadoEm', 'desc')),
+      (s) => setSaidas(s.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    );
+    return () => { u1(); u2(); u3(); };
   }, [autenticado]);
 
   const lotesDisponiveisMp = useCallback(
@@ -2371,7 +2569,8 @@ export default function Rastreabilidade() {
       {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
       {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
       {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
-      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} />}
+      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} saidas={saidas} />}
+      {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} />}
       {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
       {subAba === 'ficha'      && <FichaTecnica />}
     </div>
