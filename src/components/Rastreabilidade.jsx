@@ -74,7 +74,10 @@ const CODIGO_PARA_COMPRADO = {
   '11303': 'REBITE R-512A',
   '11304': 'REBITE R-519A',
   '11305': 'REBITE R-612',
-  '11306': 'CINTA DE SEGURANCA',
+  '11306': 'FITA POLIPROPILENO 25MM',
+  '40201': 'ETIQUETA INMETRO',
+  '40202': 'ETIQUETA IDENTIFICACAO',
+  '40203': 'PONTEIRA DE PLASTICO',
 };
 
 // Constrói listas de componentes a partir de um modelo do BOM
@@ -105,7 +108,10 @@ const COMP_COMPRADOS = [
   'REBITE R-512A',
   'REBITE R-519A',
   'REBITE R-612',
-  'CINTA DE SEGURANCA',
+  'FITA POLIPROPILENO 25MM',
+  'ETIQUETA INMETRO',
+  'ETIQUETA IDENTIFICACAO',
+  'PONTEIRA DE PLASTICO',
 ];
 
 const today = () => new Date().toISOString().split('T')[0];
@@ -2046,6 +2052,150 @@ function EstoqueAtual({ lotes }) {
   );
 }
 
+const STEP_COLORS = {
+  'Formação Tubo':  'bg-blue-100 text-blue-700',
+  'Corte Tubo':     'bg-sky-100 text-sky-700',
+  'Dobra Tubo':     'bg-indigo-100 text-indigo-700',
+  'Furação':        'bg-purple-100 text-purple-700',
+  'Guilhotina':     'bg-slate-100 text-slate-600',
+  'Prensa Estampa': 'bg-amber-100 text-amber-700',
+  'Prensa Furação': 'bg-orange-100 text-orange-700',
+  'Corte Prensa':   'bg-amber-100 text-amber-700',
+  'Dobra':          'bg-indigo-100 text-indigo-700',
+  'Estampa':        'bg-orange-100 text-orange-700',
+  'Corte':          'bg-slate-100 text-slate-600',
+  'Solda':          'bg-yellow-100 text-yellow-700',
+  'Pintura':        'bg-rose-100 text-rose-700',
+  'Montagem':       'bg-emerald-100 text-emerald-700',
+};
+
+const COTAS_LABELS = [
+  { key: 'A_tamanho_mm',          cota: 'A', label: 'Tamanho da escada',                              detalhe: '↕' },
+  { key: 'B_incl_dianteira_mm',   cota: 'B', label: 'Inclinação',                                     detalhe: 'Lateral dianteira' },
+  { key: 'B_incl_traseira_mm',    cota: 'B', label: 'Inclinação',                                     detalhe: 'Lateral traseira' },
+  { key: 'C_largura_paralela_mm', cota: 'C', label: 'Largura da escada',                              detalhe: 'Paralela' },
+  { key: 'E_prof_degrau_mm',      cota: 'E', label: 'Profundidade do degrau',                         detalhe: '↕' },
+  { key: 'F_apoio_frontal_mm',    cota: 'F', label: 'Distância de apoio frontal e traseiro',          detalhe: 'Paralela (Frontal)' },
+  { key: 'F_apoio_traseiro_mm',   cota: 'F', label: 'Distância de apoio frontal e traseiro',          detalhe: 'Paralela (Traseiro)' },
+  { key: 'G_espacador_mm',        cota: 'G', label: 'Espaçador ou trava',                             detalhe: '↕' },
+  { key: 'H_dist_degraus_mm',     cota: 'H', label: 'Distância entre degraus',                        detalhe: '↕' },
+  { key: 'I_paralelismo_mm',      cota: 'I', label: 'Paralelismo entre degraus',                      detalhe: '↕' },
+  { key: 'J_dist_degrau_solo_mm', cota: 'J', label: 'Distância do degrau mais baixo ao solo',         detalhe: '↕' },
+  { key: 'L_aresta_plataforma_mm',cota: 'L', label: 'Largura da aresta frontal da plataforma',        detalhe: '↕' },
+  { key: 'M_altura_alca_mm',      cota: 'M', label: 'Altura da alça de apoio em relação à plataforma',detalhe: '↕' },
+];
+
+function FichaTecnica() {
+  const [produto, setProduto] = useState('00185');
+  const modelo = BOM_ESCADAS.bom_escadas_rastreados.find((e) => e.codigo_produto === produto);
+  const fluxo  = BOM_ESCADAS.fluxo_processo || {};
+
+  const fmtQtd = (c) => {
+    const v = c.quantidade_por_escada;
+    const u = c.unidade;
+    if (u === 'M')  return `${v} m`;
+    if (u === 'KG') return `${v} kg`;
+    return String(v);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <SectionTitle icon={Layers}>Ficha Técnica da Escada</SectionTitle>
+
+        <div className="flex gap-2 flex-wrap mb-8">
+          {BOM_ESCADAS.bom_escadas_rastreados.map((e) => (
+            <button
+              key={e.codigo_produto}
+              type="button"
+              onClick={() => setProduto(e.codigo_produto)}
+              className={`px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${produto === e.codigo_produto ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'}`}
+            >
+              {e.codigo_produto} · {e.descricao.replace('ESCADA DOMEST ', '').replace(' S/ PISO', '')}
+            </button>
+          ))}
+        </div>
+
+        {modelo && (
+          <>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3 flex items-center gap-2">
+              <Hash size={12} /> Cotas Dimensionais (mm)
+            </h4>
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 mb-8">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="px-4 py-2.5 text-left font-black text-slate-400 w-12">Cota</th>
+                    <th className="px-4 py-2.5 text-left font-black text-slate-400">Característica</th>
+                    <th className="px-4 py-2.5 text-left font-black text-slate-400">Detalhe</th>
+                    <th className="px-4 py-2.5 text-right font-black text-slate-400 w-24">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COTAS_LABELS.map(({ key, cota, label, detalhe }) => (
+                    <tr key={key} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-2.5 font-black text-blue-600 text-sm">{cota}</td>
+                      <td className="px-4 py-2.5 text-slate-700">{label}</td>
+                      <td className="px-4 py-2.5 text-slate-400 italic">{detalhe}</td>
+                      <td className="px-4 py-2.5 text-right font-mono font-bold text-slate-800">{modelo.cotas[key]} mm</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3 flex items-center gap-2">
+              <Cog size={12} /> Lista de Componentes e Fluxo de Processo
+            </h4>
+            <div className="overflow-x-auto rounded-2xl border border-slate-200">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="px-3 py-2.5 text-left font-black text-slate-400 w-20">Código</th>
+                    <th className="px-3 py-2.5 text-left font-black text-slate-400">Descrição</th>
+                    <th className="px-3 py-2.5 text-center font-black text-slate-400 w-14">Tipo</th>
+                    <th className="px-3 py-2.5 text-center font-black text-slate-400 w-14">Nível</th>
+                    <th className="px-3 py-2.5 text-right font-black text-slate-400 w-20">Qtd/Esc.</th>
+                    <th className="px-3 py-2.5 text-left font-black text-slate-400">Fluxo de Processo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {modelo.componentes_rastreados.map((comp, i) => (
+                    <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${comp.nivel === 3 ? 'bg-slate-50/60' : ''}`}>
+                      <td className="px-3 py-2.5 font-mono text-slate-400">{comp.codigo}</td>
+                      <td className="px-3 py-2.5 font-semibold text-slate-800">{comp.descricao}</td>
+                      <td className="px-3 py-2.5 text-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${comp.tipo === 'PI' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                          {comp.tipo}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5 text-center text-slate-400 font-mono">{comp.nivel}</td>
+                      <td className="px-3 py-2.5 text-right font-mono font-bold text-slate-800">{fmtQtd(comp)}</td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex flex-wrap gap-1 items-center">
+                          {(fluxo[comp.codigo] || []).map((step, j) => (
+                            <React.Fragment key={j}>
+                              {j > 0 && <span className="text-slate-300 text-[9px] select-none">›</span>}
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${STEP_COLORS[step] ?? 'bg-slate-100 text-slate-600'}`}>
+                                {step}
+                              </span>
+                            </React.Fragment>
+                          ))}
+                          {!fluxo[comp.codigo] && <span className="text-slate-300 text-[10px] italic">—</span>}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 const ABAS = [
   { id: 'estoque',    label: 'Estoque',             icon: Warehouse         },
   { id: 'lote',       label: 'Entrada de Lotes',    icon: Package           },
@@ -2055,6 +2205,7 @@ const ABAS = [
   { id: 'ajuste',     label: 'Ajuste de Estoque',   icon: SlidersHorizontal },
   { id: 'consultar',  label: 'Rastreabilidade',     icon: ArrowUpDown       },
   { id: 'exportar',   label: 'Exportar INMETRO',    icon: Download          },
+  { id: 'ficha',      label: 'Ficha Técnica',        icon: Layers            },
 ];
 
 const SENHA_ACESSO = 'escada';
@@ -2222,6 +2373,7 @@ export default function Rastreabilidade() {
       {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
       {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} />}
       {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
+      {subAba === 'ficha'      && <FichaTecnica />}
     </div>
   );
 }
