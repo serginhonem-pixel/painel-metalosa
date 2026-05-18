@@ -1771,51 +1771,40 @@ const INVENTARIO_REAL = {
   ],
   pi: [
     // ── Patamar (81711) ──────────────────
-    { codigo: '81711', nome: 'PATAMAR', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+    { codigo: '81711', nome: 'PATAMAR # 1,20 ED', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
       loteId: 'PAT0002', danfe: '005290443', fornecedor: 'USIMINAS', certificado: '2222765', op: '018996',
       avulso: 12, soldado: 198 },
-    // ── Degrau (81712) ───────────────────
-    { codigo: '81712', nome: 'DEGRAU', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+    { codigo: '81712', nome: 'DEGRAU # 1,20 ED', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
       loteId: 'DEG0002', danfe: '005290443', fornecedor: 'USIMINAS', certificado: '2222765', op: '018996',
       avulso: 220, soldado: 890 },
-    // ── Articulador (81713) ───────────────
-    { codigo: '81713', nome: 'ARTICULADOR', mp_key: 'CHAPA 1,40 (81731)', mpLoteId: 'CHAPA140-001',
+    { codigo: '81713', nome: 'ARTICULADOR # 1,40 ED', mp_key: 'CHAPA 1,40 (81731)', mpLoteId: 'CHAPA140-001',
       loteId: 'ART0001', danfe: '006944758', fornecedor: 'CSN', certificado: 'D51330-0302', op: '',
       avulso: 0, soldado: 396 },
-    // ── Dobradiça (81714) ────────────────
-    { codigo: '81714', nome: 'DOBRADICA', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+    { codigo: '81714', nome: 'DOBRADICA # 1,20 ED', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
       loteId: 'DOB0001', danfe: '007012435', fornecedor: 'CSN', certificado: 'D61101-1001', op: '',
       avulso: 0, soldado: 56 },
-    // ── Arame sustentação (81715) ─────────
-    { codigo: '81715', nome: 'ARAME SUST', mp_key: 'ARAME (11308)', mpLoteId: 'ARA0002',
+    { codigo: '81715', nome: 'ARAME SUST PATAMAR 05MM ED', mp_key: 'ARAME (11308)', mpLoteId: 'ARA0002',
       loteId: 'ARA0002-PI', danfe: '000316083', fornecedor: 'MACCAFERRI', certificado: '', op: '',
       avulso: 0, soldado: 71 },
-    // ── Reforço montante (81721) ──────────
-    { codigo: '81721', nome: 'REFORCO MONT', mp_key: 'BARRA CHATA (11300)', mpLoteId: 'BAR0002',
+    { codigo: '81721', nome: 'REFORCO MONT. FRONTAL ED', mp_key: 'BARRA CHATA (11300)', mpLoteId: 'BAR0002',
       loteId: 'BAR0002-PI', danfe: '001490153', fornecedor: 'ARCELOR MITTAL', certificado: '', op: '',
       avulso: 0, soldado: 170 },
-    // ── Montante Frontal 4D (81701) ────────
-    { codigo: '81701', nome: 'MONT FRONTAL 4D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81701', nome: 'MONT FRONTAL ED 04 DEGRAUS', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-MF4-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 28 },
-    // ── Montante Frontal 5D (81702) ────────
-    { codigo: '81702', nome: 'MONT FRONTAL 5D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81702', nome: 'MONT FRONTAL ED 05 DEGRAUS', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-MF5-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 107 },
-    // ── Montante Frontal 7D (81704) ────────
-    { codigo: '81704', nome: 'MONT FRONTAL 7D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81704', nome: 'MONT FRONTAL ED 07 DEGRAUS', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-MF7-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 63 },
-    // ── Montante Traseiro 3D (81705) ───────
-    { codigo: '81705', nome: 'MONT TRASEIRO 3D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81705', nome: 'MONT TRASEIRO ED 03 DEGRAUS', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-MT3-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 64 },
-    // ── Montante Traseiro 7D (81709) ───────
-    { codigo: '81709', nome: 'MONT TRASEIRO 7D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81709', nome: 'MONT TRASEIRO ED 07 DEGRAUS', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-MT7-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 72 },
-    // ── Travessa (81710) ──────────────────
-    { codigo: '81710', nome: 'TRAVESSA', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+    { codigo: '81710', nome: 'TRAVESSA # 1,20 ED', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
       loteId: 'TUB-TV-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
       avulso: 0, soldado: 110 },
   ],
@@ -2138,7 +2127,7 @@ function EstoqueAtual({ lotes }) {
         if (lotesPi.length === 0) return null;
         const gruposPi = [...new Set(lotesPi.map((l) => l.codigoPi))].sort().map((cod) => {
           const ls = lotesPi.filter((l) => l.codigoPi === cod);
-          return { cod, descricao: ls[0]?.descricaoPi ?? ls[0]?.nomePi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
+          return { cod, descricao: LOTES_PI_MAP[cod] ?? ls[0]?.descricaoPi ?? ls[0]?.nomePi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
         });
         return (
           <Card>
