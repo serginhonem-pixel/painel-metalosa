@@ -1700,6 +1700,223 @@ async function seedMocks(setSeedStatus) {
   }
 }
 
+// ─── Inventário Real (Escadas - Lotes.xlsx / Planilha6) ───────────────────────
+const INVENTARIO_REAL = {
+  mp: [
+    {
+      mp_key: 'TUBO (11307)',
+      mpCodigo: '11307',
+      loteId: 'TUB0002',
+      danfe: '000019643',
+      fornecedor: 'BELOACO DOX',
+      certificado: '',
+      nroLote: 'TUB0002',
+      dataEntrada: '2024-03-12',
+      qtdRecebida: 0,   // desconhecida — saldo físico registrado no PI
+      qtdAprovada: 0,
+      qtdDisponivel: 0, // MP já virou PI; saldo está nos lotes PI abaixo
+    },
+    {
+      mp_key: 'CHAPA 1,20 (81730)',
+      mpCodigo: '81730',
+      loteId: 'CHAPA120-001',
+      danfe: '005290443',
+      fornecedor: 'USIMINAS',
+      certificado: '2222765',
+      nroLote: 'CHAPA120-001',
+      dataEntrada: '2024-01-01',
+      qtdRecebida: 0,
+      qtdAprovada: 0,
+      qtdDisponivel: 0,
+    },
+    {
+      mp_key: 'CHAPA 1,40 (81731)',
+      mpCodigo: '81731',
+      loteId: 'CHAPA140-001',
+      danfe: '006944758',
+      fornecedor: 'CSN',
+      certificado: 'D51330-0302',
+      nroLote: 'CHAPA140-001',
+      dataEntrada: '2024-01-01',
+      qtdRecebida: 0,
+      qtdAprovada: 0,
+      qtdDisponivel: 0,
+    },
+    {
+      mp_key: 'ARAME (11308)',
+      mpCodigo: '11308',
+      loteId: 'ARA0002',
+      danfe: '000316083',
+      fornecedor: 'MACCAFERRI',
+      certificado: '',
+      nroLote: 'ARA0002',
+      dataEntrada: '2024-01-01',
+      qtdRecebida: 0,
+      qtdAprovada: 0,
+      qtdDisponivel: 0,
+    },
+    {
+      mp_key: 'BARRA CHATA (11300)',
+      mpCodigo: '11300',
+      loteId: 'BAR0002',
+      danfe: '001490153',
+      fornecedor: 'ARCELOR MITTAL',
+      certificado: '',
+      nroLote: 'BAR0002',
+      dataEntrada: '2024-01-01',
+      qtdRecebida: 0,
+      qtdAprovada: 0,
+      qtdDisponivel: 0,
+    },
+  ],
+  pi: [
+    // ── Patamar (81711) ──────────────────
+    { codigo: '81711', nome: 'PATAMAR', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+      loteId: 'PAT0002', danfe: '005290443', fornecedor: 'USIMINAS', certificado: '2222765', op: '018996',
+      avulso: 12, soldado: 198 },
+    // ── Degrau (81712) ───────────────────
+    { codigo: '81712', nome: 'DEGRAU', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+      loteId: 'DEG0002', danfe: '005290443', fornecedor: 'USIMINAS', certificado: '2222765', op: '018996',
+      avulso: 220, soldado: 890 },
+    // ── Articulador (81713) ───────────────
+    { codigo: '81713', nome: 'ARTICULADOR', mp_key: 'CHAPA 1,40 (81731)', mpLoteId: 'CHAPA140-001',
+      loteId: 'ART0001', danfe: '006944758', fornecedor: 'CSN', certificado: 'D51330-0302', op: '',
+      avulso: 0, soldado: 396 },
+    // ── Dobradiça (81714) ────────────────
+    { codigo: '81714', nome: 'DOBRADICA', mp_key: 'CHAPA 1,20 (81730)', mpLoteId: 'CHAPA120-001',
+      loteId: 'DOB0001', danfe: '007012435', fornecedor: 'CSN', certificado: 'D61101-1001', op: '',
+      avulso: 0, soldado: 56 },
+    // ── Arame sustentação (81715) ─────────
+    { codigo: '81715', nome: 'ARAME SUST', mp_key: 'ARAME (11308)', mpLoteId: 'ARA0002',
+      loteId: 'ARA0002-PI', danfe: '000316083', fornecedor: 'MACCAFERRI', certificado: '', op: '',
+      avulso: 0, soldado: 71 },
+    // ── Reforço montante (81721) ──────────
+    { codigo: '81721', nome: 'REFORCO MONT', mp_key: 'BARRA CHATA (11300)', mpLoteId: 'BAR0002',
+      loteId: 'BAR0002-PI', danfe: '001490153', fornecedor: 'ARCELOR MITTAL', certificado: '', op: '',
+      avulso: 0, soldado: 170 },
+    // ── Montante Frontal 4D (81701) ────────
+    { codigo: '81701', nome: 'MONT FRONTAL 4D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-MF4-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 28 },
+    // ── Montante Frontal 5D (81702) ────────
+    { codigo: '81702', nome: 'MONT FRONTAL 5D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-MF5-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 107 },
+    // ── Montante Frontal 7D (81704) ────────
+    { codigo: '81704', nome: 'MONT FRONTAL 7D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-MF7-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 63 },
+    // ── Montante Traseiro 3D (81705) ───────
+    { codigo: '81705', nome: 'MONT TRASEIRO 3D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-MT3-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 64 },
+    // ── Montante Traseiro 7D (81709) ───────
+    { codigo: '81709', nome: 'MONT TRASEIRO 7D', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-MT7-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 72 },
+    // ── Travessa (81710) ──────────────────
+    { codigo: '81710', nome: 'TRAVESSA', mp_key: 'TUBO (11307)', mpLoteId: 'TUB0002',
+      loteId: 'TUB-TV-001', danfe: '000019643', fornecedor: 'BELOACO DOX', certificado: '', op: '',
+      avulso: 0, soldado: 110 },
+  ],
+  comprados: [
+    { codigo: '11302', nome: 'ARRUELA LISA 3/16"',    loteId: 'REB-001', danfe: '000090334', fornecedor: 'RENA',         qtd: 0    },
+    { codigo: '11303', nome: 'REBITE R-512A',          loteId: 'REB-001', danfe: '000090334', fornecedor: 'RENA',         qtd: 269  },
+    { codigo: '11304', nome: 'REBITE R-519A',          loteId: 'REB-001', danfe: '000090334', fornecedor: 'RENA',         qtd: 1800 },
+    { codigo: '11305', nome: 'REBITE R-612',           loteId: 'REB-001', danfe: '000090334', fornecedor: 'RENA',         qtd: 900  },
+    { codigo: '11306', nome: 'FITA POLIPROPILENO 25MM',loteId: 'FITA-001',danfe: '000000224', fornecedor: 'TUDO DE BOM',  qtd: 500  },
+    { codigo: '40201', nome: 'ETIQUETA INMETRO',       loteId: 'ETQ-001', danfe: '',          fornecedor: '',            qtd: 0    },
+    { codigo: '40202', nome: 'ETIQUETA IDENTIFICACAO', loteId: 'ETQ-001', danfe: '',          fornecedor: '',            qtd: 0    },
+    { codigo: '40203', nome: 'PONTEIRA DE PLASTICO',   loteId: 'PNT-001', danfe: '',          fornecedor: '',            qtd: 0    },
+  ],
+};
+
+async function seedInventarioReal(setStatus) {
+  setStatus('loading');
+  try {
+    const batch = writeBatch(db);
+    const now = new Date().toISOString();
+
+    // MP lots (estoque esgotado — já processados em PI)
+    for (const m of INVENTARIO_REAL.mp) {
+      const r = doc(collection(db, 'rastreabilidade_lotes'));
+      batch.set(r, {
+        tipo: 'MP',
+        mp: m.mp_key,
+        mpCodigo: m.mpCodigo,
+        nroLoteFornecedor: m.nroLote,
+        danfe: m.danfe,
+        certificadoQualidade: m.certificado,
+        fornecedor: m.fornecedor,
+        qtdRecebida: m.qtdRecebida,
+        qtdAprovada: m.qtdAprovada,
+        qtdReprovada: 0,
+        qtdDisponivel: m.qtdDisponivel,
+        dataEntrada: m.dataEntrada,
+        ativo: true,
+        criadoEm: now,
+        origem: 'inventario_inicial',
+      });
+    }
+
+    // PI lots — saldo real do inventário físico
+    for (const p of INVENTARIO_REAL.pi) {
+      const total = p.avulso + p.soldado;
+      const r = doc(collection(db, 'rastreabilidade_lotes'));
+      batch.set(r, {
+        tipo: 'PI',
+        codigoPi: p.codigo,
+        nomePi: p.nome,
+        mpOrigem: p.mp_key,
+        mpLoteId: p.mpLoteId,
+        nroLotePi: p.loteId,
+        danfe: p.danfe,
+        certificadoQualidade: p.certificado,
+        fornecedor: p.fornecedor,
+        nroOP: p.op,
+        qtdProduzida: total,
+        qtdDisponivel: total,
+        qtdAvulso: p.avulso,
+        qtdSoldado: p.soldado,
+        dataProducao: '2024-01-01',
+        ativo: true,
+        criadoEm: now,
+        origem: 'inventario_inicial',
+      });
+    }
+
+    // COMPRADO lots
+    for (const c of INVENTARIO_REAL.comprados) {
+      const r = doc(collection(db, 'rastreabilidade_lotes'));
+      batch.set(r, {
+        tipo: 'COMPRADO',
+        nomeComp: c.nome,
+        codigo: c.codigo,
+        danfe: c.danfe,
+        nroLoteFornecedor: c.loteId,
+        certificadoQualidade: '',
+        fornecedor: c.fornecedor,
+        qtdRecebida: c.qtd,
+        qtdAprovada: c.qtd,
+        qtdReprovada: 0,
+        qtdDisponivel: c.qtd,
+        dataEntrada: '2024-01-01',
+        ativo: true,
+        criadoEm: now,
+        origem: 'inventario_inicial',
+      });
+    }
+
+    await batch.commit();
+    setStatus('ok');
+    setTimeout(() => setStatus(null), 5000);
+  } catch (err) {
+    console.error(err);
+    setStatus('erro');
+    setTimeout(() => setStatus(null), 5000);
+  }
+}
+
 function EntradaLoteComprado({ lotes }) {
   const [form, setForm] = useState({
     codigo: Object.keys(CODIGO_PARA_COMPRADO)[0],
@@ -2511,6 +2728,7 @@ export default function Rastreabilidade() {
   const [saidas, setSaidas]             = useState([]);
   const [seedStatus, setSeedStatus]         = useState(null);
   const [importStatus, setImportStatus]     = useState(null);
+  const [inventStatus, setInventStatus]     = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -2580,6 +2798,15 @@ export default function Rastreabilidade() {
             >
               <FileText size={14} />
               {importStatus === 'loading' ? 'Importando...' : importStatus === 'ok' ? 'Importado!' : importStatus === 'erro' ? 'Erro' : 'Importar escada.json'}
+            </button>
+            <button
+              type="button"
+              disabled={inventStatus === 'loading'}
+              onClick={() => seedInventarioReal(setInventStatus)}
+              className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-600/20 disabled:opacity-50"
+            >
+              <Warehouse size={14} />
+              {inventStatus === 'loading' ? 'Importando...' : inventStatus === 'ok' ? 'Inventario importado!' : inventStatus === 'erro' ? 'Erro — ver console' : 'Importar inventario real'}
             </button>
             <button
               type="button"
