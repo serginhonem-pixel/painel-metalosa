@@ -2726,9 +2726,6 @@ export default function Rastreabilidade() {
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
   const [saidas, setSaidas]             = useState([]);
-  const [seedStatus, setSeedStatus]         = useState(null);
-  const [importStatus, setImportStatus]     = useState(null);
-  const [inventStatus, setInventStatus]     = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -2790,33 +2787,6 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
               </div>
             ))}
-            <button
-              type="button"
-              disabled={importStatus === 'loading'}
-              onClick={() => seedFromEscadaJson(setImportStatus)}
-              className="flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-blue-300 transition hover:bg-blue-600/20 disabled:opacity-50"
-            >
-              <FileText size={14} />
-              {importStatus === 'loading' ? 'Importando...' : importStatus === 'ok' ? 'Importado!' : importStatus === 'erro' ? 'Erro' : 'Importar escada.json'}
-            </button>
-            <button
-              type="button"
-              disabled={inventStatus === 'loading'}
-              onClick={() => seedInventarioReal(setInventStatus)}
-              className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-600/20 disabled:opacity-50"
-            >
-              <Warehouse size={14} />
-              {inventStatus === 'loading' ? 'Importando...' : inventStatus === 'ok' ? 'Inventario importado!' : inventStatus === 'erro' ? 'Erro — ver console' : 'Importar inventario real'}
-            </button>
-            <button
-              type="button"
-              disabled={seedStatus === 'loading'}
-              onClick={() => seedMocks(setSeedStatus)}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-slate-300 transition hover:bg-white/10 disabled:opacity-50"
-            >
-              <FlaskConical size={14} />
-              {seedStatus === 'loading' ? 'Inserindo...' : seedStatus === 'ok' ? 'Inserido' : seedStatus === 'erro' ? 'Erro' : 'Dados de teste'}
-            </button>
           </div>
         </div>
       </div>
