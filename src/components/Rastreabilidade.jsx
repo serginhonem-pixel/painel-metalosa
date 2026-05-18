@@ -2173,7 +2173,11 @@ function EstoqueAtual({ lotes }) {
                         <td colSpan={2} className="py-2 px-3 text-[10px] text-slate-500">
                           {l.nroOP
                             ? <>OP <span className="font-mono font-bold">{l.nroOP}</span> &mdash; {l.dataEntrada}</>
-                            : <span className="italic text-amber-600 font-semibold">Saldo Inicial</span>}
+                            : <>
+                                <span className="italic text-amber-600 font-semibold">Saldo Inicial</span>
+                                {l.danfe && <> &mdash; NF <span className="font-mono font-bold text-slate-600">{l.danfe}</span></>}
+                                {l.fornecedor && <span className="text-slate-400"> ({l.fornecedor})</span>}
+                              </>}
                         </td>
                         <td className="py-2 px-3 text-[10px] text-slate-400">{l.mpKey}</td>
                         <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
