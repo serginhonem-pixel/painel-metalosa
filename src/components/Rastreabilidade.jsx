@@ -2148,7 +2148,6 @@ function EstoqueAtual({ lotes }) {
                 <tr className="border-b-2 border-slate-100">
                   <th className={thCls} style={{width:32}} />
                   <th className={thCls}>PI</th>
-                  <th className={thCls}>Codigo</th>
                   <th className={thCls}>Lotes</th>
                   <th className={`${thCls} text-right`}>Saldo</th>
                   <th className={thCls}>Status</th>
@@ -2159,8 +2158,11 @@ function EstoqueAtual({ lotes }) {
                   <React.Fragment key={g.cod}>
                     <tr className="row-hover transition-colors cursor-pointer border-b border-slate-50" onClick={() => toggle('pi_' + g.cod)}>
                       <td className="py-3 px-2 text-slate-400 text-center">{expandidos['pi_' + g.cod] ? '▾' : '▸'}</td>
-                      <td className="py-3 px-3 font-black text-slate-800">{g.descricao}</td>
-                      <td className="py-3 px-3"><span className="font-mono text-[10px] bg-violet-50 border border-violet-100 text-violet-700 px-1.5 py-0.5 rounded">{g.cod}</span></td>
+                      <td className="py-3 px-3">
+                        <span className="font-mono text-[10px] bg-violet-50 border border-violet-100 text-violet-700 px-1.5 py-0.5 rounded mr-2">{g.cod}</span>
+                        <span className="font-black text-slate-800">{g.descricao}</span>
+                      </td>
+                      <td />
                       <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                       <td className="py-3 px-3 text-right"><span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 10 ? 'text-amber-500' : 'text-emerald-600'}`}>{g.totalDisp.toLocaleString('pt-BR')}</span></td>
                       <td className="py-3 px-3">{g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 10 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}</td>
@@ -2168,7 +2170,11 @@ function EstoqueAtual({ lotes }) {
                     {expandidos['pi_' + g.cod] && g.lotes.map((l) => (
                       <tr key={l.id} className="bg-violet-50/30 border-b border-violet-100/50">
                         <td />
-                        <td colSpan={2} className="py-2 px-3 text-[10px] text-slate-500">OP <span className="font-mono font-bold">{l.nroOP || '--'}</span> &mdash; {l.dataEntrada}</td>
+                        <td colSpan={2} className="py-2 px-3 text-[10px] text-slate-500">
+                          {l.nroOP
+                            ? <>OP <span className="font-mono font-bold">{l.nroOP}</span> &mdash; {l.dataEntrada}</>
+                            : <span className="italic text-amber-600 font-semibold">Saldo Inicial</span>}
+                        </td>
                         <td className="py-2 px-3 text-[10px] text-slate-400">{l.mpKey}</td>
                         <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
                         <td />
