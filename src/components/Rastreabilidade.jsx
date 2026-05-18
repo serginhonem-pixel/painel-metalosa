@@ -952,6 +952,7 @@ function ConsultarEscada({ ordens, saidas = [] }) {
   const [estornando, setEstornando]     = useState(false);
   const [feedbackEstorno, setFeedbackEstorno] = useState(null);
   const [confirmEstorno, setConfirmEstorno]   = useState(false);
+  const [filtroLista, setFiltroLista]         = useState('');
 
   const buscar = () => {
     const t = busca.trim().toLowerCase();
@@ -1008,6 +1009,20 @@ function ConsultarEscada({ ordens, saidas = [] }) {
     ? saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(resultado.nroSerie))
     : null;
 
+  const ordensAtivas = ordens.filter((o) => o.ativo);
+  const ordensFiltradas = ordensAtivas.filter((o) => {
+    const q = filtroLista.toLowerCase();
+    return !q || o.nroSerie?.toLowerCase().includes(q) || o.nroOP?.toLowerCase().includes(q) || o.descricaoModelo?.toLowerCase().includes(q);
+  });
+
+  const selecionar = (o) => {
+    setResultado(o);
+    setBuscou(true);
+    setConfirmEstorno(false);
+    setFeedbackEstorno(null);
+    setBusca(o.nroSerie ?? '');
+  };
+
   return (
     <div className="space-y-5">
       <Card>
@@ -1028,6 +1043,56 @@ function ConsultarEscada({ ordens, saidas = [] }) {
           </button>
         </div>
       </Card>
+
+      {ordensAtivas.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <SectionTitle icon={ClipboardList}>Todas as Escadas Registradas</SectionTitle>
+            <Badge color="blue">{ordensAtivas.length} registros</Badge>
+          </div>
+          <div className="mb-4 max-w-sm">
+            <Input value={filtroLista} onChange={(e) => setFiltroLista(e.target.value)} placeholder="Filtrar por serie, OP ou modelo..." />
+          </div>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-xs min-w-[600px]">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Nr Serie</th>
+                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">OP</th>
+                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Modelo</th>
+                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Data</th>
+                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                  <th className="py-2 px-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {ordensFiltradas.map((o) => {
+                  const entregue = saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(o.nroSerie));
+                  const selecionada = resultado?.id === o.id;
+                  return (
+                    <tr key={o.id}
+                      onClick={() => selecionar(o)}
+                      className={`border-b border-slate-50 cursor-pointer transition-colors ${selecionada ? 'bg-blue-50 border-blue-100' : 'hover:bg-slate-50'}`}>
+                      <td className="py-3 px-3 font-mono font-bold text-slate-800">{o.nroSerie || '—'}</td>
+                      <td className="py-3 px-3 font-mono text-slate-500">{o.nroOP || '—'}</td>
+                      <td className="py-3 px-3 text-slate-600">{o.descricaoModelo || o.modeloCod || '—'}</td>
+                      <td className="py-3 px-3 text-slate-400">{o.dataProd || '—'}</td>
+                      <td className="py-3 px-3">
+                        {entregue
+                          ? <Badge color="emerald">Entregue</Badge>
+                          : <Badge color="amber">Em estoque</Badge>}
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
       {feedbackEstorno && (
         <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 text-sm font-semibold ${feedbackEstorno.tipo === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
           {feedbackEstorno.tipo === 'ok' ? <CheckCircle2 size={18} className="shrink-0" /> : <AlertTriangle size={18} className="shrink-0" />}
