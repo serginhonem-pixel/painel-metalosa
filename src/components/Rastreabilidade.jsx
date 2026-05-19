@@ -2256,7 +2256,9 @@ function EstoqueAtual({ lotes }) {
                                 {l.fornecedor && <span className="text-slate-400"> ({l.fornecedor})</span>}
                               </>}
                         </td>
-                        <td className="py-2 px-3 text-[10px] text-slate-400">{l.mpKey}</td>
+                        <td className="py-2 px-3 text-[10px] text-slate-400">
+                          {l.mpKey && <><span className="text-slate-500">consumo de</span> <span className="font-semibold text-slate-300">{l.mpKey}</span></>}
+                        </td>
                         <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
                         <td />
                       </tr>
