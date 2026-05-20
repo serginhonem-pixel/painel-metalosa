@@ -12828,21 +12828,27 @@ const custoDetalheTitulo = custoDetalheItem
                               const linhasExport = (termoBusca ? linhasMesFiltradas : (faturamentoAtual.linhas || []).filter((row) => {
                                 const diaISO = obterDataIsoUtc(row.emissao);
                                 return String(diaISO || '').startsWith(prefixoMes);
-                              })).map((row) => ({
-                                Data: formatarDataUtcPtBr(row.emissao) || '',
-                                Tipo: row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda',
-                                Cliente: row.cliente || '',
-                                Nome: row.clienteNome || '',
-                                Vendedor: row.vendedorNome || '',
-                                Filial: row.filial || '',
-                                Grupo: row.grupo || '',
-                                Codigo: row.codigo || '',
-                                Descricao: normalizarDescricaoProduto(row.descricao) || '',
-                                Quantidade: row.quantidade ?? 0,
-                                Unidade: row.unidade || '',
-                                Valor: row.valorTotal ?? 0,
-                                NF: row.nf || '',
-                              }));
+                              })).map((row) => {
+                                const codigoCli = normalizarCodigoCliente(row.cliente);
+                                const infoCli = codigoCli ? clientesPorCodigo.get(codigoCli) : null;
+                                return {
+                                  Data: formatarDataUtcPtBr(row.emissao) || '',
+                                  Tipo: row.tipoMovimento === 'devolucao' ? 'Devolucao' : 'Venda',
+                                  Cliente: row.cliente || '',
+                                  Nome: row.clienteNome || '',
+                                  UF: infoCli?.estado || infoCli?.uf || '',
+                                  Cidade: infoCli?.municipio || infoCli?.cidade || '',
+                                  Vendedor: row.vendedorNome || '',
+                                  Filial: row.filial || '',
+                                  Grupo: row.grupo || '',
+                                  Codigo: row.codigo || '',
+                                  Descricao: normalizarDescricaoProduto(row.descricao) || '',
+                                  Quantidade: row.quantidade ?? 0,
+                                  Unidade: row.unidade || '',
+                                  Valor: row.valorTotal ?? 0,
+                                  NF: row.nf || '',
+                                };
+                              });
                               if (!linhasExport.length) return;
                               const wb = XLSX.utils.book_new();
                               const ws = XLSX.utils.json_to_sheet(linhasExport);
