@@ -131,5 +131,6 @@
   { "setor": "Tubos/ eixos", "nome": "Ponte" },
   { "setor": "Polimento", "nome": "Politriz 1" },
   { "setor": "Polimento", "nome": "Politriz 2" },
-  { "setor": "Polimento", "nome": "Exaustor" }
+  { "setor": "Polimento", "nome": "Exaustor" },
+  { "setor": "Solda Continua", "nome": "Solda Continua" }
 ]
