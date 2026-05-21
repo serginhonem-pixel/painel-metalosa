@@ -16427,14 +16427,6 @@ const custoDetalheTitulo = custoDetalheItem
                          )}
                        </div>
                        <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2"><Plus size={18}/> Salvar</button>
-                       <button
-                         type="button"
-                         onClick={handleSeedBensFirestore}
-                         disabled={bensSeedLoading}
-                         className="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2 text-sm"
-                       >
-                         {bensSeedLoading ? 'Importando...' : '↺ Reimportar ativos base'}
-                       </button>
                     </form>
                     {bensSeedDone && !bensSeedError && (
                       <div className="mb-4 text-xs font-semibold text-emerald-600">
