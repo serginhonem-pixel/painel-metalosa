@@ -4,7 +4,7 @@
     "Descricao": "CARRINHO METAL GALVANIZADO PC",
     "Valores": {
       "Dezembro -2025": 52.6373,
-      "Janeiro -2026": 52.3301,
+      "Janeiro": 52.3301,
       "Fevereiro": 53.3247,
       "Março": 53.9334
     }
@@ -14,7 +14,7 @@
     "Descricao": "CARRINHO METAL GALVANIZADO PC",
     "Valores": {
       "Dezembro -2025": 54.6105,
-      "Janeiro -2026": 54.2873,
+      "Janeiro": 54.2873,
       "Fevereiro": 55.3987,
       "Março": 55.9742
     }
@@ -24,7 +24,7 @@
     "Descricao": "CARRINHO METAL GALVANIZADO PM",
     "Valores": {
       "Dezembro -2025": 55.6044,
-      "Janeiro -2026": 55.1887,
+      "Janeiro": 55.1887,
       "Fevereiro": 57.9627,
       "Março": 58.8611
     }
@@ -34,7 +34,7 @@
     "Descricao": "CARRINHO METAL GALVANIZADO P.",
     "Valores": {
       "Dezembro -2025": 49.923,
-      "Janeiro -2026": 49.5985,
+      "Janeiro": 49.5985,
       "Fevereiro": 50.6505,
       "Março": 51.5062
     }
@@ -44,7 +44,7 @@
     "Descricao": "CARRINHO METAL GALVANIZADO P.",
     "Valores": {
       "Dezembro -2025": 51.9124,
-      "Janeiro -2026": 51.5063,
+      "Janeiro": 51.5063,
       "Fevereiro": 52.7942,
       "Março": 53.6622
     }
@@ -54,7 +54,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 43.9196,
-      "Janeiro -2026": 44.6891,
+      "Janeiro": 44.6891,
       "Fevereiro": 45.3669,
       "Março": 46.03
     }
@@ -64,7 +64,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 45.8928,
-      "Janeiro -2026": 46.6464,
+      "Janeiro": 46.6464,
       "Fevereiro": 47.4408,
       "Março": 48.0708
     }
@@ -74,7 +74,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 44.9848,
-      "Janeiro -2026": 45.7333,
+      "Janeiro": 45.7333,
       "Fevereiro": 46.587,
       "Março": 47.254
     }
@@ -84,7 +84,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 44.1091,
-      "Janeiro -2026": 44.9016,
+      "Janeiro": 44.9016,
       "Fevereiro": 45.6059,
       "Março": 46.2475
     }
@@ -94,7 +94,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 41.2053,
-      "Janeiro -2026": 41.9576,
+      "Janeiro": 41.9576,
       "Fevereiro": 42.6927,
       "Março": 43.6028
     }
@@ -104,7 +104,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 43.1947,
-      "Janeiro -2026": 43.8654,
+      "Janeiro": 43.8654,
       "Fevereiro": 44.8364,
       "Março": 45.7587
     }
@@ -114,7 +114,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 42.2705,
-      "Janeiro -2026": 43.0018,
+      "Janeiro": 43.0018,
       "Fevereiro": 43.9128,
       "Março": 44.8268
     }
@@ -124,7 +124,7 @@
     "Descricao": "CARRINHO METAL GALV PRATICO PC",
     "Valores": {
       "Dezembro -2025": 65.6911,
-      "Janeiro -2026": 65.2245,
+      "Janeiro": 65.2245,
       "Fevereiro": 70.2987,
       "Março": 70.9132
     }
@@ -134,7 +134,7 @@
     "Descricao": "CARRINHO METAL PRATICO PC 3 LR",
     "Valores": {
       "Dezembro -2025": 66.1696,
-      "Janeiro -2026": 66.7106,
+      "Janeiro": 66.7106,
       "Fevereiro": 71.4323,
       "Março": 71.8437
     }
@@ -144,7 +144,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO V",
     "Valores": {
       "Dezembro -2025": 64.4851,
-      "Janeiro -2026": 64.0786,
+      "Janeiro": 64.0786,
       "Fevereiro": 64.8326,
       "Março": 65.6442
     }
@@ -154,7 +154,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO V",
     "Valores": {
       "Dezembro -2025": 66.4746,
-      "Janeiro -2026": 65.9864,
+      "Janeiro": 65.9864,
       "Fevereiro": 66.9763,
       "Março": 67.8002
     }
@@ -164,7 +164,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 VERM",
     "Valores": {
       "Dezembro -2025": 67.1995,
-      "Janeiro -2026": 66.8101,
+      "Janeiro": 66.8101,
       "Fevereiro": 67.5068,
       "Março": 68.0715
     }
@@ -174,7 +174,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 VERM E",
     "Valores": {
       "Dezembro -2025": 69.1726,
-      "Janeiro -2026": 68.7674,
+      "Janeiro": 68.7674,
       "Fevereiro": 69.5807,
       "Março": 70.1122
     }
@@ -184,7 +184,7 @@
     "Descricao": "CAR GALV CCB PLAST PM FORCE VE",
     "Valores": {
       "Dezembro -2025": 70.1666,
-      "Janeiro -2026": 69.6687,
+      "Janeiro": 69.6687,
       "Fevereiro": 72.1447,
       "Março": 72.9991
     }
@@ -194,7 +194,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO V",
     "Valores": {
       "Dezembro -2025": 64.1457,
-      "Janeiro -2026": 66.1775,
+      "Janeiro": 66.1775,
       "Fevereiro": 64.4827,
       "Março": 65.5169
     }
@@ -204,7 +204,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO V",
     "Valores": {
       "Dezembro -2025": 66.1351,
-      "Janeiro -2026": 68.0853,
+      "Janeiro": 68.0853,
       "Fevereiro": 66.6263,
       "Março": 67.6728
     }
@@ -214,7 +214,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 VERD",
     "Valores": {
       "Dezembro -2025": 66.86,
-      "Janeiro -2026": 68.9091,
+      "Janeiro": 68.9091,
       "Fevereiro": 67.1569,
       "Março": 67.9441
     }
@@ -224,7 +224,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 VERD E",
     "Valores": {
       "Dezembro -2025": 68.8332,
-      "Janeiro -2026": 70.8663,
+      "Janeiro": 70.8663,
       "Fevereiro": 69.2308,
       "Março": 69.9848
     }
@@ -234,7 +234,7 @@
     "Descricao": "CAR GALV CCB PLAST PM FORCE VE",
     "Valores": {
       "Dezembro -2025": 69.8272,
-      "Janeiro -2026": 71.7677,
+      "Janeiro": 71.7677,
       "Fevereiro": 71.7948,
       "Março": 72.8717
     }
@@ -244,7 +244,7 @@
     "Descricao": "CARRINHO JUMBO V GALV PC 3 - 9",
     "Valores": {
       "Dezembro -2025": 118.7227,
-      "Janeiro -2026": 117.9965,
+      "Janeiro": 117.9965,
       "Fevereiro": 116.7257,
       "Março": 118.0939
     }
@@ -254,7 +254,7 @@
     "Descricao": "CARRINHO JUMBO V GALV PC 3,50",
     "Valores": {
       "Dezembro -2025": 123.332,
-      "Janeiro -2026": 122.5695,
+      "Janeiro": 122.5695,
       "Fevereiro": 121.5116,
       "Março": 122.5535
     }
@@ -264,7 +264,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO L",
     "Valores": {
       "Dezembro -2025": 64.1984,
-      "Janeiro -2026": 63.906,
+      "Janeiro": 63.906,
       "Fevereiro": 65.2338,
       "Março": 65.5893
     }
@@ -274,7 +274,7 @@
     "Descricao": "CAR GALV CCB PLAST P. MACICO L",
     "Valores": {
       "Dezembro -2025": 66.1879,
-      "Janeiro -2026": 65.8138,
+      "Janeiro": 65.8138,
       "Fevereiro": 67.3775,
       "Março": 67.7453
     }
@@ -284,7 +284,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 LRJ",
     "Valores": {
       "Dezembro -2025": 66.9128,
-      "Janeiro -2026": 66.6375,
+      "Janeiro": 66.6375,
       "Fevereiro": 67.908,
       "Março": 68.0165
     }
@@ -294,7 +294,7 @@
     "Descricao": "CAR GALV CCB PLAST PC 3 LRJ E",
     "Valores": {
       "Dezembro -2025": 68.8859,
-      "Janeiro -2026": 68.5948,
+      "Janeiro": 68.5948,
       "Fevereiro": 69.982,
       "Março": 70.0573
     }
@@ -304,7 +304,7 @@
     "Descricao": "CARRINHO METAL POP GALV PC 3",
     "Valores": {
       "Dezembro -2025": 44.8941,
-      "Janeiro -2026": 44.6401,
+      "Janeiro": 44.6401,
       "Fevereiro": 45.6965,
       "Março": 46.531
     }
@@ -314,7 +314,7 @@
     "Descricao": "CARRINHO METAL POP GALV PC 3 E",
     "Valores": {
       "Dezembro -2025": 48.4792,
-      "Janeiro -2026": 48.2057,
+      "Janeiro": 48.2057,
       "Fevereiro": 49.3552,
       "Março": 50.1146
     }
@@ -324,7 +324,7 @@
     "Descricao": "CARRINHO METAL POP GALV PC 3 F",
     "Valores": {
       "Dezembro -2025": 46.4081,
-      "Janeiro -2026": 46.152,
+      "Janeiro": 46.152,
       "Fevereiro": 47.3035,
       "Março": 48.1477
     }
@@ -334,7 +334,7 @@
     "Descricao": "CARRINHO METAL POP GALV PM FOR",
     "Valores": {
       "Dezembro -2025": 47.8612,
-      "Janeiro -2026": 47.4987,
+      "Janeiro": 47.4987,
       "Fevereiro": 50.3344,
       "Março": 51.4586
     }
@@ -344,7 +344,7 @@
     "Descricao": "CARRINHO METAL POP GALV P. MAC",
     "Valores": {
       "Dezembro -2025": 42.1798,
-      "Janeiro -2026": 41.9085,
+      "Janeiro": 41.9085,
       "Fevereiro": 43.0223,
       "Março": 44.1037
     }
@@ -354,7 +354,7 @@
     "Descricao": "CARRINHO METAL POP GALV P. MAC",
     "Valores": {
       "Dezembro -2025": 44.1692,
-      "Janeiro -2026": 43.8163,
+      "Janeiro": 43.8163,
       "Fevereiro": 45.166,
       "Março": 46.2597
     }
@@ -364,7 +364,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 44.1241,
-      "Janeiro -2026": 43.8678,
+      "Janeiro": 43.8678,
       "Fevereiro": 44.9155,
       "Março": 45.7359
     }
@@ -374,7 +374,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 46.0973,
-      "Janeiro -2026": 45.8251,
+      "Janeiro": 45.8251,
       "Fevereiro": 46.9894,
       "Março": 47.7767
     }
@@ -384,7 +384,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 45.8771,
-      "Janeiro -2026": 45.6097,
+      "Janeiro": 45.6097,
       "Fevereiro": 46.763,
       "Março": 47.577
     }
@@ -394,7 +394,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 44.1241,
-      "Janeiro -2026": 43.8678,
+      "Janeiro": 43.8678,
       "Fevereiro": 44.9155,
       "Março": 45.7359
     }
@@ -404,7 +404,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 44.1241,
-      "Janeiro -2026": 43.9469,
+      "Janeiro": 43.9469,
       "Fevereiro": 44.9358,
       "Março": 16.2939
     }
@@ -414,7 +414,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV PC",
     "Valores": {
       "Dezembro -2025": 46.0973,
-      "Janeiro -2026": 45.8251,
+      "Janeiro": 45.8251,
       "Fevereiro": 46.9894,
       "Março": 47.7767
     }
@@ -424,7 +424,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV P.",
     "Valores": {
       "Dezembro -2025": 41.4098,
-      "Janeiro -2026": 41.1363,
+      "Janeiro": 41.1363,
       "Fevereiro": 42.2412,
       "Março": 43.3087
     }
@@ -434,7 +434,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV P.",
     "Valores": {
       "Dezembro -2025": 43.3992,
-      "Janeiro -2026": 43.0441,
+      "Janeiro": 43.0441,
       "Fevereiro": 44.3849,
       "Março": 45.4646
     }
@@ -444,7 +444,7 @@
     "Descricao": "CARRINHO METAL CONSTR GALV P.",
     "Valores": {
       "Dezembro -2025": 41.4098,
-      "Janeiro -2026": 41.1363,
+      "Janeiro": 41.1363,
       "Fevereiro": 42.2412,
       "Março": 15.8084
     }
@@ -454,7 +454,7 @@
     "Descricao": "CARRINHO METAL PLUS PC 3 AZ",
     "Valores": {
       "Dezembro -2025": 65.1516,
-      "Janeiro -2026": 64.492,
+      "Janeiro": 64.492,
       "Fevereiro": 67.0483,
       "Março": 66.9737
     }
@@ -464,7 +464,7 @@
     "Descricao": "CARRINHO METAL PLUS PC 3 AZ E",
     "Valores": {
       "Dezembro -2025": 67.1366,
-      "Janeiro -2026": 66.4611,
+      "Janeiro": 66.4611,
       "Fevereiro": 68.9241,
       "Março": 68.9931
     }
@@ -474,7 +474,7 @@
     "Descricao": "CARRINHO METAL PLUS PC 3 AZ FU",
     "Valores": {
       "Dezembro -2025": 65.1516,
-      "Janeiro -2026": 64.492,
+      "Janeiro": 64.492,
       "Fevereiro": 67.0483,
       "Março": 66.9737
     }
@@ -484,7 +484,7 @@
     "Descricao": "CARRINHO METAL PLUS PM FORCE A",
     "Valores": {
       "Dezembro -2025": 68.1187,
-      "Janeiro -2026": 67.3506,
+      "Janeiro": 67.3506,
       "Fevereiro": 71.6862,
       "Março": 71.9013
     }
@@ -494,7 +494,7 @@
     "Descricao": "CARRINHO METAL PLUS P. MACICO",
     "Valores": {
       "Dezembro -2025": 62.4372,
-      "Janeiro -2026": 61.7604,
+      "Janeiro": 61.7604,
       "Fevereiro": 64.3741,
       "Março": 64.5464
     }
@@ -504,7 +504,7 @@
     "Descricao": "CARRINHO METAL PLUS P. MACICO",
     "Valores": {
       "Dezembro -2025": 62.8075,
-      "Janeiro -2026": 62.049,
+      "Janeiro": 62.049,
       "Fevereiro": 64.8222,
       "Março": 65.0288
     }
@@ -514,7 +514,7 @@
     "Descricao": "CARRINHO METAL SUPER PC 3 LRJ",
     "Valores": {
       "Dezembro -2025": 61.0979,
-      "Janeiro -2026": 60.4014,
+      "Janeiro": 60.4014,
       "Fevereiro": 63.1073,
       "Março": 62.2971
     }
@@ -524,7 +524,7 @@
     "Descricao": "CARRINHO METAL SUPER PC 3 LRJ",
     "Valores": {
       "Dezembro -2025": 63.0829,
-      "Janeiro -2026": 62.3704,
+      "Janeiro": 62.3704,
       "Fevereiro": 64.9831,
       "Março": 64.3165
     }
@@ -534,7 +534,7 @@
     "Descricao": "CARRINHO METAL SUPER PC 3 LRJ",
     "Valores": {
       "Dezembro -2025": 60.7969,
-      "Janeiro -2026": 60.1008,
+      "Janeiro": 60.1008,
       "Fevereiro": 62.8152,
       "Março": 62.0047
     }
@@ -544,7 +544,7 @@
     "Descricao": "CARRINHO METAL SUPER PM FORCE",
     "Valores": {
       "Dezembro -2025": 64.065,
-      "Janeiro -2026": 63.2599,
+      "Janeiro": 63.2599,
       "Fevereiro": 67.7453,
       "Março": 67.2247
     }
@@ -554,7 +554,7 @@
     "Descricao": "CARRINHO METAL SUPER P. MACICO",
     "Valores": {
       "Dezembro -2025": 58.3835,
-      "Janeiro -2026": 57.6698,
+      "Janeiro": 57.6698,
       "Fevereiro": 60.4331,
       "Março": 59.8698
     }
@@ -564,7 +564,7 @@
     "Descricao": "CARRINHO METAL SUPER P. MACICO",
     "Valores": {
       "Dezembro -2025": 58.7538,
-      "Janeiro -2026": 57.9583,
+      "Janeiro": 57.9583,
       "Fevereiro": 60.8812,
       "Março": 60.3522
     }
@@ -574,7 +574,7 @@
     "Descricao": "CARRINHO METAL MASTER PC 3 AZ",
     "Valores": {
       "Dezembro -2025": 69.0883,
-      "Janeiro -2026": 68.4264,
+      "Janeiro": 68.4264,
       "Fevereiro": 71.0621,
       "Março": 71.0464
     }
@@ -584,7 +584,7 @@
     "Descricao": "CARRINHO METAL MASTER PC 3 AZ",
     "Valores": {
       "Dezembro -2025": 71.0734,
-      "Janeiro -2026": 70.3955,
+      "Janeiro": 70.3955,
       "Fevereiro": 72.9379,
       "Março": 73.0658
     }
@@ -594,7 +594,7 @@
     "Descricao": "CARRINHO METAL MASTER PC 3 AZ",
     "Valores": {
       "Dezembro -2025": 68.784,
-      "Janeiro -2026": 68.1218,
+      "Janeiro": 68.1218,
       "Fevereiro": 70.7661,
       "Março": 70.7507
     }
@@ -604,7 +604,7 @@
     "Descricao": "CARRINHO METAL MASTER PM FORCE",
     "Valores": {
       "Dezembro -2025": 72.0555,
-      "Janeiro -2026": 71.285,
+      "Janeiro": 71.285,
       "Fevereiro": 75.7,
       "Março": 75.9741
     }
@@ -614,7 +614,7 @@
     "Descricao": "CARRINHO METAL MASTER P. MACIC",
     "Valores": {
       "Dezembro -2025": 66.374,
-      "Janeiro -2026": 65.6948,
+      "Janeiro": 65.6948,
       "Fevereiro": 68.3879,
       "Março": 68.6192
     }
@@ -624,7 +624,7 @@
     "Descricao": "CARRINHO METAL MASTER P. MACIC",
     "Valores": {
       "Dezembro -2025": 66.7443,
-      "Janeiro -2026": 65.9834,
+      "Janeiro": 65.9834,
       "Fevereiro": 68.836,
       "Março": 69.1016
     }
@@ -634,7 +634,7 @@
     "Descricao": "CARRINHO METAL POP PC 3 CNZ",
     "Valores": {
       "Dezembro -2025": 44.4743,
-      "Janeiro -2026": 45.3167,
+      "Janeiro": 45.3167,
       "Fevereiro": 45.9513,
       "Março": 46.6095
     }
@@ -644,7 +644,7 @@
     "Descricao": "CARRINHO METAL POP PC 3 CNZ E",
     "Valores": {
       "Dezembro -2025": 46.4475,
-      "Janeiro -2026": 47.274,
+      "Janeiro": 47.274,
       "Fevereiro": 48.0252,
       "Março": 48.6503
     }
@@ -654,7 +654,7 @@
     "Descricao": "CARRINHO METAL POP PC 3 CNZ FU",
     "Valores": {
       "Dezembro -2025": 44.5484,
-      "Janeiro -2026": 45.3909,
+      "Janeiro": 45.3909,
       "Fevereiro": 46.0611,
       "Março": 46.6986
     }
@@ -664,7 +664,7 @@
     "Descricao": "CARRINHO METAL POP PM FORCE CN",
     "Valores": {
       "Dezembro -2025": 47.4415,
-      "Janeiro -2026": 48.1753,
+      "Janeiro": 48.1753,
       "Fevereiro": 50.5893,
       "Março": 51.5372
     }
@@ -674,7 +674,7 @@
     "Descricao": "CARRINHO METAL POP P. MACICO C",
     "Valores": {
       "Dezembro -2025": 41.76,
-      "Janeiro -2026": 42.5851,
+      "Janeiro": 42.5851,
       "Fevereiro": 43.2771,
       "Março": 44.1823
     }
@@ -684,7 +684,7 @@
     "Descricao": "CARRINHO METAL POP P. MACICO C",
     "Valores": {
       "Dezembro -2025": 43.7494,
-      "Janeiro -2026": 44.4929,
+      "Janeiro": 44.4929,
       "Fevereiro": 45.4208,
       "Março": 46.3383
     }
@@ -694,7 +694,7 @@
     "Descricao": "CARRINHO METAL POP PC 3 VERM",
     "Valores": {
       "Dezembro -2025": 45.22,
-      "Janeiro -2026": 46.0624,
+      "Janeiro": 46.0624,
       "Fevereiro": 46.6973,
       "Março": 47.3602
     }
@@ -704,7 +704,7 @@
     "Descricao": "CARRINHO METAL POP PC 3 VERM E",
     "Valores": {
       "Dezembro -2025": 47.1932,
-      "Janeiro -2026": 48.0196,
+      "Janeiro": 48.0196,
       "Fevereiro": 48.7712,
       "Março": 49.401
     }
@@ -714,7 +714,7 @@
     "Descricao": "CARRINHO METAL POP PM FORCE VE",
     "Valores": {
       "Dezembro -2025": 48.1872,
-      "Janeiro -2026": 48.921,
+      "Janeiro": 48.921,
       "Fevereiro": 51.3352,
       "Março": 52.2878
     }
@@ -724,7 +724,7 @@
     "Descricao": "CARRINHO METAL POP P. MACICO V",
     "Valores": {
       "Dezembro -2025": 42.5057,
-      "Janeiro -2026": 43.3308,
+      "Janeiro": 43.3308,
       "Fevereiro": 44.0231,
       "Março": 44.933
     }
@@ -734,7 +734,7 @@
     "Descricao": "CARRINHO METAL POP P. MACICO V",
     "Valores": {
       "Dezembro -2025": 44.4951,
-      "Janeiro -2026": 45.2386,
+      "Janeiro": 45.2386,
       "Fevereiro": 46.1668,
       "Março": 47.0889
     }
@@ -744,7 +744,7 @@
     "Descricao": "CARRO CARGA 180KG PC 3 18A AZ",
     "Valores": {
       "Dezembro -2025": 66.7774,
-      "Janeiro -2026": 67.1868,
+      "Janeiro": 67.1868,
       "Fevereiro": 68.1273,
       "Março": 68.5521
     }
@@ -754,7 +754,7 @@
     "Descricao": "CARRO CARGA 180KG PC 3 18A CNZ",
     "Valores": {
       "Dezembro -2025": 66.1343,
-      "Janeiro -2026": 66.5425,
+      "Janeiro": 66.5425,
       "Fevereiro": 67.4818,
       "Março": 67.9065
     }
@@ -764,7 +764,7 @@
     "Descricao": "CARRO CARGA 180KG P. MACICO 18",
     "Valores": {
       "Dezembro -2025": 61.3487,
-      "Janeiro -2026": 61.7237,
+      "Janeiro": 61.7237,
       "Fevereiro": 62.7789,
       "Março": 63.6976
     }
@@ -774,7 +774,7 @@
     "Descricao": "CARRO CARGA 180KG P. MACICO 18",
     "Valores": {
       "Dezembro -2025": 60.7057,
-      "Janeiro -2026": 61.0794,
+      "Janeiro": 61.0794,
       "Fevereiro": 62.1333,
       "Março": 63.0521
     }
@@ -784,7 +784,7 @@
     "Descricao": "CARRINHO METAL MASTER TRUCK PC",
     "Valores": {
       "Dezembro -2025": 97.5194,
-      "Janeiro -2026": 97.517,
+      "Janeiro": 97.517,
       "Fevereiro": 101.0406,
       "Março": 100.1358
     }
@@ -794,7 +794,7 @@
     "Descricao": "CARRINHO METAL MASTER TRUCK PC",
     "Valores": {
       "Dezembro -2025": 92.8159,
-      "Janeiro -2026": 92.8132,
+      "Janeiro": 92.8132,
       "Fevereiro": 96.3365,
       "Março": 95.4421
     }
@@ -804,7 +804,7 @@
     "Descricao": "ESCADA DOMEST C/ 03 DEGRAUS",
     "Valores": {
       "Dezembro -2025": 81.4815,
-      "Janeiro -2026": 80.0234,
+      "Janeiro": 80.0234,
       "Fevereiro": 84.171,
       "Março": 81.9543
     }
@@ -814,7 +814,7 @@
     "Descricao": "ESCADA DOMEST C/ 04 DEGRAUS",
     "Valores": {
       "Dezembro -2025": 93.1789,
-      "Janeiro -2026": 91.5336,
+      "Janeiro": 91.5336,
       "Fevereiro": 96.1498,
       "Março": 93.6375
     }
@@ -824,7 +824,7 @@
     "Descricao": "ESCADA DOMEST C/ 05 DEGRAUS",
     "Valores": {
       "Dezembro -2025": 103.8344,
-      "Janeiro -2026": 102.0551,
+      "Janeiro": 102.0551,
       "Fevereiro": 107.0066,
       "Março": 104.2827
     }
@@ -834,7 +834,7 @@
     "Descricao": "ESCADA DOMEST C/ 06 DEGRAUS",
     "Valores": {
       "Dezembro -2025": 111.8134,
-      "Janeiro -2026": 109.9417,
+      "Janeiro": 109.9417,
       "Fevereiro": 115.1244,
       "Março": 112.2546
     }
@@ -844,7 +844,7 @@
     "Descricao": "ESCADA DOMEST C/ 07 DEGRAUS",
     "Valores": {
       "Dezembro -2025": 123.2221,
-      "Janeiro -2026": 121.1312,
+      "Janeiro": 121.1312,
       "Fevereiro": 126.8625,
       "Março": 123.6465
     }
@@ -854,7 +854,7 @@
     "Descricao": "CHASSI CARRO CARGA 150KG 15A A",
     "Valores": {
       "Dezembro -2025": 32.3078,
-      "Janeiro -2026": 32.7936,
+      "Janeiro": 32.7936,
       "Fevereiro": 33.7196,
       "Março": 34.7123
     }
@@ -864,7 +864,7 @@
     "Descricao": "CHASSI CARRO CARGA 180KG 18A A",
     "Valores": {
       "Dezembro -2025": 38.9129,
-      "Janeiro -2026": 39.4309,
+      "Janeiro": 39.4309,
       "Fevereiro": 40.3172,
       "Março": 41.1932
     }
@@ -874,7 +874,7 @@
     "Descricao": "CHASSI CARRO CARGA 200KG 20A A",
     "Valores": {
       "Dezembro -2025": 40.8119,
-      "Janeiro -2026": 41.4609,
+      "Janeiro": 41.4609,
       "Fevereiro": 42.374,
       "Março": 43.3274
     }
@@ -884,7 +884,7 @@
     "Descricao": "CHASSI CARRO CARGA 250KG 25A A",
     "Valores": {
       "Dezembro -2025": 44.4713,
-      "Janeiro -2026": 45.0668,
+      "Janeiro": 45.0668,
       "Fevereiro": 46.0675,
       "Março": 46.9951
     }
@@ -894,7 +894,7 @@
     "Descricao": "CHASSI CARRO CARGA 300KG 30A A",
     "Valores": {
       "Dezembro -2025": 78.6336,
-      "Janeiro -2026": 79.7304,
+      "Janeiro": 79.7304,
       "Fevereiro": 81.8139,
       "Março": 83.4441
     }
@@ -904,7 +904,7 @@
     "Descricao": "CHASSI CARRO CARGA 350KG 35A A",
     "Valores": {
       "Dezembro -2025": 55.8255,
-      "Janeiro -2026": 56.8811,
+      "Janeiro": 56.8811,
       "Fevereiro": 58.1347,
       "Março": 59.4378
     }
@@ -914,7 +914,7 @@
     "Descricao": "PERF MONT LSF 90 0,80 ZAR230 Z",
     "Valores": {
       "Dezembro -2025": 7.3572,
-      "Janeiro -2026": 7.3786,
+      "Janeiro": 7.3786,
       "Fevereiro": 7.4286,
       "Março": 6.7911
     }
@@ -924,7 +924,7 @@
     "Descricao": "PERFIL PROJETO LSF 90 0,80MM Z",
     "Valores": {
       "Dezembro -2025": 6.4241,
-      "Janeiro -2026": 6.4872,
+      "Janeiro": 6.4872,
       "Fevereiro": 6.6231,
       "Março": 5.9943
     }
@@ -934,7 +934,7 @@
     "Descricao": "PERFIL PROJETO LSF 90 0,80MM Z",
     "Valores": {
       "Dezembro -2025": 6.9194,
-      "Janeiro -2026": 6.9825,
+      "Janeiro": 6.9825,
       "Fevereiro": 7.1183,
       "Março": 6.9798
     }
@@ -944,7 +944,7 @@
     "Descricao": "PERFIL PROJETO LSF 90 1,25MM Z",
     "Valores": {
       "Dezembro -2025": 3.8002,
-      "Janeiro -2026": 3.8823,
+      "Janeiro": 3.8823,
       "Fevereiro": 4.053,
       "Março": 3.8815
     }
@@ -954,7 +954,7 @@
     "Descricao": "GUIA 90 0,80 ZAR230 Z350 149MM",
     "Valores": {
       "Dezembro -2025": 6.9001,
-      "Janeiro -2026": 6.7827,
+      "Janeiro": 6.7827,
       "Fevereiro": 6.8147,
       "Março": 6.3815
     }
@@ -964,7 +964,7 @@
     "Descricao": "GUIA 90 0,80 ZAR230 Z350 149MM",
     "Valores": {
       "Dezembro -2025": 6.101,
-      "Janeiro -2026": 5.9838,
+      "Janeiro": 5.9838,
       "Fevereiro": 6.0157,
       "Março": 5.6476
     }
@@ -974,7 +974,7 @@
     "Descricao": "MONT 90 0,80 ZAR230 Z350 170MM",
     "Valores": {
       "Dezembro -2025": 7.1171,
-      "Janeiro -2026": 6.942,
+      "Janeiro": 6.942,
       "Fevereiro": 6.9896,
       "Março": 6.6031
     }
@@ -984,7 +984,7 @@
     "Descricao": "MONT 90 0,80 ZAR230 Z350 170MM",
     "Valores": {
       "Dezembro -2025": 7.1171,
-      "Janeiro -2026": 6.942,
+      "Janeiro": 6.942,
       "Fevereiro": 6.9896,
       "Março": 6.6031
     }
@@ -994,7 +994,7 @@
     "Descricao": "MONT 90 0,80 ZAR230 Z350 170MM",
     "Valores": {
       "Dezembro -2025": 7.1171,
-      "Janeiro -2026": 6.942,
+      "Janeiro": 6.942,
       "Fevereiro": 6.9896,
       "Março": 6.6031
     }
@@ -1004,7 +1004,7 @@
     "Descricao": "CORTE E DOBRA LSF 0,80MM",
     "Valores": {
       "Dezembro -2025": 92.8532,
-      "Janeiro -2026": 93.1171,
+      "Janeiro": 93.1171,
       "Fevereiro": 93.7357,
       "Março": 85.699
     }
@@ -1014,7 +1014,7 @@
     "Descricao": "CORTE E DOBRA LSF 0,80MM ZAR40",
     "Valores": {
       "Dezembro -2025": 6.9895,
-      "Janeiro -2026": 7.0649,
+      "Janeiro": 7.0649,
       "Fevereiro": 7.2264,
       "Março": 7.0621
     }
@@ -1024,7 +1024,7 @@
     "Descricao": "CORTE E DOBRA LSF 1,25MM",
     "Valores": {
       "Dezembro -2025": 6.2956,
-      "Janeiro -2026": 6.373,
+      "Janeiro": 6.373,
       "Fevereiro": 6.5338,
       "Março": 6.8311
     }
@@ -1034,9 +1034,9 @@
     "Descricao": "CORTE E DOBRA LSF 1,25MM ZAR23",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1044,9 +1044,9 @@
     "Descricao": "CORTE E DOBRA LSF 1,25MM ZAR23",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1054,7 +1054,7 @@
     "Descricao": "CORTE E DOBRA LSF 1,25MM ZAR40",
     "Valores": {
       "Dezembro -2025": 6.1635,
-      "Janeiro -2026": 6.239,
+      "Janeiro": 6.239,
       "Fevereiro": 6.4005,
       "Março": 6.2362
     }
@@ -1064,7 +1064,7 @@
     "Descricao": "CORTE E DOBRA LSF 0,90MM",
     "Valores": {
       "Dezembro -2025": 5.1217,
-      "Janeiro -2026": 5.1902,
+      "Janeiro": 5.1902,
       "Fevereiro": 5.1774,
       "Março": 4.998
     }
@@ -1074,7 +1074,7 @@
     "Descricao": "GUIA 70 0,80 ZAR230 Z350 128MM",
     "Valores": {
       "Dezembro -2025": 4.9103,
-      "Janeiro -2026": 4.9163,
+      "Janeiro": 4.9163,
       "Fevereiro": 4.9325,
       "Março": 4.5204
     }
@@ -1084,7 +1084,7 @@
     "Descricao": "MONT 70 0,80 ZAR230 Z350 149MM",
     "Valores": {
       "Dezembro -2025": 6.0915,
-      "Janeiro -2026": 5.9769,
+      "Janeiro": 5.9769,
       "Fevereiro": 6.0081,
       "Março": 5.638
     }
@@ -1094,7 +1094,7 @@
     "Descricao": "MONT 70 0,80 ZAR230 Z350 149MM",
     "Valores": {
       "Dezembro -2025": 6.0915,
-      "Janeiro -2026": 5.9769,
+      "Janeiro": 5.9769,
       "Fevereiro": 6.0081,
       "Março": 5.638
     }
@@ -1104,7 +1104,7 @@
     "Descricao": "SLITTER LSF 40X0,80MM",
     "Valores": {
       "Dezembro -2025": 6.357,
-      "Janeiro -2026": 6.4083,
+      "Janeiro": 6.4083,
       "Fevereiro": 6.5196,
       "Março": 5.9154
     }
@@ -1114,7 +1114,7 @@
     "Descricao": "CARRINHO METAL POP 90 PC 3 E",
     "Valores": {
       "Dezembro -2025": 45.5396,
-      "Janeiro -2026": 46.3609,
+      "Janeiro": 46.3609,
       "Fevereiro": 47.1714,
       "Março": 47.8335
     }
@@ -1124,7 +1124,7 @@
     "Descricao": "CARRINHO METAL POP 90 PC3 CNZ",
     "Valores": {
       "Dezembro -2025": 45.5396,
-      "Janeiro -2026": 46.3609,
+      "Janeiro": 46.3609,
       "Fevereiro": 47.1714,
       "Março": 47.8335
     }
@@ -1134,7 +1134,7 @@
     "Descricao": "CARRINHO METAL POP 90 P. MACIC",
     "Valores": {
       "Dezembro -2025": 42.8252,
-      "Janeiro -2026": 43.6293,
+      "Janeiro": 43.6293,
       "Fevereiro": 44.4972,
       "Março": 45.4063
     }
@@ -1144,7 +1144,7 @@
     "Descricao": "CARRINHO METAL POP 90 PC 3 VER",
     "Valores": {
       "Dezembro -2025": 46.2853,
-      "Janeiro -2026": 47.1066,
+      "Janeiro": 47.1066,
       "Fevereiro": 47.9174,
       "Março": 48.5842
     }
@@ -1154,7 +1154,7 @@
     "Descricao": "CARRINHO METAL 5.0 PC 3 AZ",
     "Valores": {
       "Dezembro -2025": 50.2924,
-      "Janeiro -2026": 50.0027,
+      "Janeiro": 50.0027,
       "Fevereiro": 51.0888,
       "Março": 51.7854
     }
@@ -1164,7 +1164,7 @@
     "Descricao": "CARRINHO METAL 5.0 PC 3 AZ E",
     "Valores": {
       "Dezembro -2025": 52.2656,
-      "Janeiro -2026": 51.9599,
+      "Janeiro": 51.9599,
       "Fevereiro": 53.1627,
       "Março": 53.8262
     }
@@ -1174,7 +1174,7 @@
     "Descricao": "CARRINHO METAL 5.0 PC 3 AZ FUZ",
     "Valores": {
       "Dezembro -2025": 49.8242,
-      "Janeiro -2026": 49.5328,
+      "Janeiro": 49.5328,
       "Fevereiro": 50.6632,
       "Março": 51.3405
     }
@@ -1184,7 +1184,7 @@
     "Descricao": "CARRINHO METAL 5.0 PM FORCE AZ",
     "Valores": {
       "Dezembro -2025": 53.2595,
-      "Janeiro -2026": 52.8613,
+      "Janeiro": 52.8613,
       "Fevereiro": 55.7267,
       "Março": 56.713
     }
@@ -1194,7 +1194,7 @@
     "Descricao": "CARRINHO METAL 5.0 P. MACICO A",
     "Valores": {
       "Dezembro -2025": 47.5781,
-      "Janeiro -2026": 47.2711,
+      "Janeiro": 47.2711,
       "Fevereiro": 48.4146,
       "Março": 49.3582
     }
@@ -1204,7 +1204,7 @@
     "Descricao": "CARRINHO METAL 5.0 P. MACICO A",
     "Valores": {
       "Dezembro -2025": 49.5675,
-      "Janeiro -2026": 49.1789,
+      "Janeiro": 49.1789,
       "Fevereiro": 50.5582,
       "Março": 51.5141
     }
@@ -1214,7 +1214,7 @@
     "Descricao": "CARRINHO METAL ECOPLUS P. FORC",
     "Valores": {
       "Dezembro -2025": 69.4176,
-      "Janeiro -2026": 68.5884,
+      "Janeiro": 68.5884,
       "Fevereiro": 73.136,
       "Março": 73.3083
     }
@@ -1224,7 +1224,7 @@
     "Descricao": "CARRINHO METAL ECOPLUS P. FORC",
     "Valores": {
       "Dezembro -2025": 71.4026,
-      "Janeiro -2026": 70.5575,
+      "Janeiro": 70.5575,
       "Fevereiro": 75.0118,
       "Março": 75.3277
     }
@@ -1234,7 +1234,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 44.9063,
-      "Janeiro -2026": 45.6758,
+      "Janeiro": 45.6758,
       "Fevereiro": 46.3539,
       "Março": 47.0224
     }
@@ -1244,7 +1244,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 46.8795,
-      "Janeiro -2026": 47.6331,
+      "Janeiro": 47.6331,
       "Fevereiro": 48.4278,
       "Março": 49.0631
     }
@@ -1254,7 +1254,7 @@
     "Descricao": "CARRINHO METAL CONSTR PC 3 VRM",
     "Valores": {
       "Dezembro -2025": 46.6593,
-      "Janeiro -2026": 47.4177,
+      "Janeiro": 47.4177,
       "Fevereiro": 48.2015,
       "Março": 48.8635
     }
@@ -1264,7 +1264,7 @@
     "Descricao": "CARRINHO METAL CONSTR PC 3 VRM",
     "Valores": {
       "Dezembro -2025": 46.6593,
-      "Janeiro -2026": 47.4177,
+      "Janeiro": 47.4177,
       "Fevereiro": 48.2015,
       "Março": 48.8635
     }
@@ -1274,7 +1274,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 42.192,
-      "Janeiro -2026": 42.9443,
+      "Janeiro": 42.9443,
       "Fevereiro": 43.6797,
       "Março": 44.5951
     }
@@ -1284,7 +1284,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 44.1814,
-      "Janeiro -2026": 44.8521,
+      "Janeiro": 44.8521,
       "Fevereiro": 45.8233,
       "Março": 46.7511
     }
@@ -1294,7 +1294,7 @@
     "Descricao": "CARRINHO METAL CONSTRUTOR PC 3",
     "Valores": {
       "Dezembro -2025": 44.9968,
-      "Janeiro -2026": 45.7638,
+      "Janeiro": 45.7638,
       "Fevereiro": 46.4444,
       "Março": 47.1112
     }
@@ -1304,7 +1304,7 @@
     "Descricao": "CARRINHO METAL CONSTR P. MACIC",
     "Valores": {
       "Dezembro -2025": 42.2825,
-      "Janeiro -2026": 43.0323,
+      "Janeiro": 43.0323,
       "Fevereiro": 43.7701,
       "Março": 44.6839
     }
@@ -1314,7 +1314,7 @@
     "Descricao": "CARRINHO P/ PULVERIZADOR",
     "Valores": {
       "Dezembro -2025": 30.7892,
-      "Janeiro -2026": 30.5308,
+      "Janeiro": 30.5308,
       "Fevereiro": 31.2237,
       "Março": 31.7971
     }
@@ -1324,7 +1324,7 @@
     "Descricao": "BETONEIRA METALOSA RENTAL 400L",
     "Valores": {
       "Dezembro -2025": 4525.3544,
-      "Janeiro -2026": 4194.0734,
+      "Janeiro": 4194.0734,
       "Fevereiro": 4136.6622,
       "Março": 3983.8659
     }
@@ -1334,7 +1334,7 @@
     "Descricao": "BETONEIRA METALOSA RENTAL 400L",
     "Valores": {
       "Dezembro -2025": 3894.3127,
-      "Janeiro -2026": 3552.9769,
+      "Janeiro": 3552.9769,
       "Fevereiro": 3490.8053,
       "Março": 3331.1182
     }
@@ -1344,9 +1344,9 @@
     "Descricao": "CONJ TAMBOR BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1354,9 +1354,9 @@
     "Descricao": "BOJO SUPERIOR BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1364,9 +1364,9 @@
     "Descricao": "PINHAO DENTE INTERNO C/ BUCHA",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1374,7 +1374,7 @@
     "Descricao": "PINHAO CREMALHEIRA BET400L",
     "Valores": {
       "Dezembro -2025": 16.4504,
-      "Janeiro -2026": 15.071,
+      "Janeiro": 15.071,
       "Fevereiro": 16.9966,
       "Março": 17.1361
     }
@@ -1384,9 +1384,9 @@
     "Descricao": "POLIA MOVIDA Ø300 BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1394,9 +1394,9 @@
     "Descricao": "POLIA 2 CANAIS BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1404,9 +1404,9 @@
     "Descricao": "PAR CREMALHEIRA SEGMENTADA BET",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1414,9 +1414,9 @@
     "Descricao": "ENGRENAGEM DENTE INTERNO BET40",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1424,7 +1424,7 @@
     "Descricao": "CONJ PROTECAO CREMALHEIRA PINH",
     "Valores": {
       "Dezembro -2025": 33.5685,
-      "Janeiro -2026": 35.8083,
+      "Janeiro": 35.8083,
       "Fevereiro": 35.5694,
       "Março": 34.9979
     }
@@ -1434,9 +1434,9 @@
     "Descricao": "CAIXA MOTOR BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1444,7 +1444,7 @@
     "Descricao": "RODA FERRO BET400L",
     "Valores": {
       "Dezembro -2025": 52.3359,
-      "Janeiro -2026": 47.7982,
+      "Janeiro": 47.7982,
       "Fevereiro": 46.8385,
       "Março": 44.6311
     }
@@ -1454,9 +1454,9 @@
     "Descricao": "VOLANTE BET400L",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1464,7 +1464,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X600",
     "Valores": {
       "Dezembro -2025": 29.1258,
-      "Janeiro -2026": 28.9967,
+      "Janeiro": 28.9967,
       "Fevereiro": 29.0417,
       "Março": 28.8563
     }
@@ -1474,7 +1474,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X700",
     "Valores": {
       "Dezembro -2025": 33.9801,
-      "Janeiro -2026": 33.8294,
+      "Janeiro": 33.8294,
       "Fevereiro": 33.8819,
       "Março": 33.6656
     }
@@ -1484,7 +1484,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X800",
     "Valores": {
       "Dezembro -2025": 38.8344,
-      "Janeiro -2026": 38.6622,
+      "Janeiro": 38.6622,
       "Fevereiro": 38.7222,
       "Março": 38.475
     }
@@ -1494,7 +1494,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X900",
     "Valores": {
       "Dezembro -2025": 44.6596,
-      "Janeiro -2026": 44.4616,
+      "Janeiro": 44.4616,
       "Fevereiro": 44.5306,
       "Março": 44.2463
     }
@@ -1504,7 +1504,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X100",
     "Valores": {
       "Dezembro -2025": 48.543,
-      "Janeiro -2026": 48.3278,
+      "Janeiro": 48.3278,
       "Fevereiro": 48.4028,
       "Março": 48.0938
     }
@@ -1514,7 +1514,7 @@
     "Descricao": "PERF DEGRAU PISO BQ 250X25X120",
     "Valores": {
       "Dezembro -2025": 55.9863,
-      "Janeiro -2026": 55.738,
+      "Janeiro": 55.738,
       "Fevereiro": 55.8245,
       "Março": 55.4682
     }
@@ -1524,7 +1524,7 @@
     "Descricao": "CARRO PLATAFORMA PC 3 - 1,50M",
     "Valores": {
       "Dezembro -2025": 314.5115,
-      "Janeiro -2026": 314.2036,
+      "Janeiro": 314.2036,
       "Fevereiro": 318.274,
       "Março": 321.0128
     }
@@ -1534,7 +1534,7 @@
     "Descricao": "CARRO PLATAFORMA PC 3 - 1,50M",
     "Valores": {
       "Dezembro -2025": 359.3571,
-      "Janeiro -2026": 357.9243,
+      "Janeiro": 357.9243,
       "Fevereiro": 366.6329,
       "Março": 368.9782
     }
@@ -1544,7 +1544,7 @@
     "Descricao": "CARRO METALFORTE M16 PC 3 E",
     "Valores": {
       "Dezembro -2025": 92.1624,
-      "Janeiro -2026": 91.6917,
+      "Janeiro": 91.6917,
       "Fevereiro": 94.9715,
       "Março": 94.9425
     }
@@ -1554,7 +1554,7 @@
     "Descricao": "CARRO METALFORTE P AZUL M16 PC",
     "Valores": {
       "Dezembro -2025": 116.9707,
-      "Janeiro -2026": 116.4549,
+      "Janeiro": 116.4549,
       "Fevereiro": 121.0878,
       "Março": 120.89
     }
@@ -1564,7 +1564,7 @@
     "Descricao": "CARRO METALFORTE M16 PM FORCE",
     "Valores": {
       "Dezembro -2025": 95.1295,
-      "Janeiro -2026": 94.5503,
+      "Janeiro": 94.5503,
       "Fevereiro": 99.6095,
       "Março": 99.8701
     }
@@ -1574,7 +1574,7 @@
     "Descricao": "CARRO METALFORTE M18 PC 3 E",
     "Valores": {
       "Dezembro -2025": 81.3951,
-      "Janeiro -2026": 81.0275,
+      "Janeiro": 81.0275,
       "Fevereiro": 83.5515,
       "Março": 83.6145
     }
@@ -1584,7 +1584,7 @@
     "Descricao": "CARRO METALFORTE P AZUL M18 PC",
     "Valores": {
       "Dezembro -2025": 106.1888,
-      "Janeiro -2026": 105.7759,
+      "Janeiro": 105.7759,
       "Fevereiro": 109.653,
       "Março": 109.5472
     }
@@ -1594,7 +1594,7 @@
     "Descricao": "CAR METALFORTE P AZUL M18 PC 3",
     "Valores": {
       "Dezembro -2025": 105.9656,
-      "Janeiro -2026": 105.5575,
+      "Janeiro": 105.5575,
       "Fevereiro": 109.6068,
       "Março": 109.372
     }
@@ -1604,7 +1604,7 @@
     "Descricao": "CARRO METALFORTE M18 PC 3 E FU",
     "Valores": {
       "Dezembro -2025": 81.172,
-      "Janeiro -2026": 80.8091,
+      "Janeiro": 80.8091,
       "Fevereiro": 83.5053,
       "Março": 83.4393
     }
@@ -1614,7 +1614,7 @@
     "Descricao": "CARRO METALFORTE M18 PM FORCE",
     "Valores": {
       "Dezembro -2025": 84.3623,
-      "Janeiro -2026": 83.8861,
+      "Janeiro": 83.8861,
       "Fevereiro": 88.1894,
       "Março": 88.5421
     }
@@ -1624,7 +1624,7 @@
     "Descricao": "CARRO METALFORTE M20 PC 3 E",
     "Valores": {
       "Dezembro -2025": 72.3101,
-      "Janeiro -2026": 72.0377,
+      "Janeiro": 72.0377,
       "Fevereiro": 74.6412,
       "Março": 75.1512
     }
@@ -1634,7 +1634,7 @@
     "Descricao": "CARRO METALFORTE P AZUL M20 PC",
     "Valores": {
       "Dezembro -2025": 97.11,
-      "Janeiro -2026": 96.7925,
+      "Janeiro": 96.7925,
       "Fevereiro": 100.7491,
       "Março": 101.0902
     }
@@ -1644,7 +1644,7 @@
     "Descricao": "CARRO METALFORTE M20 PC 3 E TH",
     "Valores": {
       "Dezembro -2025": 72.3317,
-      "Janeiro -2026": 72.0641,
+      "Janeiro": 72.0641,
       "Fevereiro": 74.8398,
       "Março": 75.2208
     }
@@ -1654,7 +1654,7 @@
     "Descricao": "CARRO METALFORTE M20 PM FORCE",
     "Valores": {
       "Dezembro -2025": 75.2772,
-      "Janeiro -2026": 74.8963,
+      "Janeiro": 74.8963,
       "Fevereiro": 79.2792,
       "Março": 80.0788
     }
@@ -1664,7 +1664,7 @@
     "Descricao": "CARRO CARGA 150KG PC 3 15A AZ",
     "Valores": {
       "Dezembro -2025": 60.11,
-      "Janeiro -2026": 60.4872,
+      "Janeiro": 60.4872,
       "Fevereiro": 61.4672,
       "Março": 62.0088
     }
@@ -1674,7 +1674,7 @@
     "Descricao": "CARRO CARGA 150KG PC 3 15A CNZ",
     "Valores": {
       "Dezembro -2025": 59.5632,
-      "Janeiro -2026": 59.9394,
+      "Janeiro": 59.9394,
       "Fevereiro": 60.9183,
       "Março": 61.4599
     }
@@ -1684,7 +1684,7 @@
     "Descricao": "CARRO CARGA 150KG PC 3 15A AMR",
     "Valores": {
       "Dezembro -2025": 61.466,
-      "Janeiro -2026": 61.8421,
+      "Janeiro": 61.8421,
       "Fevereiro": 62.8212,
       "Março": 63.3633
     }
@@ -1694,7 +1694,7 @@
     "Descricao": "CARRO CARGA 150KG P. MACICO 15",
     "Valores": {
       "Dezembro -2025": 54.6813,
-      "Janeiro -2026": 55.024,
+      "Janeiro": 55.024,
       "Fevereiro": 56.1188,
       "Março": 57.1543
     }
@@ -1704,7 +1704,7 @@
     "Descricao": "CARRO CARGA 150KG P. MACICO 15",
     "Valores": {
       "Dezembro -2025": 54.7232,
-      "Janeiro -2026": 55.0635,
+      "Janeiro": 55.0635,
       "Fevereiro": 56.1587,
       "Março": 57.1962
     }
@@ -1714,7 +1714,7 @@
     "Descricao": "CARRO CARGA 150KG P. MACICO 15",
     "Valores": {
       "Dezembro -2025": 54.1346,
-      "Janeiro -2026": 54.4763,
+      "Janeiro": 54.4763,
       "Fevereiro": 55.5699,
       "Março": 56.6054
     }
@@ -1724,7 +1724,7 @@
     "Descricao": "CARRO CARGA 150KG P. MACICO 15",
     "Valores": {
       "Dezembro -2025": 56.0373,
-      "Janeiro -2026": 56.379,
+      "Janeiro": 56.379,
       "Fevereiro": 57.4728,
       "Março": 58.5088
     }
@@ -1734,7 +1734,7 @@
     "Descricao": "CARRO CARGA 200KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 79.2745,
-      "Janeiro -2026": 79.5378,
+      "Janeiro": 79.5378,
       "Fevereiro": 81.1419,
       "Março": 81.6879
     }
@@ -1744,7 +1744,7 @@
     "Descricao": "CARRO CARGA 200KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 78.642,
-      "Janeiro -2026": 78.9041,
+      "Janeiro": 78.9041,
       "Fevereiro": 80.5068,
       "Março": 81.0529
     }
@@ -1754,7 +1754,7 @@
     "Descricao": "CARRO CARGA 200KG P.MAC C/ROLE",
     "Valores": {
       "Dezembro -2025": 74.0529,
-      "Janeiro -2026": 74.2424,
+      "Janeiro": 74.2424,
       "Fevereiro": 76.0139,
       "Março": 77.0659
     }
@@ -1764,7 +1764,7 @@
     "Descricao": "CARRO CARGA 200KG P.MAC C/ROLE",
     "Valores": {
       "Dezembro -2025": 73.4203,
-      "Janeiro -2026": 73.6087,
+      "Janeiro": 73.6087,
       "Fevereiro": 75.3789,
       "Março": 76.4309
     }
@@ -1774,7 +1774,7 @@
     "Descricao": "CARRO CARGA 250KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 82.9755,
-      "Janeiro -2026": 83.1853,
+      "Janeiro": 83.1853,
       "Fevereiro": 84.877,
       "Março": 85.3972
     }
@@ -1784,7 +1784,7 @@
     "Descricao": "CARRO CARGA 250KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 82.3091,
-      "Janeiro -2026": 82.5176,
+      "Janeiro": 82.5176,
       "Fevereiro": 84.2079,
       "Março": 84.7281
     }
@@ -1794,7 +1794,7 @@
     "Descricao": "CARRO CARGA 250KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 84.6126,
-      "Janeiro -2026": 84.8211,
+      "Janeiro": 84.8211,
       "Fevereiro": 86.5116,
       "Março": 87.0325
     }
@@ -1804,7 +1804,7 @@
     "Descricao": "CARRO CARGA 300KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 116.3434,
-      "Janeiro -2026": 117.0525,
+      "Janeiro": 117.0525,
       "Fevereiro": 119.8247,
       "Março": 121.0475
     }
@@ -1814,7 +1814,7 @@
     "Descricao": "CARRO CARGA 300KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 116.3434,
-      "Janeiro -2026": 117.0525,
+      "Janeiro": 117.0525,
       "Fevereiro": 119.8247,
       "Março": 121.0475
     }
@@ -1824,7 +1824,7 @@
     "Descricao": "CARRO CARGA 350KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 94.4595,
-      "Janeiro -2026": 95.1297,
+      "Janeiro": 95.1297,
       "Fevereiro": 97.0743,
       "Março": 97.97
     }
@@ -1834,7 +1834,7 @@
     "Descricao": "CARRO CARGA 350KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 94.4485,
-      "Janeiro -2026": 95.1146,
+      "Janeiro": 95.1146,
       "Fevereiro": 97.0597,
       "Março": 97.9587
     }
@@ -1844,7 +1844,7 @@
     "Descricao": "CARRO CARGA 350KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 93.5055,
-      "Janeiro -2026": 94.1738,
+      "Janeiro": 94.1738,
       "Fevereiro": 96.1164,
       "Março": 97.0122
     }
@@ -1854,7 +1854,7 @@
     "Descricao": "CARRO CARGA 350KG PC 3 C/ROLET",
     "Valores": {
       "Dezembro -2025": 96.6908,
-      "Janeiro -2026": 97.359,
+      "Janeiro": 97.359,
       "Fevereiro": 99.302,
       "Março": 100.1987
     }
@@ -1864,7 +1864,7 @@
     "Descricao": "CACAMBA ESTACIONARIA 4M (3,17M",
     "Valores": {
       "Dezembro -2025": 1795.9273,
-      "Janeiro -2026": 1745.2928,
+      "Janeiro": 1745.2928,
       "Fevereiro": 1768.7592,
       "Março": 1776.7319
     }
@@ -1874,7 +1874,7 @@
     "Descricao": "CACAMBA ESTACIONARIA 4M (3,17M",
     "Valores": {
       "Dezembro -2025": 1781.2675,
-      "Janeiro -2026": 1730.633,
+      "Janeiro": 1730.633,
       "Fevereiro": 1754.0994,
       "Março": 1762.423
     }
@@ -1884,9 +1884,9 @@
     "Descricao": "COLUNA 6X17-5/16\" (8,00MM)",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1894,7 +1894,7 @@
     "Descricao": "COLUNA 6X20-5/16\" (8,00MM)",
     "Valores": {
       "Dezembro -2025": 57.1387,
-      "Janeiro -2026": 57.1387,
+      "Janeiro": 57.1387,
       "Fevereiro": 57.1387,
       "Março": 57.1387
     }
@@ -1904,7 +1904,7 @@
     "Descricao": "COLUNA 7X17-5/16\" (8,00MM)",
     "Valores": {
       "Dezembro -2025": 58.9056,
-      "Janeiro -2026": 58.9056,
+      "Janeiro": 58.9056,
       "Fevereiro": 58.9056,
       "Março": 58.9056
     }
@@ -1914,7 +1914,7 @@
     "Descricao": "COLUNA 7X20-5/16\" (8,00MM)",
     "Valores": {
       "Dezembro -2025": 50.73,
-      "Janeiro -2026": 50.73,
+      "Janeiro": 50.73,
       "Fevereiro": 50.73,
       "Março": 50.73
     }
@@ -1924,7 +1924,7 @@
     "Descricao": "COLUNA 7X17-3/8\" (10,00MM)",
     "Valores": {
       "Dezembro -2025": 78.2456,
-      "Janeiro -2026": 78.2456,
+      "Janeiro": 78.2456,
       "Fevereiro": 78.2456,
       "Março": 78.2456
     }
@@ -1934,7 +1934,7 @@
     "Descricao": "COLUNA 7X20-3/8\" (10,00MM)",
     "Valores": {
       "Dezembro -2025": 66.64,
-      "Janeiro -2026": 66.64,
+      "Janeiro": 66.64,
       "Fevereiro": 66.64,
       "Março": 66.64
     }
@@ -1944,9 +1944,9 @@
     "Descricao": "COLUNA 7X27-5/16\"(8,00MM)",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1954,9 +1954,9 @@
     "Descricao": "COLUNA 7X27-3/8\" (10,00MM)",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -1964,7 +1964,7 @@
     "Descricao": "RECIPIENTE INOX RETO C/ GRAD 1",
     "Valores": {
       "Dezembro -2025": 23.9984,
-      "Janeiro -2026": 24.4112,
+      "Janeiro": 24.4112,
       "Fevereiro": 25.2661,
       "Março": 25.6143
     }
@@ -1974,7 +1974,7 @@
     "Descricao": "RECIPIENTE INOX RETO 05L C/ TA",
     "Valores": {
       "Dezembro -2025": 24.5624,
-      "Janeiro -2026": 24.2246,
+      "Janeiro": 24.2246,
       "Fevereiro": 24.9446,
       "Março": 25.3355
     }
@@ -1984,7 +1984,7 @@
     "Descricao": "RECIPIENTE INOX RETO 05L S/ TA",
     "Valores": {
       "Dezembro -2025": 17.2931,
-      "Janeiro -2026": 16.8436,
+      "Janeiro": 16.8436,
       "Fevereiro": 17.4094,
       "Março": 17.7153
     }
@@ -1994,7 +1994,7 @@
     "Descricao": "RECIPIENTE INOX RETO 05L C/ AR",
     "Valores": {
       "Dezembro -2025": 17.9432,
-      "Janeiro -2026": 17.4478,
+      "Janeiro": 17.4478,
       "Fevereiro": 18.0687,
       "Março": 18.4029
     }
@@ -2004,7 +2004,7 @@
     "Descricao": "RECIPIENTE INOX RETO 05L C/ AL",
     "Valores": {
       "Dezembro -2025": 20.0195,
-      "Janeiro -2026": 19.5924,
+      "Janeiro": 19.5924,
       "Fevereiro": 20.3844,
       "Março": 20.764
     }
@@ -2014,7 +2014,7 @@
     "Descricao": "BALDE INOX RETO C/ GRAD 05L",
     "Valores": {
       "Dezembro -2025": 18.1694,
-      "Janeiro -2026": 17.8553,
+      "Janeiro": 17.8553,
       "Fevereiro": 18.5126,
       "Março": 18.8231
     }
@@ -2024,7 +2024,7 @@
     "Descricao": "BALDE INOX OVAL C/ GRAD 10L",
     "Valores": {
       "Dezembro -2025": 20.2817,
-      "Janeiro -2026": 20.5422,
+      "Janeiro": 20.5422,
       "Fevereiro": 21.3974,
       "Março": 21.7317
     }
@@ -2034,7 +2034,7 @@
     "Descricao": "BALDE INOX RETO C/ GRAD 10L",
     "Valores": {
       "Dezembro -2025": 20.321,
-      "Janeiro -2026": 20.5768,
+      "Janeiro": 20.5768,
       "Fevereiro": 21.4375,
       "Março": 21.7747
     }
@@ -2044,7 +2044,7 @@
     "Descricao": "BALDE INOX OVAL C/ GRAD 15L",
     "Valores": {
       "Dezembro -2025": 24.391,
-      "Janeiro -2026": 24.757,
+      "Janeiro": 24.757,
       "Fevereiro": 25.6676,
       "Março": 26.0444
     }
@@ -2054,7 +2054,7 @@
     "Descricao": "BALDE INOX RETO C/ GRAD 15L",
     "Valores": {
       "Dezembro -2025": 23.9984,
-      "Janeiro -2026": 24.4112,
+      "Janeiro": 24.4112,
       "Fevereiro": 25.2661,
       "Março": 25.6143
     }
@@ -2064,7 +2064,7 @@
     "Descricao": "BALDE INOX BICO C/ GRAD 15L",
     "Valores": {
       "Dezembro -2025": 24.1519,
-      "Janeiro -2026": 24.5464,
+      "Janeiro": 24.5464,
       "Fevereiro": 25.4231,
       "Março": 25.7824
     }
@@ -2074,7 +2074,7 @@
     "Descricao": "BALDE INOX RETO C/ GRAD 20L",
     "Valores": {
       "Dezembro -2025": 17.9735,
-      "Janeiro -2026": 17.7836,
+      "Janeiro": 17.7836,
       "Fevereiro": 18.4636,
       "Março": 18.8002
     }
@@ -2084,7 +2084,7 @@
     "Descricao": "BALDE INOX BICO 05L C/GRAD GAN",
     "Valores": {
       "Dezembro -2025": 23.7505,
-      "Janeiro -2026": 23.3115,
+      "Janeiro": 23.3115,
       "Fevereiro": 24.4969,
       "Março": 24.9955
     }
@@ -2094,7 +2094,7 @@
     "Descricao": "BALDE INOX BICO 10L C/GRAD GAN",
     "Valores": {
       "Dezembro -2025": 25.9244,
-      "Janeiro -2026": 26.0502,
+      "Janeiro": 26.0502,
       "Fevereiro": 27.4451,
       "Março": 27.9735
     }
@@ -2104,7 +2104,7 @@
     "Descricao": "BALDE INOX BICO 15L C/GRAD GAN",
     "Valores": {
       "Dezembro -2025": 28.5936,
-      "Janeiro -2026": 28.7927,
+      "Janeiro": 28.7927,
       "Fevereiro": 30.282,
       "Março": 30.8729
     }
@@ -2114,7 +2114,7 @@
     "Descricao": "BALDE INOX BICO 20L C/GRAD GAN",
     "Valores": {
       "Dezembro -2025": 25.3322,
-      "Janeiro -2026": 24.8259,
+      "Janeiro": 24.8259,
       "Fevereiro": 26.2623,
       "Março": 26.9042
     }
@@ -2124,7 +2124,7 @@
     "Descricao": "BALDE EM ACO P/ CONCRETO 12L C",
     "Valores": {
       "Dezembro -2025": 11.553,
-      "Janeiro -2026": 11.7921,
+      "Janeiro": 11.7921,
       "Fevereiro": 12.1128,
       "Março": 12.4092
     }
@@ -2134,7 +2134,7 @@
     "Descricao": "BALDE EM ACO P/ CONCRETO 12L A",
     "Valores": {
       "Dezembro -2025": 11.8509,
-      "Janeiro -2026": 12.0907,
+      "Janeiro": 12.0907,
       "Fevereiro": 12.4123,
       "Março": 12.7087
     }
@@ -2144,7 +2144,7 @@
     "Descricao": "BALDE EM ACO P/ CONCRETO 10L C",
     "Valores": {
       "Dezembro -2025": 8.2094,
-      "Janeiro -2026": 7.9995,
+      "Janeiro": 7.9995,
       "Fevereiro": 8.4017,
       "Março": 8.6245
     }
@@ -2154,7 +2154,7 @@
     "Descricao": "DW GUIA 48 - 3,00M",
     "Valores": {
       "Dezembro -2025": 2.5996,
-      "Janeiro -2026": 2.5559,
+      "Janeiro": 2.5559,
       "Fevereiro": 2.5862,
       "Março": 2.5206
     }
@@ -2164,7 +2164,7 @@
     "Descricao": "DW GUIA 48",
     "Valores": {
       "Dezembro -2025": 2.5996,
-      "Janeiro -2026": 2.5559,
+      "Janeiro": 2.5559,
       "Fevereiro": 2.5862,
       "Março": 2.5206
     }
@@ -2174,7 +2174,7 @@
     "Descricao": "DW GUIA 70 - 3,00M",
     "Valores": {
       "Dezembro -2025": 3.0843,
-      "Janeiro -2026": 3.0466,
+      "Janeiro": 3.0466,
       "Fevereiro": 3.0792,
       "Março": 2.9878
     }
@@ -2184,7 +2184,7 @@
     "Descricao": "DW GUIA 70",
     "Valores": {
       "Dezembro -2025": 3.0843,
-      "Janeiro -2026": 3.0466,
+      "Janeiro": 3.0466,
       "Fevereiro": 3.0792,
       "Março": 2.9878
     }
@@ -2194,7 +2194,7 @@
     "Descricao": "DW GUIA 90 - 3,00M",
     "Valores": {
       "Dezembro -2025": 3.6004,
-      "Janeiro -2026": 3.5547,
+      "Janeiro": 3.5547,
       "Fevereiro": 3.5932,
       "Março": 3.4881
     }
@@ -2204,7 +2204,7 @@
     "Descricao": "DW GUIA 90",
     "Valores": {
       "Dezembro -2025": 3.6004,
-      "Janeiro -2026": 3.5547,
+      "Janeiro": 3.5547,
       "Fevereiro": 3.5932,
       "Março": 3.4881
     }
@@ -2214,7 +2214,7 @@
     "Descricao": "DW MONTANTE 48 - 3,00M",
     "Valores": {
       "Dezembro -2025": 3.0763,
-      "Janeiro -2026": 2.9246,
+      "Janeiro": 2.9246,
       "Fevereiro": 2.9655,
       "Março": 3.1307
     }
@@ -2224,7 +2224,7 @@
     "Descricao": "DW MONTANTE 48",
     "Valores": {
       "Dezembro -2025": 3.0517,
-      "Janeiro -2026": 2.8999,
+      "Janeiro": 2.8999,
       "Fevereiro": 2.9408,
       "Março": 3.1056
     }
@@ -2234,7 +2234,7 @@
     "Descricao": "DW MONTANTE 70 - 3,00M",
     "Valores": {
       "Dezembro -2025": 3.4904,
-      "Janeiro -2026": 3.3348,
+      "Janeiro": 3.3348,
       "Fevereiro": 3.3767,
       "Março": 3.5517
     }
@@ -2244,7 +2244,7 @@
     "Descricao": "DW MONTANTE 70",
     "Valores": {
       "Dezembro -2025": 3.4904,
-      "Janeiro -2026": 3.3348,
+      "Janeiro": 3.3348,
       "Fevereiro": 3.3767,
       "Março": 3.5517
     }
@@ -2254,7 +2254,7 @@
     "Descricao": "DW MONTANTE 90 - 3,00M",
     "Valores": {
       "Dezembro -2025": 3.9717,
-      "Janeiro -2026": 3.8023,
+      "Janeiro": 3.8023,
       "Fevereiro": 3.8479,
       "Março": 4.0386
     }
@@ -2264,7 +2264,7 @@
     "Descricao": "DW MONTANTE 90",
     "Valores": {
       "Dezembro -2025": 3.9717,
-      "Janeiro -2026": 3.8023,
+      "Janeiro": 3.8023,
       "Fevereiro": 3.8479,
       "Março": 4.0386
     }
@@ -2274,7 +2274,7 @@
     "Descricao": "DW PERFIL TETO F 47 - 3,00M",
     "Valores": {
       "Dezembro -2025": 2.1722,
-      "Janeiro -2026": 2.0727,
+      "Janeiro": 2.0727,
       "Fevereiro": 2.0995,
       "Março": 2.2105
     }
@@ -2284,7 +2284,7 @@
     "Descricao": "DW PERFIL GUIA TETO U 30/20 -",
     "Valores": {
       "Dezembro -2025": 2.1148,
-      "Janeiro -2026": 1.9952,
+      "Janeiro": 1.9952,
       "Fevereiro": 2.0403,
       "Março": 2.067
     }
@@ -2294,7 +2294,7 @@
     "Descricao": "DW CANTONEIRA L 25/30 - 3,00M",
     "Valores": {
       "Dezembro -2025": 1.4975,
-      "Janeiro -2026": 1.4296,
+      "Janeiro": 1.4296,
       "Fevereiro": 1.4574,
       "Março": 1.461
     }
@@ -2304,9 +2304,9 @@
     "Descricao": "DW CANTONEIRA L 24/24 - 3,00M",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -2314,7 +2314,7 @@
     "Descricao": "DW TABICA - 3,00M",
     "Valores": {
       "Dezembro -2025": 2.6173,
-      "Janeiro -2026": 2.5351,
+      "Janeiro": 2.5351,
       "Fevereiro": 2.5749,
       "Março": 2.5453
     }
@@ -2324,7 +2324,7 @@
     "Descricao": "CHAPA ARTICULADA RAIADA 0,65MM",
     "Valores": {
       "Dezembro -2025": 20.4107,
-      "Janeiro -2026": 20.8111,
+      "Janeiro": 20.8111,
       "Fevereiro": 20.7573,
       "Março": 21.0852
     }
@@ -2334,7 +2334,7 @@
     "Descricao": "CHAPA ARTICULADA RAIADA 0,50MM",
     "Valores": {
       "Dezembro -2025": 16.0076,
-      "Janeiro -2026": 18.0477,
+      "Janeiro": 18.0477,
       "Fevereiro": 20.3873,
       "Março": 18.2693
     }
@@ -2344,7 +2344,7 @@
     "Descricao": "PERFIL LAMBRI RET BF 0,75 2000",
     "Valores": {
       "Dezembro -2025": 72.326,
-      "Janeiro -2026": 71.6784,
+      "Janeiro": 71.6784,
       "Fevereiro": 72.3584,
       "Março": 72.149
     }
@@ -2354,7 +2354,7 @@
     "Descricao": "PERFIL LAMBRI RET BF 0,75 3000",
     "Valores": {
       "Dezembro -2025": 108.489,
-      "Janeiro -2026": 107.5176,
+      "Janeiro": 107.5176,
       "Fevereiro": 108.5376,
       "Março": 108.2234
     }
@@ -2364,7 +2364,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 2000X100",
     "Valores": {
       "Dezembro -2025": 65.2446,
-      "Janeiro -2026": 62.8253,
+      "Janeiro": 62.8253,
       "Fevereiro": 59.3071,
       "Março": 59.2527
     }
@@ -2374,7 +2374,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 2000X110",
     "Valores": {
       "Dezembro -2025": 71.1759,
-      "Janeiro -2026": 68.5367,
+      "Janeiro": 68.5367,
       "Fevereiro": 64.6986,
       "Março": 64.6393
     }
@@ -2384,7 +2384,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 2400X100",
     "Valores": {
       "Dezembro -2025": 78.343,
-      "Janeiro -2026": 75.438,
+      "Janeiro": 75.438,
       "Fevereiro": 71.2134,
       "Março": 71.1481
     }
@@ -2394,7 +2394,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 2400X110",
     "Valores": {
       "Dezembro -2025": 85.51,
-      "Janeiro -2026": 82.3393,
+      "Janeiro": 82.3393,
       "Fevereiro": 77.7282,
       "Março": 77.6569
     }
@@ -2404,7 +2404,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 3000X100",
     "Valores": {
       "Dezembro -2025": 97.8669,
-      "Janeiro -2026": 94.238,
+      "Janeiro": 94.238,
       "Fevereiro": 88.9606,
       "Março": 88.879
     }
@@ -2414,7 +2414,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,75 3000X110",
     "Valores": {
       "Dezembro -2025": 106.7639,
-      "Janeiro -2026": 102.8051,
+      "Janeiro": 102.8051,
       "Fevereiro": 97.0479,
       "Março": 96.9589
     }
@@ -2424,7 +2424,7 @@
     "Descricao": "PERFIL LAMBRI RET BZ 0,75 2000",
     "Valores": {
       "Dezembro -2025": 65.2446,
-      "Janeiro -2026": 62.8253,
+      "Janeiro": 62.8253,
       "Fevereiro": 59.3071,
       "Março": 59.2527
     }
@@ -2434,7 +2434,7 @@
     "Descricao": "PERFIL LAMBRI RET BZ 0,75 3000",
     "Valores": {
       "Dezembro -2025": 97.8669,
-      "Janeiro -2026": 94.238,
+      "Janeiro": 94.238,
       "Fevereiro": 88.9606,
       "Março": 88.879
     }
@@ -2444,7 +2444,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 2000X100",
     "Valores": {
       "Dezembro -2025": 67.7309,
-      "Janeiro -2026": 66.3379,
+      "Janeiro": 66.3379,
       "Fevereiro": 67.2587,
       "Março": 72.0918
     }
@@ -2454,7 +2454,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 2000X110",
     "Valores": {
       "Dezembro -2025": 73.7355,
-      "Janeiro -2026": 72.219,
+      "Janeiro": 72.219,
       "Fevereiro": 73.2213,
       "Março": 78.4829
     }
@@ -2464,7 +2464,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 2400X100",
     "Valores": {
       "Dezembro -2025": 81.1811,
-      "Janeiro -2026": 79.5114,
+      "Janeiro": 79.5114,
       "Fevereiro": 80.615,
       "Março": 86.4079
     }
@@ -2474,7 +2474,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 2400X110",
     "Valores": {
       "Dezembro -2025": 88.6267,
-      "Janeiro -2026": 86.8039,
+      "Janeiro": 86.8039,
       "Fevereiro": 88.0087,
       "Março": 94.3329
     }
@@ -2484,7 +2484,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 3000X100",
     "Valores": {
       "Dezembro -2025": 101.3562,
-      "Janeiro -2026": 99.2717,
+      "Janeiro": 99.2717,
       "Fevereiro": 100.6495,
       "Março": 107.8821
     }
@@ -2494,7 +2494,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,80 3000X110",
     "Valores": {
       "Dezembro -2025": 110.7233,
-      "Janeiro -2026": 108.4461,
+      "Janeiro": 108.4461,
       "Fevereiro": 109.9512,
       "Março": 117.8522
     }
@@ -2504,7 +2504,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 2000X100",
     "Valores": {
       "Dezembro -2025": 93.1975,
-      "Janeiro -2026": 92.7102,
+      "Janeiro": 92.7102,
       "Fevereiro": 91.3721,
       "Março": 88.7136
     }
@@ -2514,7 +2514,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 2000X110",
     "Valores": {
       "Dezembro -2025": 101.7235,
-      "Janeiro -2026": 101.1916,
+      "Janeiro": 101.1916,
       "Fevereiro": 99.731,
       "Março": 96.8294
     }
@@ -2524,7 +2524,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 2400X100",
     "Valores": {
       "Dezembro -2025": 111.7194,
-      "Janeiro -2026": 111.1353,
+      "Janeiro": 111.1353,
       "Fevereiro": 109.5312,
       "Março": 106.3444
     }
@@ -2534,7 +2534,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 2400X110",
     "Valores": {
       "Dezembro -2025": 122.0094,
-      "Janeiro -2026": 121.3714,
+      "Janeiro": 121.3714,
       "Fevereiro": 119.6196,
       "Março": 116.1393
     }
@@ -2544,7 +2544,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 3000X100",
     "Valores": {
       "Dezembro -2025": 139.6493,
-      "Janeiro -2026": 138.9191,
+      "Janeiro": 138.9191,
       "Fevereiro": 136.914,
       "Março": 132.9305
     }
@@ -2554,7 +2554,7 @@
     "Descricao": "PERFIL LAMBRI BZ 0,90 3000X110",
     "Valores": {
       "Dezembro -2025": 152.2912,
-      "Janeiro -2026": 151.4949,
+      "Janeiro": 151.4949,
       "Fevereiro": 149.3083,
       "Março": 144.9642
     }
@@ -2564,7 +2564,7 @@
     "Descricao": "PERFIL LAMBRI RET BZ 0,90 2000",
     "Valores": {
       "Dezembro -2025": 93.1975,
-      "Janeiro -2026": 92.7102,
+      "Janeiro": 92.7102,
       "Fevereiro": 91.3721,
       "Março": 88.7136
     }
@@ -2574,7 +2574,7 @@
     "Descricao": "PERFIL LAMBRI RET BZ 0,90 3000",
     "Valores": {
       "Dezembro -2025": 139.6493,
-      "Janeiro -2026": 138.9191,
+      "Janeiro": 138.9191,
       "Fevereiro": 136.914,
       "Março": 132.9305
     }
@@ -2584,7 +2584,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 2000X100",
     "Valores": {
       "Dezembro -2025": 84.964,
-      "Janeiro -2026": 84.1592,
+      "Janeiro": 84.1592,
       "Fevereiro": 84.4762,
       "Março": 83.847
     }
@@ -2594,7 +2594,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 2000X110",
     "Valores": {
       "Dezembro -2025": 92.7367,
-      "Janeiro -2026": 91.8583,
+      "Janeiro": 91.8583,
       "Fevereiro": 92.2043,
       "Março": 91.5175
     }
@@ -2604,7 +2604,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 2400X100",
     "Valores": {
       "Dezembro -2025": 101.8496,
-      "Janeiro -2026": 100.8848,
+      "Janeiro": 100.8848,
       "Fevereiro": 101.2648,
       "Março": 100.5106
     }
@@ -2614,7 +2614,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 2400X110",
     "Valores": {
       "Dezembro -2025": 111.2305,
-      "Janeiro -2026": 110.1769,
+      "Janeiro": 110.1769,
       "Fevereiro": 110.5919,
       "Março": 109.7681
     }
@@ -2624,7 +2624,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 3000X100",
     "Valores": {
       "Dezembro -2025": 127.312,
-      "Janeiro -2026": 126.106,
+      "Janeiro": 126.106,
       "Fevereiro": 126.581,
       "Março": 125.6382
     }
@@ -2634,7 +2634,7 @@
     "Descricao": "PERFIL LAMBRI BF 0,90 3000X110",
     "Valores": {
       "Dezembro -2025": 138.8371,
-      "Janeiro -2026": 137.522,
+      "Janeiro": 137.522,
       "Fevereiro": 138.04,
       "Março": 137.0118
     }
@@ -2644,7 +2644,7 @@
     "Descricao": "PERFIL LAMBRI RET BF 0,90 2000",
     "Valores": {
       "Dezembro -2025": 84.964,
-      "Janeiro -2026": 84.1592,
+      "Janeiro": 84.1592,
       "Fevereiro": 84.4762,
       "Março": 83.847
     }
@@ -2654,7 +2654,7 @@
     "Descricao": "PERFIL LAMBRI RET BF 0,90 3000",
     "Valores": {
       "Dezembro -2025": 127.312,
-      "Janeiro -2026": 126.106,
+      "Janeiro": 126.106,
       "Fevereiro": 126.581,
       "Março": 125.6382
     }
@@ -2664,7 +2664,7 @@
     "Descricao": "PERFIL VENEZIANA BZ 0,75 75X22",
     "Valores": {
       "Dezembro -2025": 7.8252,
-      "Janeiro -2026": 7.5365,
+      "Janeiro": 7.5365,
       "Fevereiro": 7.1084,
       "Março": 7.1084
     }
@@ -2674,7 +2674,7 @@
     "Descricao": "PERFIL VENEZIANA BZ 0,75 75X22",
     "Valores": {
       "Dezembro -2025": 15.6503,
-      "Janeiro -2026": 15.073,
+      "Janeiro": 15.073,
       "Fevereiro": 14.2169,
       "Março": 14.2169
     }
@@ -2684,7 +2684,7 @@
     "Descricao": "PERFIL VENEZIANA BZ 0,90 75X22",
     "Valores": {
       "Dezembro -2025": 9.436,
-      "Janeiro -2026": 9.488,
+      "Janeiro": 9.488,
       "Fevereiro": 9.2843,
       "Março": 9.118
     }
@@ -2694,7 +2694,7 @@
     "Descricao": "PERFIL VENEZIANA BZ 0,90 75X22",
     "Valores": {
       "Dezembro -2025": 18.872,
-      "Janeiro -2026": 18.9759,
+      "Janeiro": 18.9759,
       "Fevereiro": 18.5687,
       "Março": 18.2359
     }
@@ -2704,7 +2704,7 @@
     "Descricao": "PNEU 3",
     "Valores": {
       "Dezembro -2025": 6.719,
-      "Janeiro -2026": 6.7011,
+      "Janeiro": 6.7011,
       "Fevereiro": 6.6065,
       "Março": 6.4376
     }
@@ -2714,7 +2714,7 @@
     "Descricao": "PNEU 3,50",
     "Valores": {
       "Dezembro -2025": 9.7056,
-      "Janeiro -2026": 9.7056,
+      "Janeiro": 9.7056,
       "Fevereiro": 9.7056,
       "Março": 9.2496
     }
@@ -2724,7 +2724,7 @@
     "Descricao": "CAMARA DE AR 3",
     "Valores": {
       "Dezembro -2025": 3.2311,
-      "Janeiro -2026": 3.2238,
+      "Janeiro": 3.2238,
       "Fevereiro": 3.1779,
       "Março": 3.0943
     }
@@ -2734,7 +2734,7 @@
     "Descricao": "CAMARA DE AR 3,50",
     "Valores": {
       "Dezembro -2025": 4.591,
-      "Janeiro -2026": 4.591,
+      "Janeiro": 4.591,
       "Fevereiro": 4.591,
       "Março": 4.4507
     }
@@ -2744,7 +2744,7 @@
     "Descricao": "RODA C/ ROLETE PC 3",
     "Valores": {
       "Dezembro -2025": 19.0461,
-      "Janeiro -2026": 18.853,
+      "Janeiro": 18.853,
       "Fevereiro": 19.1983,
       "Março": 18.9946
     }
@@ -2754,7 +2754,7 @@
     "Descricao": "RODA C/ ROLETE PC 3,50",
     "Valores": {
       "Dezembro -2025": 22.0398,
-      "Janeiro -2026": 21.8645,
+      "Janeiro": 21.8645,
       "Fevereiro": 22.3057,
       "Março": 21.8151
     }
@@ -2764,7 +2764,7 @@
     "Descricao": "ARO C/ ROLETE P/ PNEU METALOSA",
     "Valores": {
       "Dezembro -2025": 8.5416,
-      "Janeiro -2026": 8.513,
+      "Janeiro": 8.513,
       "Fevereiro": 8.8417,
       "Março": 8.852
     }
@@ -2774,7 +2774,7 @@
     "Descricao": "RODA C/ ROLETE P. MACICO",
     "Valores": {
       "Dezembro -2025": 16.4352,
-      "Janeiro -2026": 16.2053,
+      "Janeiro": 16.2053,
       "Fevereiro": 16.6343,
       "Março": 33.3673
     }
@@ -2784,7 +2784,7 @@
     "Descricao": "RODA C/ PNEU FORCE",
     "Valores": {
       "Dezembro -2025": 16.6985,
-      "Janeiro -2026": 16.5355,
+      "Janeiro": 16.5355,
       "Fevereiro": 18.3418,
       "Março": 18.4058
     }
@@ -2794,7 +2794,7 @@
     "Descricao": "RODA C/ ROLETE PNEU FORCE",
     "Valores": {
       "Dezembro -2025": 21.5478,
-      "Janeiro -2026": 21.3663,
+      "Janeiro": 21.3663,
       "Fevereiro": 23.3576,
       "Março": 23.4106
     }
@@ -2804,7 +2804,7 @@
     "Descricao": "CACAMBA METAL POP GALV",
     "Valores": {
       "Dezembro -2025": 14.1049,
-      "Janeiro -2026": 14.1093,
+      "Janeiro": 14.1093,
       "Fevereiro": 14.4728,
       "Março": 14.7338
     }
@@ -2814,7 +2814,7 @@
     "Descricao": "CACAMBA METAL POP GALV FUZIL",
     "Valores": {
       "Dezembro -2025": 15.5832,
-      "Janeiro -2026": 15.5866,
+      "Janeiro": 15.5866,
       "Fevereiro": 16.0006,
       "Março": 16.2907
     }
@@ -2824,7 +2824,7 @@
     "Descricao": "CACAMBA METAL GALVANIZADA",
     "Valores": {
       "Dezembro -2025": 21.8481,
-      "Janeiro -2026": 21.7993,
+      "Janeiro": 21.7993,
       "Fevereiro": 22.1011,
       "Março": 22.1363
     }
@@ -2834,7 +2834,7 @@
     "Descricao": "RODA C/ PNEU CAMARA 3",
     "Valores": {
       "Dezembro -2025": 13.7314,
-      "Janeiro -2026": 13.6769,
+      "Janeiro": 13.6769,
       "Fevereiro": 13.7038,
       "Março": 13.4782
     }
@@ -2844,7 +2844,7 @@
     "Descricao": "RODA C/ PNEU MACICO",
     "Valores": {
       "Dezembro -2025": 11.0171,
-      "Janeiro -2026": 10.9454,
+      "Janeiro": 10.9454,
       "Fevereiro": 11.0296,
       "Março": 11.051
     }
@@ -2854,7 +2854,7 @@
     "Descricao": "RODA C/ PNEU CAMARA 3,50",
     "Valores": {
       "Dezembro -2025": 16.9735,
-      "Janeiro -2026": 16.8757,
+      "Janeiro": 16.8757,
       "Fevereiro": 17.0682,
       "Março": 16.5728
     }
@@ -2864,7 +2864,7 @@
     "Descricao": "ARO P/ PNEU METALOSA",
     "Valores": {
       "Dezembro -2025": 3.7149,
-      "Janeiro -2026": 3.7042,
+      "Janeiro": 3.7042,
       "Fevereiro": 3.8519,
       "Março": 3.8738
     }
@@ -2874,7 +2874,7 @@
     "Descricao": "MANCAL",
     "Valores": {
       "Dezembro -2025": 0.7293,
-      "Janeiro -2026": 0.7335,
+      "Janeiro": 0.7335,
       "Fevereiro": 0.3714,
       "Março": 0.7431
     }
@@ -2884,7 +2884,7 @@
     "Descricao": "TRAVESSAO GALV 1,10",
     "Valores": {
       "Dezembro -2025": 1.0362,
-      "Janeiro -2026": 0.9898,
+      "Janeiro": 0.9898,
       "Fevereiro": 1.103,
       "Março": 1.0752
     }
@@ -2894,7 +2894,7 @@
     "Descricao": "TRAVESSAO GALV 0,90",
     "Valores": {
       "Dezembro -2025": 0.9344,
-      "Janeiro -2026": 0.9385,
+      "Janeiro": 0.9385,
       "Fevereiro": 0.9228,
       "Março": 0.9068
     }
@@ -2904,7 +2904,7 @@
     "Descricao": "EIXO P/ CARRINHO",
     "Valores": {
       "Dezembro -2025": 0.1733,
-      "Janeiro -2026": 0.1704,
+      "Janeiro": 0.1704,
       "Fevereiro": 0.1899,
       "Março": 0.1932
     }
@@ -2914,7 +2914,7 @@
     "Descricao": "EIXO P/ CARRINHO - CX 20 PCS",
     "Valores": {
       "Dezembro -2025": 5.5289,
-      "Janeiro -2026": 5.4626,
+      "Janeiro": 5.4626,
       "Fevereiro": 5.9227,
       "Março": 5.9984
     }
@@ -2924,7 +2924,7 @@
     "Descricao": "PERFIL DO PE GALV 1,50",
     "Valores": {
       "Dezembro -2025": 4.6454,
-      "Janeiro -2026": 4.6682,
+      "Janeiro": 4.6682,
       "Fevereiro": 2.3735,
       "Março": 4.7528
     }
@@ -2934,7 +2934,7 @@
     "Descricao": "PERFIL DO PE GALV 1,10",
     "Valores": {
       "Dezembro -2025": 3.232,
-      "Janeiro -2026": 3.0921,
+      "Janeiro": 3.0921,
       "Fevereiro": 1.7318,
       "Março": 3.3905
     }
@@ -2944,7 +2944,7 @@
     "Descricao": "REFORCO DA CACAMBA",
     "Valores": {
       "Dezembro -2025": 0.264,
-      "Janeiro -2026": 0.2866,
+      "Janeiro": 0.2866,
       "Fevereiro": 0.325,
       "Março": 0.2891
     }
@@ -2954,7 +2954,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR CNZ",
     "Valores": {
       "Dezembro -2025": 13.1304,
-      "Janeiro -2026": 14.1583,
+      "Janeiro": 14.1583,
       "Fevereiro": 14.1432,
       "Março": 14.2329
     }
@@ -2964,7 +2964,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR CNZ F",
     "Valores": {
       "Dezembro -2025": 13.3353,
-      "Janeiro -2026": 14.386,
+      "Janeiro": 14.386,
       "Fevereiro": 14.3619,
       "Março": 14.4508
     }
@@ -2974,7 +2974,7 @@
     "Descricao": "ESPACADORES P/ EIXO",
     "Valores": {
       "Dezembro -2025": 0.1608,
-      "Janeiro -2026": 0.1728,
+      "Janeiro": 0.1728,
       "Fevereiro": 0.0842,
       "Março": 0.1692
     }
@@ -2984,7 +2984,7 @@
     "Descricao": "EXPOSITOR P/ CARRINHO.",
     "Valores": {
       "Dezembro -2025": 19.0691,
-      "Janeiro -2026": 18.3947,
+      "Janeiro": 18.3947,
       "Fevereiro": 20.0747,
       "Março": 21.5748
     }
@@ -2994,7 +2994,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 JU",
     "Valores": {
       "Dezembro -2025": 26.388,
-      "Janeiro -2026": 26.274,
+      "Janeiro": 26.274,
       "Fevereiro": 26.5964,
       "Março": 26.5568
     }
@@ -3004,7 +3004,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3,50",
     "Valores": {
       "Dezembro -2025": 30.9972,
-      "Janeiro -2026": 30.847,
+      "Janeiro": 30.847,
       "Fevereiro": 31.3822,
       "Março": 31.0162
     }
@@ -3014,7 +3014,7 @@
     "Descricao": "BUCHA DE POLIPROPILENO",
     "Valores": {
       "Dezembro -2025": 0.2132,
-      "Janeiro -2026": 0.2267,
+      "Janeiro": 0.2267,
       "Fevereiro": 0.2228,
       "Março": 0.2235
     }
@@ -3024,7 +3024,7 @@
     "Descricao": "SUPORTE P/ CACAMBA GALV 1,10",
     "Valores": {
       "Dezembro -2025": 0.8915,
-      "Janeiro -2026": 0.8516,
+      "Janeiro": 0.8516,
       "Fevereiro": 0.4744,
       "Março": 0.9248
     }
@@ -3034,7 +3034,7 @@
     "Descricao": "SUPORTE P/ CACAMBA GALV 0,90",
     "Valores": {
       "Dezembro -2025": 0.854,
-      "Janeiro -2026": 0.8579,
+      "Janeiro": 0.8579,
       "Fevereiro": 0.4219,
       "Março": 0.8295
     }
@@ -3044,7 +3044,7 @@
     "Descricao": "PONTEIRA P/ VARAL AZUL",
     "Valores": {
       "Dezembro -2025": 0.1883,
-      "Janeiro -2026": 0.1958,
+      "Janeiro": 0.1958,
       "Fevereiro": 0.111,
       "Março": 0.3426
     }
@@ -3054,7 +3054,7 @@
     "Descricao": "PE GALVANIZADO PESADA",
     "Valores": {
       "Dezembro -2025": 5.6816,
-      "Janeiro -2026": 5.658,
+      "Janeiro": 5.658,
       "Fevereiro": 5.8501,
       "Março": 5.8279
     }
@@ -3064,7 +3064,7 @@
     "Descricao": "PE GALVANIZADO LEVE",
     "Valores": {
       "Dezembro -2025": 4.1664,
-      "Janeiro -2026": 4.0306,
+      "Janeiro": 4.0306,
       "Fevereiro": 4.3863,
       "Março": 4.2973
     }
@@ -3074,7 +3074,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS GALV (",
     "Valores": {
       "Dezembro -2025": 45.6388,
-      "Janeiro -2026": 45.0789,
+      "Janeiro": 45.0789,
       "Fevereiro": 47.1499,
       "Março": 47.1814
     }
@@ -3084,7 +3084,7 @@
     "Descricao": "CACAMBA METAL PLUS AZ",
     "Valores": {
       "Dezembro -2025": 27.87,
-      "Janeiro -2026": 27.8704,
+      "Janeiro": 27.8704,
       "Fevereiro": 28.5014,
       "Março": 28.975
     }
@@ -3094,7 +3094,7 @@
     "Descricao": "CACAMBA METAL PLUS AZ FUZIL",
     "Valores": {
       "Dezembro -2025": 27.87,
-      "Janeiro -2026": 27.8704,
+      "Janeiro": 27.8704,
       "Fevereiro": 28.5014,
       "Março": 28.975
     }
@@ -3104,7 +3104,7 @@
     "Descricao": "CACAMBA METAL SUPER LRJ",
     "Valores": {
       "Dezembro -2025": 23.8163,
-      "Janeiro -2026": 23.7797,
+      "Janeiro": 23.7797,
       "Fevereiro": 24.5604,
       "Março": 24.2984
     }
@@ -3114,7 +3114,7 @@
     "Descricao": "CACAMBA METAL SUPER LRJ FUZIL",
     "Valores": {
       "Dezembro -2025": 23.5218,
-      "Janeiro -2026": 23.4856,
+      "Janeiro": 23.4856,
       "Fevereiro": 24.2659,
       "Março": 24.0034
     }
@@ -3124,7 +3124,7 @@
     "Descricao": "CACAMBA METAL MASTER AZ",
     "Valores": {
       "Dezembro -2025": 31.8068,
-      "Janeiro -2026": 31.8047,
+      "Janeiro": 31.8047,
       "Fevereiro": 32.5152,
       "Março": 33.0478
     }
@@ -3134,7 +3134,7 @@
     "Descricao": "CACAMBA METAL MASTER FUZIL AZ",
     "Valores": {
       "Dezembro -2025": 31.509,
-      "Janeiro -2026": 31.5066,
+      "Janeiro": 31.5066,
       "Fevereiro": 32.2168,
       "Março": 32.7494
     }
@@ -3144,7 +3144,7 @@
     "Descricao": "CACAMBA METAL POP CNZ",
     "Valores": {
       "Dezembro -2025": 13.6851,
-      "Janeiro -2026": 14.7859,
+      "Janeiro": 14.7859,
       "Fevereiro": 14.7277,
       "Março": 14.8124
     }
@@ -3154,7 +3154,7 @@
     "Descricao": "CACAMBA METAL POP FUZIL CNZ",
     "Valores": {
       "Dezembro -2025": 13.7746,
-      "Janeiro -2026": 14.8754,
+      "Janeiro": 14.8754,
       "Fevereiro": 14.8171,
       "Março": 14.9019
     }
@@ -3164,7 +3164,7 @@
     "Descricao": "CACAMBA METAL POP FERFATTO",
     "Valores": {
       "Dezembro -2025": 13.6851,
-      "Janeiro -2026": 14.7859,
+      "Janeiro": 14.7859,
       "Fevereiro": 14.7277,
       "Março": 14.8124
     }
@@ -3174,7 +3174,7 @@
     "Descricao": "CACAMBA METAL POP VERM",
     "Valores": {
       "Dezembro -2025": 14.4308,
-      "Janeiro -2026": 15.5316,
+      "Janeiro": 15.5316,
       "Fevereiro": 15.4736,
       "Março": 15.5631
     }
@@ -3184,7 +3184,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS",
     "Valores": {
       "Dezembro -2025": 51.1608,
-      "Janeiro -2026": 51.0216,
+      "Janeiro": 51.0216,
       "Fevereiro": 52.8774,
       "Março": 52.7835
     }
@@ -3194,7 +3194,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS A",
     "Valores": {
       "Dezembro -2025": 43.4418,
-      "Janeiro -2026": 42.9604,
+      "Janeiro": 42.9604,
       "Fevereiro": 44.9435,
       "Março": 44.6693
     }
@@ -3204,7 +3204,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS POP FU",
     "Valores": {
       "Dezembro -2025": 43.3648,
-      "Janeiro -2026": 42.8839,
+      "Janeiro": 42.8839,
       "Fevereiro": 45.0452,
       "Março": 44.6672
     }
@@ -3214,7 +3214,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS FUZIL",
     "Valores": {
       "Dezembro -2025": 51.1248,
-      "Janeiro -2026": 50.9892,
+      "Janeiro": 50.9892,
       "Fevereiro": 52.8891,
       "Março": 52.7969
     }
@@ -3224,7 +3224,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3",
     "Valores": {
       "Dezembro -2025": 25.9486,
-      "Janeiro -2026": 25.8503,
+      "Janeiro": 25.8503,
       "Fevereiro": 26.1551,
       "Março": 26.0543
     }
@@ -3234,7 +3234,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 A",
     "Valores": {
       "Dezembro -2025": 24.3929,
-      "Janeiro -2026": 24.2263,
+      "Janeiro": 24.2263,
       "Fevereiro": 24.7665,
       "Março": 24.4528
     }
@@ -3244,7 +3244,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 A",
     "Valores": {
       "Dezembro -2025": 24.1727,
-      "Janeiro -2026": 24.0109,
+      "Janeiro": 24.0109,
       "Fevereiro": 24.5401,
       "Março": 24.2532
     }
@@ -3254,7 +3254,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 PO",
     "Valores": {
       "Dezembro -2025": 24.1727,
-      "Janeiro -2026": 24.0109,
+      "Janeiro": 24.0109,
       "Fevereiro": 24.5401,
       "Março": 24.2532
     }
@@ -3264,7 +3264,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 TH",
     "Valores": {
       "Dezembro -2025": 25.7254,
-      "Janeiro -2026": 25.6319,
+      "Janeiro": 25.6319,
       "Fevereiro": 26.1089,
       "Março": 25.8791
     }
@@ -3274,7 +3274,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PNEU FO",
     "Valores": {
       "Dezembro -2025": 28.9157,
-      "Janeiro -2026": 28.7089,
+      "Janeiro": 28.7089,
       "Fevereiro": 30.7931,
       "Março": 30.9819
     }
@@ -3284,7 +3284,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 FU",
     "Valores": {
       "Dezembro -2025": 25.7254,
-      "Janeiro -2026": 25.6319,
+      "Janeiro": 25.6319,
       "Fevereiro": 26.1089,
       "Março": 25.8791
     }
@@ -3294,7 +3294,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO P. MACI",
     "Valores": {
       "Dezembro -2025": 21.6195,
-      "Janeiro -2026": 21.4382,
+      "Janeiro": 21.4382,
       "Fevereiro": 22.0532,
       "Março": 22.0901
     }
@@ -3304,7 +3304,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO P. MACI",
     "Valores": {
       "Dezembro -2025": 21.6949,
-      "Janeiro -2026": 21.4452,
+      "Janeiro": 21.4452,
       "Fevereiro": 22.162,
       "Março": 22.1408
     }
@@ -3314,7 +3314,7 @@
     "Descricao": "KIT ESP P/ 01 CAR GALV PC 3 (P",
     "Valores": {
       "Dezembro -2025": 24.8323,
-      "Janeiro -2026": 24.65,
+      "Janeiro": 24.65,
       "Fevereiro": 25.2078,
       "Março": 24.9553
     }
@@ -3324,7 +3324,7 @@
     "Descricao": "KIT ESP P/ 01 CAR GALV P. MACI",
     "Valores": {
       "Dezembro -2025": 22.1343,
-      "Janeiro -2026": 21.8689,
+      "Janeiro": 21.8689,
       "Fevereiro": 22.6033,
       "Março": 22.6432
     }
@@ -3334,7 +3334,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO POP 90/",
     "Valores": {
       "Dezembro -2025": 9.7536,
-      "Janeiro -2026": 9.6363,
+      "Janeiro": 9.6363,
       "Fevereiro": 10.2088,
       "Março": 10.1578
     }
@@ -3344,7 +3344,7 @@
     "Descricao": "KIT ESP P/ 05 CARRINHOS POP 90",
     "Valores": {
       "Dezembro -2025": 42.7737,
-      "Janeiro -2026": 42.1627,
+      "Janeiro": 42.1627,
       "Fevereiro": 44.0705,
       "Março": 43.9931
     }
@@ -3354,7 +3354,7 @@
     "Descricao": "VARAL METAL 0,90 CNZ",
     "Valores": {
       "Dezembro -2025": 10.5867,
-      "Janeiro -2026": 10.5923,
+      "Janeiro": 10.5923,
       "Fevereiro": 10.9308,
       "Março": 11.1766
     }
@@ -3364,7 +3364,7 @@
     "Descricao": "KIT ESP P/ 01 CARRINHO PC 3 M.",
     "Valores": {
       "Dezembro -2025": 48.8177,
-      "Janeiro -2026": 49.4857,
+      "Janeiro": 49.4857,
       "Fevereiro": 50.1316,
       "Março": 48.9033
     }
@@ -3374,7 +3374,7 @@
     "Descricao": "BASCULADOR P/ CARRINHO M. TRUC",
     "Valores": {
       "Dezembro -2025": 1.6639,
-      "Janeiro -2026": 1.6566,
+      "Janeiro": 1.6566,
       "Fevereiro": 1.7079,
       "Março": 1.7154
     }
@@ -3384,7 +3384,7 @@
     "Descricao": "KIT FIXADOR METALOSA MASTER TR",
     "Valores": {
       "Dezembro -2025": 3.8551,
-      "Janeiro -2026": 3.8521,
+      "Janeiro": 3.8521,
       "Fevereiro": 3.8492,
       "Março": 3.7852
     }
@@ -3394,7 +3394,7 @@
     "Descricao": "VARAL METAL GALV M. TRUCK",
     "Valores": {
       "Dezembro -2025": 14.2894,
-      "Janeiro -2026": 13.6872,
+      "Janeiro": 13.6872,
       "Fevereiro": 15.3882,
       "Março": 15.1101
     }
@@ -3404,7 +3404,7 @@
     "Descricao": "EIXO P/ CARRINHO M. TRUCK",
     "Valores": {
       "Dezembro -2025": 3.4643,
-      "Janeiro -2026": 3.4218,
+      "Janeiro": 3.4218,
       "Fevereiro": 3.5073,
       "Março": 2.8677
     }
@@ -3414,7 +3414,7 @@
     "Descricao": "VARAL METAL BI-PARTIDO GALV/SU",
     "Valores": {
       "Dezembro -2025": 11.7067,
-      "Janeiro -2026": 11.5228,
+      "Janeiro": 11.5228,
       "Fevereiro": 14.8442,
       "Março": 15.8372
     }
@@ -3424,7 +3424,7 @@
     "Descricao": "VARAL METAL GALV 0,90",
     "Valores": {
       "Dezembro -2025": 8.3695,
-      "Janeiro -2026": 8.2618,
+      "Janeiro": 8.2618,
       "Fevereiro": 8.5311,
       "Março": 9.385
     }
@@ -3434,7 +3434,7 @@
     "Descricao": "VARAL METAL GALV 1,10",
     "Valores": {
       "Dezembro -2025": 13.318,
-      "Janeiro -2026": 12.7404,
+      "Janeiro": 12.7404,
       "Fevereiro": 14.2676,
       "Março": 13.9638
     }
@@ -3444,7 +3444,7 @@
     "Descricao": "GRADE P/ CARRO PLATAFORMA",
     "Valores": {
       "Dezembro -2025": 25.896,
-      "Janeiro -2026": 24.8923,
+      "Janeiro": 24.8923,
       "Fevereiro": 28.1512,
       "Março": 27.8388
     }
@@ -3454,7 +3454,7 @@
     "Descricao": "CACAMBA METALFORTE M16",
     "Valores": {
       "Dezembro -2025": 52.8958,
-      "Janeiro -2026": 53.101,
+      "Janeiro": 53.101,
       "Fevereiro": 54.5488,
       "Março": 54.9244
     }
@@ -3464,7 +3464,7 @@
     "Descricao": "CACAMBA METALFORTE P AZUL M16",
     "Valores": {
       "Dezembro -2025": 54.6044,
-      "Janeiro -2026": 54.8126,
+      "Janeiro": 54.8126,
       "Fevereiro": 56.2638,
       "Março": 56.6394
     }
@@ -3474,7 +3474,7 @@
     "Descricao": "CACAMBA METALFORTE M18",
     "Valores": {
       "Dezembro -2025": 42.1286,
-      "Janeiro -2026": 42.4367,
+      "Janeiro": 42.4367,
       "Fevereiro": 43.1288,
       "Março": 43.5964
     }
@@ -3484,7 +3484,7 @@
     "Descricao": "CACAMBA METALFORTE P AZUL M18",
     "Valores": {
       "Dezembro -2025": 43.8224,
-      "Janeiro -2026": 44.1336,
+      "Janeiro": 44.1336,
       "Fevereiro": 44.8289,
       "Março": 45.2966
     }
@@ -3494,7 +3494,7 @@
     "Descricao": "CACAMBA METALFORTE P AZUL M18",
     "Valores": {
       "Dezembro -2025": 43.8224,
-      "Janeiro -2026": 44.1336,
+      "Janeiro": 44.1336,
       "Fevereiro": 44.8289,
       "Março": 45.2966
     }
@@ -3504,7 +3504,7 @@
     "Descricao": "CACAMBA METALFORTE M18 FUZIL",
     "Valores": {
       "Dezembro -2025": 42.1286,
-      "Janeiro -2026": 42.4367,
+      "Janeiro": 42.4367,
       "Fevereiro": 43.1288,
       "Março": 43.5964
     }
@@ -3514,7 +3514,7 @@
     "Descricao": "CACAMBA METALFORTE M20",
     "Valores": {
       "Dezembro -2025": 33.0435,
-      "Janeiro -2026": 33.447,
+      "Janeiro": 33.447,
       "Fevereiro": 34.2185,
       "Março": 35.1331
     }
@@ -3524,7 +3524,7 @@
     "Descricao": "CACAMBA METALFORTE P AZUL M20",
     "Valores": {
       "Dezembro -2025": 34.7436,
-      "Janeiro -2026": 35.1502,
+      "Janeiro": 35.1502,
       "Fevereiro": 35.925,
       "Março": 36.8396
     }
@@ -3534,7 +3534,7 @@
     "Descricao": "CACAMBA METALFORTE M20 THOR",
     "Valores": {
       "Dezembro -2025": 33.2883,
-      "Janeiro -2026": 33.6917,
+      "Janeiro": 33.6917,
       "Fevereiro": 34.4633,
       "Março": 35.3779
     }
@@ -3544,7 +3544,7 @@
     "Descricao": "PERFIL DO PE METALFORTE AZ",
     "Valores": {
       "Dezembro -2025": 8.1962,
-      "Janeiro -2026": 8.1836,
+      "Janeiro": 8.1836,
       "Fevereiro": 8.685,
       "Março": 17.551
     }
@@ -3554,7 +3554,7 @@
     "Descricao": "TRAVESSAO METALFORTE AZ",
     "Valores": {
       "Dezembro -2025": 5.9568,
-      "Janeiro -2026": 5.9541,
+      "Janeiro": 5.9541,
       "Fevereiro": 6.3051,
       "Março": 6.38
     }
@@ -3564,7 +3564,7 @@
     "Descricao": "PE METALFORTE AZ",
     "Valores": {
       "Dezembro -2025": 22.3492,
-      "Janeiro -2026": 22.3213,
+      "Janeiro": 22.3213,
       "Fevereiro": 23.6752,
       "Março": 23.931
     }
@@ -3574,7 +3574,7 @@
     "Descricao": "CALCO P/ EIXO CAR M. TRUCK MET",
     "Valores": {
       "Dezembro -2025": 0.1487,
-      "Janeiro -2026": 0.1469,
+      "Janeiro": 0.1469,
       "Fevereiro": 0.0738,
       "Março": 0.1449
     }
@@ -3584,7 +3584,7 @@
     "Descricao": "CACAMBA METAL 5.0 AZ",
     "Valores": {
       "Dezembro -2025": 19.5032,
-      "Janeiro -2026": 19.4718,
+      "Janeiro": 19.4718,
       "Fevereiro": 19.8651,
       "Março": 19.9883
     }
@@ -3594,7 +3594,7 @@
     "Descricao": "CACAMBA METAL 5.0 AZ FUZIL",
     "Valores": {
       "Dezembro -2025": 18.9993,
-      "Janeiro -2026": 18.9675,
+      "Janeiro": 18.9675,
       "Fevereiro": 19.3603,
       "Março": 19.4835
     }
@@ -3604,7 +3604,7 @@
     "Descricao": "CACAMBA METAL ECOPLUS AMRL",
     "Valores": {
       "Dezembro -2025": 29.1689,
-      "Janeiro -2026": 29.1082,
+      "Janeiro": 29.1082,
       "Fevereiro": 29.9512,
       "Março": 30.382
     }
@@ -3614,7 +3614,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR GALV",
     "Valores": {
       "Dezembro -2025": 13.3349,
-      "Janeiro -2026": 13.337,
+      "Janeiro": 13.337,
       "Fevereiro": 13.6918,
       "Março": 13.9388
     }
@@ -3624,7 +3624,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR GALV",
     "Valores": {
       "Dezembro -2025": 13.3349,
-      "Janeiro -2026": 13.337,
+      "Janeiro": 13.337,
       "Fevereiro": 13.6918,
       "Março": 13.9388
     }
@@ -3634,7 +3634,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR GALV",
     "Valores": {
       "Dezembro -2025": 13.3349,
-      "Janeiro -2026": 13.337,
+      "Janeiro": 13.337,
       "Fevereiro": 13.6918,
       "Março": 13.9388
     }
@@ -3644,7 +3644,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR GALV",
     "Valores": {
       "Dezembro -2025": 13.3349,
-      "Janeiro -2026": 13.337,
+      "Janeiro": 13.337,
       "Fevereiro": 13.6918,
       "Março": 13.9388
     }
@@ -3654,7 +3654,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR GALV",
     "Valores": {
       "Dezembro -2025": 13.3349,
-      "Janeiro -2026": 13.337,
+      "Janeiro": 13.337,
       "Fevereiro": 13.6918,
       "Março": 13.9388
     }
@@ -3664,7 +3664,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR VRML",
     "Valores": {
       "Dezembro -2025": 14.1171,
-      "Janeiro -2026": 15.145,
+      "Janeiro": 15.145,
       "Fevereiro": 15.1302,
       "Março": 15.2252
     }
@@ -3674,7 +3674,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR VRML",
     "Valores": {
       "Dezembro -2025": 14.1171,
-      "Janeiro -2026": 15.145,
+      "Janeiro": 15.145,
       "Fevereiro": 15.1302,
       "Março": 15.2252
     }
@@ -3684,7 +3684,7 @@
     "Descricao": "CACAMBA METAL CONSTRUTOR VRML",
     "Valores": {
       "Dezembro -2025": 14.1171,
-      "Janeiro -2026": 15.145,
+      "Janeiro": 15.145,
       "Fevereiro": 15.1302,
       "Março": 15.2252
     }
@@ -3694,7 +3694,7 @@
     "Descricao": "CACAMBA METAL CONSTR/PRATICO L",
     "Valores": {
       "Dezembro -2025": 14.2076,
-      "Janeiro -2026": 15.233,
+      "Janeiro": 15.233,
       "Fevereiro": 15.2207,
       "Março": 15.314
     }
@@ -3704,7 +3704,7 @@
     "Descricao": "KIT ESP P/ 01 METALFORTE P AZU",
     "Valores": {
       "Dezembro -2025": 49.0484,
-      "Janeiro -2026": 48.9019,
+      "Janeiro": 48.9019,
       "Fevereiro": 50.5565,
       "Março": 50.2869
     }
@@ -3714,7 +3714,7 @@
     "Descricao": "KIT ESP P/01 METFORT P AZUL PC",
     "Valores": {
       "Dezembro -2025": 48.8253,
-      "Janeiro -2026": 48.6835,
+      "Janeiro": 48.6835,
       "Fevereiro": 50.5103,
       "Março": 50.1117
     }
@@ -3724,7 +3724,7 @@
     "Descricao": "CUBA C1R ALTO BRILHO–46X30,5X1",
     "Valores": {
       "Dezembro -2025": 18.3794,
-      "Janeiro -2026": 18.0074,
+      "Janeiro": 18.0074,
       "Fevereiro": 18.8414,
       "Março": 19.2548
     }
@@ -3734,7 +3734,7 @@
     "Descricao": "CUBA C1R BRILHO 46X30,5X11 ACO",
     "Valores": {
       "Dezembro -2025": 16.6875,
-      "Janeiro -2026": 16.4649,
+      "Janeiro": 16.4649,
       "Fevereiro": 16.9916,
       "Março": 17.3437
     }
@@ -3744,9 +3744,9 @@
     "Descricao": "CUBA C1R BRILHO 46X30,5X11 ACO",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3754,9 +3754,9 @@
     "Descricao": "CUBA C1R ALTO BRILHO 46X30,5X1",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3764,7 +3764,7 @@
     "Descricao": "CUBA C2R ALTO BRILHO 56X33X11",
     "Valores": {
       "Dezembro -2025": 21.5216,
-      "Janeiro -2026": 21.6658,
+      "Janeiro": 21.6658,
       "Fevereiro": 22.2281,
       "Março": 22.1753
     }
@@ -3774,7 +3774,7 @@
     "Descricao": "CUBA C2R BRILHO 56X33X11 ACO 4",
     "Valores": {
       "Dezembro -2025": 20.0266,
-      "Janeiro -2026": 20.2923,
+      "Janeiro": 20.2923,
       "Fevereiro": 20.5585,
       "Março": 20.4772
     }
@@ -3784,9 +3784,9 @@
     "Descricao": "CUBA C2R BRILHO 56X33X11 ACO 4",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3794,9 +3794,9 @@
     "Descricao": "CUBA C2R ALTO BRILHO 56X33X11",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3804,7 +3804,7 @@
     "Descricao": "CUBA C1F ALTO BRILHO 47X31X14",
     "Valores": {
       "Dezembro -2025": 25.643,
-      "Janeiro -2026": 24.7652,
+      "Janeiro": 24.7652,
       "Fevereiro": 26.3158,
       "Março": 27.0378
     }
@@ -3814,7 +3814,7 @@
     "Descricao": "CUBA C1F BRILHO 47X31X14 ACO 4",
     "Valores": {
       "Dezembro -2025": 21.4431,
-      "Janeiro -2026": 20.9205,
+      "Janeiro": 20.9205,
       "Fevereiro": 21.6718,
       "Março": 22.28
     }
@@ -3824,9 +3824,9 @@
     "Descricao": "CUBA C1F BRILHO 47X31X14 ACO 4",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3834,9 +3834,9 @@
     "Descricao": "CUBA C1F ALTO BRILHO 47X31X14",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3844,7 +3844,7 @@
     "Descricao": "CUBA C2F ALTO BRILHO 56X34X14",
     "Valores": {
       "Dezembro -2025": 32.9176,
-      "Janeiro -2026": 33.8489,
+      "Janeiro": 33.8489,
       "Fevereiro": 34.7425,
       "Março": 35.4162
     }
@@ -3854,7 +3854,7 @@
     "Descricao": "CUBA C2F BRILHO 56X34X14 ACO 4",
     "Valores": {
       "Dezembro -2025": 27.4345,
-      "Janeiro -2026": 28.8256,
+      "Janeiro": 28.8256,
       "Fevereiro": 28.6664,
       "Março": 29.2011
     }
@@ -3864,9 +3864,9 @@
     "Descricao": "CUBA C2F BRILHO 56X34X14 ACO 4",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3874,9 +3874,9 @@
     "Descricao": "CUBA C2F ALTO BRILHO 56X34X14",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3884,7 +3884,7 @@
     "Descricao": "CUBA C1F ALTO BRILHO 47X31X14",
     "Valores": {
       "Dezembro -2025": 35.0094,
-      "Janeiro -2026": 34.1314,
+      "Janeiro": 34.1314,
       "Fevereiro": 35.1953,
       "Março": 35.9174
     }
@@ -3894,9 +3894,9 @@
     "Descricao": "CUBA C1F ALTO BRILHO 47X31X14",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3904,7 +3904,7 @@
     "Descricao": "CUBA C2F ALTO BRILHO 56X34X14",
     "Valores": {
       "Dezembro -2025": 46.3639,
-      "Janeiro -2026": 45.1004,
+      "Janeiro": 45.1004,
       "Fevereiro": 46.0899,
       "Março": 46.6675
     }
@@ -3914,9 +3914,9 @@
     "Descricao": "CUBA C2F ALTO BRILHO 56X34X14",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -3924,7 +3924,7 @@
     "Descricao": "CUBA C1-17 ALTO BRILHO 47X31X1",
     "Valores": {
       "Dezembro -2025": 30.1674,
-      "Janeiro -2026": 29.3256,
+      "Janeiro": 29.3256,
       "Fevereiro": 30.3094,
       "Março": 31.3382
     }
@@ -3934,7 +3934,7 @@
     "Descricao": "CUBA C2-17 ALTO BRILHO 56X34X1",
     "Valores": {
       "Dezembro -2025": 28.3776,
-      "Janeiro -2026": 34.2657,
+      "Janeiro": 34.2657,
       "Fevereiro": 35.4818,
       "Março": 36.4963
     }
@@ -3944,7 +3944,7 @@
     "Descricao": "CACAMBA PLASTICA VERMELHA 60L",
     "Valores": {
       "Dezembro -2025": 23.86,
-      "Janeiro -2026": 23.86,
+      "Janeiro": 23.86,
       "Fevereiro": 98.1225,
       "Março": 98.1225
     }
@@ -3954,7 +3954,7 @@
     "Descricao": "CACAMBA PLASTICA VERDE 60L",
     "Valores": {
       "Dezembro -2025": 28.8092,
-      "Janeiro -2026": 28.8093,
+      "Janeiro": 28.8093,
       "Fevereiro": 35.9778,
       "Março": 35.9775
     }
@@ -3964,7 +3964,7 @@
     "Descricao": "KIT FIXADOR METALOSA ESPECIAL",
     "Valores": {
       "Dezembro -2025": 1.8267,
-      "Janeiro -2026": 1.825,
+      "Janeiro": 1.825,
       "Fevereiro": 1.825,
       "Março": 2.9564
     }
@@ -3974,7 +3974,7 @@
     "Descricao": "CACAMBA PLASTICA AZUL 90L",
     "Valores": {
       "Dezembro -2025": 77.03,
-      "Janeiro -2026": 77.15,
+      "Janeiro": 77.15,
       "Fevereiro": 77.15,
       "Março": 151.05
     }
@@ -3984,7 +3984,7 @@
     "Descricao": "RODA C/ BUCHA METALICA 3 P.U",
     "Valores": {
       "Dezembro -2025": 29.471,
-      "Janeiro -2026": 29.471,
+      "Janeiro": 29.471,
       "Fevereiro": 29.471,
       "Março": 29.471
     }
@@ -3994,7 +3994,7 @@
     "Descricao": "BALDE PLASTICO 12L.",
     "Valores": {
       "Dezembro -2025": 4.5204,
-      "Janeiro -2026": 4.5204,
+      "Janeiro": 4.5204,
       "Fevereiro": 4.5204,
       "Março": 4.5205
     }
@@ -4004,7 +4004,7 @@
     "Descricao": "MASSEIRA PLASTICA 20L",
     "Valores": {
       "Dezembro -2025": 8.1712,
-      "Janeiro -2026": 8.1712,
+      "Janeiro": 8.1712,
       "Fevereiro": 8.1712,
       "Março": 8.1712
     }
@@ -4014,7 +4014,7 @@
     "Descricao": "PALETEIRA HID MANUAL 2TON MOD",
     "Valores": {
       "Dezembro -2025": 678.1296,
-      "Janeiro -2026": 678.1295,
+      "Janeiro": 678.1295,
       "Fevereiro": 678.1295,
       "Março": 678.1295
     }
@@ -4024,7 +4024,7 @@
     "Descricao": "PALETEIRA HID MANUAL 2TON MOD",
     "Valores": {
       "Dezembro -2025": 784.5082,
-      "Janeiro -2026": 784.5082,
+      "Janeiro": 784.5082,
       "Fevereiro": 784.5082,
       "Março": 784.5081
     }
@@ -4034,7 +4034,7 @@
     "Descricao": "PALETEIRA HID MANUAL 3TON MOD",
     "Valores": {
       "Dezembro -2025": 722.4274,
-      "Janeiro -2026": 722.4274,
+      "Janeiro": 722.4274,
       "Fevereiro": 722.4275,
       "Março": 722.4275
     }
@@ -4044,7 +4044,7 @@
     "Descricao": "PALETEIRA HID MANUAL 3TON MOD",
     "Valores": {
       "Dezembro -2025": 751.5731,
-      "Janeiro -2026": 751.5731,
+      "Janeiro": 751.5731,
       "Fevereiro": 751.5733,
       "Março": 751.5736
     }
@@ -4054,7 +4054,7 @@
     "Descricao": "PERFIL US 45X17X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4064,7 +4064,7 @@
     "Descricao": "PERFIL US 45X17X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4074,7 +4074,7 @@
     "Descricao": "PERFIL US 45X17X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4084,7 +4084,7 @@
     "Descricao": "PERFIL US 50X25X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4094,7 +4094,7 @@
     "Descricao": "PERFIL US 50X25X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4104,7 +4104,7 @@
     "Descricao": "PERFIL US 50X25X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4114,7 +4114,7 @@
     "Descricao": "PERFIL US 50X25X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4124,7 +4124,7 @@
     "Descricao": "PERFIL US 68X30X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4134,7 +4134,7 @@
     "Descricao": "PERFIL US 68X30X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4144,7 +4144,7 @@
     "Descricao": "PERFIL US 68X30X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4154,7 +4154,7 @@
     "Descricao": "PERFIL US 68X30X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4164,7 +4164,7 @@
     "Descricao": "PERFIL US 75X40X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4174,7 +4174,7 @@
     "Descricao": "PERFIL US 75X40X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4184,7 +4184,7 @@
     "Descricao": "PERFIL US 75X40X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4194,7 +4194,7 @@
     "Descricao": "PERFIL US 75X40X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4204,7 +4204,7 @@
     "Descricao": "PERFIL US 75X40X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4214,7 +4214,7 @@
     "Descricao": "PERFIL US 75X40X4,75",
     "Valores": {
       "Dezembro -2025": 0.1048,
-      "Janeiro -2026": 0.0508,
+      "Janeiro": 0.0508,
       "Fevereiro": 0.13,
       "Março": 0.1524
     }
@@ -4224,7 +4224,7 @@
     "Descricao": "PERFIL US 75X40X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4234,7 +4234,7 @@
     "Descricao": "PERFIL US 75X40X2,30 GALV",
     "Valores": {
       "Dezembro -2025": 4.2371,
-      "Janeiro -2026": 4.183,
+      "Janeiro": 4.183,
       "Fevereiro": 4.2623,
       "Março": 4.2846
     }
@@ -4244,7 +4244,7 @@
     "Descricao": "PERFIL US 92X30X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4254,7 +4254,7 @@
     "Descricao": "PERFIL US 92X30X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4264,7 +4264,7 @@
     "Descricao": "PERFIL US 92X30X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4274,7 +4274,7 @@
     "Descricao": "PERFIL US 100X40X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4284,7 +4284,7 @@
     "Descricao": "PERFIL US 100X40X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4294,7 +4294,7 @@
     "Descricao": "PERFIL US 100X40X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4304,7 +4304,7 @@
     "Descricao": "PERFIL US 100X40X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4314,7 +4314,7 @@
     "Descricao": "PERFIL US 100X40X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4324,7 +4324,7 @@
     "Descricao": "PERFIL US 100X40X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4334,7 +4334,7 @@
     "Descricao": "PERFIL US 100X50X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4344,7 +4344,7 @@
     "Descricao": "PERFIL US 100X50X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4354,7 +4354,7 @@
     "Descricao": "PERFIL US 100X50X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4364,7 +4364,7 @@
     "Descricao": "PERFIL US 100X50X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4374,7 +4374,7 @@
     "Descricao": "PERFIL US 100X50X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4384,7 +4384,7 @@
     "Descricao": "PERFIL US 100X50X4,75",
     "Valores": {
       "Dezembro -2025": 0.1048,
-      "Janeiro -2026": 0.0508,
+      "Janeiro": 0.0508,
       "Fevereiro": 0.13,
       "Março": 0.1524
     }
@@ -4394,7 +4394,7 @@
     "Descricao": "PERFIL US 100X50X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4404,7 +4404,7 @@
     "Descricao": "PERFIL US 127X40X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4414,7 +4414,7 @@
     "Descricao": "PERFIL US 127X40X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4424,7 +4424,7 @@
     "Descricao": "PERFIL US 127X50X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4434,7 +4434,7 @@
     "Descricao": "PERFIL US 127X50X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4444,7 +4444,7 @@
     "Descricao": "PERFIL US 127X50X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4454,7 +4454,7 @@
     "Descricao": "PERFIL US 127X50X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4464,7 +4464,7 @@
     "Descricao": "PERFIL US 127X50X4,75",
     "Valores": {
       "Dezembro -2025": 0.1048,
-      "Janeiro -2026": 0.0508,
+      "Janeiro": 0.0508,
       "Fevereiro": 0.13,
       "Março": 0.1524
     }
@@ -4474,7 +4474,7 @@
     "Descricao": "PERFIL US 127X50X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4484,7 +4484,7 @@
     "Descricao": "PERFIL US 150X40X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4494,7 +4494,7 @@
     "Descricao": "PERFIL US 150X50X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4504,7 +4504,7 @@
     "Descricao": "PERFIL US 150X50X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4514,7 +4514,7 @@
     "Descricao": "PERFIL US 150X50X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4524,7 +4524,7 @@
     "Descricao": "PERFIL US 150X50X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4534,7 +4534,7 @@
     "Descricao": "PERFIL US 150X50X4,75",
     "Valores": {
       "Dezembro -2025": 0.1048,
-      "Janeiro -2026": 0.0508,
+      "Janeiro": 0.0508,
       "Fevereiro": 0.13,
       "Março": 0.1524
     }
@@ -4544,7 +4544,7 @@
     "Descricao": "PERFIL US 150X50X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4554,7 +4554,7 @@
     "Descricao": "PERFIL US 200X50X2,00",
     "Valores": {
       "Dezembro -2025": 3.8018,
-      "Janeiro -2026": 3.7487,
+      "Janeiro": 3.7487,
       "Fevereiro": 3.8275,
       "Março": 3.8507
     }
@@ -4564,7 +4564,7 @@
     "Descricao": "PERFIL US 200X50X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4574,7 +4574,7 @@
     "Descricao": "PERFIL US 200X50X3,00",
     "Valores": {
       "Dezembro -2025": 3.4423,
-      "Janeiro -2026": 3.437,
+      "Janeiro": 3.437,
       "Fevereiro": 3.4449,
       "Março": 3.4472
     }
@@ -4584,7 +4584,7 @@
     "Descricao": "PERFIL US 200X50X4,75",
     "Valores": {
       "Dezembro -2025": 0.1048,
-      "Janeiro -2026": 0.0508,
+      "Janeiro": 0.0508,
       "Fevereiro": 0.13,
       "Março": 0.1524
     }
@@ -4594,7 +4594,7 @@
     "Descricao": "PERFIL UE 50X25X10X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4604,7 +4604,7 @@
     "Descricao": "PERFIL UE 50X25X10X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4614,7 +4614,7 @@
     "Descricao": "PERFIL UE 50X25X10X1,55 GALV",
     "Valores": {
       "Dezembro -2025": 5.9829,
-      "Janeiro -2026": 5.9288,
+      "Janeiro": 5.9288,
       "Fevereiro": 6.0081,
       "Março": 6.0304
     }
@@ -4624,7 +4624,7 @@
     "Descricao": "PERFIL UE 50X25X10X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4634,7 +4634,7 @@
     "Descricao": "PERFIL UE 75X40X15X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4644,7 +4644,7 @@
     "Descricao": "PERFIL UE 75X40X15X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4654,7 +4654,7 @@
     "Descricao": "PERFIL UE 75X40X15X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4664,7 +4664,7 @@
     "Descricao": "PERFIL UE 75X40X15X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4674,7 +4674,7 @@
     "Descricao": "PERFIL UE 75X40X15X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4684,7 +4684,7 @@
     "Descricao": "PERFIL UE 75X40X15X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4694,7 +4694,7 @@
     "Descricao": "PERFIL UE 75X40X15X2,30 GALV",
     "Valores": {
       "Dezembro -2025": 4.2371,
-      "Janeiro -2026": 4.183,
+      "Janeiro": 4.183,
       "Fevereiro": 4.2623,
       "Março": 4.2846
     }
@@ -4704,7 +4704,7 @@
     "Descricao": "PERFIL UE 100X40X17X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4714,7 +4714,7 @@
     "Descricao": "PERFIL UE 100X40X17X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4724,7 +4724,7 @@
     "Descricao": "PERFIL UE 100X40X17X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4734,7 +4734,7 @@
     "Descricao": "PERFIL UE 100X40X17X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4744,7 +4744,7 @@
     "Descricao": "PERFIL UE 100X40X17X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4754,7 +4754,7 @@
     "Descricao": "PERFIL UE 100X40X17X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4764,7 +4764,7 @@
     "Descricao": "PERFIL UE 100X50X17X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4774,7 +4774,7 @@
     "Descricao": "PERFIL UE 100X50X17X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4784,7 +4784,7 @@
     "Descricao": "PERFIL UE 100X50X17X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4794,7 +4794,7 @@
     "Descricao": "PERFIL UE 100X50X17X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4804,7 +4804,7 @@
     "Descricao": "PERFIL UE 100X50X17X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4814,7 +4814,7 @@
     "Descricao": "PERFIL UE 100X50X17X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4824,7 +4824,7 @@
     "Descricao": "PERFIL UE 100X50X17X2,30 GALV",
     "Valores": {
       "Dezembro -2025": 4.2371,
-      "Janeiro -2026": 4.183,
+      "Janeiro": 4.183,
       "Fevereiro": 4.2623,
       "Março": 4.2846
     }
@@ -4834,7 +4834,7 @@
     "Descricao": "PERFIL UE 127X50X17X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4844,7 +4844,7 @@
     "Descricao": "PERFIL UE 127X50X17X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4854,7 +4854,7 @@
     "Descricao": "PERFIL UE 127X50X17X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4864,7 +4864,7 @@
     "Descricao": "PERFIL UE 127X50X17X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4874,7 +4874,7 @@
     "Descricao": "PERFIL UE 127X50X17X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4884,7 +4884,7 @@
     "Descricao": "PERFIL UE 150X50X17X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4894,7 +4894,7 @@
     "Descricao": "PERFIL UE 150X60X20X1,80",
     "Valores": {
       "Dezembro -2025": 4.0782,
-      "Janeiro -2026": 4.0242,
+      "Janeiro": 4.0242,
       "Fevereiro": 4.1034,
       "Março": 4.1258
     }
@@ -4904,7 +4904,7 @@
     "Descricao": "PERFIL UE 150X60X20X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4914,7 +4914,7 @@
     "Descricao": "PERFIL UE 150X60X20X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4924,7 +4924,7 @@
     "Descricao": "PERFIL UE 150X60X20X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4934,7 +4934,7 @@
     "Descricao": "PERFIL UE 150X60X20X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4944,7 +4944,7 @@
     "Descricao": "PERFIL UE 150X60X20X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -4954,7 +4954,7 @@
     "Descricao": "PERFIL UE 200X75X25X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -4964,7 +4964,7 @@
     "Descricao": "PERFIL UE 200X75X25X2,25",
     "Valores": {
       "Dezembro -2025": 3.6474,
-      "Janeiro -2026": 3.9352,
+      "Janeiro": 3.9352,
       "Fevereiro": 4.0144,
       "Março": 3.7038
     }
@@ -4974,7 +4974,7 @@
     "Descricao": "PERFIL UE 200X75X25X2,65",
     "Valores": {
       "Dezembro -2025": 4.2239,
-      "Janeiro -2026": 3.867,
+      "Janeiro": 3.867,
       "Fevereiro": 3.9767,
       "Março": 3.9991
     }
@@ -4984,7 +4984,7 @@
     "Descricao": "PERFIL UE 200X75X25X3,00",
     "Valores": {
       "Dezembro -2025": 3.9557,
-      "Janeiro -2026": 3.6946,
+      "Janeiro": 3.6946,
       "Fevereiro": 3.7495,
       "Março": 3.7718
     }
@@ -4994,7 +4994,7 @@
     "Descricao": "PERFIL UE 200X75X25X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -5004,7 +5004,7 @@
     "Descricao": "PERFIL U PORTA 25X32X2,00",
     "Valores": {
       "Dezembro -2025": 4.0852,
-      "Janeiro -2026": 4.0311,
+      "Janeiro": 4.0311,
       "Fevereiro": 4.1103,
       "Março": 4.1327
     }
@@ -5014,7 +5014,7 @@
     "Descricao": "PERFIL U PORTA 25X32X1,55 GALV",
     "Valores": {
       "Dezembro -2025": 5.9829,
-      "Janeiro -2026": 5.9288,
+      "Janeiro": 5.9288,
       "Fevereiro": 6.0081,
       "Março": 6.0304
     }
@@ -5024,7 +5024,7 @@
     "Descricao": "PERFIL U PORTA 25X32X1,95 GALV",
     "Valores": {
       "Dezembro -2025": 4.6682,
-      "Janeiro -2026": 4.6324,
+      "Janeiro": 4.6324,
       "Fevereiro": 4.718,
       "Março": 4.4793
     }
@@ -5034,7 +5034,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA60 4,20",
     "Valores": {
       "Dezembro -2025": 6.0054,
-      "Janeiro -2026": 5.4092,
+      "Janeiro": 5.4092,
       "Fevereiro": 5.8777,
       "Março": 5.8959
     }
@@ -5044,9 +5044,9 @@
     "Descricao": "CD VERGALHAO CA60 4,20MM PROJ",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5054,7 +5054,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA60 5,00",
     "Valores": {
       "Dezembro -2025": 8.2386,
-      "Janeiro -2026": 7.6424,
+      "Janeiro": 7.6424,
       "Fevereiro": 8.1109,
       "Março": 8.1668
     }
@@ -5064,9 +5064,9 @@
     "Descricao": "CD VERGALHAO CA60 5,00MM PROJ",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5074,7 +5074,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 1/4\"",
     "Valores": {
       "Dezembro -2025": 12.8406,
-      "Janeiro -2026": 12.2444,
+      "Janeiro": 12.2444,
       "Fevereiro": 12.578,
       "Março": 12.9263
     }
@@ -5084,9 +5084,9 @@
     "Descricao": "CD VERGALHAO CA50 1/4\" (6,30MM",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5094,7 +5094,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 5/16",
     "Valores": {
       "Dezembro -2025": 19.1982,
-      "Janeiro -2026": 18.602,
+      "Janeiro": 18.602,
       "Fevereiro": 18.961,
       "Março": 19.3945
     }
@@ -5104,9 +5104,9 @@
     "Descricao": "CD VERGALHAO CA50 5/16\" (8,00M",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5114,7 +5114,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 3/8\"",
     "Valores": {
       "Dezembro -2025": 28.4033,
-      "Janeiro -2026": 27.8071,
+      "Janeiro": 27.8071,
       "Fevereiro": 28.0932,
       "Março": 28.6544
     }
@@ -5124,9 +5124,9 @@
     "Descricao": "CD VERGALHAO CA50 3/8\" (10,00M",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5134,7 +5134,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 1/2\"",
     "Valores": {
       "Dezembro -2025": 42.534,
-      "Janeiro -2026": 41.9378,
+      "Janeiro": 41.9378,
       "Fevereiro": 41.9979,
       "Março": 43.9078
     }
@@ -5144,9 +5144,9 @@
     "Descricao": "CD VERGALHAO CA50 1/2\" (12,50M",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5154,7 +5154,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 5/8\"",
     "Valores": {
       "Dezembro -2025": 69.549,
-      "Janeiro -2026": 68.9527,
+      "Janeiro": 68.9527,
       "Fevereiro": 68.7498,
       "Março": 72.5232
     }
@@ -5164,7 +5164,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 3/4\"",
     "Valores": {
       "Dezembro -2025": 109.4689,
-      "Janeiro -2026": 108.8727,
+      "Janeiro": 108.8727,
       "Fevereiro": 109.3412,
       "Março": 109.3594
     }
@@ -5174,7 +5174,7 @@
     "Descricao": "CORT DOBRA VERGALHAO CA50 1\" (",
     "Valores": {
       "Dezembro -2025": 174.4297,
-      "Janeiro -2026": 173.8335,
+      "Janeiro": 173.8335,
       "Fevereiro": 172.6094,
       "Março": 172.6276
     }
@@ -5184,7 +5184,7 @@
     "Descricao": "CH ROLO SECADOR 2,00 (14)",
     "Valores": {
       "Dezembro -2025": 288.1025,
-      "Janeiro -2026": 288.1025,
+      "Janeiro": 288.1025,
       "Fevereiro": 288.1025,
       "Março": 288.1025
     }
@@ -5194,7 +5194,7 @@
     "Descricao": "CH ROLO PORTA SECADOR 2,00 (14",
     "Valores": {
       "Dezembro -2025": 288.095,
-      "Janeiro -2026": 288.095,
+      "Janeiro": 288.095,
       "Fevereiro": 288.095,
       "Março": 288.095
     }
@@ -5204,9 +5204,9 @@
     "Descricao": "TOMBADOR 2,25 SAC/COR (13)",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5214,7 +5214,7 @@
     "Descricao": "TOMBADOR 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 7004.73,
-      "Janeiro -2026": 7004.73,
+      "Janeiro": 7004.73,
       "Fevereiro": 7004.73,
       "Março": 7004.73
     }
@@ -5224,9 +5224,9 @@
     "Descricao": "MEXEDOR DIREITO 45 2,25 SAC/CO",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5234,7 +5234,7 @@
     "Descricao": "MEXEDOR DIREITO 45 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 54.365,
-      "Janeiro -2026": 54.365,
+      "Janeiro": 54.365,
       "Fevereiro": 54.365,
       "Março": 54.365
     }
@@ -5244,7 +5244,7 @@
     "Descricao": "MEXEDOR DIREITO 33 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 38.7995,
-      "Janeiro -2026": 38.7995,
+      "Janeiro": 38.7995,
       "Fevereiro": 38.7995,
       "Março": 38.7995
     }
@@ -5254,9 +5254,9 @@
     "Descricao": "MEXEDOR ESQUERDO 45 2,25 SAC/C",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5264,7 +5264,7 @@
     "Descricao": "MEXEDOR ESQUERDO 45 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 54.365,
-      "Janeiro -2026": 54.365,
+      "Janeiro": 54.365,
       "Fevereiro": 54.365,
       "Março": 54.365
     }
@@ -5274,7 +5274,7 @@
     "Descricao": "MEXEDOR ESQUERDO 33 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 38.7995,
-      "Janeiro -2026": 38.7995,
+      "Janeiro": 38.7995,
       "Fevereiro": 38.7995,
       "Março": 38.7995
     }
@@ -5284,9 +5284,9 @@
     "Descricao": "CH CARAMBOLA 45 2X1M 2,25 SAC/",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5294,7 +5294,7 @@
     "Descricao": "CH CARAMBOLA 45 2X1M 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 331.6338,
-      "Janeiro -2026": 331.6338,
+      "Janeiro": 331.6338,
       "Fevereiro": 331.6338,
       "Março": 331.6338
     }
@@ -5304,7 +5304,7 @@
     "Descricao": "CH CARAMBOLA 33 2X1M 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 237.9107,
-      "Janeiro -2026": 237.9107,
+      "Janeiro": 237.9107,
       "Fevereiro": 237.9107,
       "Março": 237.9107
     }
@@ -5314,9 +5314,9 @@
     "Descricao": "CH CARAMBOLA 45 1X1M 2,25 SAC/",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5324,7 +5324,7 @@
     "Descricao": "CH CARAMBOLA 45 1X1M 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 165.8168,
-      "Janeiro -2026": 165.8168,
+      "Janeiro": 165.8168,
       "Fevereiro": 165.8168,
       "Março": 165.8168
     }
@@ -5334,7 +5334,7 @@
     "Descricao": "CH CARAMBOLA 33 1X1M 2,65 (12)",
     "Valores": {
       "Dezembro -2025": 119.5075,
-      "Janeiro -2026": 119.5075,
+      "Janeiro": 119.5075,
       "Fevereiro": 119.5075,
       "Março": 119.5075
     }
@@ -5344,7 +5344,7 @@
     "Descricao": "TUBO RED 5/8\"X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -5354,7 +5354,7 @@
     "Descricao": "TUBO RED 5/8\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5364,7 +5364,7 @@
     "Descricao": "TUBO RED 5/8\"X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -5374,7 +5374,7 @@
     "Descricao": "TUBO RED 5/8\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5384,7 +5384,7 @@
     "Descricao": "TUBO RED 3/4\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5394,7 +5394,7 @@
     "Descricao": "TUBO RED 3/4\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5404,7 +5404,7 @@
     "Descricao": "TUBO RED 3/4\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5414,7 +5414,7 @@
     "Descricao": "TUBO RED 3/4\"X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -5424,7 +5424,7 @@
     "Descricao": "TUBO RED 3/4\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5434,7 +5434,7 @@
     "Descricao": "TUBO RED 3/4\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5444,7 +5444,7 @@
     "Descricao": "TUBO RED 7/8\"X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -5454,7 +5454,7 @@
     "Descricao": "TUBO RED 7/8\"X1,10 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5464,7 +5464,7 @@
     "Descricao": "TUBO RED 7/8\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5474,7 +5474,7 @@
     "Descricao": "TUBO RED 7/8\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5484,7 +5484,7 @@
     "Descricao": "TUBO RED 7/8\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5494,7 +5494,7 @@
     "Descricao": "TUBO RED 7/8\"X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -5504,7 +5504,7 @@
     "Descricao": "TUBO RED 7/8\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5514,7 +5514,7 @@
     "Descricao": "TUBO RED 7/8\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5524,7 +5524,7 @@
     "Descricao": "TUBO RED 7/8\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5534,7 +5534,7 @@
     "Descricao": "TUBO RED 1\"X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -5544,7 +5544,7 @@
     "Descricao": "TUBO RED 1\"X1,10 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5554,7 +5554,7 @@
     "Descricao": "TUBO RED 1\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5564,7 +5564,7 @@
     "Descricao": "TUBO RED 1\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5574,7 +5574,7 @@
     "Descricao": "TUBO RED 1\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5584,7 +5584,7 @@
     "Descricao": "TUBO RED 1\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5594,7 +5594,7 @@
     "Descricao": "TUBO RED 1\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5604,7 +5604,7 @@
     "Descricao": "TUBO RED 1\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5614,7 +5614,7 @@
     "Descricao": "TUBO RED 1.1/4\"X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -5624,7 +5624,7 @@
     "Descricao": "TUBO RED 1.1/4\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5634,7 +5634,7 @@
     "Descricao": "TUBO RED 1.1/4\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5644,7 +5644,7 @@
     "Descricao": "TUBO RED 1.1/4\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5654,7 +5654,7 @@
     "Descricao": "TUBO RED 1.1/4\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5664,7 +5664,7 @@
     "Descricao": "TUBO RED 1.1/4\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5674,7 +5674,7 @@
     "Descricao": "TUBO RED 1.1/4\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5684,7 +5684,7 @@
     "Descricao": "TUBO RED 1.1/2\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5694,7 +5694,7 @@
     "Descricao": "TUBO RED 1.1/2\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5704,7 +5704,7 @@
     "Descricao": "TUBO RED 1.1/2\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5714,7 +5714,7 @@
     "Descricao": "TUBO RED 1.1/2\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5724,7 +5724,7 @@
     "Descricao": "TUBO RED 1.1/2\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5734,7 +5734,7 @@
     "Descricao": "TUBO RED 1.1/2\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5744,7 +5744,7 @@
     "Descricao": "TUBO RED 2\"X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -5754,7 +5754,7 @@
     "Descricao": "TUBO RED 2\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5764,7 +5764,7 @@
     "Descricao": "TUBO RED 2\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5774,7 +5774,7 @@
     "Descricao": "TUBO RED 2\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5784,7 +5784,7 @@
     "Descricao": "TUBO RED 2\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5794,7 +5794,7 @@
     "Descricao": "TUBO RED 2\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5804,7 +5804,7 @@
     "Descricao": "TUBO RED 2\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5814,7 +5814,7 @@
     "Descricao": "TUBO RED 2.1/2\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5824,7 +5824,7 @@
     "Descricao": "TUBO RED 2.1/2\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5834,7 +5834,7 @@
     "Descricao": "TUBO RED 2.1/2\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5844,7 +5844,7 @@
     "Descricao": "TUBO RED 2.1/2\"X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -5854,7 +5854,7 @@
     "Descricao": "TUBO RED 2.1/2\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5864,7 +5864,7 @@
     "Descricao": "TUBO RED 3\"X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -5874,7 +5874,7 @@
     "Descricao": "TUBO RED 3\"X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -5884,7 +5884,7 @@
     "Descricao": "TUBO RED 3\"X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -5894,7 +5894,7 @@
     "Descricao": "TUBO RED 3\"X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -5904,7 +5904,7 @@
     "Descricao": "TUBO RED 3\"X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -5914,9 +5914,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X15 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5924,9 +5924,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X15 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5934,9 +5934,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X20 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5944,9 +5944,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X20 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5954,9 +5954,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X30 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5964,9 +5964,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X30 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5974,9 +5974,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X40 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5984,9 +5984,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X40 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -5994,9 +5994,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X50 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6004,9 +6004,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X50 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6014,9 +6014,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X60 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6024,9 +6024,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X60 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6034,9 +6034,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X70 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6044,9 +6044,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X70 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6054,9 +6054,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X80 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6064,9 +6064,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X80 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6074,9 +6074,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X90 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6084,9 +6084,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X90 - 24",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6094,7 +6094,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X100 - 2",
     "Valores": {
       "Dezembro -2025": 472.5915,
-      "Janeiro -2026": 417.0359,
+      "Janeiro": 417.0359,
       "Fevereiro": 427.7586,
       "Março": 426.2631
     }
@@ -6104,9 +6104,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X100 - 2",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6114,7 +6114,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X100 - 24M",
     "Valores": {
       "Dezembro -2025": 414.5298,
-      "Janeiro -2026": 413.0159,
+      "Janeiro": 413.0159,
       "Fevereiro": 413.7818,
       "Março": 412.1338
     }
@@ -6124,9 +6124,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X120 - 2",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6134,7 +6134,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X120 - 2",
     "Valores": {
       "Dezembro -2025": 472.7616,
-      "Janeiro -2026": 525.8279,
+      "Janeiro": 525.8279,
       "Fevereiro": 599.8757,
       "Março": 525.2039
     }
@@ -6144,7 +6144,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X120 - 24M",
     "Valores": {
       "Dezembro -2025": 501.5801,
-      "Janeiro -2026": 499.7634,
+      "Janeiro": 499.7634,
       "Fevereiro": 500.6825,
       "Março": 498.7049
     }
@@ -6154,9 +6154,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X15 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6164,9 +6164,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X15 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6174,7 +6174,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X20 - 48",
     "Valores": {
       "Dezembro -2025": 195.8297,
-      "Janeiro -2026": 173.0218,
+      "Janeiro": 173.0218,
       "Fevereiro": 177.4531,
       "Março": 176.5742
     }
@@ -6184,7 +6184,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X20 - 48",
     "Valores": {
       "Dezembro -2025": 292.0858,
-      "Janeiro -2026": 292.0858,
+      "Janeiro": 292.0858,
       "Fevereiro": 292.0858,
       "Março": 292.0858
     }
@@ -6194,7 +6194,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X20 - 48M",
     "Valores": {
       "Dezembro -2025": 168.9202,
-      "Janeiro -2026": 168.3146,
+      "Janeiro": 168.3146,
       "Fevereiro": 168.621,
       "Março": 167.9618
     }
@@ -6204,7 +6204,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X30 - 48",
     "Valores": {
       "Dezembro -2025": 295.5534,
-      "Janeiro -2026": 265.4466,
+      "Janeiro": 265.4466,
       "Fevereiro": 267.8893,
       "Março": 266.4721
     }
@@ -6214,9 +6214,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X30 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6224,7 +6224,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X30 - 48M",
     "Valores": {
       "Dezembro -2025": 252.3515,
-      "Janeiro -2026": 251.3297,
+      "Janeiro": 251.3297,
       "Fevereiro": 251.8466,
       "Março": 250.7342
     }
@@ -6234,7 +6234,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X40 - 48",
     "Valores": {
       "Dezembro -2025": 380.421,
-      "Janeiro -2026": 335.3885,
+      "Janeiro": 335.3885,
       "Fevereiro": 344.0374,
       "Março": 343.2134
     }
@@ -6244,9 +6244,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X40 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6254,7 +6254,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X40 - 48M",
     "Valores": {
       "Dezembro -2025": 332.6599,
-      "Janeiro -2026": 331.4488,
+      "Janeiro": 331.4488,
       "Fevereiro": 332.0615,
       "Março": 330.7431
     }
@@ -6264,7 +6264,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X50 - 48",
     "Valores": {
       "Dezembro -2025": 473.4779,
-      "Janeiro -2026": 417.3093,
+      "Janeiro": 417.3093,
       "Fevereiro": 428.0805,
       "Março": 427.2016
     }
@@ -6274,9 +6274,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X50 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6284,7 +6284,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X50 - 48M",
     "Valores": {
       "Dezembro -2025": 414.5298,
-      "Janeiro -2026": 413.0159,
+      "Janeiro": 413.0159,
       "Fevereiro": 413.7818,
       "Março": 412.1338
     }
@@ -6294,7 +6294,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X60 - 48",
     "Valores": {
       "Dezembro -2025": 562.0061,
-      "Janeiro -2026": 504.256,
+      "Janeiro": 504.256,
       "Fevereiro": 508.4108,
       "Março": 506.9935
     }
@@ -6304,9 +6304,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X60 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6314,7 +6314,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X60 - 48M",
     "Valores": {
       "Dezembro -2025": 499.5227,
-      "Janeiro -2026": 497.4789,
+      "Janeiro": 497.4789,
       "Fevereiro": 498.5129,
       "Março": 496.2881
     }
@@ -6324,7 +6324,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X70 - 48",
     "Valores": {
       "Dezembro -2025": 645.1944,
-      "Janeiro -2026": 568.3482,
+      "Janeiro": 568.3482,
       "Fevereiro": 583.0429,
       "Março": 582.2189
     }
@@ -6334,9 +6334,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X70 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6344,7 +6344,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X70 - 48M",
     "Valores": {
       "Dezembro -2025": 583.4499,
-      "Janeiro -2026": 581.3305,
+      "Janeiro": 581.3305,
       "Fevereiro": 582.4027,
       "Março": 580.0955
     }
@@ -6354,7 +6354,7 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X80 - 48",
     "Valores": {
       "Dezembro -2025": 736.4377,
-      "Janeiro -2026": 648.6282,
+      "Janeiro": 648.6282,
       "Fevereiro": 665.4063,
       "Março": 664.5823
     }
@@ -6364,9 +6364,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X80 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6374,7 +6374,7 @@
     "Descricao": "CHAPA GALVALUME 0,43X80 - 48M",
     "Valores": {
       "Dezembro -2025": 665.3198,
-      "Janeiro -2026": 662.8976,
+      "Janeiro": 662.8976,
       "Fevereiro": 664.123,
       "Março": 661.4862
     }
@@ -6384,9 +6384,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,43X90 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6394,9 +6394,9 @@
     "Descricao": "CHAPA GALVANIZADA 0,50X90 - 48",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -6404,7 +6404,7 @@
     "Descricao": "TUBO QD 15X15X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6414,7 +6414,7 @@
     "Descricao": "TUBO QD 15X15X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6424,7 +6424,7 @@
     "Descricao": "TUBO QD 15X15X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6434,7 +6434,7 @@
     "Descricao": "TUBO QD 15X15X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6444,7 +6444,7 @@
     "Descricao": "TUBO QD 15X15X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6454,7 +6454,7 @@
     "Descricao": "TUBO QD 20X20X0,75 GALV",
     "Valores": {
       "Dezembro -2025": 4.7103,
-      "Janeiro -2026": 4.7103,
+      "Janeiro": 4.7103,
       "Fevereiro": 4.7103,
       "Março": 4.7103
     }
@@ -6464,7 +6464,7 @@
     "Descricao": "TUBO QD 20X20X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6474,7 +6474,7 @@
     "Descricao": "TUBO QD 20X20X1,10 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6484,7 +6484,7 @@
     "Descricao": "TUBO QD 20X20X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6494,7 +6494,7 @@
     "Descricao": "TUBO QD 20X20X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6504,7 +6504,7 @@
     "Descricao": "TUBO QD 20X20X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6514,7 +6514,7 @@
     "Descricao": "TUBO QD 20X20X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6524,7 +6524,7 @@
     "Descricao": "TUBO QD 25X25X0,75 GALV",
     "Valores": {
       "Dezembro -2025": 4.7103,
-      "Janeiro -2026": 4.7103,
+      "Janeiro": 4.7103,
       "Fevereiro": 4.7103,
       "Março": 4.7103
     }
@@ -6534,7 +6534,7 @@
     "Descricao": "TUBO QD 25X25X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6544,7 +6544,7 @@
     "Descricao": "TUBO QD 25X25X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6554,7 +6554,7 @@
     "Descricao": "TUBO QD 25X25X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6564,7 +6564,7 @@
     "Descricao": "TUBO QD 25X25X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6574,7 +6574,7 @@
     "Descricao": "TUBO QD 25X25X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6584,7 +6584,7 @@
     "Descricao": "TUBO QD 30X30X0,75 GALV",
     "Valores": {
       "Dezembro -2025": 4.7103,
-      "Janeiro -2026": 4.7103,
+      "Janeiro": 4.7103,
       "Fevereiro": 4.7103,
       "Março": 4.7103
     }
@@ -6594,7 +6594,7 @@
     "Descricao": "TUBO QD 30X30X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6604,7 +6604,7 @@
     "Descricao": "TUBO QD 30X30X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6614,7 +6614,7 @@
     "Descricao": "TUBO QD 30X30X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6624,7 +6624,7 @@
     "Descricao": "TUBO QD 30X30X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6634,7 +6634,7 @@
     "Descricao": "TUBO QD 30X30X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6644,7 +6644,7 @@
     "Descricao": "TUBO QD 40X40X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6654,7 +6654,7 @@
     "Descricao": "TUBO QD 40X40X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6664,7 +6664,7 @@
     "Descricao": "TUBO QD 40X40X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -6674,7 +6674,7 @@
     "Descricao": "TUBO QD 40X40X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6684,7 +6684,7 @@
     "Descricao": "TUBO QD 40X40X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6694,7 +6694,7 @@
     "Descricao": "TUBO QD 40X40X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -6704,7 +6704,7 @@
     "Descricao": "TUBO QD 40X40X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6714,7 +6714,7 @@
     "Descricao": "TUBO QD 50X50X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6724,7 +6724,7 @@
     "Descricao": "TUBO QD 50X50X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6734,7 +6734,7 @@
     "Descricao": "TUBO QD 50X50X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6744,7 +6744,7 @@
     "Descricao": "TUBO QD 50X50X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -6754,7 +6754,7 @@
     "Descricao": "TUBO QD 50X50X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6764,7 +6764,7 @@
     "Descricao": "TUBO QD 60X60X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6774,7 +6774,7 @@
     "Descricao": "TUBO QD 60X60X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6784,7 +6784,7 @@
     "Descricao": "TUBO QD 70X70X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6794,7 +6794,7 @@
     "Descricao": "TUBO QD 70X70X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6804,7 +6804,7 @@
     "Descricao": "TUBO QD 80X80X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6814,7 +6814,7 @@
     "Descricao": "TUBO QD 80X80X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -6824,7 +6824,7 @@
     "Descricao": "TUBO QD 80X80X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6834,7 +6834,7 @@
     "Descricao": "TUBO QD 100X100X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6844,7 +6844,7 @@
     "Descricao": "TUBO QD 30X20X0,75 GALV",
     "Valores": {
       "Dezembro -2025": 4.7103,
-      "Janeiro -2026": 4.7103,
+      "Janeiro": 4.7103,
       "Fevereiro": 4.7103,
       "Março": 4.7103
     }
@@ -6854,7 +6854,7 @@
     "Descricao": "TUBO QD 30X20X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6864,7 +6864,7 @@
     "Descricao": "TUBO QD 30X20X1,10 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6874,7 +6874,7 @@
     "Descricao": "TUBO QD 30X20X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6884,7 +6884,7 @@
     "Descricao": "TUBO QD 30X20X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6894,7 +6894,7 @@
     "Descricao": "TUBO QD 30X20X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6904,7 +6904,7 @@
     "Descricao": "TUBO QD 30X20X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6914,7 +6914,7 @@
     "Descricao": "TUBO QD 30X20X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -6924,7 +6924,7 @@
     "Descricao": "TUBO QD 30X20X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -6934,7 +6934,7 @@
     "Descricao": "TUBO QD 40X20X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6944,7 +6944,7 @@
     "Descricao": "TUBO QD 40X20X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -6954,7 +6954,7 @@
     "Descricao": "TUBO QD 40X20X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -6964,7 +6964,7 @@
     "Descricao": "TUBO QD 40X20X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -6974,7 +6974,7 @@
     "Descricao": "TUBO QD 40X20X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -6984,7 +6984,7 @@
     "Descricao": "TUBO QD 50X30X0,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.4305,
-      "Janeiro -2026": 4.4305,
+      "Janeiro": 4.4305,
       "Fevereiro": 4.4305,
       "Março": 4.4305
     }
@@ -6994,7 +6994,7 @@
     "Descricao": "TUBO QD 50X30X1,10 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -7004,7 +7004,7 @@
     "Descricao": "TUBO QD 50X30X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -7014,7 +7014,7 @@
     "Descricao": "TUBO QD 50X30X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -7024,7 +7024,7 @@
     "Descricao": "TUBO QD 50X30X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -7034,7 +7034,7 @@
     "Descricao": "TUBO QD 50X30X0,90",
     "Valores": {
       "Dezembro -2025": 4.6297,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.2823,
       "Março": 4.2823
     }
@@ -7044,7 +7044,7 @@
     "Descricao": "TUBO QD 50X30X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -7054,7 +7054,7 @@
     "Descricao": "TUBO QD 50X30X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -7064,7 +7064,7 @@
     "Descricao": "TUBO QD 50X30X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7074,7 +7074,7 @@
     "Descricao": "TUBO QD 60X40X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -7084,7 +7084,7 @@
     "Descricao": "TUBO QD 60X40X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -7094,7 +7094,7 @@
     "Descricao": "TUBO QD 60X40X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7104,7 +7104,7 @@
     "Descricao": "TUBO QD 70X30X1,20 GALV",
     "Valores": {
       "Dezembro -2025": 4.9987,
-      "Janeiro -2026": 4.9987,
+      "Janeiro": 4.9987,
       "Fevereiro": 4.9987,
       "Março": 4.9987
     }
@@ -7114,7 +7114,7 @@
     "Descricao": "TUBO QD 70X30X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -7124,7 +7124,7 @@
     "Descricao": "TUBO QD 70X30X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -7134,7 +7134,7 @@
     "Descricao": "TUBO QD 70X30X1,20",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4867,
+      "Janeiro": 4.4867,
       "Fevereiro": 4.4867,
       "Março": 4.4867
     }
@@ -7144,7 +7144,7 @@
     "Descricao": "TUBO QD 70X30X1,50",
     "Valores": {
       "Dezembro -2025": 4.4344,
-      "Janeiro -2026": 4.4344,
+      "Janeiro": 4.4344,
       "Fevereiro": 4.4344,
       "Março": 4.4344
     }
@@ -7154,7 +7154,7 @@
     "Descricao": "TUBO QD 70X30X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7164,7 +7164,7 @@
     "Descricao": "TUBO QD 80X40X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -7174,7 +7174,7 @@
     "Descricao": "TUBO QD 80X40X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7184,7 +7184,7 @@
     "Descricao": "TUBO QD 100X40X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7194,7 +7194,7 @@
     "Descricao": "TUBO QD 100X50X1,50 GALV",
     "Valores": {
       "Dezembro -2025": 5.8781,
-      "Janeiro -2026": 5.8781,
+      "Janeiro": 5.8781,
       "Fevereiro": 5.8781,
       "Março": 5.8781
     }
@@ -7204,7 +7204,7 @@
     "Descricao": "TUBO QD 100X50X1,90 GALV",
     "Valores": {
       "Dezembro -2025": 4.5633,
-      "Janeiro -2026": 4.5816,
+      "Janeiro": 4.5816,
       "Fevereiro": 4.588,
       "Março": 4.3269
     }
@@ -7214,7 +7214,7 @@
     "Descricao": "TUBO QD 100X50X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7224,7 +7224,7 @@
     "Descricao": "TUBO QD 100X50X3,00",
     "Valores": {
       "Dezembro -2025": 3.8509,
-      "Janeiro -2026": 3.6438,
+      "Janeiro": 3.6438,
       "Fevereiro": 3.6194,
       "Março": 3.6194
     }
@@ -7234,7 +7234,7 @@
     "Descricao": "TUBO QD 150X50X2,00",
     "Valores": {
       "Dezembro -2025": 3.9803,
-      "Janeiro -2026": 3.9803,
+      "Janeiro": 3.9803,
       "Fevereiro": 3.9803,
       "Março": 3.9803
     }
@@ -7244,7 +7244,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM B",
     "Valores": {
       "Dezembro -2025": 35.1187,
-      "Janeiro -2026": 34.9566,
+      "Janeiro": 34.9566,
       "Fevereiro": 35.1085,
       "Março": 35.1342
     }
@@ -7254,7 +7254,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,50MM",
     "Valores": {
       "Dezembro -2025": 29.1962,
-      "Janeiro -2026": 29.079,
+      "Janeiro": 29.079,
       "Fevereiro": 29.1889,
       "Março": 29.2074
     }
@@ -7264,7 +7264,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM",
     "Valores": {
       "Dezembro -2025": 19.9443,
-      "Janeiro -2026": 19.5043,
+      "Janeiro": 19.5043,
       "Fevereiro": 20.3446,
       "Março": 20.8872
     }
@@ -7274,7 +7274,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 3",
     "Valores": {
       "Dezembro -2025": 59.8329,
-      "Janeiro -2026": 58.513,
+      "Janeiro": 58.513,
       "Fevereiro": 61.0337,
       "Março": 62.6616
     }
@@ -7284,7 +7284,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 4",
     "Valores": {
       "Dezembro -2025": 79.7772,
-      "Janeiro -2026": 78.0174,
+      "Janeiro": 78.0174,
       "Fevereiro": 81.3783,
       "Março": 83.5488
     }
@@ -7294,7 +7294,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 5",
     "Valores": {
       "Dezembro -2025": 99.7215,
-      "Janeiro -2026": 97.5217,
+      "Janeiro": 97.5217,
       "Fevereiro": 101.7228,
       "Março": 104.436
     }
@@ -7304,7 +7304,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 6",
     "Valores": {
       "Dezembro -2025": 119.6658,
-      "Janeiro -2026": 117.026,
+      "Janeiro": 117.026,
       "Fevereiro": 122.0674,
       "Março": 125.3232
     }
@@ -7314,7 +7314,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 7",
     "Valores": {
       "Dezembro -2025": 139.6101,
-      "Janeiro -2026": 136.5304,
+      "Janeiro": 136.5304,
       "Fevereiro": 142.412,
       "Março": 146.2104
     }
@@ -7324,7 +7324,7 @@
     "Descricao": "TELHA GALVALUME TP 40 0,43MM 8",
     "Valores": {
       "Dezembro -2025": 159.5544,
-      "Janeiro -2026": 156.0347,
+      "Janeiro": 156.0347,
       "Fevereiro": 162.7565,
       "Março": 167.0976
     }
@@ -7334,7 +7334,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 19.9443,
-      "Janeiro -2026": 19.5043,
+      "Janeiro": 19.5043,
       "Fevereiro": 20.3446,
       "Março": 20.8872
     }
@@ -7344,7 +7344,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 59.8329,
-      "Janeiro -2026": 58.513,
+      "Janeiro": 58.513,
       "Fevereiro": 61.0337,
       "Março": 62.6616
     }
@@ -7354,7 +7354,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 79.7772,
-      "Janeiro -2026": 78.0174,
+      "Janeiro": 78.0174,
       "Fevereiro": 81.3783,
       "Março": 83.5488
     }
@@ -7364,7 +7364,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 99.7215,
-      "Janeiro -2026": 97.5217,
+      "Janeiro": 97.5217,
       "Fevereiro": 101.7228,
       "Março": 104.436
     }
@@ -7374,7 +7374,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 119.6658,
-      "Janeiro -2026": 117.026,
+      "Janeiro": 117.026,
       "Fevereiro": 122.0674,
       "Março": 125.3232
     }
@@ -7384,7 +7384,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 139.6101,
-      "Janeiro -2026": 136.5304,
+      "Janeiro": 136.5304,
       "Fevereiro": 142.412,
       "Março": 146.2104
     }
@@ -7394,7 +7394,7 @@
     "Descricao": "TELHA GALVALUME OND 17 0,43MM",
     "Valores": {
       "Dezembro -2025": 159.5544,
-      "Janeiro -2026": 156.0347,
+      "Janeiro": 156.0347,
       "Fevereiro": 162.7565,
       "Março": 167.0976
     }
@@ -7404,7 +7404,7 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 40 ABAS",
     "Valores": {
       "Dezembro -2025": 12.8795,
-      "Janeiro -2026": 12.0064,
+      "Janeiro": 12.0064,
       "Fevereiro": 13.0863,
       "Março": 13.514
     }
@@ -7414,7 +7414,7 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 40 ABAS",
     "Valores": {
       "Dezembro -2025": 17.0842,
-      "Janeiro -2026": 16.1519,
+      "Janeiro": 16.1519,
       "Fevereiro": 17.3783,
       "Março": 17.916
     }
@@ -7424,9 +7424,9 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 40 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7434,9 +7434,9 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 40 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7444,7 +7444,7 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 25 ABAS",
     "Valores": {
       "Dezembro -2025": 12.8795,
-      "Janeiro -2026": 12.0064,
+      "Janeiro": 12.0064,
       "Fevereiro": 13.0863,
       "Março": 13.514
     }
@@ -7454,9 +7454,9 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 25 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7464,9 +7464,9 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 25 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7474,9 +7474,9 @@
     "Descricao": "TELHA CUMEEIRA GL TRAP 25 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7484,7 +7484,7 @@
     "Descricao": "TELHA CUMEEIRA GL OND 17 ABAS",
     "Valores": {
       "Dezembro -2025": 12.8795,
-      "Janeiro -2026": 12.0064,
+      "Janeiro": 12.0064,
       "Fevereiro": 13.0863,
       "Março": 13.514
     }
@@ -7494,9 +7494,9 @@
     "Descricao": "TELHA CUMEEIRA GL OND 17 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7504,9 +7504,9 @@
     "Descricao": "TELHA CUMEEIRA GL OND 17 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   },
   {
@@ -7514,9 +7514,9 @@
     "Descricao": "TELHA CUMEEIRA GL OND 17 ABAS",
     "Valores": {
       "Dezembro -2025": 0,
-      "Janeiro -2026": 0,
+      "Janeiro": 0,
       "Fevereiro": 0,
-      "Março": 0.0
+      "Março": 0
     }
   }
 ]

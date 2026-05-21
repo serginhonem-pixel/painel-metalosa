@@ -13,6 +13,7 @@ import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json'
 import vendedoresData from './data/vendedores.json';
 import { maquinasBaseData, setoresBaseData } from './data/maquinasBase';
 import DashboardManutencaoTV from './components/DashboardManutencaoTV';
+import DashboardGlobalTV from './components/DashboardGlobalTV';
 import PainelOperacaoDiaria from './components/PainelOperacaoDiaria';
 import MrpAco from './components/MrpAco';
 import Rastreabilidade from './components/Rastreabilidade';
@@ -11438,6 +11439,10 @@ const custoDetalheTitulo = custoDetalheItem
                       <p className="text-lg text-slate-300 mt-1 font-medium">
                         Manutenção · Monitoramento em tempo real
                       </p>
+                    ) : dashboardView === 'global' ? (
+                      <p className="text-lg text-slate-300 mt-1 font-medium">
+                        Visão global · Todos os recursos por setor
+                      </p>
                     ) : (
                       <p className="text-lg text-slate-300 mt-1 font-medium">
                         Faturamento atualizado em{' '}
@@ -11487,6 +11492,17 @@ const custoDetalheTitulo = custoDetalheItem
                       >
                         Manutencao
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setDashboardView('global')}
+                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                          dashboardView === 'global'
+                            ? 'bg-violet-500 text-white'
+                            : 'border border-slate-700 text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        Global
+                      </button>
                     </div>
                   </div>
                   <div className="w-full xl:w-auto flex items-center justify-end">
@@ -11501,7 +11517,7 @@ const custoDetalheTitulo = custoDetalheItem
                           {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </p>
                       </div>
-                      {dashboardView !== 'manutencao' && (
+                      {dashboardView !== 'manutencao' && dashboardView !== 'global' && (
                         <>
                           <div className="h-[58px] rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 min-w-[170px] flex flex-col justify-center">
                             <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">Total geral</p>
@@ -11743,6 +11759,13 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                   </div>
                 </div>
+              ) : dashboardView === 'global' ? (
+                <DashboardGlobalTV
+                  agora={agora}
+                  manutencaoParadas={manutencaoParadas}
+                  manutencaoOrdens={manutencaoOrdens}
+                  logoSrc={logoMetalosa}
+                />
               ) : (
                 <DashboardManutencaoTV
                   agora={agora}
