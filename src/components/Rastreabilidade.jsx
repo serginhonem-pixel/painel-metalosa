@@ -3030,11 +3030,7 @@ const ABAS = [
   },
   {
     id: 'ordem', label: 'Ordem de Producao', icon: ClipboardList,
-    tooltip: '3ª etapa — Registra a montagem de uma escada. O BOM é carregado automaticamente pelo modelo e os lotes de PI são pré-selecionados em ordem FIFO.',
-  },
-  {
-    id: 'pa', label: 'Produto Acabado', icon: PackagePlus,
-    tooltip: '4ª etapa — Atribui o número de série à escada finalizada, fechando o vínculo com todos os componentes e lotes utilizados na montagem.',
+    tooltip: 'Registra a montagem de uma escada vinculando os lotes de componentes (PI e comprados). Desconta o estoque automaticamente em ordem FIFO.',
   },
   {
     id: 'ajuste', label: 'Ajuste de Estoque', icon: SlidersHorizontal,
@@ -3359,7 +3355,6 @@ export default function Rastreabilidade({ faturamentoLinhas = [], clientesPorCod
         {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
         {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
         {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
-        {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
         {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
         {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
         {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} faturamentoLinhas={faturamentoLinhas} clientesPorCodigo={clientesPorCodigo} />}
