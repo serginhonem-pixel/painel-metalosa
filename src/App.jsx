@@ -75,7 +75,7 @@ const ITENS_MENU = [
   { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
   { id: 'mrp-aco', label: 'Planejamento Aço', icon: ShoppingCart },
-  { id: 'rastreabilidade', label: 'Rastreabilidade', icon: ScanLine },
+  { id: 'rastreabilidade', label: 'Escada', icon: ScanLine },
   { id: 'configuracao', label: 'Configuração Global', icon: Settings },
 ];
 

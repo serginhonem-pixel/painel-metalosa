@@ -3058,27 +3058,6 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
               </div>
             ))}
-            <button
-              type="button"
-              disabled={resetStatus === 'loading'}
-              onClick={() => {
-                if (window.confirm('Isso vai apagar TODOS os lotes e reimportar só o inventário real. Continua?'))
-                  limparEReimportar(setResetStatus);
-              }}
-              className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-rose-300 transition hover:bg-rose-600/20 disabled:opacity-50"
-            >
-              <ArrowUpDown size={14} />
-              {resetStatus === 'loading' ? 'Limpando...' : resetStatus === 'ok' ? 'Reimportado!' : resetStatus === 'erro' ? 'Erro — ver console' : 'Resetar e reimportar'}
-            </button>
-            <button
-              type="button"
-              disabled={lote052024Status === 'loading'}
-              onClick={() => seedLote052024(setLote052024Status)}
-              className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-600/20 disabled:opacity-50"
-            >
-              <PackagePlus size={14} />
-              {lote052024Status === 'loading' ? 'Importando...' : lote052024Status === 'ok' ? 'Importado!' : lote052024Status === 'erro' ? 'Erro — ver console' : 'Importar lote 052024'}
-            </button>
           </div>
         </div>
       </div>
