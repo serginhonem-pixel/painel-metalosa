@@ -3137,70 +3137,80 @@ export default function Rastreabilidade() {
   if (!autenticado) return <TelaLogin onLogin={() => setAutenticado(true)} />;
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right duration-700">
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-indigo-600/5 blur-3xl pointer-events-none" />
-        <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-inner">
-              <ScanLine size={28} className="text-blue-300" />
+    <div className="animate-in slide-in-from-right duration-500">
+      {/* Cabeçalho compacto */}
+      <div className="bg-white border border-slate-200 rounded-xl mb-0 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <ScanLine size={16} className="text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Controle INMETRO - Produto Acabado</p>
-              </div>
-              <h2 className="text-3xl font-black text-white tracking-tight">Rastreabilidade</h2>
-              <p className="text-slate-400 text-sm mt-1">MP para Componentes para Escada - DANFE + Certificado de Qualidade</p>
+              <h2 className="text-base font-bold text-slate-900 leading-tight">Rastreabilidade INMETRO</h2>
+              <p className="text-[11px] text-slate-500">Escadas domésticas · ABNT NBR 6158 · Lote 052024</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-6">
             {[
-              { label: 'Lotes de MP',     value: totalLotesMP },
-              { label: 'Lotes PI',        value: totalPI      },
-              { label: 'Escadas',         value: totalOrdens  },
-              { label: 'Lotes Comprados', value: totalComps   },
+              { label: 'MP', value: totalLotesMP },
+              { label: 'PI', value: totalPI },
+              { label: 'Escadas', value: totalOrdens },
+              { label: 'Comprados', value: totalComps },
             ].map(({ label, value }) => (
               <div key={label} className="text-center">
-                <p className="text-2xl font-black text-white">{value}</p>
-                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
+                <p className="text-lg font-bold text-slate-800 leading-none">{value}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide">{label}</p>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => vincularComponentes052024(setVincularStatus)}
-              disabled={vincularStatus === 'loading'}
-              className="rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 px-4 py-2 text-xs font-black text-white uppercase tracking-wider transition-all"
-            >
-              {vincularStatus === 'loading' ? 'Vinculando...' : vincularStatus === 'ok' ? 'Vinculado!' : vincularStatus === 'erro' ? 'Erro!' : 'Vincular componentes 052024'}
-            </button>
+            <Tooltip text="Vincula os dados de DANFE e fornecedor às escadas do inventário inicial 052024">
+              <button
+                type="button"
+                onClick={() => vincularComponentes052024(setVincularStatus)}
+                disabled={vincularStatus === 'loading'}
+                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all disabled:opacity-50
+                  ${vincularStatus === 'ok' ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
+                    vincularStatus === 'erro' ? 'border-rose-300 bg-rose-50 text-rose-700' :
+                    'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-400'}`}
+              >
+                {vincularStatus === 'loading' ? 'Processando...' :
+                 vincularStatus === 'ok' ? 'Vinculado' :
+                 vincularStatus === 'erro' ? 'Erro' : 'Vincular lote 052024'}
+              </button>
+            </Tooltip>
           </div>
         </div>
+        {/* Navegação por abas */}
+        <div className="flex flex-wrap px-2 gap-0">
+          {ABAS.map(({ id, label, icon: Icon, tooltip }) => (
+            <Tooltip key={id} text={tooltip}>
+              <button
+                type="button"
+                onClick={() => setSubAba(id)}
+                className={`flex items-center gap-1.5 shrink-0 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap
+                  ${subAba === id
+                    ? 'border-blue-600 text-blue-700 bg-blue-50/50'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              >
+                <Icon size={13} />{label}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
       </div>
-      <div className="flex gap-1.5 flex-wrap">
-        {ABAS.map(({ id, label, icon: Icon, tooltip }) => (
-          <Tooltip key={id} text={tooltip}>
-            <button
-              type="button"
-              onClick={() => setSubAba(id)}
-              className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all ${subAba === id ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'}`}
-            >
-              <Icon size={14} /> {label}
-            </button>
-          </Tooltip>
-        ))}
+
+      {/* Conteúdo */}
+      <div className="pt-5">
+        {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
+        {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
+        {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
+        {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
+        {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
+        {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
+        {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
+        {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} />}
+        {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
+        {subAba === 'ficha'      && <FichaTecnica />}
       </div>
-      {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
-      {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
-      {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
-      {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
-      {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
-      {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
-      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
-      {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} />}
-      {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
-      {subAba === 'ficha'      && <FichaTecnica />}
     </div>
   );
 }
