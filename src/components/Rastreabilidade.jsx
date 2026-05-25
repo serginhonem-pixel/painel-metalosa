@@ -2118,18 +2118,22 @@ async function seedInventarioReal(setStatus) {
   }
 }
 
+async function limparColecao(nome) {
+  const snap = await getDocs(collection(db, nome));
+  const ids = snap.docs.map((d) => d.id);
+  for (let i = 0; i < ids.length; i += 400) {
+    const batch = writeBatch(db);
+    ids.slice(i, i + 400).forEach((id) => batch.delete(doc(db, nome, id)));
+    await batch.commit();
+  }
+}
+
 async function limparEReimportar(setStatus) {
   setStatus('loading');
   try {
-    // Apaga todos os lotes em batches de 400
-    const snap = await getDocs(collection(db, 'rastreabilidade_lotes'));
-    const ids = snap.docs.map((d) => d.id);
-    for (let i = 0; i < ids.length; i += 400) {
-      const batch = writeBatch(db);
-      ids.slice(i, i + 400).forEach((id) => batch.delete(doc(db, 'rastreabilidade_lotes', id)));
-      await batch.commit();
-    }
-    // Reimporta inventário real
+    await limparColecao('rastreabilidade_lotes');
+    await limparColecao('rastreabilidade_ordens');
+    await limparColecao('rastreabilidade_saidas');
     await seedInventarioReal(() => {});
     setStatus('ok');
     setTimeout(() => setStatus(null), 5000);
