@@ -723,10 +723,6 @@ function OrdemProducao({ lotes }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!nroSerie.trim()) {
-      setFeedback({ tipo: 'erro', msg: 'Informe o numero de serie da escada.' });
-      return;
-    }
     for (const cf of compFab) {
       if (!cf.loteId) continue;
       const lote = lotes.find((l) => l.id === cf.loteId);
@@ -783,7 +779,7 @@ function OrdemProducao({ lotes }) {
       const ordemRef = doc(collection(db, 'rastreabilidade_ordens'));
       batch.set(ordemRef, {
         nroOP: nroOP.trim(),
-        nroSerie: nroSerie.trim(),
+        nroSerie: nroOP.trim() || ordemRef.id,
         dataProd,
         componentesFabricados: compsFab,
         componentesComprados: compsComp,
@@ -803,8 +799,8 @@ function OrdemProducao({ lotes }) {
         });
       }
       await batch.commit();
-      setFeedback({ tipo: 'ok', msg: `Ordem registrada — Escada ${nroSerie.trim()}` });
-      setNroOP(''); setNroSerie(''); setDataProd(today());
+      setFeedback({ tipo: 'ok', msg: `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}` });
+      setNroOP(''); setDataProd(today());
       const modelo = modelos.find((m) => m.codigo_produto === modeloCod);
       const { fab, comp } = buildCompsFromBom(modelo);
       const fabComFifo = fab.map((c) => {
@@ -848,14 +844,10 @@ function OrdemProducao({ lotes }) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-6 border-b border-slate-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-6 border-b border-slate-100">
           <div>
             <Label>Numero da OP</Label>
             <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Ex: OP-2026-0001" />
-          </div>
-          <div>
-            <Label>Numero de Serie da Escada *</Label>
-            <Input value={nroSerie} onChange={(e) => setNroSerie(e.target.value)} placeholder="Ex: ESC-2026-0001" />
           </div>
           <div>
             <Label>Data de Producao</Label>
@@ -948,7 +940,7 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
   const [busca, setBusca]               = useState('');
   const [resultado, setResultado]       = useState(null);
   const [buscou, setBuscou]             = useState(false);
-  const [modo, setModo]                 = useState('serie');
+  const [modo, setModo]                 = useState('op');
   const [estornando, setEstornando]     = useState(false);
   const [feedbackEstorno, setFeedbackEstorno] = useState(null);
   const [confirmEstorno, setConfirmEstorno]   = useState(false);
@@ -1057,7 +1049,7 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
       <Card>
         <SectionTitle icon={Search}>Consulta de Rastreabilidade</SectionTitle>
         <div className="flex gap-2 mb-4 flex-wrap">
-          {[{ id: 'serie', label: 'Nr de Serie' }, { id: 'op', label: 'Nr da OP' }, { id: 'lote', label: 'Por Lote (Recall)' }].map((m) => (
+          {[{ id: 'op', label: 'Nr da OP' }, { id: 'lote', label: 'Por Lote (Recall)' }].map((m) => (
             <button key={m.id} type="button" onClick={() => { setModo(m.id); setResultado(null); setBuscou(false); setBusca(''); setLoteIdSel(''); setResultadosLote([]); }}
               className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${modo === m.id ? (m.id === 'lote' ? 'bg-rose-600 text-white shadow-sm' : 'bg-blue-600 text-white shadow-sm') : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
               {m.label}
@@ -1540,7 +1532,6 @@ function AjusteEstoque({ lotes }) {
 function RegistroProdutoAcabado({ ordens, lotes }) {
   const modelos = BOM_ESCADAS.bom_escadas_rastreados;
   const [form, setForm] = useState({
-    nroSerie: '',
     nroOP: '',
     modeloCod: '',
     dataProd: today(),
@@ -1556,20 +1547,16 @@ function RegistroProdutoAcabado({ ordens, lotes }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nroSerie.trim() || !form.modeloCod || !form.inspetor.trim()) {
-      setFeedback({ tipo: 'erro', msg: 'Preencha: Nr Serie, Modelo e Inspetor.' });
-      return;
-    }
-    const duplicado = ordens.find((o) => o.nroSerie?.trim() === form.nroSerie.trim() && o.tipo === 'PA');
-    if (duplicado) {
-      setFeedback({ tipo: 'erro', msg: `Nr de serie ${form.nroSerie.trim()} ja registrado.` });
+    if (!form.modeloCod || !form.inspetor.trim()) {
+      setFeedback({ tipo: 'erro', msg: 'Preencha: Modelo e Inspetor.' });
       return;
     }
     setSaving(true);
     try {
+      const ref = doc(collection(db, 'rastreabilidade_ordens'));
       await addDoc(collection(db, 'rastreabilidade_ordens'), {
         tipo: 'PA',
-        nroSerie: form.nroSerie.trim(),
+        nroSerie: form.nroOP.trim() || ref.id,
         nroOP: form.nroOP.trim(),
         modeloCod: form.modeloCod,
         descricaoModelo: modelos.find((m) => m.codigo_produto === form.modeloCod)?.descricao ?? '',
@@ -1583,7 +1570,7 @@ function RegistroProdutoAcabado({ ordens, lotes }) {
         criadoEm: new Date().toISOString(),
       });
       setFeedback({ tipo: 'ok', msg: `Escada ${form.nroSerie.trim()} registrada como PA.` });
-      setForm({ nroSerie: '', nroOP: '', modeloCod: '', dataProd: today(), dataInspecao: today(), inspetor: '', statusQC: 'aprovado', nroLacre: '', observacao: '' });
+      setForm({ nroOP: '', modeloCod: '', dataProd: today(), dataInspecao: today(), inspetor: '', statusQC: 'aprovado', nroLacre: '', observacao: '' });
     } catch {
       setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
     } finally {
@@ -1601,11 +1588,7 @@ function RegistroProdutoAcabado({ ordens, lotes }) {
         <Feedback feedback={feedback} />
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 p-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div>
-                <Label>Numero de Serie *</Label>
-                <Input value={form.nroSerie} onChange={(e) => set('nroSerie', e.target.value)} placeholder="Ex: ESC-2026-0001" />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <Label>Numero da OP</Label>
                 <Input value={form.nroOP} onChange={(e) => set('nroOP', e.target.value)} placeholder="Ex: OP-2026-0001" />
