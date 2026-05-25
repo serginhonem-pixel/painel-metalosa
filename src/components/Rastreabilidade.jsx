@@ -944,7 +944,7 @@ function OrdemProducao({ lotes }) {
   );
 }
 
-function ConsultarEscada({ ordens, saidas = [] }) {
+function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
   const [busca, setBusca]               = useState('');
   const [resultado, setResultado]       = useState(null);
   const [buscou, setBuscou]             = useState(false);
@@ -953,8 +953,37 @@ function ConsultarEscada({ ordens, saidas = [] }) {
   const [feedbackEstorno, setFeedbackEstorno] = useState(null);
   const [confirmEstorno, setConfirmEstorno]   = useState(false);
   const [filtroLista, setFiltroLista]         = useState('');
+  const [loteIdSel, setLoteIdSel]             = useState('');
+  const [resultadosLote, setResultadosLote]   = useState([]);
 
   const buscar = () => {
+    if (modo === 'lote') {
+      if (!loteIdSel) return;
+      const lote = lotes.find((l) => l.id === loteIdSel);
+      if (!lote) { setResultadosLote([]); setResultado(null); setBuscou(true); return; }
+      let found = [];
+      if (lote.tipo === 'MP') {
+        found = ordens.filter((o) => o.ativo &&
+          (o.componentesFabricados ?? []).some((c) =>
+            (c.mpLotesConsumidos ?? []).some((m) => m.loteId === loteIdSel)
+          )
+        );
+      } else if (lote.tipo === 'PI') {
+        found = ordens.filter((o) => o.ativo &&
+          (o.componentesFabricados ?? []).some((c) => c.lotePiId === loteIdSel)
+        );
+      } else if (lote.tipo === 'COMPRADO') {
+        found = ordens.filter((o) => o.ativo &&
+          (o.componentesComprados ?? []).some((c) => c.loteId === loteIdSel)
+        );
+      }
+      setResultadosLote(found);
+      setResultado(null);
+      setBuscou(true);
+      setConfirmEstorno(false);
+      setFeedbackEstorno(null);
+      return;
+    }
     const t = busca.trim().toLowerCase();
     if (!t) return;
     let found = null;
@@ -1027,24 +1056,139 @@ function ConsultarEscada({ ordens, saidas = [] }) {
     <div className="space-y-5">
       <Card>
         <SectionTitle icon={Search}>Consulta de Rastreabilidade</SectionTitle>
-        <div className="flex gap-2 mb-4">
-          {[{ id: 'serie', label: 'Nr de Serie' }, { id: 'op', label: 'Nr da OP' }].map((m) => (
-            <button key={m.id} type="button" onClick={() => { setModo(m.id); setResultado(null); setBuscou(false); setBusca(''); }}
-              className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${modo === m.id ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {[{ id: 'serie', label: 'Nr de Serie' }, { id: 'op', label: 'Nr da OP' }, { id: 'lote', label: 'Por Lote (Recall)' }].map((m) => (
+            <button key={m.id} type="button" onClick={() => { setModo(m.id); setResultado(null); setBuscou(false); setBusca(''); setLoteIdSel(''); setResultadosLote([]); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${modo === m.id ? (m.id === 'lote' ? 'bg-rose-600 text-white shadow-sm' : 'bg-blue-600 text-white shadow-sm') : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
               {m.label}
             </button>
           ))}
         </div>
-        <div className="flex gap-3 max-w-xl">
-          <Input value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && buscar()}
-            placeholder={modo === 'serie' ? 'Nr de serie da escada...' : 'Nr da OP...'} />
-          <button type="button" onClick={buscar} className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl flex items-center gap-2 transition-all shadow-sm hover:shadow-blue-200 hover:shadow-md">
-            <Search size={14} /> Buscar
-          </button>
-        </div>
+        {modo === 'lote' ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-700">
+              <AlertTriangle size={13} className="shrink-0" />
+              Selecione um lote para ver todas as escadas fabricadas com ele — identifica unidades afetadas em situação de recall.
+            </div>
+            <div className="flex gap-3 max-w-2xl">
+              <select value={loteIdSel} onChange={(e) => setLoteIdSel(e.target.value)}
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition">
+                <option value="">-- selecionar lote de material --</option>
+                {(() => {
+                  const ativos = lotes.filter((l) => l.ativo);
+                  const mp   = ativos.filter((l) => l.tipo === 'MP');
+                  const pi   = ativos.filter((l) => l.tipo === 'PI');
+                  const comp = ativos.filter((l) => l.tipo === 'COMPRADO');
+                  return (
+                    <>
+                      {mp.length > 0 && (
+                        <optgroup label="Materia-Prima (MP)">
+                          {mp.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {MP_CODIGO[l.mp]?.label ?? l.mp} · {l.nroLoteFornecedor} · NF {l.danfe} · {l.fornecedor}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {pi.length > 0 && (
+                        <optgroup label="Produto Intermediario (PI)">
+                          {pi.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {l.descricaoPi ?? l.codigoPi} · OP {l.nroOP || '--'} · {l.dataEntrada}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {comp.length > 0 && (
+                        <optgroup label="Componentes Comprados">
+                          {comp.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {l.nomeComp} · {l.nroLoteFornecedor} · {l.fornecedor}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </>
+                  );
+                })()}
+              </select>
+              <button type="button" onClick={buscar} disabled={!loteIdSel}
+                className="shrink-0 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl flex items-center gap-2 transition-all shadow-sm hover:shadow-rose-200 hover:shadow-md">
+                <Search size={14} /> Buscar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex gap-3 max-w-xl">
+            <Input value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && buscar()}
+              placeholder={modo === 'serie' ? 'Nr de serie da escada...' : 'Nr da OP...'} />
+            <button type="button" onClick={buscar} className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl flex items-center gap-2 transition-all shadow-sm hover:shadow-blue-200 hover:shadow-md">
+              <Search size={14} /> Buscar
+            </button>
+          </div>
+        )}
       </Card>
 
-      {ordensAtivas.length > 0 && (
+      {modo === 'lote' && buscou && (
+        <Card>
+          {resultadosLote.length === 0 ? (
+            <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+              <AlertTriangle size={16} className="shrink-0" />
+              Nenhuma escada encontrada para este lote. Pode indicar que o lote ainda nao foi consumido em nenhuma ordem de producao.
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <SectionTitle icon={AlertTriangle}>Escadas Afetadas — Recall</SectionTitle>
+                <Badge color="rose">{resultadosLote.length} escada(s)</Badge>
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 mb-5 text-xs font-semibold text-rose-700">
+                <AlertTriangle size={13} className="shrink-0" />
+                {resultadosLote.length} escada(s) fabricada(s) com este lote. Clique em uma para ver a ficha completa.
+              </div>
+              <div className="overflow-x-auto -mx-2">
+                <table className="w-full text-xs min-w-[600px]">
+                  <thead>
+                    <tr className="border-b-2 border-slate-100">
+                      <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Nr Serie</th>
+                      <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">OP</th>
+                      <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Modelo</th>
+                      <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Data Prod.</th>
+                      <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                      <th className="py-2 px-3" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resultadosLote.map((o) => {
+                      const entregue = saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(o.nroSerie));
+                      const selecionada = resultado?.id === o.id;
+                      return (
+                        <tr key={o.id} onClick={() => selecionar(o)}
+                          className={`border-b border-slate-50 cursor-pointer transition-colors ${selecionada ? 'bg-rose-50 border-rose-100' : 'hover:bg-rose-50/40'}`}>
+                          <td className="py-3 px-3 font-mono font-bold text-slate-800">{o.nroSerie || '—'}</td>
+                          <td className="py-3 px-3 font-mono text-slate-500">{o.nroOP || '—'}</td>
+                          <td className="py-3 px-3 text-slate-600">{o.descricaoModelo || o.modeloCod || '—'}</td>
+                          <td className="py-3 px-3 text-slate-400">{o.dataProd || '—'}</td>
+                          <td className="py-3 px-3">
+                            {entregue
+                              ? <Badge color="emerald">Entregue</Badge>
+                              : <Badge color="amber">Em estoque</Badge>}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <span className="text-rose-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </Card>
+      )}
+
+      {modo !== 'lote' && ordensAtivas.length > 0 && (
         <Card>
           <div className="flex items-center justify-between mb-4">
             <SectionTitle icon={ClipboardList}>Todas as Escadas Registradas</SectionTitle>
@@ -1099,7 +1243,7 @@ function ConsultarEscada({ ordens, saidas = [] }) {
           {feedbackEstorno.msg}
         </div>
       )}
-      {buscou && !resultado && (
+      {buscou && !resultado && modo !== 'lote' && (
         <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-700">
           <AlertTriangle size={18} className="shrink-0" />
           Nenhum registro encontrado para <span className="font-black font-mono mx-1">"{busca.trim()}"</span>.
@@ -2916,7 +3060,7 @@ export default function Rastreabilidade() {
       {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
       {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
       {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
-      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} saidas={saidas} />}
+      {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
       {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} />}
       {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
       {subAba === 'ficha'      && <FichaTecnica />}
