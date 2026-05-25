@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../firebase';
 import BOM_ESCADAS from '../data/bomescada.json';
 import ESCADA_JSON from '../data/escada.json';
@@ -40,7 +40,26 @@ import {
   PackagePlus,
   Truck,
   X,
+  TrendingUp,
 } from 'lucide-react';
+
+const LOTES_ATIVOS_ESCADA = [
+  { lote: '052024', dataInicio: '2024-05-01', dataFim: null },
+];
+
+function getLotePorData(dataISO) {
+  const d = dataISO ? dataISO.slice(0, 10) : '';
+  for (const l of LOTES_ATIVOS_ESCADA) {
+    if (d >= l.dataInicio && (!l.dataFim || d <= l.dataFim)) return l.lote;
+  }
+  return null;
+}
+
+function normalizarCliente(valor) {
+  const digits = String(valor ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.padStart(6, '0');
+}
 
 const MP_CODIGO = {
   'TUBO (11307)':       { label: 'TUBO RED 1"X1,20 ESC',           codigo: '11307' },
@@ -2679,7 +2698,7 @@ function EstoqueAtual({ lotes }) {
   );
 }
 
-function SaidaVenda({ ordens, saidas }) {
+function SaidaVenda({ ordens, saidas, faturamentoLinhas = [], clientesPorCodigo = new Map() }) {
   const [form, setForm] = useState({ nfSaida: '', cliente: '', dataEntrega: today(), observacao: '' });
   const [selecionadas, setSelecionadas] = useState([]);
   const [saving, setSaving]             = useState(false);
@@ -2846,6 +2865,8 @@ function SaidaVenda({ ordens, saidas }) {
           </div>
         )}
       </Card>
+
+      <VendasLote faturamentoLinhas={faturamentoLinhas} ordens={ordens} clientesPorCodigo={clientesPorCodigo} />
     </div>
   );
 }
@@ -3039,6 +3060,155 @@ const ABAS = [
 
 const SENHA_ACESSO = 'escada';
 
+function VendasLote({ faturamentoLinhas = [], ordens = [], clientesPorCodigo = new Map() }) {
+  const vendasEscada = useMemo(() => {
+    return faturamentoLinhas
+      .filter((r) => {
+        const desc = String(r.Descricao ?? r.descricao ?? '').trim().toUpperCase();
+        const tipo = String(r.TipoMovimento ?? r.tipoMovimento ?? '').trim().toLowerCase();
+        const nf = r.NF ?? r.NumeroNF ?? r.nf;
+        const valor = Number(r.ValorTotal ?? r.valorTotal) || 0;
+        return (
+          desc.startsWith('ESCADA') &&
+          tipo !== 'd' &&
+          tipo !== 'devolucao' &&
+          valor > 0 &&
+          nf
+        );
+      })
+      .map((r) => {
+        const dataISO = r.Emissao ? String(r.Emissao).slice(0, 10) : '';
+        const [y, m, d] = dataISO.split('-');
+        const dataBR = dataISO ? `${d}/${m}/${y}` : '—';
+        const nf = r.NF ?? r.NumeroNF ?? r.nf;
+        const chave = normalizarCliente(r.Cliente ?? r.cliente);
+        const info = clientesPorCodigo.get(chave);
+        const qtdRaw = r.Quantidade ?? r.quantidade;
+        const codigoProd = String(r.Codigo ?? r.codigo ?? '').trim();
+        return {
+          nf,
+          data: dataBR,
+          dataISO,
+          clienteCod: r.Cliente ?? r.cliente ?? null,
+          clienteNome: info?.Nome ?? info?.nome ?? (r.Cliente ?? r.cliente ?? '—'),
+          codigo: codigoProd,
+          descricao: String(r.Descricao ?? r.descricao ?? '').trim(),
+          quantidade: qtdRaw != null ? Number(qtdRaw) : null,
+          valorTotal: Number(r.ValorTotal ?? r.valorTotal) || 0,
+          lote: getLotePorData(dataISO),
+        };
+      })
+      .sort((a, b) => b.dataISO.localeCompare(a.dataISO));
+  }, [faturamentoLinhas, clientesPorCodigo]);
+
+  const porLote = useMemo(() => {
+    const map = {};
+    for (const v of vendasEscada) {
+      const k = v.lote ?? 'sem-lote';
+      if (!map[k]) map[k] = { lote: k, linhas: [], totalQtd: 0, totalValor: 0 };
+      map[k].linhas.push(v);
+      map[k].totalQtd += v.quantidade ?? 0;
+      map[k].totalValor += v.valorTotal;
+    }
+    return Object.values(map).sort((a, b) => b.lote.localeCompare(a.lote));
+  }, [vendasEscada]);
+
+  if (!faturamentoLinhas.length) {
+    return (
+      <Card>
+        <p className="text-sm text-slate-500 text-center py-8">Dados de faturamento não disponíveis.</p>
+      </Card>
+    );
+  }
+
+  if (porLote.length === 0) {
+    return (
+      <Card>
+        <p className="text-sm text-slate-500 text-center py-8">Nenhuma venda de escada encontrada no faturamento.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {porLote.map(({ lote, linhas, totalQtd, totalValor }) => {
+        const produzidas = ordens.filter((o) => o.ativo && o.tipo === 'PA' && o.nroSerie?.startsWith(lote)).length;
+        const infoLote = LOTES_ATIVOS_ESCADA.find((l) => l.lote === lote);
+        return (
+          <Card key={lote}>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+              <div>
+                <SectionTitle icon={TrendingUp}>Lote {lote}</SectionTitle>
+                {infoLote && (
+                  <p className="text-xs text-slate-400 mt-1 ml-6">
+                    Início: {infoLote.dataInicio}{infoLote.dataFim ? ` · Fim: ${infoLote.dataFim}` : ' · Em aberto'}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-6 sm:text-right shrink-0">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Produzidas</p>
+                  <p className="text-xl font-bold text-slate-700">{produzidas || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Vendidas</p>
+                  <p className="text-xl font-bold text-blue-600">{totalQtd}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Receita</p>
+                  <p className="text-xl font-bold text-emerald-600">
+                    {totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-slate-100">
+              <table className="w-full text-xs">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="text-left py-2.5 px-3 text-slate-400 font-semibold">NF</th>
+                    <th className="text-left py-2.5 px-3 text-slate-400 font-semibold">Data</th>
+                    <th className="text-left py-2.5 px-3 text-slate-400 font-semibold">Cliente</th>
+                    <th className="text-left py-2.5 px-3 text-slate-400 font-semibold">Cód.</th>
+                    <th className="text-left py-2.5 px-3 text-slate-400 font-semibold">Modelo</th>
+                    <th className="text-right py-2.5 px-3 text-slate-400 font-semibold">Qtd</th>
+                    <th className="text-right py-2.5 px-3 text-slate-400 font-semibold">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {linhas.map((r, i) => (
+                    <tr key={i} className="border-t border-slate-50 hover:bg-slate-50/60">
+                      <td className="py-2 px-3 font-mono text-slate-700">{r.nf}</td>
+                      <td className="py-2 px-3 text-slate-500 whitespace-nowrap">{r.data}</td>
+                      <td className="py-2 px-3 text-slate-700 max-w-[200px] truncate" title={r.clienteNome}>{r.clienteNome}</td>
+                      <td className="py-2 px-3 font-mono text-slate-500">{r.codigo}</td>
+                      <td className="py-2 px-3 text-slate-600">{r.descricao}</td>
+                      <td className="py-2 px-3 text-right font-semibold text-slate-800">{r.quantidade ?? '—'}</td>
+                      <td className="py-2 px-3 text-right text-slate-600">
+                        {r.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-slate-50 border-t border-slate-200">
+                  <tr>
+                    <td colSpan={5} className="py-2 px-3 text-xs font-semibold text-slate-500">{linhas.length} linhas</td>
+                    <td className="py-2 px-3 text-right font-bold text-slate-800">{totalQtd}</td>
+                    <td className="py-2 px-3 text-right font-bold text-slate-800">
+                      {totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function TelaLogin({ onLogin }) {
   const [senha, setSenha]   = useState('');
   const [erro, setErro]     = useState(false);
@@ -3097,7 +3267,7 @@ function TelaLogin({ onLogin }) {
   );
 }
 
-export default function Rastreabilidade() {
+export default function Rastreabilidade({ faturamentoLinhas = [], clientesPorCodigo = new Map() }) {
   const [autenticado, setAutenticado]   = useState(false);
   const [subAba, setSubAba]             = useState('estoque');
   const [lotes,  setLotes]              = useState([]);
@@ -3192,7 +3362,7 @@ export default function Rastreabilidade() {
         {subAba === 'pa'         && <RegistroProdutoAcabado ordens={ordens} lotes={lotes} />}
         {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
         {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
-        {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} />}
+        {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} faturamentoLinhas={faturamentoLinhas} clientesPorCodigo={clientesPorCodigo} />}
         {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
         {subAba === 'ficha'      && <FichaTecnica />}
       </div>

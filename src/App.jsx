@@ -16273,7 +16273,7 @@ const custoDetalheTitulo = custoDetalheItem
           {/* ABA RASTREABILIDADE */}
           {abaAtiva === 'rastreabilidade' && (
             <div className="animate-in slide-in-from-top duration-500">
-              <Rastreabilidade />
+              <Rastreabilidade faturamentoLinhas={faturamentoLinhas} clientesPorCodigo={clientesPorCodigo} />
             </div>
           )}
 
