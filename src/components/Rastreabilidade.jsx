@@ -1304,38 +1304,42 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
           </div>
 
           {(resultado.componentesFabricados ?? []).length > 0 && (
-            <div className="mb-5">
+            <div className="mb-6">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 flex items-center gap-2">
-                <Layers size={12} /> Componentes Fabricados - rastreados pela MP
+                <Layers size={12} /> Componentes Fabricados — rastreados pela MP
               </p>
-              <div className="space-y-2">
-                {(resultado.componentesFabricados ?? []).map((c, i) => (
-                  <div key={i} className="grid grid-cols-12 items-start gap-2 bg-blue-50/40 border border-blue-100 rounded-2xl px-4 py-3">
-                    <div className="col-span-3">
-                      <p className="text-xs font-bold text-slate-800">{c.componente}</p>
-                      <p className="text-[10px] text-slate-400">MP: {MP_CODIGO[c.mp]?.label ?? c.mp}</p>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <FileText size={11} className="text-amber-400 shrink-0" />
-                      <span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{c.danfe || '--'}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Award size={11} className="text-violet-400 shrink-0" />
-                      <span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{c.certificadoQualidade || '--'}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Hash size={11} className="text-slate-300 shrink-0" />
-                      <span className="font-mono text-xs text-slate-600 truncate">{c.nroLoteFornecedor}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Building2 size={11} className="text-slate-300 shrink-0" />
-                      <span className="text-xs text-slate-600 truncate">{c.fornecedor}</span>
-                    </div>
-                    <div className="col-span-1 text-right">
-                      <span className="text-xs font-black text-blue-600">{c.qtdConsumida}</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto rounded-2xl border border-blue-100">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-blue-50 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      <th className="text-left px-4 py-2.5">Componente / MP</th>
+                      <th className="text-left px-4 py-2.5">DANFE</th>
+                      <th className="text-left px-4 py-2.5">Cert. Qualidade</th>
+                      <th className="text-left px-4 py-2.5">Lote Fornecedor</th>
+                      <th className="text-left px-4 py-2.5">Fornecedor</th>
+                      <th className="text-right px-4 py-2.5">Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-blue-50">
+                    {(resultado.componentesFabricados ?? []).map((c, i) => (
+                      <tr key={i} className="bg-white hover:bg-blue-50/30 transition-colors">
+                        <td className="px-4 py-3">
+                          <p className="font-bold text-slate-800 text-sm">{c.componente}</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">{MP_CODIGO[c.mp]?.label ?? c.mp}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-700 px-2.5 py-1 rounded-lg">{c.danfe || '—'}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs font-semibold bg-violet-50 border border-violet-200 text-violet-700 px-2.5 py-1 rounded-lg">{c.certificadoQualidade || '—'}</span>
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-600">{c.nroLoteFornecedor || '—'}</td>
+                        <td className="px-4 py-3 text-xs font-semibold text-slate-700">{c.fornecedor || '—'}</td>
+                        <td className="px-4 py-3 text-right font-black text-blue-600 text-sm">{c.qtdConsumida}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -1344,33 +1348,35 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 flex items-center gap-2">
                 <Package size={12} /> Componentes Comprados
               </p>
-              <div className="space-y-2">
-                {(resultado.componentesComprados ?? []).map((c, i) => (
-                  <div key={i} className="grid grid-cols-12 items-center gap-2 bg-slate-50 rounded-2xl px-4 py-3">
-                    <div className="col-span-3">
-                      <p className="text-xs font-bold text-slate-800">{c.componente}</p>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <FileText size={11} className="text-amber-400 shrink-0" />
-                      <span className="font-mono text-xs bg-amber-50 border border-amber-100 text-amber-700 px-2 py-0.5 rounded-md">{c.danfe || '--'}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Award size={11} className="text-violet-400 shrink-0" />
-                      <span className="font-mono text-xs bg-violet-50 border border-violet-100 text-violet-700 px-2 py-0.5 rounded-md">{c.certificadoQualidade || '--'}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Hash size={11} className="text-slate-300 shrink-0" />
-                      <span className="font-mono text-xs text-slate-600 truncate">{c.nroLoteFornecedor}</span>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-1.5">
-                      <Building2 size={11} className="text-slate-300 shrink-0" />
-                      <span className="text-xs text-slate-600 truncate">{c.fornecedor}</span>
-                    </div>
-                    <div className="col-span-1 text-right">
-                      <span className="text-xs font-black text-slate-600">{c.qtdConsumida}</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      <th className="text-left px-4 py-2.5">Componente</th>
+                      <th className="text-left px-4 py-2.5">DANFE</th>
+                      <th className="text-left px-4 py-2.5">Cert. Qualidade</th>
+                      <th className="text-left px-4 py-2.5">Lote Fornecedor</th>
+                      <th className="text-left px-4 py-2.5">Fornecedor</th>
+                      <th className="text-right px-4 py-2.5">Qtd</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(resultado.componentesComprados ?? []).map((c, i) => (
+                      <tr key={i} className="bg-white hover:bg-slate-50/60 transition-colors">
+                        <td className="px-4 py-3 font-bold text-slate-800">{c.componente}</td>
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-700 px-2.5 py-1 rounded-lg">{c.danfe || '—'}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs font-semibold bg-violet-50 border border-violet-200 text-violet-700 px-2.5 py-1 rounded-lg">{c.certificadoQualidade || '—'}</span>
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-600">{c.nroLoteFornecedor || '—'}</td>
+                        <td className="px-4 py-3 text-xs font-semibold text-slate-700">{c.fornecedor || '—'}</td>
+                        <td className="px-4 py-3 text-right font-black text-slate-600 text-sm">{c.qtdConsumida}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
