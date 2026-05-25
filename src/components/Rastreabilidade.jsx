@@ -3162,21 +3162,6 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide">{label}</p>
               </div>
             ))}
-            <Tooltip text="Vincula os dados de DANFE e fornecedor às escadas do inventário inicial 052024">
-              <button
-                type="button"
-                onClick={() => vincularComponentes052024(setVincularStatus)}
-                disabled={vincularStatus === 'loading'}
-                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all disabled:opacity-50
-                  ${vincularStatus === 'ok' ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
-                    vincularStatus === 'erro' ? 'border-rose-300 bg-rose-50 text-rose-700' :
-                    'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-400'}`}
-              >
-                {vincularStatus === 'loading' ? 'Processando...' :
-                 vincularStatus === 'ok' ? 'Vinculado' :
-                 vincularStatus === 'erro' ? 'Erro' : 'Vincular lote 052024'}
-              </button>
-            </Tooltip>
           </div>
         </div>
         {/* Navegação por abas */}
