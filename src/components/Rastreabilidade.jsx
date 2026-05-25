@@ -12,6 +12,7 @@ import {
   onSnapshot,
   writeBatch,
   increment,
+  where,
 } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
 import {
@@ -360,7 +361,7 @@ function EntradaLoteMP({ lotes }) {
           {isProducao && (
             <div className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4">
               <Label>OP de Producao *</Label>
-              <Input value={form.nroOPTubo} onChange={(e) => set('nroOPTubo', e.target.value)} placeholder="Ex: OP-2026-0001" />
+              <Input value={form.nroOPTubo} onChange={(e) => set('nroOPTubo', e.target.value)} placeholder="Numero da OP" />
               <p className="text-[10px] text-violet-500 font-semibold mt-1.5">Numero da ordem interna que transformou a MP mae neste material.</p>
             </div>
           )}
@@ -582,7 +583,7 @@ function ProducaoPI({ lotes }) {
               </div>
               <div>
                 <Label>Numero da OP</Label>
-                <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Ex: OP-2026-0001" />
+                <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Numero da OP" />
               </div>
             </div>
           </div>
@@ -847,7 +848,7 @@ function OrdemProducao({ lotes }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-6 border-b border-slate-100">
           <div>
             <Label>Numero da OP</Label>
-            <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Ex: OP-2026-0001" />
+            <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Numero da OP" />
           </div>
           <div>
             <Label>Data de Producao</Label>
@@ -1591,7 +1592,7 @@ function RegistroProdutoAcabado({ ordens, lotes }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <Label>Numero da OP</Label>
-                <Input value={form.nroOP} onChange={(e) => set('nroOP', e.target.value)} placeholder="Ex: OP-2026-0001" />
+                <Input value={form.nroOP} onChange={(e) => set('nroOP', e.target.value)} placeholder="Numero da OP" />
               </div>
               <div>
                 <Label>Modelo *</Label>
@@ -2136,6 +2137,107 @@ async function seedLote052024(setStatus) {
       }
     }
     await batch.commit();
+    setStatus('ok');
+    setTimeout(() => setStatus(null), 5000);
+  } catch (err) {
+    console.error(err);
+    setStatus('erro');
+    setTimeout(() => setStatus(null), 5000);
+  }
+}
+
+async function vincularComponentes052024(setStatus) {
+  setStatus('loading');
+  try {
+    // Carrega todos os lotes existentes
+    const lotesSnap = await getDocs(collection(db, 'rastreabilidade_lotes'));
+    const todosLotes = lotesSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    // Mapas: codigoPi → lote PI, codigo → lote COMPRADO
+    const piMap = {};
+    for (const l of todosLotes) {
+      if (l.tipo === 'PI' && l.codigoPi && !piMap[l.codigoPi]) piMap[l.codigoPi] = l;
+    }
+    const compMap = {};
+    for (const l of todosLotes) {
+      if (l.tipo === 'COMPRADO' && l.codigo && !compMap[l.codigo]) compMap[l.codigo] = l;
+    }
+    const mpMap = {};
+    for (const l of todosLotes) {
+      if (l.tipo === 'MP' && l.mp && !mpMap[l.mp]) mpMap[l.mp] = l;
+    }
+
+    // Busca as ordens do inventário inicial
+    const ordensSnap = await getDocs(
+      query(collection(db, 'rastreabilidade_ordens'), where('origem', '==', 'inventario_inicial')),
+    );
+    const modelos = BOM_ESCADAS.bom_escadas_rastreados;
+
+    const batches = [];
+    let batch = writeBatch(db);
+    let ops = 0;
+
+    for (const docSnap of ordensSnap.docs) {
+      const ordem = docSnap.data();
+      const modelo = modelos.find((m) => m.codigo_produto === ordem.modeloCod);
+      if (!modelo) continue;
+
+      const { fab, comp } = buildCompsFromBom(modelo);
+
+      const componentesFabricados = fab.map((c) => {
+        const l = piMap[c.codigo];
+        const mpOrigem = l?.mpLotesConsumidos?.[0] ?? {};
+        // Se não houver lote PI, cai para o lote MP direto
+        const mpLote = mpOrigem.loteId ? mpMap[l?.mpKey ?? c.mp] : mpMap[c.mp];
+        return {
+          componente: c.nome,
+          codigoComp: c.codigo,
+          tipoPeca: 'PI',
+          lotePiId: l?.id ?? '',
+          codigoPi: l?.codigoPi ?? c.codigo,
+          descricaoPi: l?.descricaoPi ?? c.nome,
+          mp: l?.mpKey ?? c.mp,
+          mpCodigo: l?.mpCodigo ?? MP_CODIGO[c.mp]?.codigo ?? '',
+          danfe: mpOrigem.danfe ?? mpLote?.danfe ?? '',
+          certificadoQualidade: mpOrigem.certificadoQualidade ?? mpLote?.certificadoQualidade ?? '',
+          nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? mpLote?.nroLoteFornecedor ?? '',
+          fornecedor: mpOrigem.fornecedor ?? mpLote?.fornecedor ?? '',
+          dataEntrada: mpOrigem.dataEntrada ?? mpLote?.dataEntrada ?? '',
+          mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
+          qtdConsumida: c.qtdConsumida,
+        };
+      });
+
+      const componentesComprados = comp.map((c) => {
+        const l = compMap[c.codigo];
+        return {
+          componente: c.nome,
+          tipo: 'COMPRADO',
+          loteId: l?.id ?? '',
+          nroLoteFornecedor: l?.nroLoteFornecedor ?? '',
+          danfe: l?.danfe ?? '',
+          certificadoQualidade: l?.certificadoQualidade ?? '',
+          fornecedor: l?.fornecedor ?? '',
+          dataEntrada: l?.dataEntrada ?? '',
+          qtdConsumida: c.qtdConsumida,
+        };
+      });
+
+      batch.update(doc(db, 'rastreabilidade_ordens', docSnap.id), {
+        componentesFabricados,
+        componentesComprados,
+      });
+      ops++;
+
+      if (ops === 400) {
+        batches.push(batch.commit());
+        batch = writeBatch(db);
+        ops = 0;
+      }
+    }
+    if (ops > 0) batches.push(batch.commit());
+    await Promise.all(batches);
+
     setStatus('ok');
     setTimeout(() => setStatus(null), 5000);
   } catch (err) {
@@ -2995,8 +3097,9 @@ export default function Rastreabilidade() {
   const [lotes,  setLotes]              = useState([]);
   const [ordens, setOrdens]             = useState([]);
   const [saidas, setSaidas]             = useState([]);
-  const [resetStatus, setResetStatus]   = useState(null);
+  const [resetStatus, setResetStatus]         = useState(null);
   const [lote052024Status, setLote052024Status] = useState(null);
+  const [vincularStatus, setVincularStatus]   = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -3058,6 +3161,14 @@ export default function Rastreabilidade() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">{label}</p>
               </div>
             ))}
+            <button
+              type="button"
+              onClick={() => vincularComponentes052024(setVincularStatus)}
+              disabled={vincularStatus === 'loading'}
+              className="rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 px-4 py-2 text-xs font-black text-white uppercase tracking-wider transition-all"
+            >
+              {vincularStatus === 'loading' ? 'Vinculando...' : vincularStatus === 'ok' ? 'Vinculado!' : vincularStatus === 'erro' ? 'Erro!' : 'Vincular componentes 052024'}
+            </button>
           </div>
         </div>
       </div>
