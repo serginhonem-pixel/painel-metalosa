@@ -2118,6 +2118,50 @@ async function seedInventarioReal(setStatus) {
   }
 }
 
+async function seedLote052024(setStatus) {
+  setStatus('loading');
+  try {
+    const batch = writeBatch(db);
+    const now = new Date().toISOString();
+    const modelos = BOM_ESCADAS.bom_escadas_rastreados;
+    const itens = [
+      { modeloCod: '00185', qtd: 8,  op: 'OP-052024-185' },
+      { modeloCod: '00187', qtd: 26, op: 'OP-052024-187' },
+      { modeloCod: '00188', qtd: 5,  op: 'OP-052024-188' },
+    ];
+    for (const { modeloCod, qtd, op } of itens) {
+      const descricao = modelos.find((m) => m.codigo_produto === modeloCod)?.descricao ?? '';
+      const prefixo = `052024-${modeloCod.slice(-3)}`;
+      for (let i = 1; i <= qtd; i++) {
+        const nroSerie = `${prefixo}-${String(i).padStart(3, '0')}`;
+        batch.set(doc(collection(db, 'rastreabilidade_ordens')), {
+          tipo: 'PA',
+          nroSerie,
+          nroOP: op,
+          modeloCod,
+          descricaoModelo: descricao,
+          dataProd: '2024-05-01',
+          dataInspecao: '2024-05-01',
+          inspetor: '',
+          statusQC: 'aprovado',
+          nroLacre: '',
+          observacao: 'Inventario inicial lote 052024',
+          ativo: true,
+          criadoEm: now,
+          origem: 'inventario_inicial',
+        });
+      }
+    }
+    await batch.commit();
+    setStatus('ok');
+    setTimeout(() => setStatus(null), 5000);
+  } catch (err) {
+    console.error(err);
+    setStatus('erro');
+    setTimeout(() => setStatus(null), 5000);
+  }
+}
+
 async function limparColecao(nome) {
   const snap = await getDocs(collection(db, nome));
   const ids = snap.docs.map((d) => d.id);
@@ -2969,6 +3013,7 @@ export default function Rastreabilidade() {
   const [ordens, setOrdens]             = useState([]);
   const [saidas, setSaidas]             = useState([]);
   const [resetStatus, setResetStatus]   = useState(null);
+  const [lote052024Status, setLote052024Status] = useState(null);
 
   useEffect(() => {
     if (!autenticado) return;
@@ -3041,6 +3086,15 @@ export default function Rastreabilidade() {
             >
               <ArrowUpDown size={14} />
               {resetStatus === 'loading' ? 'Limpando...' : resetStatus === 'ok' ? 'Reimportado!' : resetStatus === 'erro' ? 'Erro — ver console' : 'Resetar e reimportar'}
+            </button>
+            <button
+              type="button"
+              disabled={lote052024Status === 'loading'}
+              onClick={() => seedLote052024(setLote052024Status)}
+              className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-600/10 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-600/20 disabled:opacity-50"
+            >
+              <PackagePlus size={14} />
+              {lote052024Status === 'loading' ? 'Importando...' : lote052024Status === 'ok' ? 'Importado!' : lote052024Status === 'erro' ? 'Erro — ver console' : 'Importar lote 052024'}
             </button>
           </div>
         </div>
