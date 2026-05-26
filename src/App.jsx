@@ -2364,6 +2364,22 @@ export default function App() {
       ? `<div class="section"><h2>Foto</h2><img src="${escapeHtmlRelatorio(ordem.fotoUrl)}" alt="Foto da OS" /></div>`
       : '';
 
+    const linhasDuplas = linhas.filter(([, valor]) => valor !== undefined && valor !== null && String(valor).trim() !== '');
+    const linhasHtml2col = (() => {
+      let rows = '';
+      for (let i = 0; i < linhasDuplas.length; i += 2) {
+        const [l1, v1] = linhasDuplas[i];
+        const [l2, v2] = linhasDuplas[i + 1] || ['', ''];
+        const fmt = (label, val) => ['Data da falha','Criado em','Atualizado em'].includes(label) ? formatDateTimeRelatorio(val) : val;
+        rows += `<tr>
+          <th>${escapeHtmlRelatorio(l1)}</th>
+          <td>${escapeHtmlRelatorio(fmt(l1, v1))}</td>
+          ${l2 ? `<th>${escapeHtmlRelatorio(l2)}</th><td>${escapeHtmlRelatorio(fmt(l2, v2))}</td>` : '<th></th><td></td>'}
+        </tr>`;
+      }
+      return rows || '<tr><td colspan="4">Sem dados.</td></tr>';
+    })();
+
     const html = `
       <!doctype html>
       <html lang="pt-BR">
@@ -2371,104 +2387,69 @@ export default function App() {
         <meta charset="utf-8" />
         <title>Impressao OS</title>
         <style>
+          @page { size: A4 portrait; margin: 10mm 12mm; }
           * { box-sizing: border-box; }
-          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f1f5f9; }
-          h1 { font-size: 22px; margin: 0; }
-          h2 { font-size: 12px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
-          .page { padding: 28px; }
-          .header { background: linear-gradient(120deg, #0f172a, #1e293b); color: #f8fafc; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-          .brand { display: flex; align-items: center; gap: 12px; }
-          .brand img { height: 40px; width: auto; }
-          .brand small { display: block; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; }
-          .meta { font-size: 11px; color: #cbd5f5; }
-          .badges { display: flex; gap: 6px; flex-wrap: wrap; }
-          .badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; letter-spacing: 0.08em; }
+          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #fff; font-size: 14px; }
+          h1 { font-size: 20px; margin: 0; font-weight: 700; }
+          h2 { font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
+          .header { background: #0f172a; color: #f8fafc; padding: 12px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+          .brand { display: flex; align-items: center; gap: 10px; }
+          .brand img { height: 34px; width: auto; }
+          .brand small { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #94a3b8; margin-top: 2px; }
+          .meta { font-size: 11px; color: #94a3b8; text-align: right; }
+          .badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; margin-top: 5px; }
+          .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
           .badge-danger { background: #fecaca; color: #991b1b; }
           .badge-warn { background: #fde68a; color: #92400e; }
           .badge-info { background: #bae6fd; color: #075985; }
           .badge-success { background: #bbf7d0; color: #166534; }
           .badge-muted { background: #e2e8f0; color: #475569; }
-          .section { margin-top: 18px; }
-          .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
-          .card { background: #ffffff; border-radius: 14px; padding: 12px 14px; border: 1px solid #e2e8f0; }
-          .card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #94a3b8; }
-          .card .value { margin-top: 6px; font-size: 12px; font-weight: 700; color: #0f172a; }
-          table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; border-radius: 12px; overflow: hidden; }
-          th, td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
-          th { width: 28%; background: #f8fafc; color: #475569; font-weight: 600; }
+          .section { margin-top: 12px; }
+          table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+          th, td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; font-size: 13px; }
+          th { background: #f1f5f9; color: #334155; font-weight: 600; width: 16%; white-space: nowrap; }
+          td { color: #0f172a; width: 34%; }
           tr:last-child td, tr:last-child th { border-bottom: none; }
-          .box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; font-size: 11px; line-height: 1.5; white-space: pre-wrap; background: #fff; }
-          .photo { background: #fff; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; }
-          .photo img { max-width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; }
-          .footer { margin-top: 18px; font-size: 10px; color: #64748b; text-align: right; }
+          .box { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; background: #f8fafc; margin-top: 4px; }
+          .photo img { max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #e2e8f0; display: block; margin-top: 4px; }
+          .footer { margin-top: 10px; font-size: 10px; color: #94a3b8; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 6px; }
           @media print {
             body { background: #fff; }
-            .page { padding: 12mm; }
-            .header { border-radius: 12px; }
           }
         </style>
       </head>
       <body>
-        <div class="page">
-          <div class="header">
-            <div class="brand">
-              <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
-              <div>
-                <h1>Ordem de Servico</h1>
-                <small>Relatorio tecnico</small>
-              </div>
-            </div>
+        <div class="header">
+          <div class="brand">
+            <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
             <div>
-              <div class="meta">Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
-              <div class="badges" style="margin-top:6px;">
-                <span class="badge ${getBadgeTone(prioridade)}">Prioridade: ${escapeHtmlRelatorio(ordem?.prioridade || '-')}</span>
-                <span class="badge ${getBadgeTone(status)}">Status: ${escapeHtmlRelatorio(ordem?.status || '-')}</span>
-                <span class="badge ${getBadgeTone(statusMaquina)}">Maquina: ${escapeHtmlRelatorio(ordem?.statusMaquina || '-')}</span>
-              </div>
+              <h1>Ordem de Servico</h1>
+              <small>Relatorio tecnico</small>
             </div>
           </div>
-
-          <div class="grid">
-            <div class="card">
-              <div class="label">OS</div>
-              <div class="value">${escapeHtmlRelatorio(ordem?.id || '-')}</div>
-            </div>
-            <div class="card">
-              <div class="label">Ativo</div>
-              <div class="value">${escapeHtmlRelatorio(ordem?.ativo || '-')}</div>
-            </div>
-            <div class="card">
-              <div class="label">Setor / Processo</div>
-              <div class="value">${escapeHtmlRelatorio(`${ordem?.setor || '-'} ? ${ordem?.processo || '-'}`)}</div>
-            </div>
-            <div class="card">
-              <div class="label">Responsavel</div>
-              <div class="value">${escapeHtmlRelatorio(ordem?.responsavel || '-')}</div>
-            </div>
-            <div class="card">
-              <div class="label">Solicitante</div>
-              <div class="value">${escapeHtmlRelatorio(ordem?.solicitante || '-')}</div>
-            </div>
-            <div class="card">
-              <div class="label">Data da falha</div>
-              <div class="value">${escapeHtmlRelatorio(formatDateTimeRelatorio(ordem?.dataFalha))}</div>
+          <div>
+            <div class="meta">Gerado em ${escapeHtmlRelatorio(formatDateTimeRelatorio(now))}</div>
+            <div class="badges">
+              <span class="badge ${getBadgeTone(prioridade)}">Prioridade: ${escapeHtmlRelatorio(ordem?.prioridade || '-')}</span>
+              <span class="badge ${getBadgeTone(status)}">Status: ${escapeHtmlRelatorio(ordem?.status || '-')}</span>
+              <span class="badge ${getBadgeTone(statusMaquina)}">Maquina: ${escapeHtmlRelatorio(ordem?.statusMaquina || '-')}</span>
             </div>
           </div>
-
-          <div class="section">
-            <h2>Detalhes da OS</h2>
-            <table>
-              <tbody>
-                ${linhasHtml || '<tr><td colspan="2">Sem dados disponiveis.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
-
-          ${sintomaHtml}
-          ${descricaoHtml}
-          ${fotoHtml ? `<div class="section">${fotoHtml.replace('<div class="section">', '').replace('</div>', '')}</div>` : ''}
-          <div class="footer">Metalosa · Manutencao</div>
         </div>
+
+        <div class="section">
+          <h2>Detalhes da OS</h2>
+          <table>
+            <tbody>
+              ${linhasHtml2col}
+            </tbody>
+          </table>
+        </div>
+
+        ${sintomaHtml}
+        ${descricaoHtml}
+        ${fotoHtml ? `<div class="section"><h2>Foto</h2><div class="photo"><img src="${escapeHtmlRelatorio(ordem?.fotoUrl)}" alt="Foto da OS" /></div></div>` : ''}
+        <div class="footer">Metalosa &middot; Manutencao &middot; ${escapeHtmlRelatorio(ordem?.id || '')}</div>
       </body>
       </html>
     `;
