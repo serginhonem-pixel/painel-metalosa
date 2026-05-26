@@ -2514,11 +2514,11 @@ function EstoqueAtual({ lotes }) {
       {/* Estoque PI */}
       {(() => {
         const lotesPi = ativos.filter((l) => l.tipo === 'PI');
-        if (lotesPi.length === 0) return null;
-        const gruposPi = [...new Set(lotesPi.map((l) => l.codigoPi))].sort().map((cod) => {
+        const gruposPi = Object.keys(LOTES_PI_MAP).sort().map((cod) => {
           const ls = lotesPi.filter((l) => l.codigoPi === cod);
-          return { cod, descricao: LOTES_PI_MAP[cod] ?? ls[0]?.descricaoPi ?? ls[0]?.nomePi ?? cod, lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
+          return { cod, descricao: LOTES_PI_MAP[cod], lotes: ls, totalDisp: ls.reduce((s, l) => s + (l.qtdDisponivel ?? 0), 0) };
         });
+        if (gruposPi.length === 0) return null;
         return (
           <Card>
             <SectionTitle icon={Cog}>Produtos Intermediarios (PI) em Estoque</SectionTitle>
