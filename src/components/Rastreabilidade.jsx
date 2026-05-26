@@ -2701,6 +2701,8 @@ function SaidaVenda({ ordens, saidas, faturamentoLinhas = [], clientesPorCodigo 
   const [selecionadas, setSelecionadas] = useState([]);
   const [saving, setSaving]             = useState(false);
   const [feedback, setFeedback]         = useState(null);
+  const [filtroLote, setFiltroLote]     = useState('');
+  const [filtroModelo, setFiltroModelo] = useState('');
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -2709,9 +2711,26 @@ function SaidaVenda({ ordens, saidas, faturamentoLinhas = [], clientesPorCodigo 
     .filter((o) => o.ativo && !seriesJaSaidas.has(o.nroSerie))
     .sort((a, b) => (b.dataProd ?? '').localeCompare(a.dataProd ?? ''));
 
+  const lotesDisponiveis = [...new Set(ordensDisponiveis.map((o) => o.nroSerie?.split('-')[0] ?? ''))].sort().reverse();
+  const modelosNoLote = filtroLote
+    ? [...new Set(ordensDisponiveis.filter((o) => o.nroSerie?.startsWith(filtroLote)).map((o) => o.nroSerie?.split('-')[1] ?? ''))].sort()
+    : [];
+  const ordensFiltradas = ordensDisponiveis.filter((o) => {
+    if (filtroLote && !o.nroSerie?.startsWith(filtroLote)) return false;
+    if (filtroModelo && o.nroSerie?.split('-')[1] !== filtroModelo) return false;
+    return true;
+  });
+
   const adicionar = (nroSerie) => {
     if (!nroSerie || selecionadas.includes(nroSerie)) return;
     setSelecionadas((p) => [...p, nroSerie]);
+  };
+
+  const adicionarFiltradas = () => {
+    setSelecionadas((p) => {
+      const novas = ordensFiltradas.map((o) => o.nroSerie).filter((s) => !p.includes(s));
+      return [...p, ...novas];
+    });
   };
 
   const remover = (nroSerie) => setSelecionadas((p) => p.filter((s) => s !== nroSerie));
@@ -2774,24 +2793,67 @@ function SaidaVenda({ ordens, saidas, faturamentoLinhas = [], clientesPorCodigo 
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Escadas nesta saída</p>
-            <div className="flex gap-3">
-              <Select
-                value=""
-                onChange={(e) => adicionar(e.target.value)}
-                className="max-w-sm"
-              >
-                <option value="">-- adicionar escada --</option>
-                {ordensDisponiveis.map((o) => (
-                  <option key={o.id} value={o.nroSerie}>
-                    {o.nroSerie} · {o.dataProd}
-                  </option>
-                ))}
-              </Select>
-              <span className="text-[10px] font-semibold text-slate-400 self-center">
-                {ordensDisponiveis.length} em estoque disponíveis
-              </span>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Escadas nesta saída</p>
+              <span className="text-[10px] font-semibold text-slate-400">{ordensDisponiveis.length} disponíveis em estoque</span>
             </div>
+
+            {/* Filtros por lote e modelo */}
+            <div className="flex flex-wrap gap-3 items-end">
+              <div>
+                <Label>Lote</Label>
+                <Select value={filtroLote} onChange={(e) => { setFiltroLote(e.target.value); setFiltroModelo(''); }} className="min-w-[140px]">
+                  <option value="">Todos os lotes</option>
+                  {lotesDisponiveis.map((l) => (
+                    <option key={l} value={l}>{l}</option>
+                  ))}
+                </Select>
+              </div>
+              {filtroLote && modelosNoLote.length > 1 && (
+                <div>
+                  <Label>Modelo</Label>
+                  <Select value={filtroModelo} onChange={(e) => setFiltroModelo(e.target.value)} className="min-w-[120px]">
+                    <option value="">Todos</option>
+                    {modelosNoLote.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </Select>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={adicionarFiltradas}
+                disabled={ordensFiltradas.length === 0}
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                + Adicionar {ordensFiltradas.length > 0 ? `todas (${ordensFiltradas.length})` : ''}
+              </button>
+            </div>
+
+            {/* Lista de escadas disponíveis no filtro */}
+            {filtroLote && (
+              <div className="max-h-40 overflow-y-auto space-y-1 rounded-xl border border-slate-200 bg-white p-2">
+                {ordensFiltradas.length === 0 && (
+                  <p className="text-xs text-slate-400 italic p-2">Nenhuma disponível neste filtro.</p>
+                )}
+                {ordensFiltradas.map((o) => {
+                  const jaSel = selecionadas.includes(o.nroSerie);
+                  return (
+                    <button
+                      key={o.id}
+                      type="button"
+                      onClick={() => jaSel ? remover(o.nroSerie) : adicionar(o.nroSerie)}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center justify-between gap-2 ${jaSel ? 'bg-blue-100 text-blue-700 font-bold' : 'hover:bg-slate-100 text-slate-600'}`}
+                    >
+                      <span>{o.nroSerie}</span>
+                      <span className="text-[10px] text-slate-400">{o.dataProd}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Chips das escadas selecionadas */}
             <div className="flex flex-wrap gap-2 min-h-[2rem]">
               {selecionadas.length === 0 && (
                 <span className="text-xs text-slate-400 italic self-center">Nenhuma escada selecionada</span>
