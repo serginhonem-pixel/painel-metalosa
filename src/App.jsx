@@ -2390,13 +2390,13 @@ export default function App() {
           @page { size: A4 portrait; margin: 10mm 12mm; }
           * { box-sizing: border-box; }
           body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #fff; font-size: 14px; }
-          h1 { font-size: 20px; margin: 0; font-weight: 700; }
+          h1 { font-size: 20px; margin: 0; font-weight: 700; color: #0f172a; }
           h2 { font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
-          .header { background: #0f172a; color: #f8fafc; padding: 12px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+          .header { background: #fff; color: #0f172a; padding: 10px 4px 10px 0; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
           .brand { display: flex; align-items: center; gap: 10px; }
           .brand img { height: 34px; width: auto; }
-          .brand small { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #94a3b8; margin-top: 2px; }
-          .meta { font-size: 11px; color: #94a3b8; text-align: right; }
+          .brand small { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #64748b; margin-top: 2px; }
+          .meta { font-size: 11px; color: #64748b; text-align: right; }
           .badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; margin-top: 5px; }
           .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
           .badge-danger { background: #fecaca; color: #991b1b; }
