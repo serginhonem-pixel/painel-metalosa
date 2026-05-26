@@ -107,7 +107,7 @@ const CODIGO_PARA_COMPRADO = {
 function buildCompsFromBom(modelo) {
   if (!modelo) return { fab: [], comp: [] };
   const fab = modelo.componentes_rastreados
-    .filter((c) => c.tipo === 'PI' && CODIGO_PARA_MP[c.codigo])
+    .filter((c) => c.nivel === 2 && c.tipo === 'PI' && CODIGO_PARA_MP[c.codigo])
     .map((c) => ({
       codigo: c.codigo,
       nome: c.descricao,
@@ -116,7 +116,7 @@ function buildCompsFromBom(modelo) {
       qtdConsumida: c.quantidade_por_escada,
     }));
   const comp = modelo.componentes_rastreados
-    .filter((c) => c.tipo === 'MP' && CODIGO_PARA_COMPRADO[c.codigo])
+    .filter((c) => c.nivel === 2 && c.tipo === 'MP' && CODIGO_PARA_COMPRADO[c.codigo])
     .map((c) => ({
       nome: CODIGO_PARA_COMPRADO[c.codigo],
       codigo: c.codigo,
@@ -2541,7 +2541,6 @@ function EstoqueAtual({ lotes }) {
                         <span className="font-mono text-[10px] bg-violet-50 border border-violet-100 text-violet-700 px-1.5 py-0.5 rounded mr-2">{g.cod}</span>
                         <span className="font-black text-slate-800">{g.descricao}</span>
                       </td>
-                      <td />
                       <td className="py-3 px-3 text-slate-500">{g.lotes.length}</td>
                       <td className="py-3 px-3 text-right"><span className={`text-base font-black ${g.totalDisp === 0 ? 'text-rose-500' : g.totalDisp < 10 ? 'text-amber-500' : 'text-emerald-600'}`}>{g.totalDisp.toLocaleString('pt-BR')}</span></td>
                       <td className="py-3 px-3">{g.totalDisp === 0 ? <Badge color="rose">Zerado</Badge> : g.totalDisp < 10 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}</td>
@@ -2558,11 +2557,10 @@ function EstoqueAtual({ lotes }) {
                                 {l.fornecedor && <span className="text-slate-400"> ({l.fornecedor})</span>}
                               </>}
                         </td>
+                        <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
                         <td className="py-2 px-3 text-[10px] text-slate-400">
                           {l.mpKey && <><span className="text-slate-500">consumo de</span> <span className="font-semibold text-slate-300">{l.mpKey}</span></>}
                         </td>
-                        <td className="py-2 px-3 text-right"><span className={`font-black text-sm ${l.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{l.qtdDisponivel}</span></td>
-                        <td />
                       </tr>
                     ))}
                   </React.Fragment>
