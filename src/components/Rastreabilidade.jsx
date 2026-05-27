@@ -706,14 +706,37 @@ function ProducaoPI({ lotes }) {
 }
 
 // ---------- IMPRESSAO DE ORDEM JA REGISTRADA (a partir do Firebase) -------------
-function imprimirOrdemRegistrada(ordem) {
+function imprimirOrdemRegistrada(ordem, lotes = []) {
   const fmt = (d) => d ? new Date(String(d).slice(0,10) + 'T00:00:00').toLocaleDateString('pt-BR') : '--';
   const n = ordem.qtdMontagens || 1;
+
+  // Mapa de fallback para enriquecer campos vazios em ordens históricas
+  const mpMap = {};
+  const piMap = {};
+  for (const l of lotes) {
+    if (l.tipo === 'MP'  && l.mp      && !mpMap[l.mp])      mpMap[l.mp]      = l;
+    if (l.tipo === 'PI'  && l.id      && !piMap[l.id])      piMap[l.id]      = l;
+  }
+
+  const enrich = (c) => {
+    if (c.danfe && c.fornecedor) return c; // já tem dados
+    // tenta enriquecer pelo lote PI → lote MP
+    const piLote = piMap[c.lotePiId];
+    const mpLote = mpMap[piLote?.mpKey ?? c.mp];
+    const mpOrigem = piLote?.mpLotesConsumidos?.[0] ?? {};
+    return {
+      ...c,
+      danfe:                c.danfe                || mpOrigem.danfe                || mpLote?.danfe                || '',
+      certificadoQualidade: c.certificadoQualidade || mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || '',
+      nroLoteFornecedor:    c.nroLoteFornecedor    || mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || '',
+      fornecedor:           c.fornecedor           || mpOrigem.fornecedor           || mpLote?.fornecedor           || '',
+    };
+  };
 
   // qtdConsumida já é o total; qtdPorUnidade é por escada (pode não existir em ordens antigas)
   const porUn = (c) => c.qtdPorUnidade ?? (n > 1 ? Math.round(c.qtdConsumida / n) : c.qtdConsumida);
 
-  const rowsFab = (ordem.componentesFabricados ?? []).map((c) => `
+  const rowsFab = (ordem.componentesFabricados ?? []).map((raw) => { const c = enrich(raw); return `
     <tr>
       <td>${c.componente || '--'}</td>
       <td style="font-family:monospace;text-align:center">${c.codigoComp || '--'}</td>
@@ -724,7 +747,7 @@ function imprimirOrdemRegistrada(ordem) {
       <td>${c.fornecedor || '--'}</td>
       <td style="text-align:center">${porUn(c)}</td>
       <td style="text-align:center;font-weight:900;color:#1d4ed8">${c.qtdConsumida ?? '--'}</td>
-    </tr>`).join('');
+    </tr>`; }).join('');
 
   const rowsComp = (ordem.componentesComprados ?? []).map((c) => `
     <tr>
@@ -1017,20 +1040,31 @@ function OrdemProducao({ lotes, ordens = [] }) {
     try {
       const batch = writeBatch(db);
 
-      // Monta payload de componentes (igual para todas as N ordens)
+      // Mapa de fallback: mpKey → lote MP disponível (para lotes históricos sem DANFE embutido)
+      const mpMap = {};
+      for (const l of lotes) {
+        if (l.tipo === 'MP' && l.mp && !mpMap[l.mp]) mpMap[l.mp] = l;
+      }
+
+      // Monta payload de componentes
       const buildCompsFab = () => compFab
         .filter((cf) => cf.loteId)
         .map((cf) => {
-          const l = lotes.find((x) => x.id === cf.loteId);
+          const l       = lotes.find((x) => x.id === cf.loteId);
           const mpOrigem = l?.mpLotesConsumidos?.[0] ?? {};
+          // Fallback: se mpOrigem não tiver DANFE (lote histórico), busca o lote de MP pelo mpKey
+          const mpLote  = mpMap[l?.mpKey ?? cf.mp];
           return {
             componente: cf.nome, codigoComp: cf.codigo, tipoPeca: 'PI',
             lotePiId: cf.loteId, codigoPi: l?.codigoPi ?? cf.codigo,
             descricaoPi: l?.descricaoPi ?? cf.nome,
             mp: l?.mpKey ?? cf.mp, mpCodigo: l?.mpCodigo ?? MP_CODIGO[cf.mp]?.codigo ?? '',
-            danfe: mpOrigem.danfe ?? '', certificadoQualidade: mpOrigem.certificadoQualidade ?? '',
-            nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? '', fornecedor: mpOrigem.fornecedor ?? '',
-            dataEntrada: mpOrigem.dataEntrada ?? '', mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
+            danfe:                mpOrigem.danfe                || mpLote?.danfe                || '',
+            certificadoQualidade: mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || '',
+            nroLoteFornecedor:    mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || '',
+            fornecedor:           mpOrigem.fornecedor           || mpLote?.fornecedor           || '',
+            dataEntrada:          mpOrigem.dataEntrada          || mpLote?.dataEntrada          || '',
+            mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
             qtdPorUnidade: cf.qtdConsumida,
             qtdConsumida: cf.qtdConsumida * qtd,   // total já multiplicado
           };
@@ -1380,6 +1414,178 @@ function OrdemProducao({ lotes, ordens = [] }) {
   );
 }
 
+// ---------- LISTA DE ORDENS AGRUPADA POR OP ----------
+function ListaOrdens({ ordensAtivas, filtroLista, setFiltroLista, saidas, lotes = [], resultado, selecionar,
+                        excluindoId, processandoId, excluirDaLista, setExcluindoId }) {
+  const [expandidas, setExpandidas] = useState(new Set());
+
+  const toggleGrupo = (key) =>
+    setExpandidas((prev) => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
+
+  // Filtra pelo texto
+  const q = filtroLista.toLowerCase();
+  const filtradas = q
+    ? ordensAtivas.filter((o) =>
+        (o.nroSerie ?? '').toLowerCase().includes(q) ||
+        (o.nroOP ?? '').toLowerCase().includes(q) ||
+        (o.descricaoModelo ?? '').toLowerCase().includes(q) ||
+        (o.modeloCod ?? '').toLowerCase().includes(q))
+    : ordensAtivas;
+
+  // Agrupa por nroOP; sem OP → chave especial
+  const INVENTARIO = '__inventario__';
+  const gruposMap = new Map();
+  for (const o of filtradas) {
+    const key = o.nroOP?.trim() || INVENTARIO;
+    if (!gruposMap.has(key)) gruposMap.set(key, []);
+    gruposMap.get(key).push(o);
+  }
+  // Ordena: ordens com OP primeiro (desc), inventário no final
+  const grupos = [...gruposMap.entries()].sort(([a], [b]) => {
+    if (a === INVENTARIO) return 1;
+    if (b === INVENTARIO) return -1;
+    return b.localeCompare(a);
+  });
+
+  const totalOrdens = ordensAtivas.length;
+  const totalGrupos = gruposMap.size;
+
+  return (
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <SectionTitle icon={ClipboardList}>Ordens de Produção</SectionTitle>
+        <div className="flex items-center gap-2">
+          <Badge color="blue">{totalGrupos} OPs</Badge>
+          <Badge color="slate">{totalOrdens} séries</Badge>
+        </div>
+      </div>
+      <div className="mb-4 max-w-sm">
+        <Input value={filtroLista} onChange={(e) => setFiltroLista(e.target.value)} placeholder="Filtrar por série, OP ou modelo..." />
+      </div>
+
+      <div className="space-y-2">
+        {grupos.map(([key, ordens]) => {
+          const isInventario = key === INVENTARIO;
+          const expanded = expandidas.has(key);
+          const primeira = ordens[0];
+          const totalQtd = ordens.reduce((s, o) => s + (o.qtdMontagens ?? 1), 0);
+          const algumEntregue = ordens.some((o) => saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(o.nroSerie)));
+          const algumSelecionado = ordens.some((o) => o.id === resultado?.id);
+          const modelo = primeira.descricaoModelo || primeira.modeloCod || '—';
+
+          return (
+            <div key={key} className={`rounded-2xl border transition-all ${
+              isInventario ? 'border-slate-200 bg-slate-50/60' :
+              algumSelecionado ? 'border-blue-200 bg-blue-50/30' :
+              'border-slate-200 bg-white'}`}>
+
+              {/* Cabeçalho do grupo — clicável para expandir */}
+              <div
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none"
+                onClick={() => toggleGrupo(key)}>
+                <span className={`text-slate-400 transition-transform ${expanded ? 'rotate-90' : ''}`} style={{display:'inline-block'}}>▶</span>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {isInventario ? (
+                      <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Ordem de Inventário</span>
+                    ) : (
+                      <span className="font-mono font-black text-sm text-slate-800">{key}</span>
+                    )}
+                    {isInventario && (
+                      <Badge color="slate">sem OP</Badge>
+                    )}
+                    {totalQtd > 1 && !isInventario && (
+                      <Badge color="blue">{totalQtd} montagens</Badge>
+                    )}
+                    {ordens.length > 1 && (
+                      <Badge color="slate">{ordens.length} séries</Badge>
+                    )}
+                  </div>
+                  {!isInventario && modelo !== '—' && (
+                    <p className="text-[11px] text-slate-400 mt-0.5 truncate">{modelo} · {primeira.dataProd || '—'}</p>
+                  )}
+                  {isInventario && (
+                    <p className="text-[10px] text-slate-400 mt-0.5">Ordens registradas antes da implantação do sistema de OP</p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  {algumEntregue
+                    ? <Badge color="emerald">Entregue</Badge>
+                    : <Badge color="amber">Em estoque</Badge>}
+                  {!isInventario && (
+                    <button
+                      type="button"
+                      title="Imprimir OP"
+                      onClick={() => imprimirOrdemRegistrada(primeira, lotes)}
+                      className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600 transition">
+                      <Printer size={13} />
+                    </button>
+                  )}
+                  {/* Excluir grupo inteiro */}
+                  {excluindoId === key ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-black text-rose-600 uppercase">Excluir {ordens.length > 1 ? `${ordens.length} ordens` : 'ordem'}?</span>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); ordens.forEach((o) => excluirDaLista(o, e)); setExcluindoId(null); }}
+                        className="bg-rose-600 text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-rose-500 transition">
+                        Sim
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setExcluindoId(null); }}
+                        className="bg-slate-200 text-slate-600 text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-slate-300 transition">
+                        Não
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      title="Excluir ordem e restaurar saldo"
+                      onClick={(e) => { e.stopPropagation(); setExcluindoId(key); }}
+                      disabled={processandoId != null}
+                      className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition disabled:opacity-40">
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Sub-linhas com as séries — visíveis quando expandido */}
+              {expanded && (
+                <div className="border-t border-slate-100 px-4 pb-2">
+                  {ordens.map((o) => {
+                    const entregue = saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(o.nroSerie));
+                    const selecionada = resultado?.id === o.id;
+                    return (
+                      <div key={o.id}
+                        onClick={() => selecionar(o)}
+                        className={`flex items-center gap-3 py-2 px-3 my-1 rounded-xl cursor-pointer transition-colors ${selecionada ? 'bg-blue-100 border border-blue-200' : 'hover:bg-slate-50 border border-transparent'}`}>
+                        <span className="text-slate-300 text-xs select-none">└─</span>
+                        <span className="font-mono text-xs font-bold text-slate-700 flex-1">{o.nroSerie || o.id}</span>
+                        {(o.qtdMontagens ?? 1) > 1 && (
+                          <span className="text-[10px] font-bold text-blue-600">{o.qtdMontagens}x montagens</span>
+                        )}
+                        <span className="text-[10px] text-slate-400">{o.dataProd || '—'}</span>
+                        {entregue
+                          ? <Badge color="emerald">Entregue</Badge>
+                          : <Badge color="amber">Em estoque</Badge>}
+                        <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest ml-1">Ver →</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
   const [busca, setBusca]               = useState('');
   const [resultado, setResultado]       = useState(null);
@@ -1652,94 +1858,19 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
       )}
 
       {modo !== 'lote' && ordensAtivas.length > 0 && (
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <SectionTitle icon={ClipboardList}>Todas as Escadas Registradas</SectionTitle>
-            <Badge color="blue">{ordensAtivas.length} registros</Badge>
-          </div>
-          <div className="mb-4 max-w-sm">
-            <Input value={filtroLista} onChange={(e) => setFiltroLista(e.target.value)} placeholder="Filtrar por serie, OP ou modelo..." />
-          </div>
-          <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-xs min-w-[600px]">
-              <thead>
-                <tr className="border-b-2 border-slate-100">
-                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Nr Serie</th>
-                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">OP</th>
-                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Modelo</th>
-                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Data</th>
-                  <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
-                  <th className="py-2 px-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ordensFiltradas.map((o) => {
-                  const entregue = saidas.find((s) => s.ativo && (s.numerosSerieVinculados ?? []).includes(o.nroSerie));
-                  const selecionada = resultado?.id === o.id;
-                  return (
-                    <tr key={o.id}
-                      onClick={() => selecionar(o)}
-                      className={`border-b border-slate-50 cursor-pointer transition-colors ${selecionada ? 'bg-blue-50 border-blue-100' : 'hover:bg-slate-50'}`}>
-                      <td className="py-3 px-3 font-mono font-bold text-slate-800">{o.nroSerie || '—'}</td>
-                      <td className="py-3 px-3 font-mono text-slate-500">{o.nroOP || '—'}</td>
-                      <td className="py-3 px-3 text-slate-600">{o.descricaoModelo || o.modeloCod || '—'}</td>
-                      <td className="py-3 px-3 text-slate-400">{o.dataProd || '—'}</td>
-                      <td className="py-3 px-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {entregue
-                            ? <Badge color="emerald">Entregue</Badge>
-                            : <Badge color="amber">Em estoque</Badge>}
-                          {(o.qtdMontagens ?? 1) > 1 && (
-                            <Badge color="blue">{o.qtdMontagens}x</Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-3 text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            title="Imprimir Ordem de Produção"
-                            onClick={(e) => { e.stopPropagation(); imprimirOrdemRegistrada(o); }}
-                            className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600 transition">
-                            <Printer size={13} />
-                          </button>
-                          {excluindoId === o.id ? (
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[9px] font-black text-rose-600 uppercase tracking-wide">Confirmar?</span>
-                              <button
-                                type="button"
-                                onClick={(e) => excluirDaLista(o, e)}
-                                disabled={processandoId === o.id}
-                                className="bg-rose-600 text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-rose-500 transition disabled:opacity-60">
-                                Sim
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setExcluindoId(null); }}
-                                className="bg-slate-200 text-slate-600 text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-slate-300 transition">
-                                Não
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              title="Excluir ordem e restaurar saldo"
-                              onClick={(e) => excluirDaLista(o, e)}
-                              disabled={processandoId === o.id}
-                              className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition disabled:opacity-40">
-                              {processandoId === o.id ? <span className="text-[9px]">...</span> : <X size={13} />}
-                            </button>
-                          )}
-                          <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <ListaOrdens
+          ordensAtivas={ordensAtivas}
+          filtroLista={filtroLista}
+          setFiltroLista={setFiltroLista}
+          saidas={saidas}
+          lotes={lotes}
+          resultado={resultado}
+          selecionar={selecionar}
+          excluindoId={excluindoId}
+          processandoId={processandoId}
+          excluirDaLista={excluirDaLista}
+          setExcluindoId={setExcluindoId}
+        />
       )}
       {feedbackEstorno && (
         <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 text-sm font-semibold ${feedbackEstorno.tipo === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
@@ -1771,7 +1902,7 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
               <p className="text-xs text-slate-400 font-mono">Produzida em {excelSerialToISO(resultado.dataProd)}</p>
               <button
                 type="button"
-                onClick={() => imprimirOrdemRegistrada(resultado)}
+                onClick={() => imprimirOrdemRegistrada(resultado, lotes)}
                 className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 transition hover:bg-blue-100"
               >
                 <Printer size={11} /> Imprimir OP
