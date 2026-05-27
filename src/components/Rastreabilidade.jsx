@@ -41,6 +41,10 @@ import {
   Truck,
   X,
   TrendingUp,
+  Printer,
+  Lock,
+  Pencil,
+  Copy,
 } from 'lucide-react';
 
 const LOTES_ATIVOS_ESCADA = [
@@ -701,153 +705,278 @@ function ProducaoPI({ lotes }) {
   );
 }
 
+// ---------- IMPRESSAO DE ORDEM DE PRODUCAO -------------
+function imprimirOrdemProducao({ nroOP, dataProd, qtdMontagens, modeloSel, compFab, comprado, lotes }) {
+  const fmt = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('pt-BR') : '--';
+  const getLoteLabel = (loteId, tipo) => {
+    const l = lotes.find((x) => x.id === loteId);
+    if (!l) return '--';
+    if (tipo === 'PI') return `OP ${l.nroOP || '--'} | ${fmt(l.dataEntrada)} | Disp: ${l.qtdDisponivel} pcs`;
+    return `${l.nroLoteFornecedor || '--'} | DANFE ${l.danfe || '--'} | ${l.fornecedor || '--'} | Disp: ${l.qtdDisponivel}`;
+  };
+
+  const rows = (list, tipo) => list.map((c) => `
+    <tr>
+      <td>${c.nome}</td>
+      <td style="text-align:center;font-family:monospace">${c.codigo || 'Comprado'}</td>
+      <td>${getLoteLabel(c.loteId, tipo)}</td>
+      <td style="text-align:center">${c.qtdConsumida}</td>
+      <td style="text-align:center">${c.qtdConsumida * qtdMontagens}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Ordem de Producao ${nroOP || '--'}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 20px; }
+  h1 { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; margin-bottom: 4px; }
+  .sub { font-size: 10px; color: #555; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  .field label { display: block; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .2em; color: #888; margin-bottom: 2px; }
+  .field span { font-size: 13px; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+  th { background: #1e293b; color: #fff; font-size: 9px; text-transform: uppercase; letter-spacing: .15em; padding: 6px 8px; text-align: left; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e2e8f0; font-size: 10px; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .section-title { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .25em; color: #64748b; margin-bottom: 6px; }
+  .badge { display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 999px; padding: 2px 8px; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+  .footer { margin-top: 40px; display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; }
+  .assinatura { border-top: 1px solid #94a3b8; padding-top: 6px; font-size: 9px; color: #888; text-align: center; }
+  @media print { body { padding: 10px; } button { display: none; } }
+</style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+    <div>
+      <h1>Ordem de Producao</h1>
+      <div class="sub">Montagem de Escada — gerado em ${new Date().toLocaleString('pt-BR')}</div>
+    </div>
+    <button onclick="window.print()" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer">Imprimir</button>
+  </div>
+  <div class="grid">
+    <div class="field"><label>Numero da OP</label><span>${nroOP || '—'}</span></div>
+    <div class="field"><label>Data de Producao</label><span>${fmt(dataProd)}</span></div>
+    <div class="field"><label>Qtd de Montagens</label><span>${qtdMontagens} un</span></div>
+    <div class="field"><label>Modelo</label><span>${modeloSel?.codigo_produto || '--'}</span></div>
+  </div>
+  <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:11px;font-weight:700">
+    ${modeloSel?.descricao || '--'}
+  </div>
+
+  <div class="section-title">Componentes Fabricados (PI) <span class="badge">FIFO</span></div>
+  <table>
+    <thead><tr><th>Componente</th><th>Código</th><th>Lote PI</th><th style="text-align:center">Qtd/Un</th><th style="text-align:center">Total (${qtdMontagens}x)</th></tr></thead>
+    <tbody>${rows(compFab.filter(c => c.loteId), 'PI')}</tbody>
+  </table>
+
+  <div class="section-title">Componentes Comprados</div>
+  <table>
+    <thead><tr><th>Componente</th><th>Código</th><th>Lote</th><th style="text-align:center">Qtd/Un</th><th style="text-align:center">Total (${qtdMontagens}x)</th></tr></thead>
+    <tbody>${rows(comprado.filter(c => c.loteId), 'COMPRADO')}</tbody>
+  </table>
+
+  <div class="footer">
+    <div class="assinatura">Responsável pela Montagem</div>
+    <div class="assinatura">Controle de Qualidade</div>
+    <div class="assinatura">Aprovação / PCP</div>
+  </div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if (w) { w.document.write(html); w.document.close(); }
+}
+
 // ---------- ORDEM DE PRODUCAO (consome lotes PI via FIFO) -------------
 function OrdemProducao({ lotes }) {
   const modelos = BOM_ESCADAS.bom_escadas_rastreados;
 
-  const [modeloCod, setModeloCod] = useState('');
-  const [nroOP, setNroOP]         = useState('');
-  const [nroSerie, setNroSerie]   = useState('');
-  const [dataProd, setDataProd]   = useState(today());
-  const [compFab, setCompFab]     = useState([]);
-  const [comprado, setComprado]   = useState([]);
-  const [saving, setSaving]       = useState(false);
-  const [feedback, setFeedback]   = useState(null);
+  const [modeloCod, setModeloCod]       = useState('');
+  const [nroOP, setNroOP]               = useState('');
+  const [dataProd, setDataProd]         = useState(today());
+  const [qtdMontagens, setQtdMontagens] = useState(1);
+  const [compFab, setCompFab]           = useState([]);
+  const [comprado, setComprado]         = useState([]);
+  const [editandoFab, setEditandoFab]   = useState(new Set()); // índices desbloqueados
+  const [editandoComp, setEditandoComp] = useState(new Set());
+  const [saving, setSaving]             = useState(false);
+  const [feedback, setFeedback]         = useState(null);
 
-  // Retorna lotes PI disponíveis para um código de PI, ordenados FIFO
+  // Retorna lotes PI disponíveis para um código, ordenados FIFO
   const piDisponiveis = (codigoPi) =>
     lotes
       .filter((l) => l.tipo === 'PI' && l.codigoPi === codigoPi && l.ativo && l.qtdDisponivel > 0)
       .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
 
-  // Ao trocar o modelo, reconstrói listas com FIFO automático para PI
+  const compDisponiveis = (nome) =>
+    lotes
+      .filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome && l.ativo && l.qtdDisponivel > 0)
+      .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+
+  // Ao trocar o modelo, reconstrói listas com FIFO automático
   const handleModelo = (cod) => {
     setModeloCod(cod);
+    setEditandoFab(new Set());
+    setEditandoComp(new Set());
     const modelo = modelos.find((m) => m.codigo_produto === cod);
     const { fab, comp } = buildCompsFromBom(modelo);
-    // Pré-seleciona lote PI mais antigo disponível (FIFO)
+    // PI — pré-seleciona lote mais antigo (FIFO)
     const fabComFifo = fab.map((c) => {
       const fifo = lotes
         .filter((l) => l.tipo === 'PI' && l.codigoPi === c.codigo && l.ativo && l.qtdDisponivel > 0)
         .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
       return { ...c, loteId: fifo[0]?.id ?? '' };
     });
+    // Comprados — pré-seleciona lote mais antigo (FIFO)
+    const compComFifo = comp.map((c) => {
+      const fifo = lotes
+        .filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === c.nome && l.ativo && l.qtdDisponivel > 0)
+        .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+      return { ...c, loteId: fifo[0]?.id ?? '' };
+    });
     setCompFab(fabComFifo);
-    setComprado(comp);
+    setComprado(compComFifo);
   };
+
+  const toggleEditFab  = (idx) => setEditandoFab((prev)  => { const s = new Set(prev); s.has(idx) ? s.delete(idx) : s.add(idx); return s; });
+  const toggleEditComp = (idx) => setEditandoComp((prev) => { const s = new Set(prev); s.has(idx) ? s.delete(idx) : s.add(idx); return s; });
 
   const setLoteFab  = (idx, loteId) => setCompFab((prev)  => prev.map((c, i) => i === idx ? { ...c, loteId } : c));
   const setQtdFab   = (idx, qtd)    => setCompFab((prev)  => prev.map((c, i) => i === idx ? { ...c, qtdConsumida: Number(qtd) } : c));
   const setLoteComp = (idx, loteId) => setComprado((prev) => prev.map((c, i) => i === idx ? { ...c, loteId } : c));
   const setQtdComp  = (idx, qtd)    => setComprado((prev) => prev.map((c, i) => i === idx ? { ...c, qtdConsumida: Number(qtd) } : c));
 
+  const qtd = Number(qtdMontagens) || 1;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Valida saldo: cada lote precisa ter qtd suficiente para todas as montagens
     for (const cf of compFab) {
       if (!cf.loteId) continue;
       const lote = lotes.find((l) => l.id === cf.loteId);
-      if (lote && lote.qtdDisponivel < cf.qtdConsumida) {
-        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente no lote de PI "${lote.descricaoPi ?? lote.nroLoteFornecedor}". Disponivel: ${lote.qtdDisponivel}.` });
+      const necessario = cf.qtdConsumida * qtd;
+      if (lote && lote.qtdDisponivel < necessario) {
+        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente para "${lote.descricaoPi ?? cf.nome}". Necessario: ${necessario} | Disponivel: ${lote.qtdDisponivel}. Reduza a qtd de montagens ou edite o lote.` });
         return;
       }
     }
+    for (const c of comprado) {
+      if (!c.loteId) continue;
+      const lote = lotes.find((l) => l.id === c.loteId);
+      const necessario = c.qtdConsumida * qtd;
+      if (lote && lote.qtdDisponivel < necessario) {
+        setFeedback({ tipo: 'erro', msg: `Saldo insuficiente para "${c.nome}". Necessario: ${necessario} | Disponivel: ${lote.qtdDisponivel}.` });
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const batch = writeBatch(db);
-      const compsFab = compFab
+
+      // Monta payload de componentes (igual para todas as N ordens)
+      const buildCompsFab = () => compFab
         .filter((cf) => cf.loteId)
         .map((cf) => {
           const l = lotes.find((x) => x.id === cf.loteId);
-          // Rastreabilidade completa: PI → MP de origem
           const mpOrigem = l?.mpLotesConsumidos?.[0] ?? {};
           return {
-            componente: cf.nome,
-            codigoComp: cf.codigo,
-            tipoPeca: 'PI',
-            // Dados do lote PI
-            lotePiId: cf.loteId,
-            codigoPi: l?.codigoPi ?? cf.codigo,
+            componente: cf.nome, codigoComp: cf.codigo, tipoPeca: 'PI',
+            lotePiId: cf.loteId, codigoPi: l?.codigoPi ?? cf.codigo,
             descricaoPi: l?.descricaoPi ?? cf.nome,
-            // Dados da MP de origem (rastreabilidade)
-            mp: l?.mpKey ?? cf.mp,
-            mpCodigo: l?.mpCodigo ?? MP_CODIGO[cf.mp]?.codigo ?? '',
-            danfe: mpOrigem.danfe ?? '',
-            certificadoQualidade: mpOrigem.certificadoQualidade ?? '',
-            nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? '',
-            fornecedor: mpOrigem.fornecedor ?? '',
-            dataEntrada: mpOrigem.dataEntrada ?? '',
-            mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
+            mp: l?.mpKey ?? cf.mp, mpCodigo: l?.mpCodigo ?? MP_CODIGO[cf.mp]?.codigo ?? '',
+            danfe: mpOrigem.danfe ?? '', certificadoQualidade: mpOrigem.certificadoQualidade ?? '',
+            nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? '', fornecedor: mpOrigem.fornecedor ?? '',
+            dataEntrada: mpOrigem.dataEntrada ?? '', mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
             qtdConsumida: cf.qtdConsumida,
           };
         });
-      const compsComp = comprado
+      const buildCompsComp = () => comprado
         .filter((c) => c.loteId)
         .map((c) => {
           const l = lotes.find((x) => x.id === c.loteId);
           return {
-            componente: c.nome,
-            tipo: 'COMPRADO',
-            loteId: c.loteId,
-            nroLoteFornecedor: l?.nroLoteFornecedor ?? '',
-            danfe: l?.danfe ?? '',
-            certificadoQualidade: l?.certificadoQualidade ?? '',
-            fornecedor: l?.fornecedor ?? '',
-            dataEntrada: l?.dataEntrada ?? '',
-            qtdConsumida: c.qtdConsumida,
+            componente: c.nome, tipo: 'COMPRADO', loteId: c.loteId,
+            nroLoteFornecedor: l?.nroLoteFornecedor ?? '', danfe: l?.danfe ?? '',
+            certificadoQualidade: l?.certificadoQualidade ?? '', fornecedor: l?.fornecedor ?? '',
+            dataEntrada: l?.dataEntrada ?? '', qtdConsumida: c.qtdConsumida,
           };
         });
-      const ordemRef = doc(collection(db, 'rastreabilidade_ordens'));
-      batch.set(ordemRef, {
-        nroOP: nroOP.trim(),
-        nroSerie: nroOP.trim() || ordemRef.id,
-        dataProd,
-        componentesFabricados: compsFab,
-        componentesComprados: compsComp,
-        ativo: true,
-        criadoEm: new Date().toISOString(),
-      });
+
+      // Cria N ordens (uma por montagem)
+      for (let i = 0; i < qtd; i++) {
+        const ordemRef = doc(collection(db, 'rastreabilidade_ordens'));
+        const sufixo = qtd > 1 ? `-${String(i + 1).padStart(3, '0')}` : '';
+        const nroSerieGer = nroOP.trim() ? `${nroOP.trim()}${sufixo}` : ordemRef.id;
+        batch.set(ordemRef, {
+          nroOP: nroOP.trim(),
+          nroSerie: nroSerieGer,
+          dataProd,
+          qtdMontagens: 1,
+          componentesFabricados: buildCompsFab(),
+          componentesComprados: buildCompsComp(),
+          ativo: true,
+          criadoEm: new Date().toISOString(),
+        });
+      }
+
+      // Desconta estoque uma única vez pelo total (qtdConsumida * N)
       for (const cf of compFab) {
         if (!cf.loteId) continue;
         batch.update(doc(db, 'rastreabilidade_lotes', cf.loteId), {
-          qtdDisponivel: increment(-cf.qtdConsumida),
+          qtdDisponivel: increment(-(cf.qtdConsumida * qtd)),
         });
       }
       for (const c of comprado) {
         if (!c.loteId) continue;
         batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
-          qtdDisponivel: increment(-c.qtdConsumida),
+          qtdDisponivel: increment(-(c.qtdConsumida * qtd)),
         });
       }
+
       await batch.commit();
-      setFeedback({ tipo: 'ok', msg: `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}` });
-      setNroOP(''); setDataProd(today());
+      const msg = qtd > 1
+        ? `${qtd} ordens registradas — OP ${nroOP.trim() || 'sem OP'} (series ${nroOP.trim()}-001 a ${nroOP.trim()}-${String(qtd).padStart(3,'0')})`
+        : `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}`;
+      setFeedback({ tipo: 'ok', msg });
+      setNroOP(''); setDataProd(today()); setQtdMontagens(1);
+      setEditandoFab(new Set()); setEditandoComp(new Set());
+      // Re-carrega FIFO atualizado
       const modelo = modelos.find((m) => m.codigo_produto === modeloCod);
       const { fab, comp } = buildCompsFromBom(modelo);
       const fabComFifo = fab.map((c) => {
-        const fifo = lotes
-          .filter((l) => l.tipo === 'PI' && l.codigoPi === c.codigo && l.ativo && l.qtdDisponivel > 0)
-          .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+        const fifo = lotes.filter((l) => l.tipo === 'PI' && l.codigoPi === c.codigo && l.ativo && l.qtdDisponivel > 0).sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+        return { ...c, loteId: fifo[0]?.id ?? '' };
+      });
+      const compComFifo = comp.map((c) => {
+        const fifo = lotes.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === c.nome && l.ativo && l.qtdDisponivel > 0).sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
         return { ...c, loteId: fifo[0]?.id ?? '' };
       });
       setCompFab(fabComFifo);
-      setComprado(comp.map((c) => ({ ...c, loteId: '' })));
+      setComprado(compComFifo);
     } catch {
       setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
     } finally {
       setSaving(false);
-      setTimeout(() => setFeedback(null), 5000);
+      setTimeout(() => setFeedback(null), 8000);
     }
   };
 
   const vinculadosFab  = compFab.filter((c) => c.loteId).length;
   const vinculadosComp = comprado.filter((c) => c.loteId).length;
   const modeloSel      = modelos.find((m) => m.codigo_produto === modeloCod);
+  const totalConsumoPi = compFab.reduce((s, c) => s + c.qtdConsumida * qtd, 0);
 
   return (
     <Card>
       <SectionTitle icon={ClipboardList}>Registrar Montagem de Escada</SectionTitle>
       <Feedback feedback={feedback} />
       <form onSubmit={handleSubmit} className="space-y-6">
+
+        {/* MODELO */}
         <div className="rounded-2xl border-2 border-blue-100 bg-blue-50/40 p-5">
           <Label>Modelo da Escada (BOM) *</Label>
           <Select value={modeloCod} onChange={(e) => handleModelo(e.target.value)}>
@@ -864,7 +993,9 @@ function OrdemProducao({ lotes }) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-6 border-b border-slate-100">
+
+        {/* OP / DATA / QTD MONTAGENS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-6 border-b border-slate-100">
           <div>
             <Label>Numero da OP</Label>
             <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Numero da OP" />
@@ -873,82 +1004,206 @@ function OrdemProducao({ lotes }) {
             <Label>Data de Producao</Label>
             <Input type="date" value={dataProd} onChange={(e) => setDataProd(e.target.value)} />
           </div>
-        </div>
-        <div>
-          {!modeloCod && (
-            <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700">
-              <AlertTriangle size={14} /> Selecione o modelo da escada acima para carregar os componentes do BOM.
+          <div>
+            <Label>Qtd de Montagens</Label>
+            <div className="relative">
+              <Input
+                type="number" min="1" max="500" value={qtdMontagens}
+                onChange={(e) => setQtdMontagens(Math.max(1, Number(e.target.value)))}
+                className="pr-16 font-black text-center text-base"
+              />
+              {qtd > 1 && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-blue-600 uppercase tracking-wider pointer-events-none">
+                  {qtd}x
+                </span>
+              )}
             </div>
-          )}
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Fabricados — Lotes PI (FIFO)</p>
-            <Badge color={vinculadosFab > 0 ? 'blue' : 'slate'}>{vinculadosFab}/{compFab.length} vinculados</Badge>
-          </div>
-          <div className="space-y-2">
-            {compFab.map((cf, idx) => {
-              const disp = piDisponiveis(cf.codigo);
-              return (
-                <div key={cf.codigo} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${cf.loteId ? 'bg-blue-50/60 border border-blue-100' : 'bg-slate-50 border border-transparent'}`}>
-                  <div className="col-span-3">
-                    <p className="text-xs font-bold text-slate-700 leading-tight">{cf.nome}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">PI {cf.codigo}</p>
-                    {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote PI — produza antes</p>}
-                  </div>
-                  <div className="col-span-7">
-                    <select value={cf.loteId} onChange={(e) => setLoteFab(idx, e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition">
-                      <option value="">-- lote PI (FIFO) --</option>
-                      {disp.map((l) => (
-                        <option key={l.id} value={l.id}>
-                          {l.nroOP ? `OP ${l.nroOP} | ` : ''}{l.dataEntrada} | Disp: {l.qtdDisponivel} pcs
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-span-2">
-                    <input type="number" min="1" value={cf.qtdConsumida} onChange={(e) => setQtdFab(idx, e.target.value)} disabled={!cf.loteId} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-40 text-center" />
-                  </div>
-                </div>
-              );
-            })}
+            {qtd > 1 && (
+              <p className="text-[10px] text-blue-600 font-bold mt-1">
+                Serão criadas {qtd} ordens: {nroOP.trim() ? `${nroOP.trim()}-001 … ${nroOP.trim()}-${String(qtd).padStart(3,'0')}` : 'IDs automáticos'}
+              </p>
+            )}
           </div>
         </div>
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Comprados</p>
-            <Badge color={vinculadosComp > 0 ? 'cyan' : 'slate'}>{vinculadosComp}/{comprado.length} vinculados</Badge>
+
+        {/* ALERTA SEM MODELO */}
+        {!modeloCod && (
+          <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700">
+            <AlertTriangle size={14} /> Selecione o modelo da escada acima para carregar os componentes do BOM.
           </div>
-          <div className="space-y-2">
-            {comprado.map((c, idx) => {
-              const disp = lotes.filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === c.nome && l.ativo && l.qtdDisponivel > 0)
-                                .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
-              return (
-                <div key={c.nome} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${c.loteId ? 'bg-cyan-50/60 border border-cyan-100' : 'bg-slate-50 border border-transparent'}`}>
-                  <div className="col-span-3">
-                    <p className="text-xs font-bold text-slate-700 leading-tight">{c.nome}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Comprado</p>
-                    {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote</p>}
+        )}
+
+        {/* COMPONENTES FABRICADOS */}
+        {compFab.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Fabricados — Lotes PI (FIFO)</p>
+              <div className="flex items-center gap-2">
+                {qtd > 1 && <span className="text-[10px] font-bold text-blue-600">Total PI: {totalConsumoPi} pcs ({qtd}x)</span>}
+                <Badge color={vinculadosFab > 0 ? 'blue' : 'slate'}>{vinculadosFab}/{compFab.length} vinculados</Badge>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {compFab.map((cf, idx) => {
+                const disp = piDisponiveis(cf.codigo);
+                const isEditando = editandoFab.has(idx);
+                const loteAtual = lotes.find((l) => l.id === cf.loteId);
+                const suficiente = loteAtual ? loteAtual.qtdDisponivel >= cf.qtdConsumida * qtd : true;
+                return (
+                  <div key={cf.codigo} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${
+                    !suficiente && cf.loteId ? 'bg-rose-50 border border-rose-200' :
+                    cf.loteId ? 'bg-blue-50/60 border border-blue-100' : 'bg-slate-50 border border-transparent'}`}>
+                    <div className="col-span-3">
+                      <p className="text-xs font-bold text-slate-700 leading-tight">{cf.nome}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">PI {cf.codigo}</p>
+                      {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote PI</p>}
+                      {!suficiente && cf.loteId && <p className="text-[10px] text-rose-500 font-black mt-0.5">Saldo insuficiente para {qtd}x</p>}
+                    </div>
+                    <div className="col-span-6">
+                      {isEditando ? (
+                        <select value={cf.loteId} onChange={(e) => setLoteFab(idx, e.target.value)}
+                          className="w-full bg-white border-2 border-blue-400 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition">
+                          <option value="">-- lote PI (FIFO) --</option>
+                          {disp.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {l.nroOP ? `OP ${l.nroOP} | ` : ''}{l.dataEntrada} | Disp: {l.qtdDisponivel} pcs
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs ${cf.loteId ? 'bg-white border border-blue-100 text-slate-700' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>
+                          <Lock size={10} className="shrink-0 text-slate-400" />
+                          <span className="truncate">
+                            {cf.loteId && loteAtual
+                              ? `${loteAtual.nroOP ? `OP ${loteAtual.nroOP} | ` : ''}${loteAtual.dataEntrada} | Disp: ${loteAtual.qtdDisponivel} pcs`
+                              : 'Sem lote disponível'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-span-2">
+                      <div className="relative">
+                        <input type="number" min="1" value={cf.qtdConsumida}
+                          onChange={(e) => setQtdFab(idx, e.target.value)}
+                          disabled={!isEditando}
+                          className={`w-full border rounded-xl px-2 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition text-center font-bold ${isEditando ? 'bg-white border-blue-400' : 'bg-slate-100 border-slate-200 opacity-70'}`} />
+                        {qtd > 1 && <p className="text-[9px] text-blue-600 font-bold text-center mt-0.5">={cf.qtdConsumida * qtd} total</p>}
+                      </div>
+                    </div>
+                    <div className="col-span-1 flex justify-end">
+                      <button type="button" onClick={() => toggleEditFab(idx)}
+                        title={isEditando ? 'Bloquear' : 'Editar lote/qtd'}
+                        className={`p-1.5 rounded-lg transition ${isEditando ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
+                        <Pencil size={11} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="col-span-7">
-                    <select value={c.loteId} onChange={(e) => setLoteComp(idx, e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition">
-                      <option value="">-- selecionar lote --</option>
-                      {disp.map((l) => (
-                        <option key={l.id} value={l.id}>
-                          {l.nroLoteFornecedor} | DANFE {l.danfe} | {l.fornecedor} | Disp: {l.qtdDisponivel}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-span-2">
-                    <input type="number" min="1" value={c.qtdConsumida} onChange={(e) => setQtdComp(idx, e.target.value)} disabled={!c.loteId} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-40 text-center" />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <div className="flex justify-end pt-2">
-          <button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-blue-200 hover:shadow-md">
-            <Plus size={15} /> {saving ? 'Salvando...' : 'Registrar Ordem'}
+        )}
+
+        {/* COMPONENTES COMPRADOS */}
+        {comprado.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Componentes Comprados</p>
+              <Badge color={vinculadosComp > 0 ? 'cyan' : 'slate'}>{vinculadosComp}/{comprado.length} vinculados</Badge>
+            </div>
+            <div className="space-y-2">
+              {comprado.map((c, idx) => {
+                const disp = compDisponiveis(c.nome);
+                const isEditando = editandoComp.has(idx);
+                const loteAtual = lotes.find((l) => l.id === c.loteId);
+                const suficiente = loteAtual ? loteAtual.qtdDisponivel >= c.qtdConsumida * qtd : true;
+                return (
+                  <div key={c.nome} className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${
+                    !suficiente && c.loteId ? 'bg-rose-50 border border-rose-200' :
+                    c.loteId ? 'bg-cyan-50/60 border border-cyan-100' : 'bg-slate-50 border border-transparent'}`}>
+                    <div className="col-span-3">
+                      <p className="text-xs font-bold text-slate-700 leading-tight">{c.nome}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Comprado</p>
+                      {disp.length === 0 && <p className="text-[10px] text-amber-500 font-semibold mt-0.5">Sem lote</p>}
+                      {!suficiente && c.loteId && <p className="text-[10px] text-rose-500 font-black mt-0.5">Saldo insuficiente para {qtd}x</p>}
+                    </div>
+                    <div className="col-span-6">
+                      {isEditando ? (
+                        <select value={c.loteId} onChange={(e) => setLoteComp(idx, e.target.value)}
+                          className="w-full bg-white border-2 border-cyan-400 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500 transition">
+                          <option value="">-- selecionar lote --</option>
+                          {disp.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {l.nroLoteFornecedor} | DANFE {l.danfe} | {l.fornecedor} | Disp: {l.qtdDisponivel}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs ${c.loteId ? 'bg-white border border-cyan-100 text-slate-700' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>
+                          <Lock size={10} className="shrink-0 text-slate-400" />
+                          <span className="truncate">
+                            {c.loteId && loteAtual
+                              ? `${loteAtual.nroLoteFornecedor || '--'} | DANFE ${loteAtual.danfe || '--'} | Disp: ${loteAtual.qtdDisponivel}`
+                              : 'Sem lote disponível'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-span-2">
+                      <div className="relative">
+                        <input type="number" min="1" value={c.qtdConsumida}
+                          onChange={(e) => setQtdComp(idx, e.target.value)}
+                          disabled={!isEditando}
+                          className={`w-full border rounded-xl px-2 py-2 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500 transition text-center font-bold ${isEditando ? 'bg-white border-cyan-400' : 'bg-slate-100 border-slate-200 opacity-70'}`} />
+                        {qtd > 1 && <p className="text-[9px] text-cyan-600 font-bold text-center mt-0.5">={c.qtdConsumida * qtd} total</p>}
+                      </div>
+                    </div>
+                    <div className="col-span-1 flex justify-end">
+                      <button type="button" onClick={() => toggleEditComp(idx)}
+                        title={isEditando ? 'Bloquear' : 'Editar lote/qtd'}
+                        className={`p-1.5 rounded-lg transition ${isEditando ? 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
+                        <Pencil size={11} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* RESUMO TOTAL + BOTÕES */}
+        {modeloCod && (
+          <div className="rounded-2xl bg-slate-50 border border-slate-200 px-5 py-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2">Resumo da Operação</p>
+            <div className="flex flex-wrap gap-4 text-xs font-bold text-slate-700">
+              <span>📦 {qtd} {qtd === 1 ? 'montagem' : 'montagens'}</span>
+              <span>🔩 {compFab.length} componentes PI</span>
+              <span>🛒 {comprado.length} comprados</span>
+              <span className={vinculadosFab + vinculadosComp < compFab.length + comprado.length ? 'text-amber-600' : 'text-emerald-600'}>
+                ✓ {vinculadosFab + vinculadosComp}/{compFab.length + comprado.length} lotes vinculados
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between pt-2">
+          {/* Botão imprimir */}
+          <button
+            type="button"
+            disabled={!modeloCod}
+            onClick={() => imprimirOrdemProducao({ nroOP, dataProd, qtdMontagens: qtd, modeloSel, compFab, comprado, lotes })}
+            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl disabled:opacity-40 transition-all">
+            <Printer size={14} /> Imprimir OP
+          </button>
+
+          {/* Botão registrar */}
+          <button
+            type="submit"
+            disabled={saving || !modeloCod}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest py-3 px-8 rounded-xl flex items-center gap-2 disabled:opacity-60 transition-all shadow-sm hover:shadow-blue-200 hover:shadow-md">
+            <Plus size={15} />
+            {saving ? 'Salvando...' : qtd > 1 ? `Registrar ${qtd} Ordens` : 'Registrar Ordem'}
           </button>
         </div>
       </form>
