@@ -1,7 +1,9 @@
 ﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../firebase';
-import BOM_ESCADAS from '../data/bomescada.json';
-import ESCADA_JSON from '../data/escada.json';
+import BOM_ESCADAS      from '../data/bomescada.json';
+import ESCADA_JSON      from '../data/escada.json';
+import MP_HISTORICO     from '../data/rastreabilidade_mp.json';
+import PI_LOTE_HISTORICO from '../data/lote_pi.json';
 import {
   collection,
   addDoc,
@@ -140,6 +142,37 @@ const COMP_COMPRADOS = [
   'ETIQUETA IDENTIFICACAO',
   'PONTEIRA DE PLASTICO',
 ];
+
+// ---------- MAPA ESTÁTICO DE FALLBACK: codigoPi → dados do lote de MP ----------
+// Usa rastreabilidade_mp.json + lote_pi.json para preencher DANFE/Fornecedor
+// quando os lotes históricos no Firebase não têm esses dados.
+const _MP_LOTE_MAP = (() => {
+  // 1. Monta map: lote_mp_string → { danfe, fornecedor, certificadoQualidade, nroLoteFornecedor }
+  const mpLoteMap = {};
+  for (const mp of MP_HISTORICO.rastreabilidade_mp) {
+    // Descobre o mpKey usado no sistema (ex: 'TUBO (11307)')
+    const mpKey = Object.entries(MP_CODIGO).find(([, v]) => v.codigo === mp.codigo)?.[0] || mp.codigo;
+    for (const lote of mp.lotes) {
+      mpLoteMap[lote.lote] = {
+        danfe:                lote.danfe        || '',
+        fornecedor:           lote.fornecedor   || '',
+        certificadoQualidade: lote.certificado  || '',
+        nroLoteFornecedor:    lote.lote,
+        mpKey,
+      };
+    }
+  }
+  // 2. Para cada codigoPi, pega o PRIMEIRO lote de MP disponível (FIFO)
+  const result = {};
+  for (const pi of PI_LOTE_HISTORICO.lotes_PI) {
+    for (const lote of pi.lotes) {
+      if (!result[pi.codigo_PI] && mpLoteMap[lote.lote_mp]) {
+        result[pi.codigo_PI] = mpLoteMap[lote.lote_mp];
+      }
+    }
+  }
+  return result;
+})();
 
 const today = () => new Date().toISOString().split('T')[0];
 
@@ -719,17 +752,18 @@ function imprimirOrdemRegistrada(ordem, lotes = []) {
   }
 
   const enrich = (c) => {
-    if (c.danfe && c.fornecedor) return c; // já tem dados
-    // tenta enriquecer pelo lote PI → lote MP
-    const piLote = piMap[c.lotePiId];
-    const mpLote = mpMap[piLote?.mpKey ?? c.mp];
-    const mpOrigem = piLote?.mpLotesConsumidos?.[0] ?? {};
+    if (c.danfe && c.fornecedor) return c; // já tem dados completos
+    const piLote     = piMap[c.lotePiId];
+    const mpLote     = mpMap[piLote?.mpKey ?? c.mp];
+    const mpOrigem   = piLote?.mpLotesConsumidos?.[0] ?? {};
+    // Fallback final: dados históricos do JSON (rastreabilidade_mp.json + lote_pi.json)
+    const staticFb   = _MP_LOTE_MAP[c.codigoComp] ?? {};
     return {
       ...c,
-      danfe:                c.danfe                || mpOrigem.danfe                || mpLote?.danfe                || '',
-      certificadoQualidade: c.certificadoQualidade || mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || '',
-      nroLoteFornecedor:    c.nroLoteFornecedor    || mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || '',
-      fornecedor:           c.fornecedor           || mpOrigem.fornecedor           || mpLote?.fornecedor           || '',
+      danfe:                c.danfe                || mpOrigem.danfe                || mpLote?.danfe                || staticFb.danfe                || '',
+      certificadoQualidade: c.certificadoQualidade || mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || staticFb.certificadoQualidade || '',
+      nroLoteFornecedor:    c.nroLoteFornecedor    || mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || staticFb.nroLoteFornecedor    || '',
+      fornecedor:           c.fornecedor           || mpOrigem.fornecedor           || mpLote?.fornecedor           || staticFb.fornecedor           || '',
     };
   };
 
@@ -1051,22 +1085,22 @@ function OrdemProducao({ lotes, ordens = [] }) {
         .filter((cf) => cf.loteId)
         .map((cf) => {
           const l       = lotes.find((x) => x.id === cf.loteId);
-          const mpOrigem = l?.mpLotesConsumidos?.[0] ?? {};
-          // Fallback: se mpOrigem não tiver DANFE (lote histórico), busca o lote de MP pelo mpKey
-          const mpLote  = mpMap[l?.mpKey ?? cf.mp];
+          const mpOrigem  = l?.mpLotesConsumidos?.[0] ?? {};
+          const mpLote    = mpMap[l?.mpKey ?? cf.mp];
+          const staticFb  = _MP_LOTE_MAP[cf.codigo] ?? {};
           return {
             componente: cf.nome, codigoComp: cf.codigo, tipoPeca: 'PI',
             lotePiId: cf.loteId, codigoPi: l?.codigoPi ?? cf.codigo,
             descricaoPi: l?.descricaoPi ?? cf.nome,
             mp: l?.mpKey ?? cf.mp, mpCodigo: l?.mpCodigo ?? MP_CODIGO[cf.mp]?.codigo ?? '',
-            danfe:                mpOrigem.danfe                || mpLote?.danfe                || '',
-            certificadoQualidade: mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || '',
-            nroLoteFornecedor:    mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || '',
-            fornecedor:           mpOrigem.fornecedor           || mpLote?.fornecedor           || '',
-            dataEntrada:          mpOrigem.dataEntrada          || mpLote?.dataEntrada          || '',
+            danfe:                mpOrigem.danfe                || mpLote?.danfe                || staticFb.danfe                || '',
+            certificadoQualidade: mpOrigem.certificadoQualidade || mpLote?.certificadoQualidade || staticFb.certificadoQualidade || '',
+            nroLoteFornecedor:    mpOrigem.nroLoteFornecedor    || mpLote?.nroLoteFornecedor    || staticFb.nroLoteFornecedor    || '',
+            fornecedor:           mpOrigem.fornecedor           || mpLote?.fornecedor           || staticFb.fornecedor           || '',
+            dataEntrada:          mpOrigem.dataEntrada          || mpLote?.dataEntrada          || staticFb.dataEntrada          || '',
             mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
             qtdPorUnidade: cf.qtdConsumida,
-            qtdConsumida: cf.qtdConsumida * qtd,   // total já multiplicado
+            qtdConsumida: cf.qtdConsumida * qtd,
           };
         });
       const buildCompsComp = () => comprado
