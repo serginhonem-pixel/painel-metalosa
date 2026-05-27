@@ -705,6 +705,103 @@ function ProducaoPI({ lotes }) {
   );
 }
 
+// ---------- IMPRESSAO DE ORDEM JA REGISTRADA (a partir do Firebase) -------------
+function imprimirOrdemRegistrada(ordem) {
+  const fmt = (d) => d ? new Date(String(d).slice(0,10) + 'T00:00:00').toLocaleDateString('pt-BR') : '--';
+
+  const rowsFab = (ordem.componentesFabricados ?? []).map((c) => `
+    <tr>
+      <td>${c.componente || '--'}</td>
+      <td style="font-family:monospace;text-align:center">${c.codigoComp || '--'}</td>
+      <td>${c.descricaoPi || '--'}</td>
+      <td>${c.danfe || '--'}</td>
+      <td>${c.certificadoQualidade || '--'}</td>
+      <td>${c.nroLoteFornecedor || '--'}</td>
+      <td>${c.fornecedor || '--'}</td>
+      <td style="text-align:center;font-weight:900">${c.qtdConsumida ?? '--'}</td>
+    </tr>`).join('');
+
+  const rowsComp = (ordem.componentesComprados ?? []).map((c) => `
+    <tr>
+      <td>${c.componente || '--'}</td>
+      <td>${c.danfe || '--'}</td>
+      <td>${c.certificadoQualidade || '--'}</td>
+      <td>${c.nroLoteFornecedor || '--'}</td>
+      <td>${c.fornecedor || '--'}</td>
+      <td style="text-align:center;font-weight:900">${c.qtdConsumida ?? '--'}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>OP ${ordem.nroOP || ordem.nroSerie || '--'}</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,sans-serif; font-size:11px; color:#111; padding:22px; }
+  h1 { font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:.15em; }
+  .sub { font-size:9px; color:#64748b; margin-top:2px; margin-bottom:18px; }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; background:#f1f5f9; border-radius:8px; padding:12px 14px; }
+  .field label { display:block; font-size:8px; font-weight:900; text-transform:uppercase; letter-spacing:.2em; color:#94a3b8; margin-bottom:3px; }
+  .field span { font-size:13px; font-weight:700; }
+  .section { font-size:8px; font-weight:900; text-transform:uppercase; letter-spacing:.25em; color:#64748b; margin:16px 0 6px; }
+  table { width:100%; border-collapse:collapse; font-size:10px; }
+  th { background:#1e293b; color:#fff; font-size:8px; text-transform:uppercase; letter-spacing:.12em; padding:5px 7px; text-align:left; }
+  td { padding:4px 7px; border-bottom:1px solid #e2e8f0; }
+  tr:nth-child(even) td { background:#f8fafc; }
+  .footer { margin-top:36px; display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+  .assinatura { border-top:1px solid #94a3b8; padding-top:5px; font-size:8px; color:#94a3b8; text-align:center; }
+  .badge { display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:999px; padding:1px 7px; font-size:8px; font-weight:900; text-transform:uppercase; }
+  .badge-green { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+  @media print { button { display:none !important; } }
+</style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+    <div>
+      <h1>Ordem de Produção</h1>
+      <div class="sub">Montagem de Escada · gerado em ${new Date().toLocaleString('pt-BR')}</div>
+    </div>
+    <button onclick="window.print()" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:7px 18px;font-weight:900;font-size:10px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer">Imprimir</button>
+  </div>
+
+  <div class="grid4">
+    <div class="field"><label>Número da OP</label><span>${ordem.nroOP || '—'}</span></div>
+    <div class="field"><label>Nº de Série</label><span>${ordem.nroSerie || '—'}</span></div>
+    <div class="field"><label>Data de Produção</label><span>${fmt(ordem.dataProd)}</span></div>
+    <div class="field"><label>Status</label><span class="badge badge-green">Registrada</span></div>
+  </div>
+
+  ${(ordem.componentesFabricados ?? []).length > 0 ? `
+  <div class="section">Componentes Fabricados (PI) <span class="badge">FIFO</span></div>
+  <table>
+    <thead><tr>
+      <th>Componente</th><th>Código</th><th>Lote PI</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th><th style="text-align:center">Qtd</th>
+    </tr></thead>
+    <tbody>${rowsFab}</tbody>
+  </table>` : ''}
+
+  ${(ordem.componentesComprados ?? []).length > 0 ? `
+  <div class="section">Componentes Comprados</div>
+  <table>
+    <thead><tr>
+      <th>Componente</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th><th style="text-align:center">Qtd</th>
+    </tr></thead>
+    <tbody>${rowsComp}</tbody>
+  </table>` : ''}
+
+  <div class="footer">
+    <div class="assinatura">Responsável pela Montagem</div>
+    <div class="assinatura">Controle de Qualidade</div>
+    <div class="assinatura">Aprovação / PCP</div>
+  </div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=950,height=720');
+  if (w) { w.document.write(html); w.document.close(); }
+}
+
 // ---------- IMPRESSAO DE ORDEM DE PRODUCAO -------------
 function imprimirOrdemProducao({ nroOP, dataProd, qtdMontagens, modeloSel, compFab, comprado, lotes }) {
   const fmt = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('pt-BR') : '--';
@@ -1473,7 +1570,7 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
                   <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Modelo</th>
                   <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Data</th>
                   <th className="text-left py-2 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
-                  <th className="py-2 px-3" />
+                  <th className="py-2 px-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -1493,8 +1590,17 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
                           ? <Badge color="emerald">Entregue</Badge>
                           : <Badge color="amber">Em estoque</Badge>}
                       </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
+                      <td className="py-3 px-3 text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            title="Imprimir Ordem de Produção"
+                            onClick={(e) => { e.stopPropagation(); imprimirOrdemRegistrada(o); }}
+                            className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600 transition">
+                            <Printer size={13} />
+                          </button>
+                          <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -1532,11 +1638,18 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
             <div className="flex flex-col items-end gap-2">
               <Badge color="emerald">Rastreada</Badge>
               <p className="text-xs text-slate-400 font-mono">Produzida em {excelSerialToISO(resultado.dataProd)}</p>
+              <button
+                type="button"
+                onClick={() => imprimirOrdemRegistrada(resultado)}
+                className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 transition hover:bg-blue-100"
+              >
+                <Printer size={11} /> Imprimir OP
+              </button>
               {!confirmEstorno ? (
                 <button
                   type="button"
                   onClick={() => setConfirmEstorno(true)}
-                  className="mt-1 flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-600 transition hover:bg-rose-100"
+                  className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-600 transition hover:bg-rose-100"
                 >
                   <AlertTriangle size={11} /> Estornar Ordem
                 </button>
