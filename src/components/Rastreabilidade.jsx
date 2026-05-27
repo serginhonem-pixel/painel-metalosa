@@ -887,12 +887,24 @@ function imprimirOrdemProducao({ nroOP, dataProd, qtdMontagens, modeloSel, compF
   if (w) { w.document.write(html); w.document.close(); }
 }
 
+// Gera sugestão de OP no formato OP-{lote}-{codigo}-{dataYYYYMMDD}-{índice 3 dígitos}
+function gerarSugestaoOP(modeloCod, dataProd, ordens) {
+  if (!modeloCod || !dataProd) return '';
+  const lote       = getLotePorData(dataProd) || 'SL';
+  const dataFmt    = dataProd.replace(/-/g, '');         // 20260527
+  const prefixo    = `OP-${lote}-${modeloCod}-${dataFmt}`;
+  const existentes = (ordens ?? []).filter((o) => o.ativo && (o.nroOP ?? '').startsWith(prefixo));
+  const indice     = existentes.length + 1;
+  return `${prefixo}-${String(indice).padStart(3, '0')}`;
+}
+
 // ---------- ORDEM DE PRODUCAO (consome lotes PI via FIFO) -------------
-function OrdemProducao({ lotes }) {
+function OrdemProducao({ lotes, ordens = [] }) {
   const modelos = BOM_ESCADAS.bom_escadas_rastreados;
 
   const [modeloCod, setModeloCod]       = useState('');
   const [nroOP, setNroOP]               = useState('');
+  const [opAutogerada, setOpAutogerada] = useState(false); // true = valor foi gerado automaticamente
   const [dataProd, setDataProd]         = useState(today());
   const [qtdMontagens, setQtdMontagens] = useState(1);
   const [compFab, setCompFab]           = useState([]);
@@ -912,6 +924,33 @@ function OrdemProducao({ lotes }) {
     lotes
       .filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome && l.ativo && l.qtdDisponivel > 0)
       .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+
+  // Sempre que modelo ou data mudar, recalcula a sugestão de OP
+  // (só sobrescreve se o campo estava vazio ou foi autogerado antes)
+  useEffect(() => {
+    if (!modeloCod || !dataProd) return;
+    if (opAutogerada || nroOP === '') {
+      setNroOP(gerarSugestaoOP(modeloCod, dataProd, ordens));
+      setOpAutogerada(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modeloCod, dataProd]);
+
+  const handleDataProd = (val) => {
+    setDataProd(val);
+    // se OP foi autogerada, agenda recálculo via useEffect acima
+  };
+
+  const handleNroOPManual = (val) => {
+    setNroOP(val);
+    setOpAutogerada(false); // usuário editou manualmente → não sobrescrever mais
+  };
+
+  const regerarOP = () => {
+    const sugestao = gerarSugestaoOP(modeloCod, dataProd, ordens);
+    setNroOP(sugestao);
+    setOpAutogerada(true);
+  };
 
   // Ao trocar o modelo, reconstrói listas com FIFO automático
   const handleModelo = (cod) => {
@@ -1039,8 +1078,11 @@ function OrdemProducao({ lotes }) {
         ? `${qtd} ordens registradas — OP ${nroOP.trim() || 'sem OP'} (series ${nroOP.trim()}-001 a ${nroOP.trim()}-${String(qtd).padStart(3,'0')})`
         : `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}`;
       setFeedback({ tipo: 'ok', msg });
-      setNroOP(''); setDataProd(today()); setQtdMontagens(1);
+      setDataProd(today()); setQtdMontagens(1);
       setEditandoFab(new Set()); setEditandoComp(new Set());
+      // Regenera sugestão de OP para a próxima ordem
+      setOpAutogerada(true);
+      setNroOP(gerarSugestaoOP(modeloCod, today(), ordens));
       // Re-carrega FIFO atualizado
       const modelo = modelos.find((m) => m.codigo_produto === modeloCod);
       const { fab, comp } = buildCompsFromBom(modelo);
@@ -1094,12 +1136,41 @@ function OrdemProducao({ lotes }) {
         {/* OP / DATA / QTD MONTAGENS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-6 border-b border-slate-100">
           <div>
-            <Label>Numero da OP</Label>
-            <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Numero da OP" />
+            <div className="flex items-center justify-between mb-1.5">
+              <Label>Numero da OP</Label>
+              {opAutogerada && modeloCod && (
+                <span className="text-[9px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-1">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                  Auto-gerada
+                </span>
+              )}
+            </div>
+            <div className="relative flex gap-2">
+              <Input
+                value={nroOP}
+                onChange={(e) => handleNroOPManual(e.target.value)}
+                placeholder={modeloCod ? 'Gerando...' : 'Selecione o modelo primeiro'}
+                className={opAutogerada ? 'font-mono text-blue-700 bg-blue-50 border-blue-200' : ''}
+              />
+              {modeloCod && (
+                <button
+                  type="button"
+                  onClick={regerarOP}
+                  title="Regenerar sugestão de OP"
+                  className="shrink-0 px-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 transition text-[10px] font-black uppercase tracking-wide">
+                  ↺
+                </button>
+              )}
+            </div>
+            {opAutogerada && nroOP && (
+              <p className="text-[9px] text-slate-400 mt-1 font-mono">
+                Formato: OP · Lote · Código · Data · Índice
+              </p>
+            )}
           </div>
           <div>
             <Label>Data de Producao</Label>
-            <Input type="date" value={dataProd} onChange={(e) => setDataProd(e.target.value)} />
+            <Input type="date" value={dataProd} onChange={(e) => handleDataProd(e.target.value)} />
           </div>
           <div>
             <Label>Qtd de Montagens</Label>
@@ -1362,35 +1433,62 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
     setFeedbackEstorno(null);
   };
 
+  // Restaura saldo de todos os lotes consumidos pela ordem e marca como inativa
+  const aplicarEstorno = async (ordem) => {
+    const batch = writeBatch(db);
+    for (const c of ordem.componentesFabricados ?? []) {
+      // PI: salvo como lotePiId (não loteId)
+      const idLote = c.lotePiId || c.loteId;
+      if (!idLote || !c.qtdConsumida) continue;
+      batch.update(doc(db, 'rastreabilidade_lotes', idLote), {
+        qtdDisponivel: increment(+c.qtdConsumida),
+      });
+    }
+    for (const c of ordem.componentesComprados ?? []) {
+      if (!c.loteId || !c.qtdConsumida) continue;
+      batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
+        qtdDisponivel: increment(+c.qtdConsumida),
+      });
+    }
+    batch.update(doc(db, 'rastreabilidade_ordens', ordem.id), { ativo: false });
+    await batch.commit();
+  };
+
   const estornar = async () => {
     if (!resultado) return;
     setEstornando(true);
     try {
-      const batch = writeBatch(db);
-      for (const c of resultado.componentesFabricados ?? []) {
-        if (!c.loteId || !c.qtdConsumida) continue;
-        batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
-          qtdDisponivel: increment(+c.qtdConsumida),
-        });
-      }
-      for (const c of resultado.componentesComprados ?? []) {
-        if (!c.loteId || !c.qtdConsumida) continue;
-        batch.update(doc(db, 'rastreabilidade_lotes', c.loteId), {
-          qtdDisponivel: increment(+c.qtdConsumida),
-        });
-      }
-      batch.update(doc(db, 'rastreabilidade_ordens', resultado.id), { ativo: false });
-      await batch.commit();
-      setFeedbackEstorno({ tipo: 'ok', msg: `Ordem da escada ${resultado.nroSerie} estornada. Saldos restaurados.` });
+      await aplicarEstorno(resultado);
+      setFeedbackEstorno({ tipo: 'ok', msg: `Ordem ${resultado.nroSerie} excluída. Saldos restaurados.` });
       setResultado(null);
       setBuscou(false);
       setBusca('');
     } catch {
-      setFeedbackEstorno({ tipo: 'erro', msg: 'Erro ao estornar. Tente novamente.' });
+      setFeedbackEstorno({ tipo: 'erro', msg: 'Erro ao excluir. Tente novamente.' });
     } finally {
       setEstornando(false);
       setConfirmEstorno(false);
       setTimeout(() => setFeedbackEstorno(null), 5000);
+    }
+  };
+
+  const [excluindoId, setExcluindoId] = useState(null);   // id da linha em confirmação
+  const [processandoId, setProcessandoId] = useState(null); // id sendo excluído
+
+  const excluirDaLista = async (o, e) => {
+    e.stopPropagation();
+    if (excluindoId !== o.id) { setExcluindoId(o.id); return; }
+    setProcessandoId(o.id);
+    setExcluindoId(null);
+    try {
+      await aplicarEstorno(o);
+      setFeedbackEstorno({ tipo: 'ok', msg: `Ordem ${o.nroSerie} excluída. Saldos restaurados.` });
+      if (resultado?.id === o.id) { setResultado(null); setBuscou(false); setBusca(''); }
+    } catch {
+      setFeedbackEstorno({ tipo: 'erro', msg: 'Erro ao excluir. Tente novamente.' });
+    } finally {
+      setProcessandoId(null);
+      setTimeout(() => setFeedbackEstorno(null), 6000);
     }
   };
 
@@ -1599,6 +1697,33 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
                             className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600 transition">
                             <Printer size={13} />
                           </button>
+                          {excluindoId === o.id ? (
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-[9px] font-black text-rose-600 uppercase tracking-wide">Confirmar?</span>
+                              <button
+                                type="button"
+                                onClick={(e) => excluirDaLista(o, e)}
+                                disabled={processandoId === o.id}
+                                className="bg-rose-600 text-white text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-rose-500 transition disabled:opacity-60">
+                                Sim
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setExcluindoId(null); }}
+                                className="bg-slate-200 text-slate-600 text-[9px] font-black uppercase px-2 py-1 rounded-lg hover:bg-slate-300 transition">
+                                Não
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              title="Excluir ordem e restaurar saldo"
+                              onClick={(e) => excluirDaLista(o, e)}
+                              disabled={processandoId === o.id}
+                              className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition disabled:opacity-40">
+                              {processandoId === o.id ? <span className="text-[9px]">...</span> : <X size={13} />}
+                            </button>
+                          )}
                           <span className="text-blue-500 font-black text-[10px] uppercase tracking-widest">Ver →</span>
                         </div>
                       </td>
@@ -3782,7 +3907,7 @@ export default function Rastreabilidade({ faturamentoLinhas = [], clientesPorCod
         {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
         {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
         {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
-        {subAba === 'ordem'      && <OrdemProducao lotes={lotes} />}
+        {subAba === 'ordem'      && <OrdemProducao lotes={lotes} ordens={ordens} />}
         {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
         {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
         {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} faturamentoLinhas={faturamentoLinhas} clientesPorCodigo={clientesPorCodigo} />}
