@@ -708,6 +708,10 @@ function ProducaoPI({ lotes }) {
 // ---------- IMPRESSAO DE ORDEM JA REGISTRADA (a partir do Firebase) -------------
 function imprimirOrdemRegistrada(ordem) {
   const fmt = (d) => d ? new Date(String(d).slice(0,10) + 'T00:00:00').toLocaleDateString('pt-BR') : '--';
+  const n = ordem.qtdMontagens || 1;
+
+  // qtdConsumida já é o total; qtdPorUnidade é por escada (pode não existir em ordens antigas)
+  const porUn = (c) => c.qtdPorUnidade ?? (n > 1 ? Math.round(c.qtdConsumida / n) : c.qtdConsumida);
 
   const rowsFab = (ordem.componentesFabricados ?? []).map((c) => `
     <tr>
@@ -718,7 +722,8 @@ function imprimirOrdemRegistrada(ordem) {
       <td>${c.certificadoQualidade || '--'}</td>
       <td>${c.nroLoteFornecedor || '--'}</td>
       <td>${c.fornecedor || '--'}</td>
-      <td style="text-align:center;font-weight:900">${c.qtdConsumida ?? '--'}</td>
+      <td style="text-align:center">${porUn(c)}</td>
+      <td style="text-align:center;font-weight:900;color:#1d4ed8">${c.qtdConsumida ?? '--'}</td>
     </tr>`).join('');
 
   const rowsComp = (ordem.componentesComprados ?? []).map((c) => `
@@ -728,7 +733,8 @@ function imprimirOrdemRegistrada(ordem) {
       <td>${c.certificadoQualidade || '--'}</td>
       <td>${c.nroLoteFornecedor || '--'}</td>
       <td>${c.fornecedor || '--'}</td>
-      <td style="text-align:center;font-weight:900">${c.qtdConsumida ?? '--'}</td>
+      <td style="text-align:center">${porUn(c)}</td>
+      <td style="text-align:center;font-weight:900;color:#0e7490">${c.qtdConsumida ?? '--'}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html>
@@ -769,14 +775,15 @@ function imprimirOrdemRegistrada(ordem) {
     <div class="field"><label>Número da OP</label><span>${ordem.nroOP || '—'}</span></div>
     <div class="field"><label>Nº de Série</label><span>${ordem.nroSerie || '—'}</span></div>
     <div class="field"><label>Data de Produção</label><span>${fmt(ordem.dataProd)}</span></div>
-    <div class="field"><label>Status</label><span class="badge badge-green">Registrada</span></div>
+    <div class="field"><label>Qtd de Montagens</label><span style="color:#1d4ed8">${n} un</span></div>
   </div>
 
   ${(ordem.componentesFabricados ?? []).length > 0 ? `
   <div class="section">Componentes Fabricados (PI) <span class="badge">FIFO</span></div>
   <table>
     <thead><tr>
-      <th>Componente</th><th>Código</th><th>Lote PI</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th><th style="text-align:center">Qtd</th>
+      <th>Componente</th><th>Código</th><th>Lote PI</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th>
+      <th style="text-align:center">Qtd/Un</th><th style="text-align:center;background:#1e3a5f">Total (${n}x)</th>
     </tr></thead>
     <tbody>${rowsFab}</tbody>
   </table>` : ''}
@@ -785,7 +792,8 @@ function imprimirOrdemRegistrada(ordem) {
   <div class="section">Componentes Comprados</div>
   <table>
     <thead><tr>
-      <th>Componente</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th><th style="text-align:center">Qtd</th>
+      <th>Componente</th><th>DANFE</th><th>Cert. Qualidade</th><th>Lote Fornecedor</th><th>Fornecedor</th>
+      <th style="text-align:center">Qtd/Un</th><th style="text-align:center;background:#164e63">Total (${n}x)</th>
     </tr></thead>
     <tbody>${rowsComp}</tbody>
   </table>` : ''}
@@ -925,25 +933,17 @@ function OrdemProducao({ lotes, ordens = [] }) {
       .filter((l) => l.tipo === 'COMPRADO' && l.nomeComp === nome && l.ativo && l.qtdDisponivel > 0)
       .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
 
-  // Sempre que modelo ou data mudar, recalcula a sugestão de OP
-  // (só sobrescreve se o campo estava vazio ou foi autogerado antes)
-  useEffect(() => {
-    if (!modeloCod || !dataProd) return;
-    if (opAutogerada || nroOP === '') {
-      setNroOP(gerarSugestaoOP(modeloCod, dataProd, ordens));
-      setOpAutogerada(true);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modeloCod, dataProd]);
-
-  const handleDataProd = (val) => {
-    setDataProd(val);
-    // se OP foi autogerada, agenda recálculo via useEffect acima
-  };
-
   const handleNroOPManual = (val) => {
     setNroOP(val);
     setOpAutogerada(false); // usuário editou manualmente → não sobrescrever mais
+  };
+
+  const handleDataProd = (val) => {
+    setDataProd(val);
+    // Se OP ainda está no modo autogerado, recalcula imediatamente com a nova data
+    if (opAutogerada && modeloCod) {
+      setNroOP(gerarSugestaoOP(modeloCod, val, ordens));
+    }
   };
 
   const regerarOP = () => {
@@ -957,6 +957,10 @@ function OrdemProducao({ lotes, ordens = [] }) {
     setModeloCod(cod);
     setEditandoFab(new Set());
     setEditandoComp(new Set());
+    // Gera OP imediatamente (síncrono) ao selecionar o modelo
+    const sugestao = gerarSugestaoOP(cod, dataProd, ordens);
+    setNroOP(sugestao);
+    setOpAutogerada(true);
     const modelo = modelos.find((m) => m.codigo_produto === cod);
     const { fab, comp } = buildCompsFromBom(modelo);
     // PI — pré-seleciona lote mais antigo (FIFO)
@@ -1027,7 +1031,8 @@ function OrdemProducao({ lotes, ordens = [] }) {
             danfe: mpOrigem.danfe ?? '', certificadoQualidade: mpOrigem.certificadoQualidade ?? '',
             nroLoteFornecedor: mpOrigem.nroLoteFornecedor ?? '', fornecedor: mpOrigem.fornecedor ?? '',
             dataEntrada: mpOrigem.dataEntrada ?? '', mpLotesConsumidos: l?.mpLotesConsumidos ?? [],
-            qtdConsumida: cf.qtdConsumida,
+            qtdPorUnidade: cf.qtdConsumida,
+            qtdConsumida: cf.qtdConsumida * qtd,   // total já multiplicado
           };
         });
       const buildCompsComp = () => comprado
@@ -1038,28 +1043,26 @@ function OrdemProducao({ lotes, ordens = [] }) {
             componente: c.nome, tipo: 'COMPRADO', loteId: c.loteId,
             nroLoteFornecedor: l?.nroLoteFornecedor ?? '', danfe: l?.danfe ?? '',
             certificadoQualidade: l?.certificadoQualidade ?? '', fornecedor: l?.fornecedor ?? '',
-            dataEntrada: l?.dataEntrada ?? '', qtdConsumida: c.qtdConsumida,
+            dataEntrada: l?.dataEntrada ?? '',
+            qtdPorUnidade: c.qtdConsumida,
+            qtdConsumida: c.qtdConsumida * qtd,   // total já multiplicado
           };
         });
 
-      // Cria N ordens (uma por montagem)
-      for (let i = 0; i < qtd; i++) {
-        const ordemRef = doc(collection(db, 'rastreabilidade_ordens'));
-        const sufixo = qtd > 1 ? `-${String(i + 1).padStart(3, '0')}` : '';
-        const nroSerieGer = nroOP.trim() ? `${nroOP.trim()}${sufixo}` : ordemRef.id;
-        batch.set(ordemRef, {
-          nroOP: nroOP.trim(),
-          nroSerie: nroSerieGer,
-          dataProd,
-          qtdMontagens: 1,
-          componentesFabricados: buildCompsFab(),
-          componentesComprados: buildCompsComp(),
-          ativo: true,
-          criadoEm: new Date().toISOString(),
-        });
-      }
+      // UMA única ordem com qtdMontagens e totais já calculados
+      const ordemRef = doc(collection(db, 'rastreabilidade_ordens'));
+      batch.set(ordemRef, {
+        nroOP: nroOP.trim(),
+        nroSerie: nroOP.trim() || ordemRef.id,
+        dataProd,
+        qtdMontagens: qtd,
+        componentesFabricados: buildCompsFab(),
+        componentesComprados: buildCompsComp(),
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
 
-      // Desconta estoque uma única vez pelo total (qtdConsumida * N)
+      // Desconta estoque pelo total (qtdConsumida * N)
       for (const cf of compFab) {
         if (!cf.loteId) continue;
         batch.update(doc(db, 'rastreabilidade_lotes', cf.loteId), {
@@ -1074,9 +1077,7 @@ function OrdemProducao({ lotes, ordens = [] }) {
       }
 
       await batch.commit();
-      const msg = qtd > 1
-        ? `${qtd} ordens registradas — OP ${nroOP.trim() || 'sem OP'} (series ${nroOP.trim()}-001 a ${nroOP.trim()}-${String(qtd).padStart(3,'0')})`
-        : `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}`;
+      const msg = `Ordem registrada — OP ${nroOP.trim() || 'sem OP'}${qtd > 1 ? ` · ${qtd} montagens` : ''}`;
       setFeedback({ tipo: 'ok', msg });
       setDataProd(today()); setQtdMontagens(1);
       setEditandoFab(new Set()); setEditandoComp(new Set());
@@ -1684,9 +1685,14 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
                       <td className="py-3 px-3 text-slate-600">{o.descricaoModelo || o.modeloCod || '—'}</td>
                       <td className="py-3 px-3 text-slate-400">{o.dataProd || '—'}</td>
                       <td className="py-3 px-3">
-                        {entregue
-                          ? <Badge color="emerald">Entregue</Badge>
-                          : <Badge color="amber">Em estoque</Badge>}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {entregue
+                            ? <Badge color="emerald">Entregue</Badge>
+                            : <Badge color="amber">Em estoque</Badge>}
+                          {(o.qtdMontagens ?? 1) > 1 && (
+                            <Badge color="blue">{o.qtdMontagens}x</Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-2">
