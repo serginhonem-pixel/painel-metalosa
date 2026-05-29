@@ -23,6 +23,7 @@ const SEED_DATA = {
     { uid: 'u2', name: 'João Técnico', email: 'tec@empresa.com', role: 'maintenance', sector: 'Mecânica' },
     { uid: 'u3', name: 'Ana Elétrica', email: 'ana@empresa.com', role: 'maintenance', sector: 'Elétrica' },
     { uid: 'u4', name: 'Operador Paulo', email: 'op@empresa.com', role: 'operator', sector: 'Produção A' },
+    { uid: 'u5', name: 'Marcio Guerçon', email: 'marcio.guercao@empresa.com', role: 'maintenance', sector: 'Matrizaria' },
   ],
   assets: [
     { id: 'a1', name: 'Injetora 01', sector: 'Produção A', criticality: 'high', manufacturer: 'Romi' },

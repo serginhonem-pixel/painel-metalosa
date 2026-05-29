@@ -532,6 +532,7 @@ function ProducaoPI({ lotes }) {
 
   const [codigoPi, setCodigoPi]     = useState(piOpcoes[0]?.codigo_pi ?? '');
   const [nroOP, setNroOP]           = useState('');
+  const [opAutogerada, setOpAutogerada] = useState(false);
   const [dataProd, setDataProd]     = useState(today());
   const [qtdProduzida, setQtdProd]  = useState('');
   const [qtdAprovada, setQtdAprov]  = useState('');
@@ -541,10 +542,43 @@ function ProducaoPI({ lotes }) {
   const [saving, setSaving]         = useState(false);
   const [feedback, setFeedback]     = useState(null);
 
+  // Auto-gera OP quando os lotes do Firebase carregam (PI pré-selecionado)
+  useEffect(() => {
+    if (codigoPi && lotes.length > 0 && !nroOP) {
+      const piLotes = lotes.filter((l) => l.tipo === 'PI');
+      const sugestao = gerarSugestaoOP(codigoPi, dataProd, piLotes);
+      if (sugestao) { setNroOP(sugestao); setOpAutogerada(true); }
+    }
+  }, [lotes.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const piSel    = piOpcoes.find((p) => p.codigo_pi === codigoPi);
   const mpKey    = piSel?.mp_key ?? '';
   const mpDisp   = lotes.filter((l) => l.tipo === 'MP' && l.mp === mpKey && l.ativo && l.qtdDisponivel > 0)
                         .sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada)); // FIFO order for display
+
+  const handleCodigoPi = (v) => {
+    setCodigoPi(v);
+    setConsumoMp([{ loteId: '', qtdConsumida: '' }]);
+    const piLotes = lotes.filter((l) => l.tipo === 'PI');
+    const sugestao = gerarSugestaoOP(v, dataProd, piLotes);
+    setNroOP(sugestao);
+    setOpAutogerada(true);
+  };
+
+  const handleDataProdPi = (val) => {
+    setDataProd(val);
+    if (opAutogerada && codigoPi) {
+      const piLotes = lotes.filter((l) => l.tipo === 'PI');
+      setNroOP(gerarSugestaoOP(codigoPi, val, piLotes));
+    }
+  };
+
+  const regerarOPPi = () => {
+    const piLotes = lotes.filter((l) => l.tipo === 'PI');
+    const sugestao = gerarSugestaoOP(codigoPi, dataProd, piLotes);
+    setNroOP(sugestao);
+    setOpAutogerada(true);
+  };
 
   const addLinhaMp    = () => setConsumoMp((p) => [...p, { loteId: '', qtdConsumida: '' }]);
   const removeLinhaMp = (i) => setConsumoMp((p) => p.filter((_, idx) => idx !== i));
@@ -607,9 +641,14 @@ function ProducaoPI({ lotes }) {
       }
       await batch.commit();
       setFeedback({ tipo: 'ok', msg: `Lote de PI (${codigoPi}) registrado — ${aprov} pcs aprovadas.` });
-      setNroOP(''); setQtdProd(''); setQtdAprov(''); setQtdRep('');
+      setQtdProd(''); setQtdAprov(''); setQtdRep('');
       setConsumoMp([{ loteId: '', qtdConsumida: '' }]);
-      setDataProd(today());
+      const novaData = today();
+      setDataProd(novaData);
+      // Regenera sugestão de OP para o próximo lote
+      const piLotesAtualizados = lotes.filter((l) => l.tipo === 'PI');
+      setNroOP(gerarSugestaoOP(codigoPi, novaData, piLotesAtualizados));
+      setOpAutogerada(true);
     } catch {
       setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
     } finally {
@@ -630,7 +669,7 @@ function ProducaoPI({ lotes }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <Label>Produto Intermediario (PI) *</Label>
-                <Select value={codigoPi} onChange={(e) => { setCodigoPi(e.target.value); setConsumoMp([{ loteId: '', qtdConsumida: '' }]); }}>
+                <Select value={codigoPi} onChange={(e) => handleCodigoPi(e.target.value)}>
                   {piOpcoes.map((p) => (
                     <option key={p.codigo_pi} value={p.codigo_pi}>{p.codigo_pi} — {p.descricao_pi}</option>
                   ))}
@@ -638,15 +677,40 @@ function ProducaoPI({ lotes }) {
                 {mpKey && <p className="text-[10px] text-violet-600 font-bold mt-1.5 uppercase tracking-widest">MP: {mpKey}</p>}
               </div>
               <div>
-                <Label>Numero da OP</Label>
-                <Input value={nroOP} onChange={(e) => setNroOP(e.target.value)} placeholder="Numero da OP" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <Label>Numero da OP</Label>
+                  {opAutogerada && (
+                    <span className="text-[9px] font-black uppercase tracking-widest text-violet-500 flex items-center gap-1">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                      Auto-gerada
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={nroOP}
+                    onChange={(e) => { setNroOP(e.target.value); setOpAutogerada(false); }}
+                    placeholder="Numero da OP"
+                    className={opAutogerada ? 'font-mono text-violet-700 bg-violet-50 border-violet-200' : ''}
+                  />
+                  <button
+                    type="button"
+                    onClick={regerarOPPi}
+                    title="Regenerar sugestão de OP"
+                    className="shrink-0 px-3 rounded-xl bg-violet-50 border border-violet-200 text-violet-600 hover:bg-violet-100 transition text-[10px] font-black uppercase tracking-wide">
+                    ↺
+                  </button>
+                </div>
+                {opAutogerada && nroOP && (
+                  <p className="text-[9px] text-slate-400 mt-1 font-mono">Formato: OP · Lote · Código PI · Data · Índice</p>
+                )}
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <Label>Data de Producao</Label>
-              <Input type="date" value={dataProd} onChange={(e) => setDataProd(e.target.value)} />
+              <Input type="date" value={dataProd} onChange={(e) => handleDataProdPi(e.target.value)} />
             </div>
             <div>
               <Label>Qtd Produzida</Label>
@@ -873,7 +937,7 @@ function imprimirOrdemProducao({ nroOP, dataProd, qtdMontagens, modeloSel, compF
   const getLoteLabel = (loteId, tipo) => {
     const l = lotes.find((x) => x.id === loteId);
     if (!l) return '--';
-    if (tipo === 'PI') return `OP ${l.nroOP || '--'} | ${fmt(l.dataEntrada)} | Disp: ${l.qtdDisponivel} pcs`;
+    if (tipo === 'PI') return `PI-${l.codigoPi} | OP ${l.nroOP || '--'} | ${fmt(l.dataEntrada)} | Disp: ${l.qtdDisponivel} pcs`;
     return `${l.nroLoteFornecedor || '--'} | DANFE ${l.danfe || '--'} | ${l.fornecedor || '--'} | Disp: ${l.qtdDisponivel}`;
   };
 
@@ -1303,7 +1367,7 @@ function OrdemProducao({ lotes, ordens = [] }) {
                           <option value="">-- lote PI (FIFO) --</option>
                           {disp.map((l) => (
                             <option key={l.id} value={l.id}>
-                              {l.nroOP ? `OP ${l.nroOP} | ` : ''}{l.dataEntrada} | Disp: {l.qtdDisponivel} pcs
+                              PI-{l.codigoPi} | {l.nroOP ? `OP ${l.nroOP} | ` : ''}{l.dataEntrada} | Disp: {l.qtdDisponivel} pcs
                             </option>
                           ))}
                         </select>
@@ -1312,7 +1376,7 @@ function OrdemProducao({ lotes, ordens = [] }) {
                           <Lock size={10} className="shrink-0 text-slate-400" />
                           <span className="truncate">
                             {cf.loteId && loteAtual
-                              ? `${loteAtual.nroOP ? `OP ${loteAtual.nroOP} | ` : ''}${loteAtual.dataEntrada} | Disp: ${loteAtual.qtdDisponivel} pcs`
+                              ? `PI-${loteAtual.codigoPi} | ${loteAtual.nroOP ? `OP ${loteAtual.nroOP} | ` : ''}${loteAtual.dataEntrada} | Disp: ${loteAtual.qtdDisponivel} pcs`
                               : 'Sem lote disponível'}
                           </span>
                         </div>
