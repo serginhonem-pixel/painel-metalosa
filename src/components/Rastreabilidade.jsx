@@ -2137,7 +2137,7 @@ function ConsultarEscada({ ordens, lotes = [], saidas = [] }) {
 }
 
 // ---------- AJUSTE DE ESTOQUE ----------------------------------------
-function AjusteEstoque({ lotes }) {
+function AjusteEstoque({ lotes, ordens }) {
   const todos = lotes.filter((l) => l.ativo);
   const [loteId,     setLoteId]     = useState('');
   const [tipoAjuste, setTipoAjuste] = useState('inventario');
@@ -2146,12 +2146,24 @@ function AjusteEstoque({ lotes }) {
   const [saving,     setSaving]     = useState(false);
   const [feedback,   setFeedback]   = useState(null);
 
-  const lote = todos.find((l) => l.id === loteId);
+  const isPa = loteId.startsWith('PA:');
+  const paModeloCod = isPa ? loteId.slice(3) : null;
+  const lote = !isPa ? todos.find((l) => l.id === loteId) : null;
+
+  const paAtivos = ordens.filter((o) => o.tipo === 'PA' && o.ativo);
+  const gruposPa = BOM_ESCADAS.bom_escadas_rastreados.map((m) => ({
+    modeloCod: m.codigo_produto,
+    descricao: m.descricao,
+    saldo: paAtivos.filter((o) => o.modeloCod === m.codigo_produto).length,
+  })).sort((a, b) => a.modeloCod.localeCompare(b.modeloCod));
+
+  const paInfo = isPa ? gruposPa.find((g) => g.modeloCod === paModeloCod) : null;
+  const saldoAtual = isPa ? (paInfo?.saldo ?? 0) : (lote?.qtdDisponivel ?? 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!loteId || novaQtd === '') {
-      setFeedback({ tipo: 'erro', msg: 'Selecione o lote e informe a nova quantidade.' });
+      setFeedback({ tipo: 'erro', msg: 'Selecione o item e informe a nova quantidade.' });
       return;
     }
     const novaQtdNum = Number(novaQtd);
@@ -2162,25 +2174,69 @@ function AjusteEstoque({ lotes }) {
     setSaving(true);
     try {
       const batch = writeBatch(db);
-      const delta = novaQtdNum - (lote?.qtdDisponivel ?? 0);
-      batch.update(doc(db, 'rastreabilidade_lotes', loteId), {
-        qtdDisponivel: novaQtdNum,
-      });
-      // Registra historico do ajuste
-      batch.set(doc(collection(db, 'rastreabilidade_ajustes')), {
-        loteId,
-        tipo: lote?.tipo ?? '',
-        mp: lote?.mp ?? lote?.codigoPi ?? lote?.nomeComp ?? '',
-        nroLote: lote?.nroLoteFornecedor ?? lote?.nroOP ?? '',
-        qtdAntes: lote?.qtdDisponivel ?? 0,
-        qtdDepois: novaQtdNum,
-        delta,
-        tipoAjuste,
-        motivo: motivo.trim(),
-        ajustadoEm: new Date().toISOString(),
-      });
+      const delta = novaQtdNum - saldoAtual;
+
+      if (isPa) {
+        const unidadesPa = ordens
+          .filter((o) => o.tipo === 'PA' && o.ativo && o.modeloCod === paModeloCod)
+          .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+
+        if (delta < 0) {
+          // Desativar as unidades mais recentes
+          unidadesPa.slice(0, Math.abs(delta)).forEach((o) => {
+            batch.update(doc(db, 'rastreabilidade_ordens', o.id), { ativo: false });
+          });
+        } else if (delta > 0) {
+          // Criar novas unidades de ajuste
+          const now = new Date().toISOString();
+          for (let i = 0; i < delta; i++) {
+            batch.set(doc(collection(db, 'rastreabilidade_ordens')), {
+              tipo: 'PA',
+              nroSerie: `AJ-${paModeloCod}-${Date.now()}-${i}`,
+              nroOP: '',
+              modeloCod: paModeloCod,
+              descricaoModelo: paInfo?.descricao ?? paModeloCod,
+              dataProd: new Date().toISOString().slice(0, 10),
+              statusQC: 'aprovado',
+              observacao: motivo.trim() || 'Ajuste de estoque',
+              ativo: true,
+              criadoEm: now,
+              origem: 'ajuste',
+            });
+          }
+        }
+        batch.set(doc(collection(db, 'rastreabilidade_ajustes')), {
+          loteId: `PA:${paModeloCod}`,
+          tipo: 'PA',
+          mp: paInfo?.descricao ?? paModeloCod,
+          nroLote: '',
+          qtdAntes: saldoAtual,
+          qtdDepois: novaQtdNum,
+          delta,
+          tipoAjuste,
+          motivo: motivo.trim(),
+          ajustadoEm: new Date().toISOString(),
+        });
+      } else {
+        batch.update(doc(db, 'rastreabilidade_lotes', loteId), {
+          qtdDisponivel: novaQtdNum,
+        });
+        batch.set(doc(collection(db, 'rastreabilidade_ajustes')), {
+          loteId,
+          tipo: lote?.tipo ?? '',
+          mp: lote?.mp ?? lote?.codigoPi ?? lote?.nomeComp ?? '',
+          nroLote: lote?.nroLoteFornecedor ?? lote?.nroOP ?? '',
+          qtdAntes: saldoAtual,
+          qtdDepois: novaQtdNum,
+          delta,
+          tipoAjuste,
+          motivo: motivo.trim(),
+          ajustadoEm: new Date().toISOString(),
+        });
+      }
+
       await batch.commit();
-      setFeedback({ tipo: 'ok', msg: `Saldo ajustado de ${lote?.qtdDisponivel ?? 0} para ${novaQtdNum} (${delta >= 0 ? '+' : ''}${delta}).` });
+      setFeedback({ tipo: 'ok', msg: `Saldo ajustado de ${saldoAtual} para ${novaQtdNum} (${delta >= 0 ? '+' : ''}${delta}).` });
       setLoteId(''); setNovaQtd(''); setMotivo('');
     } catch {
       setFeedback({ tipo: 'erro', msg: 'Erro ao salvar. Tente novamente.' });
@@ -2210,7 +2266,7 @@ function AjusteEstoque({ lotes }) {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <Label>Selecione o Lote *</Label>
+            <Label>Selecione o Item *</Label>
             <select value={loteId} onChange={(e) => { setLoteId(e.target.value); setNovaQtd(''); }} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-amber-500 transition">
               <option value="">-- selecionar lote --</option>
               {gruposMp.length > 0 && (
@@ -2228,6 +2284,11 @@ function AjusteEstoque({ lotes }) {
                   {gruposComp.map((l) => <option key={l.id} value={l.id}>{l.nomeComp} | Lote {l.nroLoteFornecedor} | Saldo: {l.qtdDisponivel}</option>)}
                 </optgroup>
               )}
+              {gruposPa.length > 0 && (
+                <optgroup label="Produto Acabado (PA)">
+                  {gruposPa.map((g) => <option key={g.modeloCod} value={`PA:${g.modeloCod}`}>{g.descricao} | Cod {g.modeloCod} | Saldo: {g.saldo}</option>)}
+                </optgroup>
+              )}
             </select>
           </div>
           <div>
@@ -2237,23 +2298,23 @@ function AjusteEstoque({ lotes }) {
             </Select>
           </div>
         </div>
-        {lote && (
+        {(lote || paInfo) && (
           <div className="rounded-2xl border border-amber-100 bg-amber-50/40 p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo</p>
-              <p className="text-sm font-bold text-slate-700 mt-1">{lote.tipo}</p>
+              <p className="text-sm font-bold text-slate-700 mt-1">{isPa ? 'PA' : lote.tipo}</p>
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Material</p>
-              <p className="text-sm font-bold text-slate-700 mt-1">{MP_CODIGO[lote.mp]?.label ?? lote.descricaoPi ?? lote.nomeComp ?? lote.mp ?? '--'}</p>
+              <p className="text-sm font-bold text-slate-700 mt-1">{isPa ? paInfo.descricao : (MP_CODIGO[lote.mp]?.label ?? lote.descricaoPi ?? lote.nomeComp ?? lote.mp ?? '--')}</p>
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Saldo Atual</p>
-              <p className={`text-2xl font-black mt-1 ${lote.qtdDisponivel === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{lote.qtdDisponivel}</p>
+              <p className={`text-2xl font-black mt-1 ${saldoAtual === 0 ? 'text-rose-500' : 'text-emerald-600'}`}>{saldoAtual}</p>
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">DANFE / OP</p>
-              <p className="text-sm font-mono text-slate-600 mt-1">{lote.danfe || lote.nroOP || '--'}</p>
+              <p className="text-sm font-mono text-slate-600 mt-1">{isPa ? (paModeloCod) : (lote.danfe || lote.nroOP || '--')}</p>
             </div>
           </div>
         )}
@@ -2261,9 +2322,9 @@ function AjusteEstoque({ lotes }) {
           <div>
             <Label>Nova Quantidade (saldo correto) *</Label>
             <Input type="number" min="0" value={novaQtd} onChange={(e) => setNovaQtd(e.target.value)} placeholder="Ex: 250" disabled={!loteId} />
-            {lote && novaQtd !== '' && (
-              <p className={`text-[10px] font-black mt-1 ${Number(novaQtd) > lote.qtdDisponivel ? 'text-emerald-600' : Number(novaQtd) < lote.qtdDisponivel ? 'text-rose-500' : 'text-slate-400'}`}>
-                Diferenca: {Number(novaQtd) - lote.qtdDisponivel >= 0 ? '+' : ''}{Number(novaQtd) - lote.qtdDisponivel} unidades
+            {(lote || paInfo) && novaQtd !== '' && (
+              <p className={`text-[10px] font-black mt-1 ${Number(novaQtd) > saldoAtual ? 'text-emerald-600' : Number(novaQtd) < saldoAtual ? 'text-rose-500' : 'text-slate-400'}`}>
+                Diferenca: {Number(novaQtd) - saldoAtual >= 0 ? '+' : ''}{Number(novaQtd) - saldoAtual} unidades
               </p>
             )}
           </div>
@@ -3190,7 +3251,7 @@ function EntradaLoteComprado({ lotes }) {
   );
 }
 
-function EstoqueAtual({ lotes }) {
+function EstoqueAtual({ lotes, ordens }) {
   const ativos = lotes.filter((l) => l.ativo);
   const [expandidos, setExpandidos] = useState({});
   const toggle = (key) => setExpandidos((p) => ({ ...p, [key]: !p[key] }));
@@ -3420,6 +3481,52 @@ function EstoqueAtual({ lotes }) {
           </table>
         </Card>
       )}
+
+      {(() => {
+        const paAtivos = (ordens ?? []).filter((o) => o.tipo === 'PA' && o.ativo);
+        const gruposPa = BOM_ESCADAS.bom_escadas_rastreados.map((m) => ({
+          modeloCod: m.codigo_produto,
+          descricao: m.descricao,
+          saldo: paAtivos.filter((o) => o.modeloCod === m.codigo_produto).length,
+        })).sort((a, b) => a.modeloCod.localeCompare(b.modeloCod));
+        const totalPa = gruposPa.reduce((s, g) => s + g.saldo, 0);
+        return (
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <SectionTitle icon={Award}>Produto Acabado (PA) — Escadas</SectionTitle>
+              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Total: <span className="text-slate-700">{totalPa}</span></span>
+            </div>
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b-2 border-slate-100">
+                  <th className={thCls}>Modelo</th>
+                  <th className={thCls}>Descricao</th>
+                  <th className={`${thCls} text-right`}>Saldo Disponivel</th>
+                  <th className={thCls}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gruposPa.map((g) => (
+                  <tr key={g.modeloCod} className="border-b border-slate-50">
+                    <td className="py-3 px-3">
+                      <span className="font-mono text-[10px] bg-amber-50 border border-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{g.modeloCod}</span>
+                    </td>
+                    <td className="py-3 px-3 font-semibold text-slate-700">{g.descricao}</td>
+                    <td className="py-3 px-3 text-right">
+                      <span className={`text-base font-black ${g.saldo === 0 ? 'text-rose-500' : g.saldo < 5 ? 'text-amber-500' : 'text-emerald-600'}`}>
+                        {g.saldo}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      {g.saldo === 0 ? <Badge color="rose">Zerado</Badge> : g.saldo < 5 ? <Badge color="amber">Baixo</Badge> : <Badge color="emerald">OK</Badge>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        );
+      })()}
     </div>
   );
 }
@@ -4139,11 +4246,11 @@ export default function Rastreabilidade({ faturamentoLinhas = [], clientesPorCod
 
       {/* Conteúdo */}
       <div className="pt-5">
-        {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} />}
+        {subAba === 'estoque'    && <EstoqueAtual lotes={lotes} ordens={ordens} />}
         {subAba === 'lote'       && <div className="space-y-8"><EntradaLoteMP lotes={lotes} /><EntradaLoteComprado lotes={lotes} /></div>}
         {subAba === 'producaopi' && <ProducaoPI lotes={lotes} />}
         {subAba === 'ordem'      && <OrdemProducao lotes={lotes} ordens={ordens} />}
-        {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} />}
+        {subAba === 'ajuste'     && <AjusteEstoque lotes={lotes} ordens={ordens} />}
         {subAba === 'consultar'  && <ConsultarEscada ordens={ordens} lotes={lotes} saidas={saidas} />}
         {subAba === 'saida'      && <SaidaVenda ordens={ordens} saidas={saidas} faturamentoLinhas={faturamentoLinhas} clientesPorCodigo={clientesPorCodigo} />}
         {subAba === 'exportar'   && <ExportarInmetro ordens={ordens} />}
