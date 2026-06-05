@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import funcionariosBase from './data/funcionarios.json';
 import faturamentoData from './data/faturamento.json';
 import devolucaoData from './data/devolucao.json';
@@ -63,8 +63,6 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'custos', label: 'Custos', icon: Layers },
-  { id: 'portfolio', label: 'Portf�lio / Mix', icon: Briefcase },
-  { id: 'gestao', label: 'Opera��o Di�ria', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
   { id: 'configuracao', label: 'Configura��o Global', icon: Settings },
 ];
