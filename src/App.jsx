@@ -71,8 +71,6 @@ const ITENS_MENU = [
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
   { id: 'faturamento', label: 'Faturamento', icon: DollarSign },
   { id: 'custos', label: 'Custos', icon: Layers },
-  { id: 'portfolio', label: 'Portfólio / Mix', icon: Briefcase },
-  { id: 'gestao', label: 'Operação Diária', icon: Activity },
   { id: 'manutencao', label: 'Manutencao', icon: Wrench },
   { id: 'mrp-aco', label: 'Planejamento Aço', icon: ShoppingCart },
   { id: 'rastreabilidade', label: 'Escada', icon: ScanLine },
