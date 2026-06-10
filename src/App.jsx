@@ -61,7 +61,8 @@ import {
   Target,
   ShoppingCart,
   Zap,
-  ScanLine
+  ScanLine,
+  Search
 } from 'lucide-react';
 
 // --- Constantes e Dados Iniciais ---
@@ -13883,120 +13884,113 @@ const custoDetalheTitulo = custoDetalheItem
                 <div className="relative">
                   
                   {/* ── HEADER PRINCIPAL ── */}
-                  <div className="relative border-b border-slate-800/40 px-2 py-7">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="space-y-4 flex-1">
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-amber-400/30 to-orange-500/20 blur-md"></div>
-                            <div className="relative h-14 w-14 rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/15 to-amber-500/5 flex items-center justify-center shadow-lg">
-                              <Wrench size={24} className="text-amber-300" />
-                            </div>
-                          </div>
-                          <div>
-                            <p className="text-[10px] uppercase tracking-[0.35em] text-amber-300/60 font-semibold">Central de manutenção</p>
-                            <h2 className="text-2xl font-black text-white tracking-tight">Abertura de OS para produção</h2>
-                          </div>
+                  <div className="border-b border-slate-800/40 px-2 py-5">
+                    {/* Linha 1: título + ações */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl border border-amber-400/25 bg-amber-400/10 flex items-center justify-center shrink-0">
+                          <Wrench size={18} className="text-amber-300" />
                         </div>
-                        <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
-                          Registre as ocorrências da produção com dados completos. Uma boa abertura acelera o atendimento e reduz paradas.
-                        </p>
-                        {isManutencaoOnly && (
-                          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/[0.06] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-amber-200/80">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                            Perfil de abertura
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-black text-white tracking-tight">Manutenção Industrial</h2>
+                            <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                              Online
+                            </span>
+                            {isManutencaoOnly && (
+                              <span className="rounded-full border border-amber-400/20 bg-amber-400/[0.08] px-2.5 py-0.5 text-[10px] font-bold text-amber-200/80">
+                                Perfil operador
+                              </span>
+                            )}
                           </div>
-                        )}
-                        {/* KPIs inline */}
-                        <div className="flex flex-wrap gap-3 pt-1">
-                          {manutencaoKpis.map((kpi) => (
-                            <div key={kpi.id} className="group rounded-xl border border-slate-700/50 bg-slate-900/50 hover:bg-slate-800/50 px-4 py-2.5 text-xs font-bold transition-all duration-200 hover:border-slate-600/60">
-                              <span className="text-[9px] uppercase tracking-[0.2em] text-slate-500 group-hover:text-slate-400 transition-colors">{kpi.label}</span>
-                              <div className={`mt-1 text-lg font-black text-white ${kpi.tone}`}>{kpi.value}</div>
-                            </div>
-                          ))}
+                          <p className="mt-0.5 text-xs text-slate-500">Gestão de ordens de serviço e ativos industriais</p>
                         </div>
                       </div>
-                      
-                      {/* Painel lateral: Checklist + Botão */}
-                      <div className="w-full lg:w-[300px] shrink-0">
-                        <div className="rounded-2xl border border-slate-700/40 bg-slate-900/40 backdrop-blur-sm p-5 space-y-4">
-                          <div>
-                            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold flex items-center gap-1.5">
-                              <span className="w-1 h-1 rounded-full bg-amber-400"></span>
-                              Checklist de abertura
-                            </p>
-                            <ul className="mt-3 space-y-2.5 text-xs text-slate-400">
-                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Ativo e setor corretos</li>
-                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Prioridade real</li>
-                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Descrição objetiva</li>
-                              <li className="flex items-center gap-2.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400/70"></span>Foto se necessário</li>
-                            </ul>
-                          </div>
-                          <button
-                            onClick={abrirNovaOs}
-                            data-tour="nova-os"
-                            className="w-full rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs font-black py-3 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2"
-                          >
-                            <Plus size={14} />
-                            Abrir nova OS
-                          </button>
+                      <button
+                        onClick={abrirNovaOs}
+                        data-tour="nova-os"
+                        className="shrink-0 rounded-xl bg-amber-400 text-slate-950 text-xs font-black px-5 py-2.5 shadow-lg shadow-amber-500/20 hover:bg-amber-300 transition-all duration-200 flex items-center gap-2"
+                      >
+                        <Plus size={14} />
+                        Nova OS
+                      </button>
+                    </div>
+
+                    {/* Linha 2: KPI strip */}
+                    <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                      {[
+                        { ...manutencaoKpis[0], border: 'border-l-amber-400', bg: 'bg-amber-400/5' },
+                        { ...manutencaoKpis[1], border: 'border-l-blue-400', bg: 'bg-blue-400/5' },
+                        { ...manutencaoKpis[2], border: 'border-l-emerald-400', bg: 'bg-emerald-400/5' },
+                        { ...manutencaoKpis[3], border: 'border-l-rose-400', bg: 'bg-rose-400/5' },
+                        { ...manutencaoKpis[4], border: 'border-l-cyan-400', bg: 'bg-cyan-400/5' },
+                        { ...manutencaoKpis[5], border: 'border-l-purple-400', bg: 'bg-purple-400/5' },
+                      ].map((kpi) => (
+                        <div key={kpi.id} className={`rounded-xl border border-slate-800/60 border-l-2 ${kpi.border} ${kpi.bg} px-4 py-3`}>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{kpi.label}</p>
+                          <p className={`mt-1.5 text-2xl font-black ${kpi.tone}`}>{kpi.value}</p>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
 
                   {/* ── BARRA DE NAVEGAÇÃO ── */}
-                  <div className="flex flex-wrap items-center gap-3 px-2 py-4 border-b border-slate-800/40">
-                    <div className="flex bg-slate-900/60 p-1 rounded-xl border border-slate-800/60 backdrop-blur-sm">
-                      <button onClick={() => setSubAbaManutencao('resumo')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'resumo' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <LayoutDashboard size={13} />Resumo
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('ordens')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'ordens' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <Layers size={13} />Ordens
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('minhas')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'minhas' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <Users size={13} />Minhas
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('agenda')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'agenda' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <CalendarIcon size={13} />Agenda
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('ativos')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'ativos' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <Cpu size={13} />Ativos
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('relatorios')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'relatorios' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <BarChart3 size={13} />Relatórios
-                      </button>
-                      <button onClick={() => setSubAbaManutencao('logs')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'logs' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                        <FileText size={13} />Logs
-                      </button>
-                      {isManutencaoOperador && (
-                        <button onClick={() => setSubAbaManutencao('operador')} className={`px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-2 ${subAbaManutencao === 'operador' ? 'bg-gradient-to-r from-amber-400/90 to-orange-400/90 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                          <UserCog size={13} />Operador
-                        </button>
-                      )}
+                  <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-3 border-b border-slate-800/40">
+                    <div className="flex flex-wrap gap-0.5">
+                      {[
+                        { id: 'resumo', icon: LayoutDashboard, label: 'Resumo', badge: null },
+                        { id: 'ordens', icon: Layers, label: 'Ordens', badge: manutencaoOrdens.filter(o => o.status !== 'Finalizada' && o.status !== 'Cancelada').length },
+                        { id: 'minhas', icon: Users, label: 'Minhas', badge: minhasSolicitacoes.length || null },
+                        { id: 'agenda', icon: CalendarIcon, label: 'Agenda', badge: null },
+                        { id: 'ativos', icon: Cpu, label: 'Ativos', badge: null },
+                        { id: 'relatorios', icon: BarChart3, label: 'Relatórios', badge: null },
+                        { id: 'logs', icon: FileText, label: 'Logs', badge: null },
+                        ...(isManutencaoOperador ? [{ id: 'operador', icon: UserCog, label: 'Operador', badge: null }] : []),
+                      ].map(({ id, icon: Icon, label, badge }) => {
+                        const isActive = subAbaManutencao === id;
+                        return (
+                          <button
+                            key={id}
+                            onClick={() => setSubAbaManutencao(id)}
+                            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                              isActive
+                                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                                : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <Icon size={12} />
+                            {label}
+                            {badge > 0 && (
+                              <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-black leading-none ${isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-700 text-slate-300'}`}>
+                                {badge}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div className="ml-auto flex gap-2">
+                    <div className="flex gap-2 shrink-0">
                       {!isManutencaoOnly && subAbaManutencao === 'relatorios' && (
-                        <button
-                          onClick={handleExportarRelatorioManutencaoPdf}
-                          className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
-                        >
-                          Exportar PDF
-                        </button>
-                      )}
-                      {!isManutencaoOnly && subAbaManutencao === 'relatorios' && (
-                        <button
-                          onClick={handleExportarRelatorioManutencaoPpt}
-                          className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200"
-                        >
-                          Exportar PPT
-                        </button>
+                        <>
+                          <button
+                            onClick={handleExportarRelatorioManutencaoPdf}
+                            className="px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-white transition-all duration-200"
+                          >
+                            PDF
+                          </button>
+                          <button
+                            onClick={handleExportarRelatorioManutencaoPpt}
+                            className="px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-white transition-all duration-200"
+                          >
+                            PPT
+                          </button>
+                        </>
                       )}
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="px-4 py-2 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-bold text-slate-300 hover:border-slate-500 hover:text-white hover:bg-slate-800/40 transition-all duration-200 md:hidden"
+                        className="px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-white transition-all duration-200 md:hidden"
                       >
                         Sair
                       </button>
@@ -14007,345 +14001,276 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="p-6 lg:p-8">
 
                 {subAbaManutencao === 'resumo' && (
-                  <div className="space-y-6">
+                  <div className="space-y-5">
                     {/* Alerta Operacional */}
-                    <div className={`relative overflow-hidden rounded-2xl border p-6 shadow-lg ${manutencaoParadas.length ? 'border-amber-500/30 bg-gradient-to-r from-amber-500/[0.08] via-amber-500/[0.04] to-transparent' : 'border-emerald-500/20 bg-gradient-to-r from-emerald-500/[0.06] via-emerald-500/[0.03] to-transparent'}`}>
-                      <div className={`absolute top-0 left-0 w-1 h-full rounded-l-2xl ${manutencaoParadas.length ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
-                      <div className={`pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl ${manutencaoParadas.length ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`}></div>
-                      <div className="relative flex flex-wrap items-start justify-between gap-4">
-                        <div className="flex items-start gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${manutencaoParadas.length ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'}`}>
-                            <AlertTriangle size={22} className={manutencaoParadas.length ? 'text-amber-400' : 'text-emerald-400'} />
-                          </div>
-                          <div>
-                            <p className={`text-[10px] font-bold uppercase tracking-[0.25em] ${manutencaoParadas.length ? 'text-amber-300/70' : 'text-emerald-300/70'}`}>Alerta operacional</p>
-                            <h3 className="mt-1.5 text-lg font-black text-white">
-                              {manutencaoParadas.length
-                                ? `${manutencaoParadas.length} processo(s) parado(s)`
-                                : 'Nenhuma parada registrada'}
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-400">
-                              {manutencaoParadas.length
-                                ? 'Processos dependentes de manutenção.'
-                                : 'Sem processos parados no momento.'}
-                            </p>
-                            {manutencaoParadas.length ? (
-                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
-                                {manutencaoParadas.slice(0, 4).map((os) => (
-                                  <span key={os.id} className="rounded-lg border border-amber-400/30 bg-amber-500/[0.08] px-3 py-1 font-semibold">
-                                    {os.ativo || os.setor || os.id}
-                                  </span>
-                                ))}
-                                {manutencaoParadas.length > 4 && (
-                                  <span className="rounded-lg border border-amber-400/30 bg-amber-500/[0.08] px-3 py-1 font-semibold">
-                                    +{manutencaoParadas.length - 4} mais
-                                  </span>
-                                )}
-                              </div>
-                            ) : null}
-                          </div>
+                    <div className={`flex items-center justify-between gap-4 rounded-xl border px-5 py-4 ${manutencaoParadas.length ? 'border-amber-500/30 bg-amber-500/[0.05]' : 'border-emerald-500/20 bg-emerald-500/[0.04]'}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${manutencaoParadas.length ? 'bg-amber-500/15' : 'bg-emerald-500/12'}`}>
+                          <AlertTriangle size={15} className={manutencaoParadas.length ? 'text-amber-400' : 'text-emerald-400'} />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded-lg px-3 py-1.5 text-xs font-bold ${manutencaoParadas.length ? 'bg-amber-500/15 text-amber-200 border border-amber-400/20' : 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20'}`}>
-                            {manutencaoParadas.length ? 'Crítico' : 'OK'}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setSubAbaManutencao('ordens')}
-                            className="rounded-lg border border-slate-600/60 bg-slate-800/30 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-slate-700/40 hover:border-slate-500 transition-all duration-200"
-                          >
-                            Ver OS →
-                          </button>
+                        <div className="min-w-0">
+                          <p className={`text-sm font-bold ${manutencaoParadas.length ? 'text-amber-200' : 'text-emerald-200'}`}>
+                            {manutencaoParadas.length ? `${manutencaoParadas.length} processo(s) parado(s)` : 'Nenhuma parada registrada'}
+                          </p>
+                          {manutencaoParadas.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {manutencaoParadas.slice(0, 5).map((os) => (
+                                <span key={os.id} className="text-[10px] font-semibold text-amber-100/70 bg-amber-500/10 border border-amber-400/20 rounded px-2 py-0.5">
+                                  {os.ativo || os.setor || os.id}
+                                </span>
+                              ))}
+                              {manutencaoParadas.length > 5 && (
+                                <span className="text-[10px] font-semibold text-slate-400">+{manutencaoParadas.length - 5}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-[10px] font-black px-2.5 py-1 rounded-md border ${manutencaoParadas.length ? 'border-amber-400/30 bg-amber-500/10 text-amber-200' : 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200'}`}>
+                          {manutencaoParadas.length ? 'ATENÇÃO' : 'NORMAL'}
+                        </span>
+                        <button type="button" onClick={() => setSubAbaManutencao('ordens')} className="text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors">
+                          Ver OS →
+                        </button>
                       </div>
                     </div>
 
-                    {/* KPIs */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {manutencaoKpis.map((kpi) => (
-                        <div key={kpi.id} className="group relative overflow-hidden rounded-2xl border border-slate-800/50 bg-gradient-to-br from-slate-900/70 to-slate-900/40 p-5 shadow-md hover:border-slate-700/60 transition-all duration-200">
-                          <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-slate-700/[0.06] blur-xl pointer-events-none group-hover:bg-slate-600/[0.1] transition-all"></div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{kpi.label}</p>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-3xl font-black text-white">{kpi.value}</span>
-                            <span className={`text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-700/40 bg-slate-800/40 text-slate-300 ${kpi.tone}`}>Hoje</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    {/* Grid principal: paradas + equipe | ações rápidas | minhas | backlog */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-                    {/* Grid principal: paradas, acoes, solicitacoes, backlog */}
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
-                      
                       {/* Paradas em andamento */}
-                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/15 flex items-center justify-center">
-                            <AlertTriangle size={14} className="text-red-400" />
-                          </div>
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Paradas</h3>
+                      <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/50">
+                          <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Paradas</h3>
+                          {manutencaoParadas.length > 0 && (
+                            <span className="ml-auto text-[10px] font-black text-rose-300 bg-rose-500/10 border border-rose-400/20 rounded px-1.5 py-0.5">{manutencaoParadas.length}</span>
+                          )}
                         </div>
-                        {manutencaoParadas.length ? (
-                          <div className="space-y-3">
-                            {manutencaoParadas.map((item) => {
-                              const prioridade = String(item.prioridade || 'Media').toLowerCase();
-                              const toneMap = {
-                                alta: 'border-l-rose-500 bg-rose-500/[0.04]',
-                                critica: 'border-l-rose-500 bg-rose-500/[0.04]',
-                                media: 'border-l-amber-500 bg-amber-500/[0.04]',
-                              };
-                              const itemTone = toneMap[prioridade] || 'border-l-emerald-500 bg-emerald-500/[0.04]';
+                        <div className="p-3 space-y-2">
+                          {manutencaoParadas.length ? (
+                            manutencaoParadas.map((item) => {
+                              const p = String(item.prioridade || 'media').toLowerCase();
+                              const dot = p === 'critica' || p === 'alta' ? 'bg-rose-400' : p === 'media' ? 'bg-amber-400' : 'bg-slate-400';
                               return (
-                                <div key={item.id} className={`rounded-xl border border-slate-800/50 p-4 border-l-[3px] ${itemTone} hover:bg-slate-800/20 transition-all duration-200`}>
+                                <div key={item.id} className="rounded-lg border border-slate-800/40 bg-slate-950/30 px-3 py-2.5">
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="min-w-0">
-                                      <p className="text-sm font-bold text-white truncate">{item.ativo || item.setor || item.id}</p>
-                                      <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                                        {item.statusMaquina || 'Parada'} — {item.descricao || 'Aguardando detalhes'}
-                                      </p>
-                                      {item.responsavel && (
-                                        <p className="mt-1.5 text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
-                                          <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
-                                          {item.responsavel}
-                                        </p>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`}></span>
+                                        <p className="text-xs font-bold text-white truncate">{item.ativo || item.setor || item.id}</p>
+                                      </div>
+                                      {item.responsavel ? (
+                                        <p className="mt-1 text-[10px] text-emerald-400 font-semibold">{item.responsavel}</p>
+                                      ) : (
+                                        <p className="mt-1 text-[10px] text-slate-600">Sem responsável</p>
                                       )}
                                     </div>
-                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-300 border border-slate-700/30">
-                                        {item.prioridade || 'Media'}
-                                      </span>
-                                      {item.responsavel && (
-                                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-emerald-400/30 bg-emerald-500/[0.08] text-emerald-300">
-                                          Atendendo
-                                        </span>
-                                      )}
-                                    </div>
+                                    <span className="text-[9px] font-bold shrink-0 px-1.5 py-0.5 rounded border border-slate-700/40 bg-slate-800/40 text-slate-400">
+                                      {item.prioridade || 'Media'}
+                                    </span>
                                   </div>
                                 </div>
                               );
-                            })}
-                          </div>
-                        ) : (
-                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
-                            Sem paradas registradas
-                          </div>
-                        )}
-                        <div className="mt-5 border-t border-slate-800/30 pt-4">
-                          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 flex items-center gap-1.5">
-                            <Users size={10} className="text-slate-500" />
-                            Equipe em atendimento
-                          </h4>
+                            })
+                          ) : (
+                            <div className="py-6 text-center text-xs text-slate-600">Sem paradas</div>
+                          )}
+                        </div>
+                        {/* Equipe em atendimento */}
+                        <div className="border-t border-slate-800/40 px-4 py-3">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-2">Equipe</p>
                           {manutencaoEquipeEmAndamento.length ? (
-                            <div className="mt-3 space-y-2">
+                            <div className="space-y-1.5">
                               {manutencaoEquipeEmAndamento.map((item) => (
-                                <div key={item.responsavel} className="rounded-lg border border-slate-800/30 bg-slate-900/30 px-3 py-2">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-[8px] font-black text-cyan-300">
-                                        {item.responsavel.substring(0, 2).toUpperCase()}
-                                      </div>
-                                      <span className="text-xs font-semibold text-slate-200">{item.responsavel}</span>
+                                <div key={item.responsavel} className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <div className="w-5 h-5 rounded bg-slate-700/60 flex items-center justify-center text-[8px] font-black text-slate-300 shrink-0">
+                                      {item.responsavel.substring(0, 2).toUpperCase()}
                                     </div>
-                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-cyan-400/25 bg-cyan-500/[0.07] text-cyan-300">
-                                      {item.total} OS
-                                    </span>
+                                    <span className="text-[11px] font-semibold text-slate-300 truncate">{item.responsavel}</span>
                                   </div>
-                                  {item.ativos.length ? (
-                                    <p className="mt-1.5 text-[10px] text-slate-500 truncate">
-                                      {item.ativos.join(' · ')}
-                                    </p>
-                                  ) : null}
+                                  <span className="text-[9px] font-bold text-blue-300 shrink-0">{item.total} OS</span>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <div className="mt-3 rounded-lg border border-slate-800/30 bg-slate-950/20 p-3 text-xs text-slate-500 text-center">
-                              Nenhum responsável alocado
-                            </div>
+                            <p className="text-[10px] text-slate-600">Nenhum alocado</p>
                           )}
                         </div>
                       </div>
 
                       {/* Ações rápidas */}
-                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/15 flex items-center justify-center">
-                            <Zap size={14} className="text-amber-400" />
-                          </div>
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ações rápidas</h3>
+                      <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/50">
+                          <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Ações rápidas</h3>
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
-                          <button
-                            type="button"
-                            onClick={abrirNovaOs}
-                            className="w-full rounded-xl border border-amber-400/30 bg-gradient-to-r from-amber-400/[0.08] to-transparent px-4 py-3.5 text-left text-xs font-bold text-amber-100 hover:bg-amber-400/15 hover:border-amber-400/40 transition-all duration-200 flex items-center gap-3"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-400/15 flex items-center justify-center shrink-0">
-                              <Plus size={14} className="text-amber-300" />
+                        <div className="p-3 space-y-2">
+                          <button type="button" onClick={abrirNovaOs} className="w-full flex items-center gap-3 rounded-lg border border-amber-400/25 bg-amber-400/[0.06] hover:bg-amber-400/10 px-3 py-3 text-left transition-colors">
+                            <Plus size={14} className="text-amber-300 shrink-0" />
+                            <div>
+                              <p className="text-xs font-bold text-amber-100">Abrir nova OS</p>
+                              <p className="text-[10px] text-slate-500">Registrar ocorrência</p>
                             </div>
-                            Abrir nova OS
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setSubAbaManutencao('minhas')}
-                            className="w-full rounded-xl border border-slate-700/40 bg-slate-800/20 px-4 py-3.5 text-left text-xs font-bold text-slate-200 hover:border-slate-600 hover:bg-slate-800/40 transition-all duration-200 flex items-center gap-3"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                              <Users size={14} className="text-blue-400" />
+                          <button type="button" onClick={() => setSubAbaManutencao('ordens')} className="w-full flex items-center gap-3 rounded-lg border border-slate-700/40 bg-slate-800/20 hover:bg-slate-800/40 px-3 py-3 text-left transition-colors">
+                            <Layers size={14} className="text-slate-400 shrink-0" />
+                            <div>
+                              <p className="text-xs font-bold text-slate-200">Ver todas as ordens</p>
+                              <p className="text-[10px] text-slate-500">{manutencaoOrdens.length} registradas</p>
                             </div>
-                            Ver minhas solicitações
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setSubAbaManutencao('ordens')}
-                            className="w-full rounded-xl border border-slate-700/40 bg-slate-800/20 px-4 py-3.5 text-left text-xs font-bold text-slate-200 hover:border-slate-600 hover:bg-slate-800/40 transition-all duration-200 flex items-center gap-3"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-slate-600/20 flex items-center justify-center shrink-0">
-                              <Layers size={14} className="text-slate-400" />
+                          <button type="button" onClick={() => setSubAbaManutencao('minhas')} className="w-full flex items-center gap-3 rounded-lg border border-slate-700/40 bg-slate-800/20 hover:bg-slate-800/40 px-3 py-3 text-left transition-colors">
+                            <Users size={14} className="text-blue-400 shrink-0" />
+                            <div>
+                              <p className="text-xs font-bold text-slate-200">Minhas solicitações</p>
+                              <p className="text-[10px] text-slate-500">{minhasSolicitacoes.length} abertas por você</p>
                             </div>
-                            Ver ordens abertas
+                          </button>
+                          <button type="button" onClick={() => setSubAbaManutencao('relatorios')} className="w-full flex items-center gap-3 rounded-lg border border-slate-700/40 bg-slate-800/20 hover:bg-slate-800/40 px-3 py-3 text-left transition-colors">
+                            <BarChart3 size={14} className="text-purple-400 shrink-0" />
+                            <div>
+                              <p className="text-xs font-bold text-slate-200">Relatórios</p>
+                              <p className="text-[10px] text-slate-500">PDF e PPT</p>
+                            </div>
                           </button>
                         </div>
                       </div>
-                      
+
                       {/* Minhas solicitações */}
-                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
-                              <Users size={14} className="text-blue-400" />
-                            </div>
-                            <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas</h3>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setSubAbaManutencao('minhas')}
-                            className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            Ver todas →
-                          </button>
+                      <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/50">
+                          <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Minhas</h3>
+                          <button type="button" onClick={() => setSubAbaManutencao('minhas')} className="ml-auto text-[10px] font-semibold text-blue-400 hover:text-blue-300">Ver todas →</button>
                         </div>
-                        {minhasSolicitacoes.length ? (
-                          <div className="space-y-2.5">
-                            {minhasSolicitacoes.slice(0, 4).map((os) => (
-                              <div key={os.id} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-3 hover:bg-slate-800/30 transition-all duration-200">
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="min-w-0">
-                                    <p className="text-xs font-bold text-slate-100 truncate">{os.ativo || os.id}</p>
-                                    <p className="text-[10px] text-slate-500">{os.setor || '-'}</p>
+                        <div className="p-3 space-y-2">
+                          {minhasSolicitacoes.length ? (
+                            minhasSolicitacoes.slice(0, 5).map((os) => {
+                              const sMap = { 'aberta': 'text-blue-300', 'em andamento': 'text-amber-300', 'finalizada': 'text-emerald-300', 'aguardando peca': 'text-purple-300', 'contestada': 'text-rose-300' };
+                              const sColor = sMap[(os.status || '').toLowerCase()] || 'text-slate-400';
+                              return (
+                                <div key={os.id} className="rounded-lg border border-slate-800/40 bg-slate-950/30 px-3 py-2.5">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-bold text-slate-100 truncate">{os.ativo || os.id}</p>
+                                      <p className="text-[10px] text-slate-500">{os.setor || '-'}</p>
+                                    </div>
+                                    <span className={`text-[10px] font-bold shrink-0 ${sColor}`}>{os.status || 'Aberta'}</span>
                                   </div>
-                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-500/[0.12] text-blue-300 border border-blue-400/20 shrink-0">
-                                    {os.status || 'Aberta'}
-                                  </span>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
-                            Nenhuma solicitação
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Backlog por líder */}
-                      <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/15 flex items-center justify-center">
-                            <Target size={14} className="text-purple-400" />
-                          </div>
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Backlog</h3>
+                              );
+                            })
+                          ) : (
+                            <div className="py-6 text-center text-xs text-slate-600">Nenhuma solicitação</div>
+                          )}
                         </div>
-                        {backlogPorLider.length ? (
-                          <div className="space-y-2.5">
-                            {backlogPorLider.map((item) => (
-                              <div key={item.lider} className="rounded-xl border border-slate-800/30 bg-slate-900/30 p-3 hover:bg-slate-800/30 transition-all duration-200">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-md bg-slate-700/40 flex items-center justify-center text-[8px] font-black text-slate-300">
+                      </div>
+
+                      {/* Backlog por líder */}
+                      <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/50">
+                          <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Backlog</h3>
+                        </div>
+                        <div className="p-3 space-y-2">
+                          {backlogPorLider.length ? (
+                            backlogPorLider.map((item) => (
+                              <div key={item.lider} className="rounded-lg border border-slate-800/40 bg-slate-950/30 px-3 py-2.5">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <div className="w-5 h-5 rounded bg-slate-700/60 flex items-center justify-center text-[8px] font-black text-slate-300 shrink-0">
                                       {item.lider.substring(0, 2).toUpperCase()}
                                     </div>
-                                    <span className="text-xs font-semibold text-slate-200">{item.lider}</span>
+                                    <span className="text-xs font-semibold text-slate-200 truncate">{item.lider}</span>
                                   </div>
-                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-slate-800/50 text-slate-300 border border-slate-700/30">
-                                    {item.total} OS
-                                  </span>
+                                  <span className="text-[10px] font-black text-slate-300 shrink-0">{item.total} OS</span>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="rounded-xl border border-slate-800/30 bg-slate-950/20 p-4 text-sm text-slate-500 text-center">
-                            Sem dados de backlog
-                          </div>
-                        )}
+                            ))
+                          ) : (
+                            <div className="py-6 text-center text-xs text-slate-600">Sem dados de backlog</div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {subAbaManutencao === 'ordens' && (
-                  <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
-                    <div className="p-5 border-b border-slate-800/40 flex items-center justify-between bg-slate-900/30">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
-                          <Layers size={14} className="text-blue-400" />
-                        </div>
+                  <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                    {/* Barra de busca + filtros */}
+                    <div className="p-4 border-b border-slate-800/40 space-y-3">
+                      {/* Linha 1: título + busca */}
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Ordens recentes</h3>
-                          <p className="text-[10px] text-slate-500 mt-0.5">Todas as ordens de serviço registradas</p>
+                          <h3 className="text-sm font-bold text-slate-100">Ordens de Serviço</h3>
+                          <p className="text-[10px] text-slate-500">{manutencaoOrdensFiltradas.length} de {manutencaoOrdens.length} registros</p>
+                        </div>
+                        <div className="relative">
+                          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                          <input
+                            type="text"
+                            value={manutencaoBusca}
+                            onChange={(e) => setManutencaoBusca(e.target.value)}
+                            placeholder="Buscar por ativo, setor, responsável..."
+                            className="w-full sm:w-72 rounded-lg border border-slate-700/60 bg-slate-950/50 pl-8 pr-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 outline-none focus:border-amber-400/50 transition-colors"
+                          />
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-1.5 text-xs">
-                        {['Todas', 'Aberta', 'Contestada', 'Em andamento', 'Aguardando peca', 'Finalizada'].map((s) => {
+                      {/* Linha 2: filtros de status */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          { s: 'Todas', color: 'slate' },
+                          { s: 'Aberta', color: 'blue' },
+                          { s: 'Em andamento', color: 'amber' },
+                          { s: 'Aguardando peca', color: 'purple' },
+                          { s: 'Contestada', color: 'rose' },
+                          { s: 'Finalizada', color: 'emerald' },
+                        ].map(({ s, color }) => {
                           const isActive = manutencaoFiltroStatus === s;
-                          const colorMap = {
-                            'Todas': isActive ? 'bg-slate-700/60 text-slate-100 border-slate-500/50' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                            'Aberta': isActive ? 'bg-blue-500/20 text-blue-200 border-blue-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                            'Contestada': isActive ? 'bg-rose-500/20 text-rose-200 border-rose-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                            'Em andamento': isActive ? 'bg-amber-500/20 text-amber-200 border-amber-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                            'Aguardando peca': isActive ? 'bg-purple-500/20 text-purple-200 border-purple-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                            'Finalizada': isActive ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40' : 'bg-slate-800/40 text-slate-400 border-slate-700/30 hover:border-slate-600',
-                          };
-                          const countMap = {
-                            'Todas': manutencaoOrdens.length,
-                            'Aberta': manutencaoOrdens.filter(o => o.status === 'Aberta').length,
-                            'Contestada': manutencaoOrdens.filter(o => o.status === 'Contestada').length,
-                            'Em andamento': manutencaoOrdens.filter(o => o.status === 'Em andamento').length,
-                            'Aguardando peca': manutencaoOrdens.filter(o => o.status === 'Aguardando peca').length,
-                            'Finalizada': manutencaoOrdens.filter(o => o.status === 'Finalizada').length,
-                          };
+                          const count = s === 'Todas' ? manutencaoOrdens.length : manutencaoOrdens.filter(o => o.status === s).length;
+                          const activeClass = {
+                            slate: 'bg-slate-700 text-slate-100 border-slate-500',
+                            blue: 'bg-blue-500/20 text-blue-200 border-blue-400/40',
+                            amber: 'bg-amber-500/20 text-amber-200 border-amber-400/40',
+                            purple: 'bg-purple-500/20 text-purple-200 border-purple-400/40',
+                            rose: 'bg-rose-500/20 text-rose-200 border-rose-400/40',
+                            emerald: 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40',
+                          }[color];
                           return (
                             <button
                               key={s}
                               type="button"
                               onClick={() => setManutencaoFiltroStatus(s)}
-                              className={`px-3 py-1.5 rounded-lg font-bold border transition-all flex items-center gap-1.5 ${colorMap[s]}`}
+                              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${isActive ? activeClass : 'border-slate-700/40 text-slate-500 hover:text-slate-300 hover:border-slate-600'}`}
                             >
                               {s}
-                              <span className="text-[9px] opacity-70">{countMap[s]}</span>
+                              <span className={`text-[9px] font-black ${isActive ? 'opacity-70' : 'opacity-50'}`}>{count}</span>
                             </button>
                           );
                         })}
                       </div>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-950/50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-800/30">
+                      <table className="w-full text-left">
+                        <thead className="bg-slate-950/40 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-5 py-3.5 font-bold">OS</th>
-                            <th className="px-5 py-3.5 font-bold">Ativo</th>
-                            <th className="px-5 py-3.5 font-bold">Setor</th>
-                            <th className="px-5 py-3.5 font-bold">Prioridade</th>
-                            <th className="px-5 py-3.5 font-bold">Status</th>
-                            <th className="px-5 py-3.5 font-bold">Responsável</th>
-                            <th className="px-5 py-3.5 font-bold">Ações</th>
+                            <th className="px-4 py-3 font-bold">OS / Ativo</th>
+                            <th className="px-4 py-3 font-bold">Setor</th>
+                            <th className="px-4 py-3 font-bold">Prioridade</th>
+                            <th className="px-4 py-3 font-bold">Status</th>
+                            <th className="px-4 py-3 font-bold">Responsável</th>
+                            <th className="px-4 py-3 font-bold">Abertura</th>
+                            <th className="px-4 py-3 font-bold text-right">Ações</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/30 text-slate-200">
+                        <tbody className="divide-y divide-slate-800/25">
                           {manutencaoOrdensLoading ? (
                             <tr>
-                              <td className="px-5 py-8 text-sm text-slate-500 text-center" colSpan={7}>
+                              <td className="px-4 py-8 text-sm text-slate-500 text-center" colSpan={7}>
                                 <div className="flex items-center justify-center gap-2">
                                   <div className="w-4 h-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin"></div>
                                   Carregando ordens...
@@ -14353,83 +14278,68 @@ const custoDetalheTitulo = custoDetalheItem
                               </td>
                             </tr>
                           ) : manutencaoOrdensError ? (
-                            <tr>
-                              <td className="px-5 py-6 text-sm text-rose-400" colSpan={7}>
-                                {manutencaoOrdensError}
-                              </td>
-                            </tr>
+                            <tr><td className="px-4 py-6 text-sm text-rose-400" colSpan={7}>{manutencaoOrdensError}</td></tr>
                           ) : manutencaoOrdensFiltradas.length ? (
                             manutencaoOrdensFiltradas.map((ordem) => {
                               const prioridadeMap = {
-                                'critica': 'bg-rose-500/15 text-rose-300 border-rose-400/20',
-                                'alta': 'bg-amber-500/15 text-amber-300 border-amber-400/20',
-                                'media': 'bg-blue-500/10 text-blue-300 border-blue-400/15',
-                                'baixa': 'bg-slate-700/30 text-slate-300 border-slate-600/20',
+                                'critica': { cls: 'text-rose-300 bg-rose-500/10 border-rose-400/25', dot: 'bg-rose-400' },
+                                'alta': { cls: 'text-amber-300 bg-amber-500/10 border-amber-400/25', dot: 'bg-amber-400' },
+                                'media': { cls: 'text-blue-300 bg-blue-500/10 border-blue-400/20', dot: 'bg-blue-400' },
+                                'baixa': { cls: 'text-slate-400 bg-slate-800/40 border-slate-600/25', dot: 'bg-slate-500' },
                               };
-                              const prioridadeStr = (ordem.prioridade || '-').toLowerCase();
-                              const prioridadeClass = prioridadeMap[prioridadeStr] || 'bg-slate-700/30 text-slate-300 border-slate-600/20';
+                              const pStr = (ordem.prioridade || '-').toLowerCase();
+                              const pStyle = prioridadeMap[pStr] || prioridadeMap['baixa'];
                               const statusMap = {
-                                'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
-                                'contestada': 'bg-rose-500/12 text-rose-300 border-rose-400/20',
-                                'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
-                                'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
-                                'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
-                                'aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/20',
+                                'aberta': 'text-blue-300',
+                                'contestada': 'text-rose-300',
+                                'em andamento': 'text-amber-300',
+                                'finalizada': 'text-emerald-300',
+                                'cancelada': 'text-slate-500',
+                                'aguardando peca': 'text-purple-300',
                               };
-                              const statusStr = (ordem.status || '-').toLowerCase();
-                              const statusClass = statusMap[statusStr] || 'bg-blue-500/12 text-blue-300 border-blue-400/20';
+                              const sStr = (ordem.status || '-').toLowerCase();
+                              const sColor = statusMap[sStr] || 'text-slate-400';
+                              const abertura = ordem.createdAt || ordem.dataFalha;
+                              const aberturaStr = abertura ? new Date(abertura).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '-';
                               return (
-                                <tr key={ordem.id} className="hover:bg-slate-800/20 transition-colors duration-150">
-                                  <td className="px-5 py-3.5 font-bold text-white text-xs">{ordem.id}</td>
-                                  <td className="px-5 py-3.5 text-slate-200 text-xs font-medium">{ordem.ativo || '-'}</td>
-                                  <td className="px-5 py-3.5 text-slate-400 text-xs">{ordem.setor || '-'}</td>
-                                  <td className="px-5 py-3.5">
-                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${prioridadeClass}`}>{ordem.prioridade || '-'}</span>
+                                <tr key={ordem.id} className="hover:bg-slate-800/15 transition-colors group">
+                                  <td className="px-4 py-3">
+                                    <p className="text-[11px] font-bold text-slate-400">{ordem.id}</p>
+                                    <p className="text-sm font-semibold text-slate-100">{ordem.ativo || '-'}</p>
                                   </td>
-                                  <td className="px-5 py-3.5">
-                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${statusClass}`}>{ordem.status || '-'}</span>
+                                  <td className="px-4 py-3 text-xs text-slate-400">{ordem.setor || '-'}</td>
+                                  <td className="px-4 py-3">
+                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border ${pStyle.cls}`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${pStyle.dot}`}></span>
+                                      {ordem.prioridade || '-'}
+                                    </span>
                                   </td>
-                                  <td className="px-5 py-3.5 text-slate-300 text-xs">{ordem.responsavel || '-'}</td>
-                                  <td className="px-5 py-3.5">
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleVisualizarOs(ordem)}
-                                        className="text-[10px] font-bold text-amber-300 hover:text-amber-200 px-2 py-1 rounded-md hover:bg-amber-500/10 transition-all"
-                                      >
-                                        Ver
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEditarOs(ordem)}
-                                        className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200 px-2 py-1 rounded-md hover:bg-cyan-500/10 transition-all"
-                                      >
-                                        Editar
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleImprimirOs(ordem)}
-                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md hover:bg-slate-700/30 transition-all"
-                                      >
-                                        Imprimir
-                                      </button>
+                                  <td className="px-4 py-3">
+                                    <span className={`text-xs font-semibold ${sColor}`}>{ordem.status || '-'}</span>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    {ordem.responsavel ? (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded bg-slate-700/60 flex items-center justify-center text-[8px] font-black text-slate-300 shrink-0">
+                                          {ordem.responsavel.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        <span className="text-xs text-slate-300">{ordem.responsavel}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-slate-600">—</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-xs text-slate-500">{aberturaStr}</td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center justify-end gap-1">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">Ver</button>
+                                      <button type="button" onClick={() => handleEditarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">Editar</button>
+                                      <button type="button" onClick={() => handleImprimirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">Imprimir</button>
                                       {ordem.status === 'Finalizada' && (
-                                        <button
-                                          type="button"
-                                          onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })}
-                                          className="text-[10px] font-bold text-rose-300 hover:text-rose-200 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
-                                        >
-                                          Reabrir
-                                        </button>
+                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">Reabrir</button>
                                       )}
                                       {canDeleteOs && (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleExcluirOs(ordem)}
-                                          className="text-[10px] font-bold text-rose-400 hover:text-rose-300 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
-                                        >
-                                          Excluir
-                                        </button>
+                                        <button type="button" onClick={() => handleExcluirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-500 hover:bg-rose-500/10 transition-all">Excluir</button>
                                       )}
                                     </div>
                                   </td>
@@ -14438,10 +14348,15 @@ const custoDetalheTitulo = custoDetalheItem
                             })
                           ) : (
                             <tr>
-                              <td className="px-5 py-10 text-sm text-slate-500 text-center" colSpan={7}>
+                              <td className="px-4 py-12 text-center" colSpan={7}>
                                 <div className="flex flex-col items-center gap-2">
-                                  <Layers size={24} className="text-slate-600" />
-                                  {manutencaoFiltroStatus !== 'Todas' ? `Nenhuma OS com status "${manutencaoFiltroStatus}"` : 'Sem ordens registradas'}
+                                  <Layers size={28} className="text-slate-700" />
+                                  <p className="text-sm text-slate-500">
+                                    {manutencaoBusca ? `Nenhum resultado para "${manutencaoBusca}"` : manutencaoFiltroStatus !== 'Todas' ? `Nenhuma OS com status "${manutencaoFiltroStatus}"` : 'Sem ordens registradas'}
+                                  </p>
+                                  {(manutencaoBusca || manutencaoFiltroStatus !== 'Todas') && (
+                                    <button type="button" onClick={() => { setManutencaoBusca(''); setManutencaoFiltroStatus('Todas'); }} className="text-xs text-amber-400 hover:text-amber-300">Limpar filtros</button>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -14453,104 +14368,88 @@ const custoDetalheTitulo = custoDetalheItem
                 )}
 
                 {subAbaManutencao === 'minhas' && (
-                  <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 shadow-md overflow-hidden">
-                    <div className="p-5 border-b border-slate-800/40 bg-slate-900/30">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
-                          <Users size={14} className="text-blue-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">Minhas solicitações</h3>
-                          <p className="text-[10px] text-slate-500 mt-0.5">Solicitações abertas por você</p>
-                        </div>
+                  <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 py-3 border-b border-slate-800/40">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-100">Minhas Solicitações</h3>
+                        <p className="text-[10px] text-slate-500">OS abertas por você — {minhasSolicitacoes.length} registros</p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={abrirNovaOs}
+                        className="shrink-0 flex items-center gap-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold px-3.5 py-2 hover:bg-amber-300 transition-colors"
+                      >
+                        <Plus size={12} />
+                        Nova OS
+                      </button>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-950/50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-800/30">
+                      <table className="w-full text-left">
+                        <thead className="bg-slate-950/40 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-5 py-3.5 font-bold">OS</th>
-                            <th className="px-5 py-3.5 font-bold">Ativo</th>
-                            <th className="px-5 py-3.5 font-bold">Setor</th>
-                            <th className="px-5 py-3.5 font-bold">Prioridade</th>
-                            <th className="px-5 py-3.5 font-bold">Status</th>
-                            <th className="px-5 py-3.5 font-bold">Criado em</th>
-                            <th className="px-5 py-3.5 font-bold">Ações</th>
+                            <th className="px-4 py-3 font-bold">OS / Ativo</th>
+                            <th className="px-4 py-3 font-bold">Setor</th>
+                            <th className="px-4 py-3 font-bold">Prioridade</th>
+                            <th className="px-4 py-3 font-bold">Status</th>
+                            <th className="px-4 py-3 font-bold">Aberto em</th>
+                            <th className="px-4 py-3 font-bold text-right">Ações</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/30 text-slate-200">
+                        <tbody className="divide-y divide-slate-800/25">
                           {manutencaoOrdensLoading ? (
                             <tr>
-                              <td className="px-5 py-8 text-sm text-slate-500 text-center" colSpan={7}>
+                              <td className="px-4 py-8 text-sm text-slate-500 text-center" colSpan={6}>
                                 <div className="flex items-center justify-center gap-2">
                                   <div className="w-4 h-4 border-2 border-slate-600 border-t-slate-300 rounded-full animate-spin"></div>
-                                  Carregando solicitações...
+                                  Carregando...
                                 </div>
                               </td>
                             </tr>
                           ) : manutencaoOrdensError ? (
-                            <tr>
-                              <td className="px-5 py-6 text-sm text-rose-400" colSpan={7}>
-                                {manutencaoOrdensError}
-                              </td>
-                            </tr>
+                            <tr><td className="px-4 py-6 text-sm text-rose-400" colSpan={6}>{manutencaoOrdensError}</td></tr>
                           ) : minhasSolicitacoes.length ? (
                             minhasSolicitacoes.map((ordem) => {
-                              const statusMap = {
-                                'aberta': 'bg-blue-500/12 text-blue-300 border-blue-400/20',
-                                'contestada': 'bg-rose-500/12 text-rose-300 border-rose-400/20',
-                                'em andamento': 'bg-amber-500/12 text-amber-300 border-amber-400/20',
-                                'finalizada': 'bg-emerald-500/12 text-emerald-300 border-emerald-400/20',
-                                'cancelada': 'bg-slate-700/30 text-slate-400 border-slate-600/20',
-                                'aguardando peca': 'bg-purple-500/12 text-purple-300 border-purple-400/20',
+                              const statusColor = {
+                                'aberta': 'text-blue-300',
+                                'contestada': 'text-rose-300',
+                                'em andamento': 'text-amber-300',
+                                'finalizada': 'text-emerald-300',
+                                'cancelada': 'text-slate-500',
+                                'aguardando peca': 'text-purple-300',
+                              }[(ordem.status || '').toLowerCase()] || 'text-slate-400';
+                              const prioridadeMap = {
+                                'critica': { cls: 'text-rose-300 bg-rose-500/10 border-rose-400/25', dot: 'bg-rose-400' },
+                                'alta': { cls: 'text-amber-300 bg-amber-500/10 border-amber-400/25', dot: 'bg-amber-400' },
+                                'media': { cls: 'text-blue-300 bg-blue-500/10 border-blue-400/20', dot: 'bg-blue-400' },
+                                'baixa': { cls: 'text-slate-400 bg-slate-800/40 border-slate-600/25', dot: 'bg-slate-500' },
                               };
-                              const statusStr = (ordem.status || '-').toLowerCase();
-                              const statusClass = statusMap[statusStr] || 'bg-blue-500/12 text-blue-300 border-blue-400/20';
+                              const pStyle = prioridadeMap[(ordem.prioridade || '').toLowerCase()] || prioridadeMap['baixa'];
+                              const abertura = ordem.createdAt || ordem.dataFalha;
+                              const aberturaStr = abertura ? new Date(abertura).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-';
                               return (
-                                <tr key={ordem.id} className="hover:bg-slate-800/20 transition-colors duration-150">
-                                  <td className="px-5 py-3.5 font-bold text-white text-xs">{ordem.id}</td>
-                                  <td className="px-5 py-3.5 text-slate-200 text-xs font-medium">{ordem.ativo || '-'}</td>
-                                  <td className="px-5 py-3.5 text-slate-400 text-xs">{ordem.setor || '-'}</td>
-                                  <td className="px-5 py-3.5">
-                                    <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-slate-800/50 text-slate-300 border border-slate-700/30">{ordem.prioridade || '-'}</span>
+                                <tr key={ordem.id} className="hover:bg-slate-800/15 transition-colors">
+                                  <td className="px-4 py-3">
+                                    <p className="text-[11px] font-bold text-slate-400">{ordem.id}</p>
+                                    <p className="text-sm font-semibold text-slate-100">{ordem.ativo || '-'}</p>
                                   </td>
-                                  <td className="px-5 py-3.5">
-                                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md border ${statusClass}`}>{ordem.status || '-'}</span>
+                                  <td className="px-4 py-3 text-xs text-slate-400">{ordem.setor || '-'}</td>
+                                  <td className="px-4 py-3">
+                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border ${pStyle.cls}`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${pStyle.dot}`}></span>
+                                      {ordem.prioridade || '-'}
+                                    </span>
                                   </td>
-                                  <td className="px-5 py-3.5 text-slate-400 text-xs">
-                                    {formatDateTimeRelatorio(ordem.createdAt || ordem.dataFalha)}
+                                  <td className="px-4 py-3">
+                                    <span className={`text-xs font-semibold ${statusColor}`}>{ordem.status || '-'}</span>
                                   </td>
-                                  <td className="px-5 py-3.5">
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleVisualizarOs(ordem)}
-                                        className="text-[10px] font-bold text-amber-300 hover:text-amber-200 px-2 py-1 rounded-md hover:bg-amber-500/10 transition-all"
-                                      >
-                                        Ver
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEditarOs(ordem)}
-                                        className="text-[10px] font-bold text-cyan-300 hover:text-cyan-200 px-2 py-1 rounded-md hover:bg-cyan-500/10 transition-all"
-                                      >
-                                        Editar
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleImprimirOs(ordem)}
-                                        className="text-[10px] font-bold text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md hover:bg-slate-700/30 transition-all"
-                                      >
-                                        Imprimir
-                                      </button>
+                                  <td className="px-4 py-3 text-xs text-slate-500">{aberturaStr}</td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center justify-end gap-1">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">Ver</button>
+                                      <button type="button" onClick={() => handleEditarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">Editar</button>
+                                      <button type="button" onClick={() => handleImprimirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">Imprimir</button>
                                       {ordem.status === 'Finalizada' && (
-                                        <button
-                                          type="button"
-                                          onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })}
-                                          className="text-[10px] font-bold text-rose-300 hover:text-rose-200 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-all"
-                                        >
-                                          Reabrir
-                                        </button>
+                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">Reabrir</button>
                                       )}
                                     </div>
                                   </td>
@@ -14559,10 +14458,14 @@ const custoDetalheTitulo = custoDetalheItem
                             })
                           ) : (
                             <tr>
-                              <td className="px-5 py-10 text-sm text-slate-500 text-center" colSpan={7}>
-                                <div className="flex flex-col items-center gap-2">
-                                  <Users size={24} className="text-slate-600" />
-                                  Nenhuma solicitação registrada
+                              <td className="px-4 py-12 text-center" colSpan={6}>
+                                <div className="flex flex-col items-center gap-3">
+                                  <Users size={28} className="text-slate-700" />
+                                  <p className="text-sm text-slate-500">Você ainda não abriu nenhuma OS</p>
+                                  <button type="button" onClick={abrirNovaOs} className="flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                                    <Plus size={12} />
+                                    Abrir primeira OS
+                                  </button>
                                 </div>
                               </td>
                             </tr>
