@@ -8276,6 +8276,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       .filter((row) => (filtroFilial2025 === 'Todas' ? true : row.filial === filtroFilial2025))
       .filter((row) => {
         if (!filtroCfops2025.length) return true;
+        if (row.tipoMovimento === 'devolucao') return true;
         const cfop = String(row.cfop || '').trim();
         return cfop ? filtroCfops2025.includes(cfop) : false;
       });
@@ -8458,7 +8459,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       const filial = obterFilialFaturamento(row);
       if (filtroFilial2025 !== 'Todas' && filial !== filtroFilial2025) return;
 
-      if (filtroCfops2025.length) {
+      if (filtroCfops2025.length && tipoMovimento !== 'devolucao') {
         const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
         if (!cfop || !filtroCfops2025.includes(cfop)) return;
       }
@@ -11856,33 +11857,64 @@ const custoDetalheTitulo = custoDetalheItem
               </div>
 
               {subAbaFaturamento === '2025' && (
-                <div className="space-y-6">
-                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-5">
+
+                  {/* Hero header */}
+                  <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 shadow-xl border border-slate-700">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-black">Consolidado 2025</p>
-                        <h2 className="text-2xl font-black text-slate-900 mt-1">Painel Faturamento 2025</h2>
-                        <p className="text-xs text-slate-400 mt-1">Inclui devolucoes registradas na planilha</p>
+                        <p className="text-[9px] uppercase tracking-[0.5em] text-slate-500 font-bold">Consolidado 2025</p>
+                        <h2 className="text-3xl font-black text-white mt-1 tracking-tight">Painel Faturamento 2025</h2>
+                        <p className="text-xs text-slate-500 mt-1">Inclui devolucoes registradas na planilha</p>
                       </div>
-                      {faturamentoDados.carregando ? (
-                        <span className="text-xs text-slate-400 italic">Carregando planilha...</span>
-                      ) : faturamentoDados.erro ? (
-                        <span className="text-xs text-rose-600 font-semibold">{faturamentoDados.erro}</span>
-                      ) : (
-                        <span className="text-xs text-emerald-600 font-semibold">
-                          Atualizado com {faturamento2025.movimentos} movimentos
-                        </span>
-                      )}
+                      <div className="flex flex-col items-end gap-2">
+                        {faturamentoDados.carregando ? (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-700 text-xs text-slate-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            Carregando...
+                          </span>
+                        ) : faturamentoDados.erro ? (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-900/50 border border-red-700/50 text-xs text-red-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                            {faturamentoDados.erro}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-900/40 border border-emerald-700/50 text-xs text-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            {faturamento2025.movimentos.toLocaleString('pt-BR')} movimentos
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Receita Liquida</p>
+                        <p className="text-2xl font-black text-white mt-1.5">{formatarMoeda(faturamento2025.total)}</p>
+                        <p className="text-[11px] text-slate-500 mt-1">apos devolucoes</p>
+                      </div>
+                      <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Receita Bruta</p>
+                        <p className="text-2xl font-black text-blue-300 mt-1.5">{formatarMoeda(faturamento2025.totalBruto)}</p>
+                        <p className="text-[11px] text-slate-500 mt-1">somente vendas</p>
+                      </div>
+                      <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Total Devolucoes</p>
+                        <div className="flex items-baseline gap-2 mt-1.5">
+                          <p className="text-2xl font-black text-rose-400">{formatarMoeda(faturamento2025.totalDevolucao)}</p>
+                          <span className="text-xs font-semibold text-rose-500/80">{faturamento2025.devolucaoPercent.toFixed(1)}%</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1">do faturamento bruto</p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2.5 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
-                        Filtros 2025
-                      </span>
-                      <span className="text-[9px] text-slate-400">
-                        {filtroCfops2025.length ? `${filtroCfops2025.length} CFOPs` : 'Todos os CFOPs'}
+                  {/* Filtros */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="text-[9px] font-black uppercase tracking-[0.35em] text-slate-400">Filtros</span>
+                      <span className="text-[9px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                        {filtroCfops2025.length ? `${filtroCfops2025.length} CFOPs ativos` : 'Todos os CFOPs'}
                       </span>
                     </div>
                     <CfopFilterSelector
@@ -11891,8 +11923,8 @@ const custoDetalheTitulo = custoDetalheItem
                       label="CFOP"
                       options={cfops2025Options}
                     />
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                      <span className="mr-2">Filiais</span>
+                    <div className="flex flex-wrap items-center gap-2 mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      <span className="text-slate-400 mr-1">Filial</span>
                       {filiais2025.map((filial) => (
                         <button
                           key={filial}
@@ -11900,8 +11932,8 @@ const custoDetalheTitulo = custoDetalheItem
                           onClick={() => setFiltroFilial2025(filial)}
                           className={`rounded-full px-3 py-1.5 transition-all ${
                             filtroFilial2025 === filial
-                              ? 'bg-blue-600 text-white shadow'
-                              : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                              ? 'bg-slate-900 text-white shadow'
+                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                           }`}
                         >
                           {filial}
@@ -11910,116 +11942,116 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {/* KPIs secundarios — 4 colunas */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-emerald-400">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Ticket Medio</p>
+                      <p className="text-xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.ticketMedio)}</p>
+                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.pedidos.toLocaleString('pt-BR')} pedidos</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-blue-400">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Clientes Ativos</p>
+                      <p className="text-xl font-black text-slate-900 mt-2">{faturamento2025.clientesAtivos.toLocaleString('pt-BR')}</p>
+                      <p className="text-xs text-slate-400 mt-1">no ano</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-slate-400">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Movimentos</p>
+                      <p className="text-xl font-black text-slate-900 mt-2">{faturamento2025.movimentos.toLocaleString('pt-BR')}</p>
+                      <p className="text-xs text-slate-400 mt-1">linhas processadas</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-amber-400">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Dias Ativos</p>
+                      <p className="text-xl font-black text-amber-600 mt-2">{faturamento2025.diasAtivos}</p>
+                      <p className="text-xs text-slate-400 mt-1">dias com emissao</p>
+                    </div>
+                  </div>
+
+                  {/* KPIs de desempenho — 4 colunas */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Total liquido</p>
-                      <p className="text-2xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.total)}</p>
-                      <p className="text-xs text-slate-400 mt-1">Receita apos devolucoes</p>
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Media Mensal</p>
+                      <p className="text-lg font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.mediaMensal)}</p>
+                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.porMes.length} meses ativos</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Total bruto</p>
-                      <p className="text-2xl font-black text-blue-600 mt-2">{formatarMoeda(faturamento2025.totalBruto)}</p>
-                      <p className="text-xs text-slate-400 mt-1">Somente vendas</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Devolucoes</p>
-                      <p className="text-2xl font-black text-rose-500 mt-2">{formatarMoeda(faturamento2025.totalDevolucao)}</p>
-                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.devolucaoPercent.toFixed(2)}% do bruto</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Ticket medio</p>
-                      <p className="text-2xl font-black text-emerald-600 mt-2">{formatarMoeda(faturamento2025.ticketMedio)}</p>
-                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.pedidos} pedidos</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Clientes ativos</p>
-                      <p className="text-2xl font-black text-slate-900 mt-2">{faturamento2025.clientesAtivos}</p>
-                      <p className="text-xs text-slate-400 mt-1">No ano</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Movimentos</p>
-                      <p className="text-2xl font-black text-slate-900 mt-2">{faturamento2025.movimentos}</p>
-                      <p className="text-xs text-slate-400 mt-1">Linhas processadas</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Dias ativos</p>
-                      <p className="text-2xl font-black text-amber-500 mt-2">{faturamento2025.diasAtivos}</p>
-                      <p className="text-xs text-slate-400 mt-1">Dias com emissao</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Media mensal</p>
-                      <p className="text-2xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.mediaMensal)}</p>
-                      <p className="text-xs text-slate-400 mt-1">{faturamento2025.porMes.length} meses</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Melhor mes</p>
-                      <p className="text-xl font-black text-emerald-600 mt-2">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Melhor Mes</p>
+                      <p className="text-lg font-black text-emerald-600 mt-2">
                         {faturamento2025.melhorMes ? faturamento2025.melhorMes.mes : '-'}
                       </p>
                       <p className="text-xs text-slate-400 mt-1">
-                        {faturamento2025.melhorMes ? formatarMoeda(faturamento2025.melhorMes.valor) : '-'}
+                        {faturamento2025.melhorMes ? formatarValorCurto(faturamento2025.melhorMes.valor) : '-'}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Pior mes</p>
-                      <p className="text-xl font-black text-rose-500 mt-2">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Pior Mes</p>
+                      <p className="text-lg font-black text-rose-500 mt-2">
                         {faturamento2025.piorMes ? faturamento2025.piorMes.mes : '-'}
                       </p>
                       <p className="text-xs text-slate-400 mt-1">
-                        {faturamento2025.piorMes ? formatarMoeda(faturamento2025.piorMes.valor) : '-'}
+                        {faturamento2025.piorMes ? formatarValorCurto(faturamento2025.piorMes.valor) : '-'}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Ultimo mes</p>
-                      <p className="text-xl font-black text-slate-900 mt-2">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Variacao MoM</p>
+                      <p className={`text-lg font-black mt-2 ${
+                        faturamento2025.variacaoUltimoMes === null
+                          ? 'text-slate-400'
+                          : faturamento2025.variacaoUltimoMes >= 0
+                          ? 'text-emerald-600'
+                          : 'text-rose-500'
+                      }`}>
                         {faturamento2025.variacaoUltimoMes === null
                           ? '-'
                           : `${faturamento2025.variacaoUltimoMes >= 0 ? '+' : ''}${(faturamento2025.variacaoUltimoMes * 100).toFixed(1)}%`}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">Variacao MoM</p>
+                      <p className="text-xs text-slate-400 mt-1">ultimo mes</p>
                     </div>
                   </div>
 
+                  {/* Paineis de analise — 3 colunas */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Insights 2025</h3>
-                      <div className="mt-4 space-y-3 text-sm text-slate-600">
-                        <div className="flex items-center justify-between">
-                          <span>Share top 5 grupos</span>
-                          <span className="font-black text-slate-900">{faturamento2025.shareTop5Grupos.toFixed(1)}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>Percentual devolucoes</span>
-                          <span className="font-black text-rose-500">{faturamento2025.devolucaoPercent.toFixed(2)}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>Ticket medio por pedido</span>
-                          <span className="font-black text-emerald-600">{formatarMoeda(faturamento2025.ticketMedio)}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>Clientes ativos</span>
-                          <span className="font-black text-slate-900">{faturamento2025.clientesAtivos}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>Dias com emissao</span>
-                          <span className="font-black text-amber-500">{faturamento2025.diasAtivos}</span>
-                        </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                      <div className="px-5 py-4 border-b border-slate-100 bg-slate-50">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Resumo Anual</h3>
+                      </div>
+                      <div className="p-5 space-y-3">
+                        {[
+                          { label: 'Share top 5 grupos', value: `${faturamento2025.shareTop5Grupos.toFixed(1)}%`, color: 'text-slate-900' },
+                          { label: 'Taxa de devolucao', value: `${faturamento2025.devolucaoPercent.toFixed(2)}%`, color: 'text-rose-500' },
+                          { label: 'Ticket medio', value: formatarMoeda(faturamento2025.ticketMedio), color: 'text-emerald-600' },
+                          { label: 'Clientes ativos', value: faturamento2025.clientesAtivos.toLocaleString('pt-BR'), color: 'text-blue-600' },
+                          { label: 'Dias com emissao', value: String(faturamento2025.diasAtivos), color: 'text-amber-600' },
+                        ].map(({ label, value, color }) => (
+                          <div key={label} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                            <span className="text-xs text-slate-500">{label}</span>
+                            <span className={`text-xs font-black ${color}`}>{value}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Top grupos</h3>
-                      <div className="mt-4 space-y-3">
-                        {faturamento2025.topGrupos.slice(0, 5).map((item) => {
-                          const share = faturamento2025.total !== 0 ? (item.valor / faturamento2025.total) * 100 : 0;
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                      <div className="px-5 py-4 border-b border-slate-100 bg-slate-50">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Top Grupos</h3>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        {faturamento2025.topGrupos.slice(0, 5).map((item, idx) => {
+                          const share = faturamento2025.totalBruto !== 0 ? (item.valor / faturamento2025.totalBruto) * 100 : 0;
+                          const cores = ['bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-sky-500', 'bg-cyan-500'];
                           return (
-                            <div key={item.grupo} className="space-y-1">
-                              <div className="flex items-center justify-between text-xs text-slate-500">
-                                <span className="font-semibold text-slate-700">{item.grupo}</span>
-                                <span>{formatarValorCurto(item.valor)}</span>
+                            <div key={item.grupo} className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${cores[idx]}`} />
+                                  <span className="text-xs font-semibold text-slate-700">{item.grupo}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-slate-400">{share.toFixed(1)}%</span>
+                                  <span className="text-xs font-black text-slate-900">{formatarValorCurto(item.valor)}</span>
+                                </div>
                               </div>
-                              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                                <div className="h-full bg-blue-500" style={{ width: `${Math.min(share, 100)}%` }} />
+                              <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                                <div className={`h-full ${cores[idx]}`} style={{ width: `${Math.min(share, 100)}%` }} />
                               </div>
                             </div>
                           );
@@ -12030,17 +12062,32 @@ const custoDetalheTitulo = custoDetalheItem
                       </div>
                     </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Devolucao por CFOP</h3>
-                      <div className="mt-4 space-y-3">
-                        {faturamento2025.devolucoesPorCfop.slice(0, 6).map((item) => (
-                          <div key={item.cfop} className="flex items-center justify-between text-xs text-slate-500">
-                            <span className="font-semibold text-slate-700">CFOP {item.cfop}</span>
-                            <span className="font-black text-rose-500">{formatarMoeda(item.valor)}</span>
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                      <div className="px-5 py-4 border-b border-slate-100 bg-slate-50">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Devolucoes por CFOP</h3>
+                      </div>
+                      <div className="p-5">
+                        {faturamento2025.devolucoesPorCfop.length > 0 ? (
+                          <div className="space-y-1">
+                            {faturamento2025.devolucoesPorCfop.slice(0, 6).map((item) => {
+                              const share = faturamento2025.totalDevolucao > 0 ? (item.valor / faturamento2025.totalDevolucao) * 100 : 0;
+                              return (
+                                <div key={item.cfop} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="text-xs font-semibold text-slate-700">CFOP {item.cfop}</span>
+                                      <span className="text-xs font-black text-rose-500">{formatarValorCurto(item.valor)}</span>
+                                    </div>
+                                    <div className="h-1 rounded-full bg-slate-100 overflow-hidden">
+                                      <div className="h-full bg-rose-400" style={{ width: `${Math.min(share, 100)}%` }} />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        ))}
-                        {faturamento2025.devolucoesPorCfop.length === 0 && (
-                          <p className="text-xs text-slate-400 italic">Sem devolucoes com CFOP.</p>
+                        ) : (
+                          <p className="text-xs text-slate-400 italic mt-2">Sem devolucoes com CFOP.</p>
                         )}
                       </div>
                     </div>
