@@ -11949,11 +11949,6 @@ const custoDetalheTitulo = custoDetalheItem
                       <p className="text-xl font-black text-slate-900 mt-2">{formatarMoeda(faturamento2025.ticketMedio)}</p>
                       <p className="text-xs text-slate-400 mt-1">{faturamento2025.pedidos.toLocaleString('pt-BR')} pedidos</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-blue-400">
-                      <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Clientes Ativos</p>
-                      <p className="text-xl font-black text-slate-900 mt-2">{faturamento2025.clientesAtivos.toLocaleString('pt-BR')}</p>
-                      <p className="text-xs text-slate-400 mt-1">no ano</p>
-                    </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm border-l-4 border-l-slate-400">
                       <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Movimentos</p>
                       <p className="text-xl font-black text-slate-900 mt-2">{faturamento2025.movimentos.toLocaleString('pt-BR')}</p>
@@ -12019,7 +12014,7 @@ const custoDetalheTitulo = custoDetalheItem
                           { label: 'Share top 5 grupos', value: `${faturamento2025.shareTop5Grupos.toFixed(1)}%`, color: 'text-slate-900' },
                           { label: 'Taxa de devolucao', value: `${faturamento2025.devolucaoPercent.toFixed(2)}%`, color: 'text-rose-500' },
                           { label: 'Ticket medio', value: formatarMoeda(faturamento2025.ticketMedio), color: 'text-emerald-600' },
-                          { label: 'Clientes ativos', value: faturamento2025.clientesAtivos.toLocaleString('pt-BR'), color: 'text-blue-600' },
+
                           { label: 'Dias com emissao', value: String(faturamento2025.diasAtivos), color: 'text-amber-600' },
                         ].map(({ label, value, color }) => (
                           <div key={label} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
