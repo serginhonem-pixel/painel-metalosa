@@ -18,7 +18,7 @@ messaging.onBackgroundMessage((payload) => {
   const title = payload?.notification?.title || 'Atualizacao de OS';
   const options = {
     body: payload?.notification?.body || '',
-    icon: '/vite.svg',
+    icon: '/icon-192.png',
     data: payload?.data || {},
   };
   self.registration.showNotification(title, options);
