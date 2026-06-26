@@ -13978,8 +13978,8 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
 
                   {/* ── BARRA DE NAVEGAÇÃO ── */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-3 border-b border-slate-800/40">
-                    <div className="flex flex-wrap gap-0.5">
+                  <div className="flex items-center justify-between gap-2 px-2 py-3 border-b border-slate-800/40 overflow-x-auto">
+                    <div className="flex gap-0.5 shrink-0">
                       {[
                         { id: 'resumo', icon: LayoutDashboard, label: 'Resumo', badge: null },
                         { id: 'ordens', icon: Layers, label: 'Ordens', badge: manutencaoOrdens.filter(o => o.status !== 'Finalizada' && o.status !== 'Cancelada').length },
@@ -14040,7 +14040,7 @@ const custoDetalheTitulo = custoDetalheItem
                   </div>
 
                   {/* ── CONTEÚDO DAS SUB-ABAS ── */}
-                  <div className="p-6 lg:p-8">
+                  <div className="py-4 px-0 sm:p-6 lg:p-8">
 
                 {subAbaManutencao === 'resumo' && (
                   <div className="space-y-5">
@@ -14301,11 +14301,11 @@ const custoDetalheTitulo = custoDetalheItem
                         <thead className="bg-slate-950/40 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-800/30">
                           <tr>
                             <th className="px-4 py-3 font-bold">OS / Ativo</th>
-                            <th className="px-4 py-3 font-bold">Setor</th>
-                            <th className="px-4 py-3 font-bold">Prioridade</th>
+                            <th className="px-4 py-3 font-bold hidden sm:table-cell">Setor</th>
+                            <th className="px-4 py-3 font-bold hidden sm:table-cell">Prioridade</th>
                             <th className="px-4 py-3 font-bold">Status</th>
-                            <th className="px-4 py-3 font-bold">Responsável</th>
-                            <th className="px-4 py-3 font-bold">Abertura</th>
+                            <th className="px-4 py-3 font-bold hidden md:table-cell">Responsável</th>
+                            <th className="px-4 py-3 font-bold hidden md:table-cell">Abertura</th>
                             <th className="px-4 py-3 font-bold text-right">Ações</th>
                           </tr>
                         </thead>
@@ -14349,8 +14349,8 @@ const custoDetalheTitulo = custoDetalheItem
                                     <p className="text-[11px] font-bold text-slate-400">{ordem.id}</p>
                                     <p className="text-sm font-semibold text-slate-100">{ordem.ativo || '-'}</p>
                                   </td>
-                                  <td className="px-4 py-3 text-xs text-slate-400">{ordem.setor || '-'}</td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-4 py-3 text-xs text-slate-400 hidden sm:table-cell">{ordem.setor || '-'}</td>
+                                  <td className="px-4 py-3 hidden sm:table-cell">
                                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border ${pStyle.cls}`}>
                                       <span className={`w-1.5 h-1.5 rounded-full ${pStyle.dot}`}></span>
                                       {ordem.prioridade || '-'}
@@ -14359,7 +14359,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   <td className="px-4 py-3">
                                     <span className={`text-xs font-semibold ${sColor}`}>{ordem.status || '-'}</span>
                                   </td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-4 py-3 hidden md:table-cell">
                                     {ordem.responsavel ? (
                                       <div className="flex items-center gap-2">
                                         <div className="w-6 h-6 rounded bg-slate-700/60 flex items-center justify-center text-[8px] font-black text-slate-300 shrink-0">
@@ -14371,7 +14371,7 @@ const custoDetalheTitulo = custoDetalheItem
                                       <span className="text-xs text-slate-600">—</span>
                                     )}
                                   </td>
-                                  <td className="px-4 py-3 text-xs text-slate-500">{aberturaStr}</td>
+                                  <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{aberturaStr}</td>
                                   <td className="px-4 py-3">
                                     <div className="flex items-center justify-end gap-1">
                                       <button type="button" onClick={() => handleVisualizarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">Ver</button>
