@@ -15574,7 +15574,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   type="button"
                                   onClick={() => {
                                     setNovaOsFiltroSetor(s);
-                                    setNovaOsForm((prev) => ({ ...prev, ativo: '', setor: '', processo: '' }));
+                                    setNovaOsForm((prev) => ({ ...prev, ativo: '', setor: s === 'Todos' ? '' : s, processo: '' }));
                                   }}
                                   className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
                                     novaOsFiltroSetor === s
