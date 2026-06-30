@@ -1118,6 +1118,8 @@ export default function App() {
       ...novaOsDefaults,
       statusMaquina,
     });
+    setNovaOsFiltroSetor('Todos');
+    setFiltroAtivoMobile('');
     setStatusMaquinaPromptOpen(false);
     setManutencaoModalOpen(true);
   };
