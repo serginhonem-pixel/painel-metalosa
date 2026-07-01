@@ -12905,7 +12905,7 @@ const custoDetalheTitulo = custoDetalheItem
                               const sufixo = termoBusca ? `_${termoBusca.replace(/\s+/g, '_')}` : '';
                               XLSX.writeFile(wb, `faturamento_${prefixoMes}${sufixo}.xlsx`);
                             };
-                            const handleExportarFechamentoPdf = () => {
+                            const handleExportarFechamentoPdf = async () => {
                               const k = kpisFiltradosProduto;
                               const ativo = !!k;
                               const total = Number(ativo ? k.total : faturamentoAtual.total) || 0;
@@ -12916,60 +12916,369 @@ const custoDetalheTitulo = custoDetalheItem
                               const mediaDia = dias > 0 ? total / dias : 0;
                               const mesLabel = mesesLabelFaturamento[Number(faturamentoMes) - 1] || faturamentoMes;
 
+                              const linhasRelatorio = termoBusca
+                                ? faturamentoLinhasComVendedor.filter((row) => {
+                                    const codigo = String(row.codigo || '').toLowerCase();
+                                    const descricao = String(row.descricao || '').toLowerCase();
+                                    return codigo.includes(termoBusca) || descricao.includes(termoBusca);
+                                  })
+                                : faturamentoLinhasComVendedor;
+
+                              let topClientes;
+                              let topProdutos;
+                              if (ativo) {
+                                const clientesMapRel = new Map();
+                                const produtosMapRel = new Map();
+                                linhasRelatorio.forEach((row) => {
+                                  const codigoCli = normalizarCodigoCliente(row.cliente);
+                                  const infoCli = codigoCli ? clientesPorCodigo.get(codigoCli) : null;
+                                  const chaveCli = codigoCli || String(row.cliente || 'Sem cliente');
+                                  if (!clientesMapRel.has(chaveCli)) {
+                                    clientesMapRel.set(chaveCli, { cliente: chaveCli, valor: 0, info: infoCli });
+                                  }
+                                  clientesMapRel.get(chaveCli).valor += row.valorTotal || 0;
+
+                                  const chaveProd = `${row.codigo || ''}||${row.descricao || ''}`;
+                                  if (!produtosMapRel.has(chaveProd)) {
+                                    produtosMapRel.set(chaveProd, {
+                                      codigo: row.codigo || '',
+                                      descricao: row.descricao || '',
+                                      valor: 0,
+                                      quantidade: 0,
+                                    });
+                                  }
+                                  const prodRel = produtosMapRel.get(chaveProd);
+                                  prodRel.valor += row.valorTotal || 0;
+                                  prodRel.quantidade += Number(row.quantidade) || 0;
+                                });
+                                topClientes = Array.from(clientesMapRel.values()).sort((a, b) => b.valor - a.valor).slice(0, 8);
+                                topProdutos = Array.from(produtosMapRel.values()).sort((a, b) => b.valor - a.valor).slice(0, 8);
+                              } else {
+                                topClientes = (faturamentoAtual.topClientes || []).slice(0, 8);
+                                topProdutos = (faturamentoAtual.topProdutos || []).slice(0, 8);
+                              }
+
+                              const vendedorMapRel = new Map();
+                              linhasRelatorio.forEach((row) => {
+                                const vendedor = row.vendedorNome || 'Sem vendedor';
+                                if (!vendedorMapRel.has(vendedor)) {
+                                  vendedorMapRel.set(vendedor, { vendedor, valor: 0, movimentos: 0 });
+                                }
+                                const item = vendedorMapRel.get(vendedor);
+                                item.valor += row.valorTotal || 0;
+                                item.movimentos += 1;
+                              });
+                              const porVendedor = Array.from(vendedorMapRel.values()).sort((a, b) => b.valor - a.valor).slice(0, 10);
+
+                              let devolucoesCfopRel;
+                              if (ativo) {
+                                const mapaCfop = new Map();
+                                linhasRelatorio
+                                  .filter((row) => row.tipoMovimento === 'devolucao')
+                                  .forEach((row) => {
+                                    const cfop = String(row.cfop || '').trim();
+                                    if (!cfop) return;
+                                    mapaCfop.set(cfop, (mapaCfop.get(cfop) || 0) + Math.abs(row.valorTotal || 0));
+                                  });
+                                devolucoesCfopRel = Array.from(mapaCfop.entries());
+                              } else {
+                                devolucoesCfopRel = Object.entries(faturamentoAtual.devolucoesPorCfop || {});
+                              }
+                              devolucoesCfopRel = devolucoesCfopRel.sort((a, b) => b[1] - a[1]);
+
+                              const diaMaisForte = dadosMes.reduce(
+                                (best, item) => (item.valor > (best?.valor ?? -Infinity) ? item : best),
+                                null
+                              );
+                              const diaMaisFraco = dadosMes.reduce(
+                                (worst, item) => (item.valor < (worst?.valor ?? Infinity) ? item : worst),
+                                null
+                              );
+
+                              // Paleta e helpers visuais
+                              const NAVY = [15, 23, 42];
+                              const SLATE = [100, 116, 139];
+                              const SLATE_LIGHT = [148, 163, 184];
+                              const BORDER = [226, 232, 240];
+                              const CARDS = [
+                                { titulo: 'Faturamento do período', valor: formatarMoeda(total), sub: 'Líquido no período', accent: [37, 99, 235], tint: [239, 246, 255] },
+                                { titulo: 'Devoluções (CFOP)', valor: formatarMoeda(totalDev), sub: 'Valores de devolução', accent: [225, 29, 72], tint: [255, 241, 242] },
+                                { titulo: 'Fat. médio / dia', valor: formatarMoeda(mediaDia), sub: 'Média nos dias com venda', accent: [79, 70, 229], tint: [238, 242, 255] },
+                                { titulo: 'Ticket médio', valor: formatarMoeda(ticket), sub: 'Por movimento', accent: [124, 58, 237], tint: [245, 243, 255] },
+                                { titulo: 'Clientes ativos', valor: String(clientes), sub: 'Com vendas no mês', accent: [5, 150, 105], tint: [236, 253, 245] },
+                                { titulo: 'Dias ativos', valor: String(dias), sub: 'Dias com faturamento', accent: [217, 119, 6], tint: [255, 251, 235] },
+                              ];
+
+                              const loadImageAsDataUrl = (url) =>
+                                fetch(url)
+                                  .then((res) => res.blob())
+                                  .then(
+                                    (blob) =>
+                                      new Promise((resolve, reject) => {
+                                        const reader = new FileReader();
+                                        reader.onload = () => resolve(reader.result);
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(blob);
+                                      })
+                                  )
+                                  .catch(() => null);
+
+                              const logoDataUrl = await loadImageAsDataUrl(logoMetalosa);
+
                               const doc = new jsPDF();
                               const pageWidth = doc.internal.pageSize.getWidth();
-                              doc.setFontSize(16);
+                              const pageHeight = doc.internal.pageSize.getHeight();
+                              const marginX = 14;
+                              const contentW = pageWidth - marginX * 2;
+
+                              const drawFooter = () => {
+                                const pageCount = doc.internal.getNumberOfPages();
+                                for (let i = 1; i <= pageCount; i += 1) {
+                                  doc.setPage(i);
+                                  doc.setDrawColor(...BORDER);
+                                  doc.setLineWidth(0.2);
+                                  doc.line(marginX, pageHeight - 14, pageWidth - marginX, pageHeight - 14);
+                                  doc.setFontSize(8);
+                                  doc.setFont(undefined, 'normal');
+                                  doc.setTextColor(...SLATE_LIGHT);
+                                  doc.text('Metalosa · Fechamento de Faturamento', marginX, pageHeight - 9);
+                                  doc.text(`Página ${i} de ${pageCount}`, pageWidth - marginX, pageHeight - 9, { align: 'right' });
+                                }
+                              };
+
+                              const ensureSpace = (currentY, needed) => {
+                                if (currentY + needed > pageHeight - 20) {
+                                  doc.addPage();
+                                  return 22;
+                                }
+                                return currentY;
+                              };
+
+                              const sectionTitle = (texto, y) => {
+                                doc.setFillColor(...NAVY);
+                                doc.rect(marginX, y - 4, 3, 5, 'F');
+                                doc.setFontSize(11.5);
+                                doc.setFont(undefined, 'bold');
+                                doc.setTextColor(...NAVY);
+                                doc.text(texto, marginX + 6, y);
+                                return y + 7;
+                              };
+
+                              // ===== Cabeçalho =====
+                              doc.setFillColor(...NAVY);
+                              doc.rect(0, 0, pageWidth, 34, 'F');
+                              if (logoDataUrl) {
+                                try {
+                                  doc.addImage(logoDataUrl, 'PNG', marginX, 8, 22, 14.9);
+                                } catch (err) {
+                                  /* logo indisponível, segue sem imagem */
+                                }
+                              }
+                              const textX = logoDataUrl ? marginX + 28 : marginX;
+                              doc.setTextColor(255, 255, 255);
+                              doc.setFontSize(17);
                               doc.setFont(undefined, 'bold');
-                              doc.text('Fechamento de Faturamento', 14, 18);
+                              doc.text('Fechamento de Faturamento', textX, 15);
                               doc.setFontSize(11);
                               doc.setFont(undefined, 'normal');
-                              doc.text(`${mesLabel} de ${faturamentoAno}${termoBusca ? ` — filtro: "${filtroGraficoProduto}"` : ''}`, 14, 26);
-                              doc.setFontSize(9);
-                              doc.setTextColor(120);
-                              doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, 14, 32);
-                              doc.setTextColor(0);
+                              doc.text(
+                                `${mesLabel} de ${faturamentoAno}${termoBusca ? ` — filtro: "${filtroGraficoProduto}"` : ''}`,
+                                textX,
+                                22
+                              );
+                              doc.setFontSize(8.5);
+                              doc.setTextColor(190, 200, 215);
+                              doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, textX, 28);
+                              doc.setTextColor(0, 0, 0);
 
-                              autoTable(doc, {
-                                startY: 38,
-                                head: [['Indicador', 'Valor']],
-                                body: [
-                                  ['Faturamento do período (líquido)', formatarMoeda(total)],
-                                  ['Devoluções (CFOP)', formatarMoeda(totalDev)],
-                                  ['Faturamento médio/dia', formatarMoeda(mediaDia)],
-                                  ['Ticket médio', formatarMoeda(ticket)],
-                                  ['Clientes ativos', String(clientes)],
-                                  ['Dias ativos', String(dias)],
-                                ],
-                                theme: 'grid',
-                                headStyles: { fillColor: [30, 41, 59] },
-                                margin: { left: 14, right: 14 },
+                              // ===== Cards de indicadores =====
+                              let y = 46;
+                              const gap = 4;
+                              const cardW = (contentW - gap * 2) / 3;
+                              const cardH = 24;
+                              CARDS.forEach((card, i) => {
+                                const col = i % 3;
+                                const row = Math.floor(i / 3);
+                                const x = marginX + col * (cardW + gap);
+                                const cy = y + row * (cardH + gap);
+                                doc.setFillColor(...card.tint);
+                                doc.roundedRect(x, cy, cardW, cardH, 2, 2, 'F');
+                                doc.setFillColor(...card.accent);
+                                doc.roundedRect(x, cy, 2.2, cardH, 1, 1, 'F');
+                                doc.setFontSize(7.5);
+                                doc.setFont(undefined, 'bold');
+                                doc.setTextColor(...SLATE);
+                                doc.text(card.titulo.toUpperCase(), x + 6, cy + 7);
+                                doc.setFontSize(13);
+                                doc.setFont(undefined, 'bold');
+                                doc.setTextColor(...NAVY);
+                                doc.text(card.valor, x + 6, cy + 15);
+                                doc.setFontSize(7);
+                                doc.setFont(undefined, 'normal');
+                                doc.setTextColor(...SLATE_LIGHT);
+                                doc.text(card.sub, x + 6, cy + 20.5);
+                              });
+                              y += 2 * (cardH + gap) + 6;
+
+                              // ===== Gráfico de faturamento por dia =====
+                              y = sectionTitle('Faturamento por dia', y);
+                              const chartX = marginX;
+                              const chartW = contentW;
+                              const chartH = 52;
+                              const chartY = y + 4;
+                              const maxValor = Math.max(...dadosMes.map((item) => Math.abs(item.valor)), 1);
+
+                              doc.setDrawColor(...BORDER);
+                              doc.setLineWidth(0.2);
+                              [0.25, 0.5, 0.75, 1].forEach((p) => {
+                                const gy = chartY + chartH * (1 - p);
+                                doc.line(chartX, gy, chartX + chartW, gy);
+                                doc.setFontSize(6);
+                                doc.setTextColor(...SLATE_LIGHT);
+                                doc.text(formatarValorCurto(maxValor * p), chartX + chartW, gy - 0.8, { align: 'right' });
                               });
 
-                              const afterKpiY = doc.lastAutoTable.finalY + 10;
-                              doc.setFontSize(12);
-                              doc.setFont(undefined, 'bold');
-                              doc.text('Faturamento por dia', 14, afterKpiY);
+                              const barGap = 1;
+                              const barSlot = chartW / Math.max(dadosMes.length, 1);
+                              const barW = Math.max(barSlot - barGap, 1);
+                              dadosMes.forEach((item, i) => {
+                                const bx = chartX + i * barSlot + barGap / 2;
+                                const barH = (Math.abs(item.valor) / maxValor) * chartH;
+                                const by = chartY + chartH - barH;
+                                const cor = item.valor >= 0 ? [37, 99, 235] : [225, 29, 72];
+                                doc.setFillColor(...cor);
+                                doc.rect(bx, by, barW, Math.max(barH, 0.4), 'F');
+                                if (barSlot >= 5) {
+                                  doc.setFontSize(5.5);
+                                  doc.setTextColor(...SLATE);
+                                  doc.text(item.dia.slice(8), bx + barW / 2, chartY + chartH + 4, { align: 'center' });
+                                }
+                              });
+                              y = chartY + chartH + 10;
 
+                              if (diaMaisForte && diaMaisFraco) {
+                                doc.setFontSize(8.5);
+                                doc.setFont(undefined, 'normal');
+                                doc.setTextColor(...SLATE);
+                                const melhorData = new Date(`${diaMaisForte.dia}T00:00:00`).toLocaleDateString('pt-BR');
+                                const piorData = new Date(`${diaMaisFraco.dia}T00:00:00`).toLocaleDateString('pt-BR');
+                                doc.text(
+                                  `Melhor dia: ${melhorData} (${formatarMoeda(diaMaisForte.valor)})   •   Menor dia: ${piorData} (${formatarMoeda(diaMaisFraco.valor)})`,
+                                  marginX,
+                                  y
+                                );
+                                y += 8;
+                              }
+
+                              // ===== Faturamento por dia (tabela) =====
+                              doc.addPage();
+                              y = 22;
+                              y = sectionTitle('Detalhamento diário', y);
                               autoTable(doc, {
-                                startY: afterKpiY + 4,
+                                startY: y,
                                 head: [['Dia', 'Faturamento']],
                                 body: dadosMes.map((item) => [
                                   new Date(`${item.dia}T00:00:00`).toLocaleDateString('pt-BR'),
                                   formatarMoeda(item.valor),
                                 ]),
                                 theme: 'striped',
-                                headStyles: { fillColor: [30, 41, 59] },
-                                margin: { left: 14, right: 14 },
-                                columnStyles: { 1: { halign: 'right' } },
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
+                                margin: { left: marginX, right: marginX },
+                                columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
                               });
+                              y = doc.lastAutoTable.finalY + 14;
 
-                              const pageCount = doc.internal.getNumberOfPages();
-                              for (let i = 1; i <= pageCount; i += 1) {
-                                doc.setPage(i);
-                                doc.setFontSize(8);
-                                doc.setTextColor(150);
-                                doc.text(`Página ${i} de ${pageCount}`, pageWidth - 30, doc.internal.pageSize.getHeight() - 10);
+                              // ===== Top clientes =====
+                              y = ensureSpace(y, 20);
+                              y = sectionTitle('Top clientes do período', y);
+                              autoTable(doc, {
+                                startY: y,
+                                head: [['Cliente', 'Cidade/UF', 'Faturamento']],
+                                body: topClientes.length
+                                  ? topClientes.map((item) => [
+                                      item.info?.nome || item.cliente,
+                                      [item.info?.municipio, item.info?.estado].filter(Boolean).join(' / ') || '-',
+                                      formatarMoeda(item.valor),
+                                    ])
+                                  : [['Sem dados para o período', '', '']],
+                                theme: 'striped',
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
+                                margin: { left: marginX, right: marginX },
+                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
+                              });
+                              y = doc.lastAutoTable.finalY + 12;
+
+                              // ===== Top produtos =====
+                              y = ensureSpace(y, 20);
+                              y = sectionTitle('Top produtos do período', y);
+                              autoTable(doc, {
+                                startY: y,
+                                head: [['Código', 'Descrição', 'Qtd.', 'Faturamento']],
+                                body: topProdutos.length
+                                  ? topProdutos.map((item) => [
+                                      item.codigo || '-',
+                                      item.descricao || '-',
+                                      Number(item.quantidade || 0).toLocaleString('pt-BR'),
+                                      formatarMoeda(item.valor),
+                                    ])
+                                  : [['-', 'Sem dados para o período', '', '']],
+                                theme: 'striped',
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
+                                margin: { left: marginX, right: marginX },
+                                columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } },
+                              });
+                              y = doc.lastAutoTable.finalY + 12;
+
+                              // ===== Faturamento por vendedor =====
+                              y = ensureSpace(y, 20);
+                              y = sectionTitle('Faturamento por vendedor', y);
+                              autoTable(doc, {
+                                startY: y,
+                                head: [['Vendedor', 'Movimentos', 'Faturamento']],
+                                body: porVendedor.length
+                                  ? porVendedor.map((item) => [
+                                      item.vendedor,
+                                      String(item.movimentos),
+                                      formatarMoeda(item.valor),
+                                    ])
+                                  : [['Sem dados para o período', '', '']],
+                                theme: 'striped',
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
+                                margin: { left: marginX, right: marginX },
+                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
+                              });
+                              y = doc.lastAutoTable.finalY + 12;
+
+                              // ===== Devoluções por CFOP =====
+                              if (devolucoesCfopRel.length) {
+                                y = ensureSpace(y, 20);
+                                y = sectionTitle('Devoluções por CFOP', y);
+                                autoTable(doc, {
+                                  startY: y,
+                                  head: [['CFOP', 'Descrição', 'Valor']],
+                                  body: devolucoesCfopRel.map(([cfop, valor]) => [
+                                    cfop,
+                                    CFOP_DEVOLUCAO_LABELS[cfop] || '-',
+                                    formatarMoeda(valor),
+                                  ]),
+                                  theme: 'striped',
+                                  styles: { fontSize: 8, cellPadding: 2 },
+                                  headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                  alternateRowStyles: { fillColor: [248, 250, 252] },
+                                  margin: { left: marginX, right: marginX },
+                                  columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
+                                });
                               }
+
+                              drawFooter();
 
                               const sufixoPdf = termoBusca ? `_${termoBusca.replace(/\s+/g, '_')}` : '';
                               doc.save(`fechamento_faturamento_${prefixoMes}${sufixoPdf}.pdf`);
