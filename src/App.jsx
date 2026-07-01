@@ -20,6 +20,8 @@ import Rastreabilidade from './components/Rastreabilidade';
 import { computeCostBreakdown } from './services/costing';
 import * as XLSX from 'xlsx';
 import pptxgen from 'pptxgenjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12903,6 +12905,75 @@ const custoDetalheTitulo = custoDetalheItem
                               const sufixo = termoBusca ? `_${termoBusca.replace(/\s+/g, '_')}` : '';
                               XLSX.writeFile(wb, `faturamento_${prefixoMes}${sufixo}.xlsx`);
                             };
+                            const handleExportarFechamentoPdf = () => {
+                              const k = kpisFiltradosProduto;
+                              const ativo = !!k;
+                              const total = Number(ativo ? k.total : faturamentoAtual.total) || 0;
+                              const totalDev = Number(ativo ? k.totalDevolucao : faturamentoAtual.totalDevolucao) || 0;
+                              const dias = Number(ativo ? k.diasAtivos : faturamentoAtual.diasAtivos) || 0;
+                              const clientes = Number(ativo ? k.clientesAtivos : faturamentoAtual.clientesAtivos) || 0;
+                              const ticket = Number(ativo ? k.ticketMedio : faturamentoAtual.ticketMedio) || 0;
+                              const mediaDia = dias > 0 ? total / dias : 0;
+                              const mesLabel = mesesLabelFaturamento[Number(faturamentoMes) - 1] || faturamentoMes;
+
+                              const doc = new jsPDF();
+                              const pageWidth = doc.internal.pageSize.getWidth();
+                              doc.setFontSize(16);
+                              doc.setFont(undefined, 'bold');
+                              doc.text('Fechamento de Faturamento', 14, 18);
+                              doc.setFontSize(11);
+                              doc.setFont(undefined, 'normal');
+                              doc.text(`${mesLabel} de ${faturamentoAno}${termoBusca ? ` — filtro: "${filtroGraficoProduto}"` : ''}`, 14, 26);
+                              doc.setFontSize(9);
+                              doc.setTextColor(120);
+                              doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, 14, 32);
+                              doc.setTextColor(0);
+
+                              autoTable(doc, {
+                                startY: 38,
+                                head: [['Indicador', 'Valor']],
+                                body: [
+                                  ['Faturamento do período (líquido)', formatarMoeda(total)],
+                                  ['Devoluções (CFOP)', formatarMoeda(totalDev)],
+                                  ['Faturamento médio/dia', formatarMoeda(mediaDia)],
+                                  ['Ticket médio', formatarMoeda(ticket)],
+                                  ['Clientes ativos', String(clientes)],
+                                  ['Dias ativos', String(dias)],
+                                ],
+                                theme: 'grid',
+                                headStyles: { fillColor: [30, 41, 59] },
+                                margin: { left: 14, right: 14 },
+                              });
+
+                              const afterKpiY = doc.lastAutoTable.finalY + 10;
+                              doc.setFontSize(12);
+                              doc.setFont(undefined, 'bold');
+                              doc.text('Faturamento por dia', 14, afterKpiY);
+
+                              autoTable(doc, {
+                                startY: afterKpiY + 4,
+                                head: [['Dia', 'Faturamento']],
+                                body: dadosMes.map((item) => [
+                                  new Date(`${item.dia}T00:00:00`).toLocaleDateString('pt-BR'),
+                                  formatarMoeda(item.valor),
+                                ]),
+                                theme: 'striped',
+                                headStyles: { fillColor: [30, 41, 59] },
+                                margin: { left: 14, right: 14 },
+                                columnStyles: { 1: { halign: 'right' } },
+                              });
+
+                              const pageCount = doc.internal.getNumberOfPages();
+                              for (let i = 1; i <= pageCount; i += 1) {
+                                doc.setPage(i);
+                                doc.setFontSize(8);
+                                doc.setTextColor(150);
+                                doc.text(`Página ${i} de ${pageCount}`, pageWidth - 30, doc.internal.pageSize.getHeight() - 10);
+                              }
+
+                              const sufixoPdf = termoBusca ? `_${termoBusca.replace(/\s+/g, '_')}` : '';
+                              doc.save(`fechamento_faturamento_${prefixoMes}${sufixoPdf}.pdf`);
+                            };
                             const dados = dadosMes;
                             if (!dados.length) {
                               return (
@@ -13057,23 +13128,39 @@ const custoDetalheTitulo = custoDetalheItem
                                       Filtro: <span className="font-bold text-blue-600">"{filtroGraficoProduto}"</span>
                                       {' '}— {dadosMes.length} dia(s) com resultado
                                     </p>
-                                    <button
-                                      type="button"
-                                      onClick={handleExportarGraficoExcel}
-                                      className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
-                                    >
-                                      ↓ Baixar Excel filtrado
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={handleExportarGraficoExcel}
+                                        className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
+                                      >
+                                        ↓ Baixar Excel filtrado
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={handleExportarFechamentoPdf}
+                                        className="flex items-center gap-1.5 rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition"
+                                      >
+                                        ↓ Baixar PDF do fechamento
+                                      </button>
+                                    </div>
                                   </div>
                                 )}
                                 {!termoBusca && (
-                                  <div className="flex justify-end px-1">
+                                  <div className="flex justify-end gap-2 px-1">
                                     <button
                                       type="button"
                                       onClick={handleExportarGraficoExcel}
                                       className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 transition"
                                     >
                                       ↓ Baixar Excel do mês
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={handleExportarFechamentoPdf}
+                                      className="flex items-center gap-1.5 rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition"
+                                    >
+                                      ↓ Baixar PDF do fechamento
                                     </button>
                                   </div>
                                 )}
