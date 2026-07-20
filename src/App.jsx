@@ -1815,11 +1815,13 @@ export default function App() {
       { nome: 'Jose Fernando', setor: 'Manutencao - Mecanico' },
       { nome: 'Timóteo Vaz', setor: 'Manutencao - Ferramenteiro' },
       { nome: 'Jose Ricardo de Barros', setor: 'Manutencao - Ferramenteiro' },
+      { nome: 'Marcio Gueçon Figueiredo', setor: 'Manutencao - Ferramenteiro' },
       { nome: 'Luizma', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Cristiano', setor: 'Manutencao - Caldeiraria' },
       { nome: 'Juliano', setor: 'Manutencao - Eletricista' },
       { nome: 'Rogerio', setor: 'Manutencao - Eletricista' },
       { nome: 'Matheus', setor: 'Manutencao - Eletricista' },
+      { nome: 'Marcos Henrique Pinheiros', setor: 'Manutencao - Soldador' },
     ];
   }, []);
 
@@ -14981,15 +14983,28 @@ const custoDetalheTitulo = custoDetalheItem
                           </div>
                           <div>
                             <label className="text-xs font-bold text-slate-400">Centro de custo</label>
-                            <select
+                            <input
                               value={novoAtivoCc}
                               onChange={(e) => setNovoAtivoCc(e.target.value)}
+                              list="novo-ativo-cc-opcoes"
+                              autoComplete="off"
+                              placeholder="Ex: Industria, Transporte, Corte..."
                               className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
                               required
-                            >
-                              <option>Industria</option>
-                              <option>Transporte</option>
-                            </select>
+                            />
+                            <datalist id="novo-ativo-cc-opcoes">
+                              {Array.from(
+                                new Set([
+                                  'Industria',
+                                  'Transporte',
+                                  ...listaMaquinas.map((m) => m.setor).filter(Boolean),
+                                ])
+                              )
+                                .sort()
+                                .map((s) => (
+                                  <option key={s} value={s} />
+                                ))}
+                            </datalist>
                           </div>
                           {normalizarTexto(novoAtivoCc) === 'industria' && (
                             <div>
@@ -16722,18 +16737,29 @@ const custoDetalheTitulo = custoDetalheItem
                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
                              Centro de Custo
                            </label>
-                           <select
+                           <input
                              name="setorMaq"
                              value={novoAtivoCc}
                              onChange={(e) => setNovoAtivoCc(e.target.value)}
+                             list="config-ativo-cc-opcoes"
+                             autoComplete="off"
+                             placeholder="Ex: Industria, Transporte, Corte..."
                              className="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none"
                              required
-                           >
-                             {Array.from(new Set(listaMaquinas.map((m) => m.setor).filter(Boolean))).sort().map((s) => (
-                               <option key={s}>{s}</option>
-                             ))}
-                             <option>Transporte</option>
-                           </select>
+                           />
+                           <datalist id="config-ativo-cc-opcoes">
+                             {Array.from(
+                               new Set([
+                                 'Industria',
+                                 'Transporte',
+                                 ...listaMaquinas.map((m) => m.setor).filter(Boolean),
+                               ])
+                             )
+                               .sort()
+                               .map((s) => (
+                                 <option key={s} value={s} />
+                               ))}
+                           </datalist>
                          </div>
                          {normalizarTexto(novoAtivoCc) === 'industria' && (
                            <select
