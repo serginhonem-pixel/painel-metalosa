@@ -132,5 +132,9 @@
   { "setor": "Polimento", "nome": "Politriz 1" },
   { "setor": "Polimento", "nome": "Politriz 2" },
   { "setor": "Polimento", "nome": "Exaustor" },
-  { "setor": "Solda Continua", "nome": "Solda Continua" }
+  { "setor": "Solda Continua", "nome": "Solda Continua" },
+  { "setor": "Corte", "nome": "Desbobinador do corte da Slitter 06" },
+  { "setor": "Corte", "nome": "Suporte de retirar bobinas da Slitter" },
+  { "setor": "Corte", "nome": "Tesoura rotativa Slitter 01" },
+  { "setor": "Corte", "nome": "Tesoura rotativa Slitter 02 Marafon" }
 ]
