@@ -75,6 +75,30 @@ import {
 
 // --- Constantes e Dados Iniciais ---
 
+const CATEGORIAS_OS_PROBLEMA = [
+  'Eletrico', 'Mecanico', 'Hidraulico', 'Pneumatico', 'Automacao/CLP',
+  'Instrumentacao/Sensores', 'Software', 'Utilidades', 'Qualidade', 'Seguranca', 'Outro',
+];
+
+const MAPA_SEM_ACENTO = {
+  a: 'aàáâãäå', e: 'eèéêë', i: 'iìíîï', o: 'oòóôõö', u: 'uùúûü', c: 'cç', n: 'nñ',
+};
+const TABELA_SEM_ACENTO = Object.entries(MAPA_SEM_ACENTO).reduce((tabela, [base, variantes]) => {
+  for (const variante of variantes) tabela[variante] = base;
+  return tabela;
+}, {});
+const removerAcentos = (texto) =>
+  texto.toLowerCase().split('').map((c) => TABELA_SEM_ACENTO[c] || c).join('');
+
+// Normaliza variações acentuadas (ex: "Mecânico") para a grafia canônica do select ("Mecanico"),
+// evitando que a mesma categoria apareça duplicada nos relatórios.
+const normalizarCategoriaOs = (categoria) => {
+  if (!categoria) return categoria;
+  const alvo = removerAcentos(categoria.trim());
+  const canonica = CATEGORIAS_OS_PROBLEMA.find((c) => removerAcentos(c) === alvo);
+  return canonica || categoria;
+};
+
 const ITENS_MENU = [
   { id: 'dashboard-tv', label: 'Dashboard TV', icon: LayoutDashboard },
   { id: 'executivo', label: 'Painel Executivo', icon: LayoutDashboard },
@@ -1050,8 +1074,14 @@ export default function App() {
   const [modoRapidoIndex, setModoRapidoIndex] = useState(0);
   const [filtroAtivoMobile, setFiltroAtivoMobile] = useState('');
   const [novaOsFiltroSetor, setNovaOsFiltroSetor] = useState('Todos');
-  const [relatorioInicio, setRelatorioInicio] = useState('');
-  const [relatorioFim, setRelatorioFim] = useState('');
+  const [relatorioInicio, setRelatorioInicio] = useState(() => {
+    const hoje = new Date();
+    return new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10);
+  });
+  const [relatorioFim, setRelatorioFim] = useState(() => {
+    const hoje = new Date();
+    return new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().slice(0, 10);
+  });
   const [manutencaoModalOpen, setManutencaoModalOpen] = useState(false);
   const [statusMaquinaPromptOpen, setStatusMaquinaPromptOpen] = useState(false);
   const [manutencaoDetalheModal, setManutencaoDetalheModal] = useState(null);
@@ -4212,10 +4242,14 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     const unsubscribe = onSnapshot(
       collection(db, 'manutencao_os'),
       async (snap) => {
-        let items = snap.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...docSnap.data(),
-        }));
+        let items = snap.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...data,
+            categoria: normalizarCategoriaOs(data.categoria),
+          };
+        });
         const nowIso = new Date().toISOString();
         const finalizadasSemFechamento = items.filter(
           (os) => os.status === 'Finalizada' && !os.fechadaEm
