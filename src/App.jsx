@@ -48,6 +48,10 @@ import {
   UserX,
   UserPlus,
   Trash2,
+  Eye,
+  Pencil,
+  Printer,
+  RotateCcw,
   CheckCircle2,
   XCircle,
   Settings,
@@ -10489,7 +10493,7 @@ const custoDetalheTitulo = custoDetalheItem
       )}
 
       {/* Conteúdo Principal */}
-      <main className={`flex-1 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
+      <main className={`flex-1 min-w-0 px-4 md:px-6 ${abaAtiva === 'dashboard-tv' ? 'pb-4' : 'pb-24 md:pb-8'}`}>
         {abaAtiva !== 'faturamento' && abaAtiva !== 'executivo' && abaAtiva !== 'dashboard-tv' && (
           <header className="w-full mb-8 flex justify-between items-end">
           <div>
@@ -14352,7 +14356,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <button
                         onClick={abrirNovaOs}
                         data-tour="nova-os"
-                        className="shrink-0 rounded-xl bg-amber-400 text-slate-950 text-xs font-black px-5 py-2.5 shadow-lg shadow-amber-500/20 hover:bg-amber-300 transition-all duration-200 flex items-center gap-2"
+                        className="w-full sm:w-auto shrink-0 rounded-xl bg-amber-400 text-slate-950 text-xs font-black px-5 py-2.5 shadow-lg shadow-amber-500/20 hover:bg-amber-300 transition-all duration-200 flex items-center justify-center gap-2"
                       >
                         <Plus size={14} />
                         Nova OS
@@ -14360,7 +14364,7 @@ const custoDetalheTitulo = custoDetalheItem
                     </div>
 
                     {/* Linha 2: KPI strip */}
-                    <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="mt-5 grid grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
                       {[
                         { ...manutencaoKpis[0], border: 'border-l-amber-400', bg: 'bg-amber-400/5' },
                         { ...manutencaoKpis[1], border: 'border-l-blue-400', bg: 'bg-blue-400/5' },
@@ -14369,17 +14373,17 @@ const custoDetalheTitulo = custoDetalheItem
                         { ...manutencaoKpis[4], border: 'border-l-cyan-400', bg: 'bg-cyan-400/5' },
                         { ...manutencaoKpis[5], border: 'border-l-purple-400', bg: 'bg-purple-400/5' },
                       ].map((kpi) => (
-                        <div key={kpi.id} className={`rounded-xl border border-slate-800/60 border-l-2 ${kpi.border} ${kpi.bg} px-4 py-3`}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{kpi.label}</p>
-                          <p className={`mt-1.5 text-2xl font-black ${kpi.tone}`}>{kpi.value}</p>
+                        <div key={kpi.id} className={`rounded-xl border border-slate-800/60 border-l-2 ${kpi.border} ${kpi.bg} px-2.5 sm:px-4 py-2.5 sm:py-3 min-w-0`}>
+                          <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-slate-500 truncate">{kpi.label}</p>
+                          <p className={`mt-1 sm:mt-1.5 text-lg sm:text-2xl font-black ${kpi.tone} truncate`}>{kpi.value}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* ── BARRA DE NAVEGAÇÃO ── */}
-                  <div className="flex items-center justify-between gap-2 px-2 py-3 border-b border-slate-800/40 overflow-x-auto">
-                    <div className="flex gap-0.5 shrink-0">
+                  <div className="flex items-center gap-2 px-2 py-3 border-b border-slate-800/40">
+                    <div className="flex min-w-0 flex-1 gap-0.5 overflow-x-auto">
                       {[
                         { id: 'resumo', icon: LayoutDashboard, label: 'Resumo', badge: null },
                         { id: 'ordens', icon: Layers, label: 'Ordens', badge: manutencaoOrdens.filter(o => o.status !== 'Finalizada' && o.status !== 'Cancelada').length },
@@ -14395,7 +14399,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <button
                             key={id}
                             onClick={() => setSubAbaManutencao(id)}
-                            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                            className={`relative flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
                               isActive
                                 ? 'bg-amber-400 text-slate-950 shadow-sm'
                                 : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
@@ -14700,13 +14704,13 @@ const custoDetalheTitulo = custoDetalheItem
                       <table className="w-full text-left">
                         <thead className="bg-slate-950/40 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-4 py-3 font-bold">OS / Ativo</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold">OS / Ativo</th>
                             <th className="px-4 py-3 font-bold hidden sm:table-cell">Setor</th>
                             <th className="px-4 py-3 font-bold hidden sm:table-cell">Prioridade</th>
-                            <th className="px-4 py-3 font-bold">Status</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold">Status</th>
                             <th className="px-4 py-3 font-bold hidden md:table-cell">Responsável</th>
                             <th className="px-4 py-3 font-bold hidden md:table-cell">Abertura</th>
-                            <th className="px-4 py-3 font-bold text-right">Ações</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold text-right">Ações</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/25">
@@ -14745,7 +14749,7 @@ const custoDetalheTitulo = custoDetalheItem
                               const aberturaStr = abertura ? new Date(abertura).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '-';
                               return (
                                 <tr key={ordem.id} className="hover:bg-slate-800/15 transition-colors group">
-                                  <td className="px-4 py-3">
+                                  <td className="px-2 sm:px-4 py-3">
                                     <p className="text-[11px] font-bold text-slate-400">{ordem.id}</p>
                                     <p className="text-sm font-semibold text-slate-100">{ordem.ativo || '-'}</p>
                                   </td>
@@ -14756,7 +14760,7 @@ const custoDetalheTitulo = custoDetalheItem
                                       {ordem.prioridade || '-'}
                                     </span>
                                   </td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-2 sm:px-4 py-3">
                                     <span className={`text-xs font-semibold ${sColor}`}>{ordem.status || '-'}</span>
                                   </td>
                                   <td className="px-4 py-3 hidden md:table-cell">
@@ -14772,16 +14776,26 @@ const custoDetalheTitulo = custoDetalheItem
                                     )}
                                   </td>
                                   <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{aberturaStr}</td>
-                                  <td className="px-4 py-3">
-                                    <div className="flex items-center justify-end gap-1">
-                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">Ver</button>
-                                      <button type="button" onClick={() => handleEditarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">Editar</button>
-                                      <button type="button" onClick={() => handleImprimirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">Imprimir</button>
+                                  <td className="px-2 sm:px-4 py-3">
+                                    <div className="flex items-center justify-end gap-0.5 sm:gap-1">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">
+                                        <Eye size={13} /><span className="hidden sm:inline">Ver</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleEditarOs(ordem)} title="Editar" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">
+                                        <Pencil size={13} /><span className="hidden sm:inline">Editar</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleImprimirOs(ordem)} title="Imprimir" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">
+                                        <Printer size={13} /><span className="hidden sm:inline">Imprimir</span>
+                                      </button>
                                       {ordem.status === 'Finalizada' && (
-                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">Reabrir</button>
+                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} title="Reabrir" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">
+                                          <RotateCcw size={13} /><span className="hidden sm:inline">Reabrir</span>
+                                        </button>
                                       )}
                                       {canDeleteOs && (
-                                        <button type="button" onClick={() => handleExcluirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-500 hover:bg-rose-500/10 transition-all">Excluir</button>
+                                        <button type="button" onClick={() => handleExcluirOs(ordem)} title="Excluir" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-rose-500 hover:bg-rose-500/10 transition-all">
+                                          <Trash2 size={13} /><span className="hidden sm:inline">Excluir</span>
+                                        </button>
                                       )}
                                     </div>
                                   </td>
@@ -14829,12 +14843,12 @@ const custoDetalheTitulo = custoDetalheItem
                       <table className="w-full text-left">
                         <thead className="bg-slate-950/40 text-slate-500 text-[10px] uppercase tracking-wider border-b border-slate-800/30">
                           <tr>
-                            <th className="px-4 py-3 font-bold">OS / Ativo</th>
-                            <th className="px-4 py-3 font-bold">Setor</th>
-                            <th className="px-4 py-3 font-bold">Prioridade</th>
-                            <th className="px-4 py-3 font-bold">Status</th>
-                            <th className="px-4 py-3 font-bold">Aberto em</th>
-                            <th className="px-4 py-3 font-bold text-right">Ações</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold">OS / Ativo</th>
+                            <th className="px-4 py-3 font-bold hidden sm:table-cell">Setor</th>
+                            <th className="px-4 py-3 font-bold hidden sm:table-cell">Prioridade</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold">Status</th>
+                            <th className="px-4 py-3 font-bold hidden md:table-cell">Aberto em</th>
+                            <th className="px-2 sm:px-4 py-3 font-bold text-right">Ações</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/25">
@@ -14870,28 +14884,36 @@ const custoDetalheTitulo = custoDetalheItem
                               const aberturaStr = abertura ? new Date(abertura).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-';
                               return (
                                 <tr key={ordem.id} className="hover:bg-slate-800/15 transition-colors">
-                                  <td className="px-4 py-3">
+                                  <td className="px-2 sm:px-4 py-3">
                                     <p className="text-[11px] font-bold text-slate-400">{ordem.id}</p>
                                     <p className="text-sm font-semibold text-slate-100">{ordem.ativo || '-'}</p>
                                   </td>
-                                  <td className="px-4 py-3 text-xs text-slate-400">{ordem.setor || '-'}</td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-4 py-3 text-xs text-slate-400 hidden sm:table-cell">{ordem.setor || '-'}</td>
+                                  <td className="px-4 py-3 hidden sm:table-cell">
                                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border ${pStyle.cls}`}>
                                       <span className={`w-1.5 h-1.5 rounded-full ${pStyle.dot}`}></span>
                                       {ordem.prioridade || '-'}
                                     </span>
                                   </td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-2 sm:px-4 py-3">
                                     <span className={`text-xs font-semibold ${statusColor}`}>{ordem.status || '-'}</span>
                                   </td>
-                                  <td className="px-4 py-3 text-xs text-slate-500">{aberturaStr}</td>
-                                  <td className="px-4 py-3">
-                                    <div className="flex items-center justify-end gap-1">
-                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">Ver</button>
-                                      <button type="button" onClick={() => handleEditarOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">Editar</button>
-                                      <button type="button" onClick={() => handleImprimirOs(ordem)} className="px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">Imprimir</button>
+                                  <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{aberturaStr}</td>
+                                  <td className="px-2 sm:px-4 py-3">
+                                    <div className="flex items-center justify-end gap-0.5 sm:gap-1">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">
+                                        <Eye size={13} /><span className="hidden sm:inline">Ver</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleEditarOs(ordem)} title="Editar" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">
+                                        <Pencil size={13} /><span className="hidden sm:inline">Editar</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleImprimirOs(ordem)} title="Imprimir" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-500 hover:text-slate-200 hover:bg-slate-700/30 transition-all">
+                                        <Printer size={13} /><span className="hidden sm:inline">Imprimir</span>
+                                      </button>
                                       {ordem.status === 'Finalizada' && (
-                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} className="px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">Reabrir</button>
+                                        <button type="button" onClick={() => atualizarOs(ordem.id, { status: 'Contestada' })} title="Reabrir" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-rose-400 hover:bg-rose-500/10 transition-all">
+                                          <RotateCcw size={13} /><span className="hidden sm:inline">Reabrir</span>
+                                        </button>
                                       )}
                                     </div>
                                   </td>
@@ -17003,7 +17025,7 @@ const custoDetalheTitulo = custoDetalheItem
 
       {/* Menu Mobile Inferior */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
-        <div className="grid grid-cols-6">
+        <div className="flex overflow-x-auto">
           {menuItems.map((item) => (
             (() => {
               const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
@@ -17012,7 +17034,7 @@ const custoDetalheTitulo = custoDetalheItem
                   key={item.id}
                   onClick={() => !isDisabled && setAbaAtiva(item.id)}
                   disabled={isDisabled}
-                  className={`flex flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex flex-1 min-w-[56px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
                     abaAtiva === item.id
                       ? 'text-blue-400'
                       : 'text-slate-400 hover:text-slate-200'
