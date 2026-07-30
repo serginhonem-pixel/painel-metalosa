@@ -17025,7 +17025,7 @@ const custoDetalheTitulo = custoDetalheItem
 
       {/* Menu Mobile Inferior */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
-        <div className="flex overflow-x-auto">
+        <div className="flex overflow-x-auto scrollbar-thin-nav">
           {menuItems.map((item) => (
             (() => {
               const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
@@ -17034,7 +17034,7 @@ const custoDetalheTitulo = custoDetalheItem
                   key={item.id}
                   onClick={() => !isDisabled && setAbaAtiva(item.id)}
                   disabled={isDisabled}
-                  className={`flex flex-1 min-w-[56px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex flex-shrink-0 w-[68px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
                     abaAtiva === item.id
                       ? 'text-blue-400'
                       : 'text-slate-400 hover:text-slate-200'

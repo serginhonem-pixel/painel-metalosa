@@ -7,6 +7,37 @@ body {
   color: #e6e6e6;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.5);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.75);
+}
+
+.scrollbar-thin-nav {
+  scrollbar-width: none;
+}
+
+.scrollbar-thin-nav::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes marquee-30s {
   0% {
     transform: translateX(0);
