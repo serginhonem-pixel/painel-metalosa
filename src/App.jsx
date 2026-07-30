@@ -68,7 +68,9 @@ import {
   ShoppingCart,
   Zap,
   ScanLine,
-  Search
+  Search,
+  ChevronUp,
+  MoreHorizontal
 } from 'lucide-react';
 
 // --- Constantes e Dados Iniciais ---
@@ -1664,6 +1666,18 @@ export default function App() {
     }
     return ITENS_MENU;
   }, [isManutencaoOnly]);
+
+  const MENU_MOBILE_PRINCIPAL_IDS = ['dashboard-tv', 'executivo', 'faturamento', 'manutencao'];
+  const menuItemsPrincipais = useMemo(
+    () => menuItems.filter((item) => MENU_MOBILE_PRINCIPAL_IDS.includes(item.id)),
+    [menuItems]
+  );
+  const menuItemsMais = useMemo(
+    () => menuItems.filter((item) => !MENU_MOBILE_PRINCIPAL_IDS.includes(item.id)),
+    [menuItems]
+  );
+  const [menuMobileMaisAberto, setMenuMobileMaisAberto] = useState(false);
+  const abaAtivaEstaNoMais = menuItemsMais.some((item) => item.id === abaAtiva);
 
   useEffect(() => {
     if (!authUser) {
@@ -17024,29 +17038,72 @@ const custoDetalheTitulo = custoDetalheItem
       </main>
 
       {/* Menu Mobile Inferior */}
+      {menuMobileMaisAberto && (
+        <div
+          className="md:hidden fixed inset-0 z-30"
+          onClick={() => setMenuMobileMaisAberto(false)}
+        />
+      )}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-slate-800 backdrop-blur">
-        <div className="flex overflow-x-auto scrollbar-thin-nav">
-          {menuItems.map((item) => (
-            (() => {
+        {menuMobileMaisAberto && menuItemsMais.length > 0 && (
+          <div className="absolute bottom-full left-0 right-0 mb-1 mx-2 rounded-xl border border-slate-800 bg-slate-900/95 backdrop-blur shadow-2xl overflow-hidden">
+            {menuItemsMais.map((item) => {
               const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
               return (
                 <button
                   key={item.id}
-                  onClick={() => !isDisabled && setAbaAtiva(item.id)}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    setAbaAtiva(item.id);
+                    setMenuMobileMaisAberto(false);
+                  }}
                   disabled={isDisabled}
-                  className={`flex flex-shrink-0 w-[68px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex w-full items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-wide transition-all border-b border-slate-800/60 last:border-b-0 ${
                     abaAtiva === item.id
-                      ? 'text-blue-400'
-                      : 'text-slate-400 hover:text-slate-200'
-                  } ${isDisabled ? 'cursor-not-allowed opacity-50 hover:text-slate-400' : ''}`}
-                  title={isDisabled ? 'Em ajuste' : undefined}
+                      ? 'text-blue-400 bg-blue-500/10'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  } ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
-                  <item.icon size={18} />
-                  <span className="whitespace-nowrap">{item.label.split(' ')[0]}</span>
+                  <item.icon size={16} />
+                  <span>{item.label}</span>
                 </button>
               );
-            })()
-          ))}
+            })}
+          </div>
+        )}
+        <div className="flex">
+          {menuItemsPrincipais.map((item) => {
+            const isDisabled = item.id === 'portfolio' && isPortfolioDisabled;
+            return (
+              <button
+                key={item.id}
+                onClick={() => !isDisabled && setAbaAtiva(item.id)}
+                disabled={isDisabled}
+                className={`flex flex-1 min-w-[56px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                  abaAtiva === item.id
+                    ? 'text-blue-400'
+                    : 'text-slate-400 hover:text-slate-200'
+                } ${isDisabled ? 'cursor-not-allowed opacity-50 hover:text-slate-400' : ''}`}
+                title={isDisabled ? 'Em ajuste' : undefined}
+              >
+                <item.icon size={18} />
+                <span className="whitespace-nowrap">{item.label.split(' ')[0]}</span>
+              </button>
+            );
+          })}
+          {menuItemsMais.length > 0 && (
+            <button
+              onClick={() => setMenuMobileMaisAberto((prev) => !prev)}
+              className={`flex flex-1 min-w-[56px] flex-col items-center justify-center gap-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                menuMobileMaisAberto || abaAtivaEstaNoMais
+                  ? 'text-blue-400'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {menuMobileMaisAberto ? <ChevronUp size={18} /> : <MoreHorizontal size={18} />}
+              <span className="whitespace-nowrap">Mais</span>
+            </button>
+          )}
         </div>
       </nav>
     </div>
