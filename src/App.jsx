@@ -563,6 +563,14 @@ const normalizarDescricaoProduto = (valor) => {
   return texto;
 };
 
+const ensureSpacePdf = (doc, pageHeight, currentY, needed) => {
+  if (currentY + needed > pageHeight - 16) {
+    doc.addPage();
+    return 24;
+  }
+  return currentY;
+};
+
 const obterFilialFaturamento = (row, opcoes = {}) => {
   const { descricaoOverride = '', padrao = 'Sem filial' } = opcoes;
   const descricao = normalizarDescricaoProduto(
@@ -8228,6 +8236,660 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     XLSX.writeFile(wb, nomeArquivo);
   };
 
+  const handleExportarRelatorioExecutivoAnual = async () => {
+    const ano = faturamentoAno;
+    const linhasAno = (faturamentoLinhas || []).filter((row) => obterMesKey(row)?.key?.startsWith(`${ano}-`));
+    if (!linhasAno.length) return;
+
+    const WEEKDAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+    const WEEKDAY_ORDER = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
+    const MONTHS_PT = { '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr', '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez' };
+
+    let total = 0;
+    const byMonth = new Map();
+    const byFilial = new Map();
+    const byGroup = new Map();
+    const byProduct = new Map();
+    const byClient = new Map();
+    const byVendor = new Map();
+    const byWeekday = new Map();
+    const byMonthFilial = new Map();
+    let cfopIntra = 0;
+    let cfopInter = 0;
+    let cfopOutros = 0;
+
+    linhasAno.forEach((row) => {
+      const valor = obterValorLiquido(row);
+      const qtd = obterQuantidadeLiquida(row);
+      const mesInfo = obterMesKey(row);
+      if (!mesInfo) return;
+      total += valor;
+      byMonth.set(mesInfo.key, (byMonth.get(mesInfo.key) || 0) + valor);
+
+      const filial = obterFilialFaturamento(row);
+      byFilial.set(filial, (byFilial.get(filial) || 0) + valor);
+      byMonthFilial.set(`${mesInfo.key}|${filial}`, (byMonthFilial.get(`${mesInfo.key}|${filial}`) || 0) + valor);
+
+      const grupoRaw = row.Grupo;
+      const grupo = grupoRaw && String(grupoRaw).trim() ? String(grupoRaw).trim() : 'Sem grupo';
+      byGroup.set(grupo, (byGroup.get(grupo) || 0) + valor);
+
+      const codigo = String(row.Codigo || '').trim();
+      const descricao = normalizarDescricaoProduto(row.Descricao || '');
+      const chaveProd = `${codigo}||${descricao}`;
+      if (!byProduct.has(chaveProd)) byProduct.set(chaveProd, { codigo, descricao, valor: 0, qtd: 0, notas: 0 });
+      const prod = byProduct.get(chaveProd);
+      prod.valor += valor;
+      prod.qtd += qtd;
+      prod.notas += 1;
+
+      const clienteCod = row.Cliente ? String(row.Cliente).trim() : '';
+      if (clienteCod) {
+        if (!byClient.has(clienteCod)) byClient.set(clienteCod, { valor: 0, notas: 0, meses: new Set() });
+        const cli = byClient.get(clienteCod);
+        cli.valor += valor;
+        cli.notas += 1;
+        cli.meses.add(mesInfo.key);
+      }
+      const vendedorCod = row.Vendedor1 ? String(row.Vendedor1).trim() : '';
+      if (vendedorCod) byVendor.set(vendedorCod, (byVendor.get(vendedorCod) || 0) + valor);
+
+      const emissaoDate = parseEmissaoData(row.Emissao);
+      if (emissaoDate) {
+        const wd = WEEKDAY_NAMES[emissaoDate.getUTCDay()];
+        byWeekday.set(wd, (byWeekday.get(wd) || 0) + valor);
+      }
+
+      const cfop = String(row.CodFiscal || '').trim();
+      if (cfop.startsWith('5')) cfopIntra += valor;
+      else if (cfop.startsWith('6')) cfopInter += valor;
+      else cfopOutros += valor;
+    });
+
+    if (total <= 0) return;
+
+    const mesesOrdenados = Array.from(byMonth.keys()).sort();
+    const filiaisOrdenadas = Array.from(byFilial.entries()).sort((a, b) => b[1] - a[1]);
+    const gruposOrdenados = Array.from(byGroup.entries()).sort((a, b) => b[1] - a[1]);
+    const produtosOrdenados = Array.from(byProduct.values()).sort((a, b) => b.valor - a.valor);
+    const clientesOrdenados = Array.from(byClient.entries())
+      .map(([cliente, info]) => ({ cliente, ...info }))
+      .sort((a, b) => b.valor - a.valor);
+    const vendedoresOrdenados = Array.from(byVendor.entries()).sort((a, b) => b[1] - a[1]);
+
+    let cum = 0;
+    let countTo80Products = 0;
+    for (const p of produtosOrdenados) {
+      cum += p.valor;
+      countTo80Products += 1;
+      if (cum / total >= 0.8) break;
+    }
+    let cumC = 0;
+    let countClientsTo80 = 0;
+    for (const c of clientesOrdenados) {
+      cumC += c.valor;
+      countClientsTo80 += 1;
+      if (cumC / total >= 0.8) break;
+    }
+    const top10ClientPct = clientesOrdenados.slice(0, 10).reduce((s, c) => s + c.valor, 0) / total * 100;
+    const clientsSingleNote = clientesOrdenados.filter((c) => c.notas === 1).length;
+
+    const abcCurve = [];
+    let cumAbc = 0;
+    produtosOrdenados.forEach((p, i) => {
+      cumAbc += p.valor;
+      if (i < 60 || i % 40 === 0) abcCurve.push({ rank: i + 1, cumPct: (cumAbc / total) * 100 });
+    });
+
+    const loadImageAsDataUrl = (url) =>
+      fetch(url)
+        .then((res) => res.blob())
+        .then(
+          (blob) =>
+            new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            })
+        )
+        .catch(() => null);
+    const logoDataUrl = await loadImageAsDataUrl(logoMetalosa);
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 16;
+    const contentW = pageWidth - marginX * 2;
+
+    const NAVY = [15, 23, 42];
+    const SLATE = [100, 116, 139];
+    const SLATE_LIGHT = [148, 163, 184];
+    const BORDER = [226, 232, 240];
+    const PANEL = [244, 244, 241];
+    const BLUE = [42, 120, 214];
+    const ORANGE = [235, 104, 52];
+    const AQUA = [27, 175, 122];
+    const VIOLET = [74, 58, 167];
+    const RED = [227, 73, 72];
+
+    const fmtMi = (v) => `R$ ${(v / 1e6).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
+    const fmtInt = (v) => Math.round(v).toLocaleString('pt-BR');
+
+    const sectionTitle = (texto, y, accent = BLUE) => {
+      doc.setFillColor(...accent);
+      doc.rect(marginX, y - 4, 3, 5, 'F');
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(texto, marginX + 6, y);
+      return y + 8;
+    };
+    const sectionDesc = (texto, y) => {
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
+      const linhas = doc.splitTextToSize(texto, contentW);
+      doc.text(linhas, marginX, y);
+      return y + linhas.length * 4.2 + 4;
+    };
+    const paragraph = (texto, y) => {
+      doc.setFontSize(9.3);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(20, 20, 20);
+      const linhas = doc.splitTextToSize(texto, contentW);
+      doc.text(linhas, marginX, y);
+      return y + linhas.length * 4.6 + 4;
+    };
+    const bullet = (texto, y) => {
+      doc.setFontSize(9.3);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(20, 20, 20);
+      const linhas = doc.splitTextToSize(texto, contentW - 8);
+      doc.setTextColor(...BLUE);
+      doc.text('•', marginX, y);
+      doc.setTextColor(20, 20, 20);
+      doc.text(linhas, marginX + 6, y);
+      return y + linhas.length * 4.6 + 4;
+    };
+
+    const drawHeaderFooterAll = () => {
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 2; i <= pageCount; i += 1) {
+        doc.setPage(i);
+        doc.setFillColor(...BLUE);
+        doc.rect(0, 0, pageWidth, 2.4, 'F');
+        doc.setFontSize(7.6);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(...SLATE_LIGHT);
+        doc.text(`FATURAMENTO ${ano} · RELATÓRIO EXECUTIVO`, marginX, 10);
+        doc.text('Metalosa', pageWidth - marginX, 10, { align: 'right' });
+        doc.setDrawColor(...BORDER);
+        doc.setLineWidth(0.2);
+        doc.line(marginX, 12, pageWidth - marginX, 12);
+        doc.line(marginX, pageHeight - 12, pageWidth - marginX, pageHeight - 12);
+        doc.text(`Fonte: notas fiscais de saída, ${ano}`, marginX, pageHeight - 8);
+        doc.text(`${i - 1}`, pageWidth - marginX, pageHeight - 8, { align: 'right' });
+      }
+    };
+
+    // ===== Capa =====
+    doc.setFillColor(...NAVY);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+    doc.setFillColor(...BLUE);
+    doc.rect(0, 22, pageWidth, 3, 'F');
+    doc.setFillColor(...ORANGE);
+    doc.rect(0, 25, pageWidth * 0.42, 1.5, 'F');
+    if (logoDataUrl) {
+      try {
+        doc.addImage(logoDataUrl, 'PNG', marginX, 36, 26, 17.6);
+      } catch (err) {
+        /* logo indisponível */
+      }
+    }
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10.5);
+    doc.setFont(undefined, 'normal');
+    doc.text('PAINEL INDUSTRIAL · RELATÓRIO EXECUTIVO', marginX, 66);
+    doc.setFontSize(26);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Faturamento ${ano}`, marginX, 84);
+    doc.setTextColor(143, 182, 232);
+    doc.text('Análise de Operações e Produtos', marginX, 94);
+    doc.setTextColor(195, 194, 183);
+    doc.setFontSize(10.5);
+    doc.setFont(undefined, 'normal');
+    const ultimoMes = mesesOrdenados[mesesOrdenados.length - 1] || '';
+    const [ultAno, ultMes] = ultimoMes.split('-');
+    const periodoTexto = `Período: janeiro a ${(MONTHS_PT[ultMes] || '').toLowerCase()} de ${ultAno || ano} (${mesesOrdenados.length} meses)`;
+    doc.text(periodoTexto, marginX, 108);
+    doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')}`, marginX, 115);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(30);
+    doc.setFont(undefined, 'bold');
+    doc.text(fmtMi(total).replace('mi', 'milhões'), marginX, 158);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(195, 194, 183);
+    doc.text(
+      `em faturamento bruto, ${fmtInt(linhasAno.length)} notas fiscais, ${filiaisOrdenadas.length} filiais, ${fmtInt(produtosOrdenados.length)} produtos ativos`,
+      marginX,
+      165
+    );
+    doc.setDrawColor(44, 62, 92);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, pageHeight - 22, pageWidth - marginX, pageHeight - 22);
+    doc.setFontSize(8);
+    doc.setTextColor(125, 138, 163);
+    doc.text('Fonte: base de notas fiscais de saída (ERP) · Documento de uso interno', marginX, pageHeight - 16);
+
+    // ===== Sumário executivo =====
+    doc.addPage();
+    let y = 24;
+    y = sectionTitle('Sumário executivo', y);
+    y = sectionDesc(
+      `Panorama consolidado do faturamento de ${ano}, com leitura por filial, produto, cliente e canal de venda a partir da base de notas fiscais de saída.`,
+      y
+    );
+
+    const filialLabel = (f) => (f && f !== 'Sem filial' ? `Filial ${f}` : 'Sem filial');
+    const filialLider = filiaisOrdenadas[0];
+    const clienteLider = clientesOrdenados[0];
+    const KPIS = [
+      { titulo: 'FATURAMENTO', valor: fmtMi(total), sub: `${ano} · ${fmtInt(linhasAno.length)} notas`, accent: BLUE, tint: [239, 246, 255] },
+      { titulo: 'MÉDIA MENSAL', valor: fmtMi(total / mesesOrdenados.length), sub: `projeção anual ≈ ${fmtMi((total / mesesOrdenados.length) * 12)}`, accent: ORANGE, tint: [255, 247, 237] },
+      { titulo: 'FILIAL LÍDER', valor: filialLider ? filialLabel(filialLider[0]) : '-', sub: filialLider ? `${(filialLider[1] / total * 100).toFixed(0)}% do faturamento` : '', accent: AQUA, tint: [236, 253, 245] },
+      { titulo: 'CONCENTRAÇÃO', valor: `${top10ClientPct.toFixed(0)}%`, sub: 'da receita em 10 clientes', accent: RED, tint: [255, 241, 242] },
+    ];
+    const gap = 4;
+    const cardW = (contentW - gap * 3) / 4;
+    const cardH = 26;
+    KPIS.forEach((card, i) => {
+      const x = marginX + i * (cardW + gap);
+      doc.setFillColor(...card.tint);
+      doc.roundedRect(x, y, cardW, cardH, 2, 2, 'F');
+      doc.setFillColor(...card.accent);
+      doc.roundedRect(x, y, 2.2, cardH, 1, 1, 'F');
+      doc.setFontSize(7);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...SLATE);
+      doc.text(card.titulo, x + 6, y + 7);
+      doc.setFontSize(13.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(card.valor, x + 6, y + 15.5);
+      doc.setFontSize(6.8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE_LIGHT);
+      const subLinhas = doc.splitTextToSize(card.sub, cardW - 10);
+      doc.text(subLinhas, x + 6, y + 21.5);
+    });
+    y += cardH + 12;
+
+    y = sectionTitle('Principais achados', y);
+    const melhorMes = mesesOrdenados.reduce((best, m) => (byMonth.get(m) > (byMonth.get(best) ?? -Infinity) ? m : best), mesesOrdenados[0]);
+    const piorMes = mesesOrdenados.reduce((worst, m) => (byMonth.get(m) < (byMonth.get(worst) ?? Infinity) ? m : worst), mesesOrdenados[0]);
+    const top2Grupos = gruposOrdenados.slice(0, 2).reduce((s, [, v]) => s + v, 0);
+    const achados = [
+      `O faturamento somou ${fmtMi(total)} em ${mesesOrdenados.length} meses de ${ano}, com pico em ${MONTHS_PT[melhorMes.split('-')[1]]} (${fmtMi(byMonth.get(melhorMes))}) e vale em ${MONTHS_PT[piorMes.split('-')[1]]} (${fmtMi(byMonth.get(piorMes))}).`,
+      filialLider
+        ? `A ${filialLabel(filialLider[0])} responde por ${(filialLider[1] / total * 100).toFixed(0)}% de todo o faturamento (${fmtMi(filialLider[1])}) — a maior concentração operacional entre as filiais.`
+        : null,
+      `O portfólio tem alta concentração de receita: apenas ${countTo80Products} produtos (de ${fmtInt(produtosOrdenados.length)} ativos) respondem por 80% do faturamento — perfil de cauda longa clássico.`,
+      gruposOrdenados.length >= 2
+        ? `Os dois maiores grupos de produto somam ${fmtMi(top2Grupos)} (${(top2Grupos / total * 100).toFixed(0)}% do total) — o núcleo do negócio.`
+        : null,
+      clienteLider
+        ? `Concentração de clientes é ponto de atenção: o cliente ${clienteLider.cliente} responde sozinho por ${(clienteLider.valor / total * 100).toFixed(1)}% da receita (${fmtMi(clienteLider.valor)}), e os 10 maiores juntos somam ${top10ClientPct.toFixed(0)}% — ${fmtInt(clientsSingleNote)} de ${fmtInt(clientesOrdenados.length)} clientes ativos compraram apenas uma vez no período.`
+        : null,
+      clientesOrdenados.length
+        ? `No total, ${fmtInt(countClientsTo80)} clientes (de ${fmtInt(clientesOrdenados.length)}) respondem por 80% da receita.`
+        : null,
+      `Vendas interestaduais (CFOP 6xxx) representam ${(cfopInter / total * 100).toFixed(0)}% do faturamento total — parcela relevante da operação atende clientes fora do estado sede.`,
+    ].filter(Boolean);
+    achados.forEach((a) => {
+      y = bullet(a, y);
+    });
+
+    // ===== Evolução mensal =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Evolução mensal', y);
+    y = sectionDesc('Faturamento por mês de emissão da nota fiscal. A linha tracejada marca a média do período.', y);
+
+    const chartH1 = 55;
+    const chartY1 = y;
+    const maxMes = Math.max(...mesesOrdenados.map((m) => byMonth.get(m)), 1);
+    const slot1 = contentW / mesesOrdenados.length;
+    const barW1 = slot1 * 0.55;
+    const avgMes = total / mesesOrdenados.length;
+
+    doc.setDrawColor(...BORDER);
+    doc.setLineWidth(0.2);
+    [0.25, 0.5, 0.75, 1].forEach((p) => {
+      const gy = chartY1 + chartH1 * (1 - p);
+      doc.line(marginX, gy, marginX + contentW, gy);
+      doc.setFontSize(6.5);
+      doc.setTextColor(...SLATE_LIGHT);
+      doc.text(formatarValorCurto(maxMes * p * 1.15), marginX + contentW, gy - 0.8, { align: 'right' });
+    });
+    mesesOrdenados.forEach((m, i) => {
+      const v = byMonth.get(m);
+      const bx = marginX + i * slot1 + (slot1 - barW1) / 2;
+      const barH = (v / (maxMes * 1.15)) * chartH1;
+      const by = chartY1 + chartH1 - barH;
+      doc.setFillColor(...BLUE);
+      doc.rect(bx, by, barW1, barH, 'F');
+      doc.setFontSize(7.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(formatarValorCurto(v), bx + barW1 / 2, by - 2, { align: 'center' });
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
+      doc.text(MONTHS_PT[m.split('-')[1]], bx + barW1 / 2, chartY1 + chartH1 + 6, { align: 'center' });
+    });
+    const avgY1 = chartY1 + chartH1 - (avgMes / (maxMes * 1.15)) * chartH1;
+    doc.setDrawColor(...SLATE_LIGHT);
+    doc.setLineDashPattern([1.2, 1], 0);
+    doc.line(marginX, avgY1, marginX + contentW, avgY1);
+    doc.setLineDashPattern([], 0);
+    doc.setFontSize(7.5);
+    doc.setTextColor(...SLATE);
+    doc.text(`Média: ${fmtMi(avgMes)}`, marginX + contentW, avgY1 - 2, { align: 'right' });
+    y = chartY1 + chartH1 + 16;
+
+    y = paragraph(
+      `${MONTHS_PT[melhorMes.split('-')[1]]} foi o mês de maior faturamento (${fmtMi(byMonth.get(melhorMes))}). ${MONTHS_PT[piorMes.split('-')[1]]} registrou o menor volume do período (${fmtMi(byMonth.get(piorMes))}).`,
+      y
+    );
+
+    y += 4;
+    y = sectionTitle('Padrão semanal de vendas', y, AQUA);
+    const chartH2 = 42;
+    const chartY2 = y;
+    const maxWd = Math.max(...WEEKDAY_ORDER.map((d) => byWeekday.get(d) || 0), 1);
+    const slot2 = contentW / WEEKDAY_ORDER.length;
+    const barW2 = slot2 * 0.5;
+    doc.setDrawColor(...BORDER);
+    doc.line(marginX, chartY2 + chartH2, marginX + contentW, chartY2 + chartH2);
+    WEEKDAY_ORDER.forEach((d, i) => {
+      const v = byWeekday.get(d) || 0;
+      const bx = marginX + i * slot2 + (slot2 - barW2) / 2;
+      const barH = (v / (maxWd * 1.15)) * chartH2;
+      const by = chartY2 + chartH2 - barH;
+      doc.setFillColor(...AQUA);
+      if (barH > 0) doc.rect(bx, by, barW2, barH, 'F');
+      if (v > 0) {
+        doc.setFontSize(7);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(...NAVY);
+        doc.text(formatarValorCurto(v), bx + barW2 / 2, by - 2, { align: 'center' });
+      }
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
+      doc.text(d, bx + barW2 / 2, chartY2 + chartH2 + 6, { align: 'center' });
+    });
+    y = chartY2 + chartH2 + 14;
+    const diaTop = WEEKDAY_ORDER.reduce((best, d) => ((byWeekday.get(d) || 0) > (byWeekday.get(best) || 0) ? d : best), WEEKDAY_ORDER[0]);
+    y = paragraph(`${diaTop}-feira concentra o maior volume de faturamento da semana (${fmtMi(byWeekday.get(diaTop) || 0)}).`, y);
+
+    // ===== Filiais =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Desempenho por filial', y);
+    y = sectionDesc(`Distribuição do faturamento entre as filiais operacionais em ${ano}.`, y);
+
+    const filCores = [BLUE, AQUA, VIOLET, [237, 161, 0]];
+    const rowH = 12;
+    const maxFil = filiaisOrdenadas[0]?.[1] || 1;
+    filiaisOrdenadas.forEach(([f, v], i) => {
+      const by = y + i * (rowH + 3);
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
+      doc.text(filialLabel(f), marginX, by + rowH / 2 + 1);
+      const trackX = marginX + 30;
+      const trackW = contentW - 30 - 45;
+      doc.setFillColor(...BORDER);
+      doc.roundedRect(trackX, by + 2, trackW, rowH - 4, 1.5, 1.5, 'F');
+      const barW = Math.max((v / maxFil) * trackW, 2);
+      doc.setFillColor(...filCores[i % filCores.length]);
+      doc.roundedRect(trackX, by + 2, barW, rowH - 4, 1.5, 1.5, 'F');
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(`${fmtMi(v)} (${(v / total * 100).toFixed(0)}%)`, marginX + contentW, by + rowH / 2 + 1, { align: 'right' });
+    });
+    y += filiaisOrdenadas.length * (rowH + 3) + 8;
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Filial', 'Faturamento', '% do total', 'Média mensal']],
+      body: filiaisOrdenadas.map(([f, v]) => [
+        filialLabel(f),
+        fmtMi(v),
+        `${(v / total * 100).toFixed(1)}%`,
+        fmtMi(v / mesesOrdenados.length),
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    y = ensureSpacePdf(doc, pageHeight, y, 40);
+    y = sectionTitle('Mapa mensal por filial', y, VIOLET);
+    autoTable(doc, {
+      startY: y,
+      head: [['Filial', ...mesesOrdenados.map((m) => MONTHS_PT[m.split('-')[1]])]],
+      body: filiaisOrdenadas.map(([f]) => [
+        filialLabel(f),
+        ...mesesOrdenados.map((m) => (byMonthFilial.get(`${m}|${f}`) || 0) / 1e6).map((v) => v.toFixed(1)),
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 7.5, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+    });
+    y = doc.lastAutoTable.finalY + 4;
+    doc.setFontSize(7.5);
+    doc.setTextColor(...SLATE_LIGHT);
+    doc.text('Valores em R$ milhões.', marginX, y);
+
+    // ===== Produtos =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Portfólio de produtos', y);
+    y = sectionDesc(`A base ativa em ${ano} conta com ${fmtInt(produtosOrdenados.length)} produtos distintos vendidos.`, y);
+
+    y = sectionTitle('Faturamento por grupo de produto', y, ORANGE);
+    const topGrupos = gruposOrdenados.slice(0, 10);
+    const maxGrupo = topGrupos[0]?.[1] || 1;
+    const rowHG = 9;
+    topGrupos.forEach(([g, v], i) => {
+      const by = y + i * (rowHG + 2.5);
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
+      const label = doc.splitTextToSize(g, 34)[0];
+      doc.text(label, marginX, by + rowHG / 2 + 1);
+      const trackX = marginX + 36;
+      const trackW = contentW - 36 - 30;
+      doc.setFillColor(...BORDER);
+      doc.rect(trackX, by + 1.5, trackW, rowHG - 3, 'F');
+      const barW = Math.max((v / maxGrupo) * trackW, 2);
+      doc.setFillColor(...BLUE);
+      doc.rect(trackX, by + 1.5, barW, rowHG - 3, 'F');
+      doc.setFontSize(7.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(fmtMi(v), marginX + contentW, by + rowHG / 2 + 1, { align: 'right' });
+    });
+    y += topGrupos.length * (rowHG + 2.5) + 10;
+
+    y = ensureSpacePdf(doc, pageHeight, y, 90);
+    y = sectionTitle('Concentração de receita (curva ABC)', y, RED);
+    y = sectionDesc('Percentual acumulado do faturamento por produto, ordenado do maior para o menor.', y);
+    const chartH3 = 48;
+    const chartY3 = y;
+    const maxRank = abcCurve[abcCurve.length - 1]?.rank || 1;
+    doc.setDrawColor(...BORDER);
+    [0.25, 0.5, 0.75, 1].forEach((p) => {
+      const gy = chartY3 + chartH3 * (1 - p);
+      doc.line(marginX, gy, marginX + contentW, gy);
+      doc.setFontSize(6.5);
+      doc.setTextColor(...SLATE_LIGHT);
+      doc.text(`${Math.round(p * 100)}%`, marginX + contentW, gy - 0.8, { align: 'right' });
+    });
+    doc.setDrawColor(...BLUE);
+    doc.setLineWidth(0.7);
+    for (let i = 0; i < abcCurve.length - 1; i += 1) {
+      const p1 = abcCurve[i];
+      const p2 = abcCurve[i + 1];
+      const x1 = marginX + (p1.rank / maxRank) * contentW;
+      const y1 = chartY3 + chartH3 * (1 - p1.cumPct / 100);
+      const x2 = marginX + (p2.rank / maxRank) * contentW;
+      const y2 = chartY3 + chartH3 * (1 - p2.cumPct / 100);
+      doc.line(x1, y1, x2, y2);
+    }
+    const marcaX = marginX + (countTo80Products / maxRank) * contentW;
+    const marcaY = chartY3 + chartH3 * 0.2;
+    doc.setDrawColor(...ORANGE);
+    doc.setLineDashPattern([1, 1], 0);
+    doc.line(marcaX, chartY3, marcaX, chartY3 + chartH3);
+    doc.setLineDashPattern([], 0);
+    doc.setFillColor(...ORANGE);
+    doc.circle(marcaX, chartY3 + chartH3 * 0.2, 1.2, 'F');
+    doc.setFontSize(7.5);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...NAVY);
+    doc.text(`${countTo80Products} produtos = 80%`, marcaX + 3, marcaY - 2);
+    y = chartY3 + chartH3 + 12;
+    y = paragraph(
+      `Apenas ${countTo80Products} produtos (${(countTo80Products / produtosOrdenados.length * 100).toFixed(0)}% do portfólio) respondem por 80% de toda a receita.`,
+      y
+    );
+
+    // ===== Top produtos =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Top 20 produtos por faturamento', y);
+    y = sectionDesc('Ranking do período com quantidade vendida, número de notas e ticket médio por nota.', y);
+    autoTable(doc, {
+      startY: y,
+      head: [['#', 'Código', 'Descrição', 'Faturamento', 'Qtd.', 'Notas', 'Ticket médio']],
+      body: produtosOrdenados.slice(0, 20).map((p, i) => [
+        String(i + 1),
+        p.codigo,
+        p.descricao,
+        formatarMoeda(p.valor),
+        fmtInt(p.qtd),
+        fmtInt(p.notas),
+        formatarMoeda(p.valor / p.notas),
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 7.6, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+      columnStyles: { 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ===== Clientes e vendedores =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Clientes e canais de venda', y);
+    y = sectionDesc(
+      `A base ativa soma ${fmtInt(clientesOrdenados.length)} clientes distintos em ${ano}, atendidos por ${fmtInt(vendedoresOrdenados.length)} vendedores/canais.`,
+      y
+    );
+    y = sectionTitle('Top 15 clientes por faturamento', y, AQUA);
+    autoTable(doc, {
+      startY: y,
+      head: [['#', 'Cliente', 'Faturamento', '% total', 'Notas', 'Meses', 'Ticket médio']],
+      body: clientesOrdenados.slice(0, 15).map((c, i) => [
+        String(i + 1),
+        c.cliente,
+        formatarMoeda(c.valor),
+        `${(c.valor / total * 100).toFixed(1)}%`,
+        fmtInt(c.notas),
+        `${c.meses.size}/${mesesOrdenados.length}`,
+        formatarMoeda(c.valor / c.notas),
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 7.6, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+      columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    y = ensureSpacePdf(doc, pageHeight, y, 60);
+    y = sectionTitle('Top 10 vendedores/canais por faturamento', y, VIOLET);
+    autoTable(doc, {
+      startY: y,
+      head: [['#', 'Código', 'Faturamento', '% do total']],
+      body: vendedoresOrdenados.slice(0, 10).map(([v, val], i) => [
+        String(i + 1),
+        v,
+        formatarMoeda(val),
+        `${(val / total * 100).toFixed(1)}%`,
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+      columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' } },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ===== Perfil fiscal =====
+    doc.addPage();
+    y = 24;
+    y = sectionTitle('Perfil fiscal das operações', y);
+    y = sectionDesc('Distribuição do faturamento por Código Fiscal de Operação (CFOP) agrupado.', y);
+    autoTable(doc, {
+      startY: y,
+      head: [['Categoria', 'Faturamento', '% do total']],
+      body: [
+        ['Vendas dentro do estado (CFOP 5xxx)', fmtMi(cfopIntra), `${(cfopIntra / total * 100).toFixed(1)}%`],
+        ['Vendas interestaduais (CFOP 6xxx)', fmtMi(cfopInter), `${(cfopInter / total * 100).toFixed(1)}%`],
+        ['Outras operações', fmtMi(cfopOutros), `${(cfopOutros / total * 100).toFixed(1)}%`],
+      ],
+      theme: 'striped',
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: marginX, right: marginX },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+    });
+    y = doc.lastAutoTable.finalY + 12;
+    y = paragraph(
+      `Vendas interestaduais representam ${(cfopInter / total * 100).toFixed(0)}% do faturamento total, o que impacta a apuração de ICMS/DIFAL proporcionalmente ao volume.`,
+      y
+    );
+
+    y += 8;
+    y = sectionTitle('Notas metodológicas', y, SLATE);
+    paragraph(
+      `Fonte: base de notas fiscais de saída (ERP), consolidada por mês de emissão, filial, código de produto, cliente e vendedor/canal. A projeção anual usa a média mensal observada extrapolada para 12 meses, sem ajuste de sazonalidade.`,
+      y
+    );
+
+    drawHeaderFooterAll();
+    doc.save(`relatorio_executivo_faturamento_${ano}.pdf`);
+  };
+
   useEffect(() => {
     if (!diasFaturamentoSelecionados.length) return;
     const diasDisponiveis = new Set((faturamentoAtual.porDia || []).map((item) => item.dia));
@@ -13614,6 +14276,14 @@ const custoDetalheTitulo = custoDetalheItem
                                       }`}
                                     >
                                       Baixar Excel
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={handleExportarRelatorioExecutivoAnual}
+                                      title={`Relatório executivo completo do ano ${faturamentoAno}: evolução mensal, filiais, produtos, clientes e vendedores`}
+                                      className="rounded-full border border-rose-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-200 hover:text-white transition"
+                                    >
+                                      Relatório executivo (PDF)
                                     </button>
                                     {faturamentoTabelaView === 'dia' && diasFaturamentoSelecionados.length > 0 && (
                                       <button
