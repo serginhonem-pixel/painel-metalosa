@@ -563,10 +563,9 @@ const normalizarDescricaoProduto = (valor) => {
   return texto;
 };
 
-const ensureSpacePdf = (doc, pageHeight, currentY, needed, onNewPage) => {
+const ensureSpacePdf = (doc, pageHeight, currentY, needed) => {
   if (currentY + needed > pageHeight - 16) {
     doc.addPage();
-    if (onNewPage) onNewPage();
     return 24;
   }
   return currentY;
@@ -8357,103 +8356,59 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         .catch(() => null);
     const logoDataUrl = await loadImageAsDataUrl(logoMetalosa);
 
-    /*
-     * IMPECCABLE DIRECTION — Relatório Executivo de Faturamento (redesign)
-     * THESIS: o relatório lido como um instrumento de precisão industrial —
-     *   números tratados como leituras calibradas, nunca como slides de BI.
-     * OWN-WORLD: newsprint (#FAF8F1) + preto quase puro (#111110) + um único
-     *   acento laranja-sinal (#C74221); courier para todo número/leitura de
-     *   dado, helvetica para prosa; meio-tom/matriz de pontos como segunda
-     *   cor sempre que uma categoria precisa se diferenciar sem recorrer a
-     *   mais matizes.
-     * STORY: a diretoria abre o PDF e em segundos lê o total do ano, os
-     *   riscos de concentração (cliente/produto/filial) e a sazonalidade,
-     *   com a confiança de quem lê um painel de instrumentos calibrado.
-     * FIRST VIEWPORT: capa em preto full-bleed, painel "readout" emoldurado
-     *   com o total do ano em courier bold gigante, spine de meio-tom
-     *   esmaecendo no canto direito, indicadores de notas/filiais/produtos
-     *   logo abaixo.
-     * FORM: direção sorteada nº3 (planta técnica industrial) perdeu, por
-     *   escolha do usuário, para o desafiante Emigre Bitmap Type Specimen —
-     *   seed key 99f74bdc.
-     * FINISH: unreviewed and undocumented is unfinished; this build ends
-     *   with the finish review, the verdict, and DESIGN.md.
-     */
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginX = 16;
     const contentW = pageWidth - marginX * 2;
 
-    const INK = [17, 17, 15];
-    const INK_SOFT = [82, 78, 68];
-    const INK_FAINT = [108, 103, 90];
-    const LINE = [214, 208, 190];
-    const PAPER = [250, 248, 241];
-    const PAPER_DEEP = [238, 234, 220];
-    const ACCENT = [199, 66, 33];
-    const ACCENT_TEXT = [227, 140, 108];
-    const COVER_SUB = [214, 206, 190];
-    const COVER_MUTED = [170, 163, 148];
-    const COVER_FAINT = [140, 134, 120];
+    const NAVY = [15, 23, 42];
+    const SLATE = [100, 116, 139];
+    const SLATE_LIGHT = [148, 163, 184];
+    const BORDER = [226, 232, 240];
+    const PANEL = [244, 244, 241];
+    const BLUE = [42, 120, 214];
+    const ORANGE = [235, 104, 52];
+    const AQUA = [27, 175, 122];
+    const VIOLET = [74, 58, 167];
+    const RED = [227, 73, 72];
 
     const fmtMi = (v) => `R$ ${(v / 1e6).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
     const fmtInt = (v) => Math.round(v).toLocaleString('pt-BR');
 
-    // Instrument-panel chrome: dot-matrix/halftone fill, the report's own
-    // way of telling two categories apart without reaching for another hue.
-    const halftoneRect = (x, y, w, h, color, density = 1.6) => {
-      doc.setFillColor(...color);
-      for (let dy = density / 2; dy < h; dy += density) {
-        for (let dx = density / 2; dx < w; dx += density) {
-          doc.circle(x + dx, y + dy, density * 0.16, 'F');
-        }
-      }
-    };
-    const trackedCaps = (texto) => texto.toUpperCase().split('').join(' ');
-
-    const newPage = () => {
-      doc.addPage();
-      doc.setFillColor(...PAPER);
-      doc.rect(0, 0, pageWidth, pageHeight, 'F');
-    };
-
-    const sectionTitle = (texto, y, accent = ACCENT) => {
+    const sectionTitle = (texto, y, accent = BLUE) => {
       doc.setFillColor(...accent);
-      doc.rect(marginX, y - 3.6, 1.6, 1.6, 'F');
-      doc.rect(marginX, y - 1.6, 1.6, 1.6, 'F');
-      doc.setFillColor(...INK);
-      doc.rect(marginX + 2.2, y - 3.6, 1.6, 1.6, 'F');
-      doc.rect(marginX + 2.2, y - 1.6, 1.6, 1.6, 'F');
-      doc.setFontSize(12.5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...INK);
-      doc.text(texto, marginX + 7.5, y);
+      doc.rect(marginX, y - 4, 3, 5, 'F');
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(texto, marginX + 6, y);
       return y + 8;
     };
     const sectionDesc = (texto, y) => {
       doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_SOFT);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
       const linhas = doc.splitTextToSize(texto, contentW);
       doc.text(linhas, marginX, y);
       return y + linhas.length * 4.2 + 4;
     };
     const paragraph = (texto, y) => {
       doc.setFontSize(9.3);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(20, 20, 20);
       const linhas = doc.splitTextToSize(texto, contentW);
       doc.text(linhas, marginX, y);
       return y + linhas.length * 4.6 + 4;
     };
     const bullet = (texto, y) => {
       doc.setFontSize(9.3);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(20, 20, 20);
       const linhas = doc.splitTextToSize(texto, contentW - 8);
-      doc.setFillColor(...ACCENT);
-      doc.rect(marginX, y - 2.6, 1.6, 1.6, 'F');
+      doc.setTextColor(...BLUE);
+      doc.text('•', marginX, y);
+      doc.setTextColor(20, 20, 20);
       doc.text(linhas, marginX + 6, y);
       return y + linhas.length * 4.6 + 4;
     };
@@ -8462,52 +8417,29 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 2; i <= pageCount; i += 1) {
         doc.setPage(i);
-        doc.setFillColor(...ACCENT);
-        doc.rect(0, 0, pageWidth, 1.6, 'F');
-        doc.setFontSize(7.2);
-        doc.setFont('courier', 'normal');
-        doc.setTextColor(...INK_FAINT);
+        doc.setFillColor(...BLUE);
+        doc.rect(0, 0, pageWidth, 2.4, 'F');
+        doc.setFontSize(7.6);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(...SLATE_LIGHT);
         doc.text(`FATURAMENTO ${ano} · RELATÓRIO EXECUTIVO`, marginX, 10);
-        doc.text('METALOSA', pageWidth - marginX, 10, { align: 'right' });
-        doc.setDrawColor(...LINE);
+        doc.text('Metalosa', pageWidth - marginX, 10, { align: 'right' });
+        doc.setDrawColor(...BORDER);
         doc.setLineWidth(0.2);
         doc.line(marginX, 12, pageWidth - marginX, 12);
         doc.line(marginX, pageHeight - 12, pageWidth - marginX, pageHeight - 12);
-        doc.text(`FONTE: NF-E DE SAÍDA, ${ano}`, marginX, pageHeight - 8);
-        doc.text(`${String(i - 1).padStart(2, '0')}`, pageWidth - marginX, pageHeight - 8, { align: 'right' });
+        doc.text(`Fonte: notas fiscais de saída, ${ano}`, marginX, pageHeight - 8);
+        doc.text(`${i - 1}`, pageWidth - marginX, pageHeight - 8, { align: 'right' });
       }
     };
 
     // ===== Capa =====
-    doc.setFillColor(...INK);
+    doc.setFillColor(...NAVY);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
-
-    // Halftone spine, fading top to bottom — the report's own instrument mark.
-    const spineW = 9;
-    const spineX = pageWidth - spineW;
-    const spineBands = [
-      { d: 1.3, h: pageHeight * 0.22 },
-      { d: 2.1, h: pageHeight * 0.22 },
-      { d: 3.2, h: pageHeight * 0.22 },
-      { d: 5.2, h: pageHeight * 0.34 },
-    ];
-    let spineY = 0;
-    spineBands.forEach((band) => {
-      halftoneRect(spineX, spineY, spineW, band.h, ACCENT, band.d);
-      spineY += band.h;
-    });
-
-    doc.setFillColor(...ACCENT);
-    doc.rect(0, 22, pageWidth, 1.2, 'F');
-    doc.setFillColor(...PAPER);
-    doc.rect(marginX, 25.6, 1.6, 1.6, 'F');
-    doc.rect(marginX + 2.4, 25.6, 1.6, 1.6, 'F');
-    doc.rect(marginX + 4.8, 25.6, 1.6, 1.6, 'F');
-    doc.setFontSize(7.4);
-    doc.setFont('courier', 'normal');
-    doc.setTextColor(...COVER_SUB);
-    doc.text('PAINEL INDUSTRIAL · METALOSA', marginX + 9, 27);
-
+    doc.setFillColor(...BLUE);
+    doc.rect(0, 22, pageWidth, 3, 'F');
+    doc.setFillColor(...ORANGE);
+    doc.rect(0, 25, pageWidth * 0.42, 1.5, 'F');
     if (logoDataUrl) {
       try {
         doc.addImage(logoDataUrl, 'PNG', marginX, 36, 26, 17.6);
@@ -8515,65 +8447,45 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         /* logo indisponível */
       }
     }
-    doc.setTextColor(...ACCENT_TEXT);
-    doc.setFontSize(11);
-    doc.setFont('courier', 'bold');
-    doc.text('RELATÓRIO EXECUTIVO', marginX, 68);
-    doc.setTextColor(...PAPER);
-    doc.setFontSize(34);
-    doc.setFont('courier', 'bold');
-    doc.text(`FATURAMENTO ${ano}`, marginX, 89);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...COVER_SUB);
-    doc.text('Análise de Operações e Produtos', marginX, 99);
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...COVER_MUTED);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10.5);
+    doc.setFont(undefined, 'normal');
+    doc.text('PAINEL INDUSTRIAL · RELATÓRIO EXECUTIVO', marginX, 66);
+    doc.setFontSize(26);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Faturamento ${ano}`, marginX, 84);
+    doc.setTextColor(143, 182, 232);
+    doc.text('Análise de Operações e Produtos', marginX, 94);
+    doc.setTextColor(195, 194, 183);
+    doc.setFontSize(10.5);
+    doc.setFont(undefined, 'normal');
     const ultimoMes = mesesOrdenados[mesesOrdenados.length - 1] || '';
     const [ultAno, ultMes] = ultimoMes.split('-');
     const periodoTexto = `Período: janeiro a ${(MONTHS_PT[ultMes] || '').toLowerCase()} de ${ultAno || ano} (${mesesOrdenados.length} meses)`;
-    doc.text(periodoTexto, marginX, 111);
-    doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')}`, marginX, 117.5);
+    doc.text(periodoTexto, marginX, 108);
+    doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')}`, marginX, 115);
 
-    // Readout panel — the cover's single instrument, framed like a display.
-    const panelX = marginX;
-    const panelY = 132;
-    const panelW = contentW;
-    const panelH = 46;
-    doc.setDrawColor(...PAPER);
-    doc.setLineWidth(0.35);
-    doc.rect(panelX, panelY, panelW, panelH);
-    doc.setFontSize(7.4);
-    doc.setFont('courier', 'normal');
-    doc.setTextColor(...ACCENT_TEXT);
-    doc.text(trackedCaps('total faturamento'), panelX + 6, panelY + 9);
-    doc.setFontSize(28);
-    doc.setFont('courier', 'bold');
-    doc.setTextColor(...PAPER);
-    doc.text(fmtMi(total).replace('mi', 'milhões'), panelX + 6, panelY + 26);
-    doc.setDrawColor(70, 66, 58);
-    doc.setLineWidth(0.2);
-    doc.line(panelX + 6, panelY + 32, panelX + panelW - 6, panelY + 32);
-    doc.setFontSize(8.4);
-    doc.setFont('courier', 'normal');
-    doc.setTextColor(...COVER_MUTED);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(30);
+    doc.setFont(undefined, 'bold');
+    doc.text(fmtMi(total).replace('mi', 'milhões'), marginX, 158);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(195, 194, 183);
     doc.text(
-      `${fmtInt(linhasAno.length)} NOTAS FISCAIS   ${filiaisOrdenadas.length} FILIAIS   ${fmtInt(produtosOrdenados.length)} PRODUTOS ATIVOS`,
-      panelX + 6,
-      panelY + 40
+      `em faturamento bruto, ${fmtInt(linhasAno.length)} notas fiscais, ${filiaisOrdenadas.length} filiais, ${fmtInt(produtosOrdenados.length)} produtos ativos`,
+      marginX,
+      165
     );
-
-    doc.setDrawColor(70, 66, 58);
-    doc.setLineWidth(0.4);
-    doc.line(marginX, pageHeight - 20, pageWidth - marginX, pageHeight - 20);
-    doc.setFontSize(7.6);
-    doc.setFont('courier', 'normal');
-    doc.setTextColor(...COVER_FAINT);
-    doc.text('FONTE: BASE DE NOTAS FISCAIS DE SAÍDA (ERP) · DOCUMENTO DE USO INTERNO', marginX, pageHeight - 14);
+    doc.setDrawColor(44, 62, 92);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, pageHeight - 22, pageWidth - marginX, pageHeight - 22);
+    doc.setFontSize(8);
+    doc.setTextColor(125, 138, 163);
+    doc.text('Fonte: base de notas fiscais de saída (ERP) · Documento de uso interno', marginX, pageHeight - 16);
 
     // ===== Sumário executivo =====
-    newPage();
+    doc.addPage();
     let y = 24;
     y = sectionTitle('Sumário executivo', y);
     y = sectionDesc(
@@ -8585,37 +8497,33 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     const filialLider = filiaisOrdenadas[0];
     const clienteLider = clientesOrdenados[0];
     const KPIS = [
-      { titulo: 'FATURAMENTO', valor: fmtMi(total), sub: `${ano} · ${fmtInt(linhasAno.length)} notas` },
-      { titulo: 'MÉDIA MENSAL', valor: fmtMi(total / mesesOrdenados.length), sub: `projeção anual ~ ${fmtMi((total / mesesOrdenados.length) * 12)}` },
-      { titulo: 'FILIAL LÍDER', valor: filialLider ? filialLabel(filialLider[0]) : '-', sub: filialLider ? `${(filialLider[1] / total * 100).toFixed(0)}% do faturamento` : '' },
-      { titulo: 'CONCENTRAÇÃO', valor: `${top10ClientPct.toFixed(0)}%`, sub: 'da receita em 10 clientes' },
+      { titulo: 'FATURAMENTO', valor: fmtMi(total), sub: `${ano} · ${fmtInt(linhasAno.length)} notas`, accent: BLUE, tint: [239, 246, 255] },
+      { titulo: 'MÉDIA MENSAL', valor: fmtMi(total / mesesOrdenados.length), sub: `projeção anual ≈ ${fmtMi((total / mesesOrdenados.length) * 12)}`, accent: ORANGE, tint: [255, 247, 237] },
+      { titulo: 'FILIAL LÍDER', valor: filialLider ? filialLabel(filialLider[0]) : '-', sub: filialLider ? `${(filialLider[1] / total * 100).toFixed(0)}% do faturamento` : '', accent: AQUA, tint: [236, 253, 245] },
+      { titulo: 'CONCENTRAÇÃO', valor: `${top10ClientPct.toFixed(0)}%`, sub: 'da receita em 10 clientes', accent: RED, tint: [255, 241, 242] },
     ];
     const gap = 4;
     const cardW = (contentW - gap * 3) / 4;
-    const cardH = 30;
+    const cardH = 26;
     KPIS.forEach((card, i) => {
       const x = marginX + i * (cardW + gap);
-      doc.setDrawColor(...LINE);
-      doc.setLineWidth(0.3);
-      doc.rect(x, y, cardW, cardH);
-      halftoneRect(x + cardW - 9, y + 3, 6, 6, i === 0 ? ACCENT : INK, 1.1);
-      doc.setFontSize(6.6);
-      doc.setFont('courier', 'normal');
-      doc.setTextColor(...INK_SOFT);
-      doc.text(card.titulo, x + 4, y + 8);
-      doc.setDrawColor(...LINE);
-      doc.setLineDashPattern([0.4, 0.6], 0);
-      doc.line(x + 4, y + 11, x + cardW - 4, y + 11);
-      doc.setLineDashPattern([], 0);
-      doc.setFontSize(14.5);
-      doc.setFont('courier', 'bold');
-      doc.setTextColor(...INK);
-      doc.text(card.valor, x + 4, y + 20);
-      doc.setFontSize(6.6);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_FAINT);
-      const subLinhas = doc.splitTextToSize(card.sub, cardW - 8);
-      doc.text(subLinhas, x + 4, y + 25.5);
+      doc.setFillColor(...card.tint);
+      doc.roundedRect(x, y, cardW, cardH, 2, 2, 'F');
+      doc.setFillColor(...card.accent);
+      doc.roundedRect(x, y, 2.2, cardH, 1, 1, 'F');
+      doc.setFontSize(7);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...SLATE);
+      doc.text(card.titulo, x + 6, y + 7);
+      doc.setFontSize(13.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
+      doc.text(card.valor, x + 6, y + 15.5);
+      doc.setFontSize(6.8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE_LIGHT);
+      const subLinhas = doc.splitTextToSize(card.sub, cardW - 10);
+      doc.text(subLinhas, x + 6, y + 21.5);
     });
     y += cardH + 12;
 
@@ -8645,7 +8553,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     });
 
     // ===== Evolução mensal =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Evolução mensal', y);
     y = sectionDesc('Faturamento por mês de emissão da nota fiscal. A linha tracejada marca a média do período.', y);
@@ -8657,43 +8565,39 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     const barW1 = slot1 * 0.55;
     const avgMes = total / mesesOrdenados.length;
 
-    doc.setDrawColor(...LINE);
+    doc.setDrawColor(...BORDER);
     doc.setLineWidth(0.2);
-    doc.setLineDashPattern([0.2, 1], 0);
     [0.25, 0.5, 0.75, 1].forEach((p) => {
       const gy = chartY1 + chartH1 * (1 - p);
       doc.line(marginX, gy, marginX + contentW, gy);
       doc.setFontSize(6.5);
-      doc.setFont('courier', 'normal');
-      doc.setTextColor(...INK_FAINT);
+      doc.setTextColor(...SLATE_LIGHT);
       doc.text(formatarValorCurto(maxMes * p * 1.15), marginX + contentW, gy - 0.8, { align: 'right' });
     });
-    doc.setLineDashPattern([], 0);
     mesesOrdenados.forEach((m, i) => {
       const v = byMonth.get(m);
       const bx = marginX + i * slot1 + (slot1 - barW1) / 2;
       const barH = (v / (maxMes * 1.15)) * chartH1;
       const by = chartY1 + chartH1 - barH;
-      doc.setFillColor(...ACCENT);
+      doc.setFillColor(...BLUE);
       doc.rect(bx, by, barW1, barH, 'F');
       doc.setFontSize(7.5);
-      doc.setFont('courier', 'bold');
-      doc.setTextColor(...INK);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
       doc.text(formatarValorCurto(v), bx + barW1 / 2, by - 2, { align: 'center' });
       doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_SOFT);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
       doc.text(MONTHS_PT[m.split('-')[1]], bx + barW1 / 2, chartY1 + chartH1 + 6, { align: 'center' });
     });
     const avgY1 = chartY1 + chartH1 - (avgMes / (maxMes * 1.15)) * chartH1;
-    doc.setDrawColor(...INK_FAINT);
+    doc.setDrawColor(...SLATE_LIGHT);
     doc.setLineDashPattern([1.2, 1], 0);
     doc.line(marginX, avgY1, marginX + contentW, avgY1);
     doc.setLineDashPattern([], 0);
     doc.setFontSize(7.5);
-    doc.setFont('courier', 'normal');
-    doc.setTextColor(...INK_SOFT);
-    doc.text(`MÉDIA: ${fmtMi(avgMes)}`, marginX + contentW, avgY1 - 2, { align: 'right' });
+    doc.setTextColor(...SLATE);
+    doc.text(`Média: ${fmtMi(avgMes)}`, marginX + contentW, avgY1 - 2, { align: 'right' });
     y = chartY1 + chartH1 + 16;
 
     y = paragraph(
@@ -8702,29 +8606,30 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     );
 
     y += 4;
-    y = sectionTitle('Padrão semanal de vendas', y, INK);
+    y = sectionTitle('Padrão semanal de vendas', y, AQUA);
     const chartH2 = 42;
     const chartY2 = y;
     const maxWd = Math.max(...WEEKDAY_ORDER.map((d) => byWeekday.get(d) || 0), 1);
     const slot2 = contentW / WEEKDAY_ORDER.length;
     const barW2 = slot2 * 0.5;
-    doc.setDrawColor(...LINE);
+    doc.setDrawColor(...BORDER);
     doc.line(marginX, chartY2 + chartH2, marginX + contentW, chartY2 + chartH2);
     WEEKDAY_ORDER.forEach((d, i) => {
       const v = byWeekday.get(d) || 0;
       const bx = marginX + i * slot2 + (slot2 - barW2) / 2;
       const barH = (v / (maxWd * 1.15)) * chartH2;
       const by = chartY2 + chartH2 - barH;
-      if (barH > 0) halftoneRect(bx, by, barW2, barH, INK, 1.4);
+      doc.setFillColor(...AQUA);
+      if (barH > 0) doc.rect(bx, by, barW2, barH, 'F');
       if (v > 0) {
         doc.setFontSize(7);
-        doc.setFont('courier', 'bold');
-        doc.setTextColor(...INK);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(...NAVY);
         doc.text(formatarValorCurto(v), bx + barW2 / 2, by - 2, { align: 'center' });
       }
       doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_SOFT);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
       doc.text(d, bx + barW2 / 2, chartY2 + chartH2 + 6, { align: 'center' });
     });
     y = chartY2 + chartH2 + 14;
@@ -8732,35 +8637,30 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     y = paragraph(`${diaTop}-feira concentra o maior volume de faturamento da semana (${fmtMi(byWeekday.get(diaTop) || 0)}).`, y);
 
     // ===== Filiais =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Desempenho por filial', y);
     y = sectionDesc(`Distribuição do faturamento entre as filiais operacionais em ${ano}.`, y);
 
+    const filCores = [BLUE, AQUA, VIOLET, [237, 161, 0]];
     const rowH = 12;
     const maxFil = filiaisOrdenadas[0]?.[1] || 1;
     filiaisOrdenadas.forEach(([f, v], i) => {
       const by = y + i * (rowH + 3);
       doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_SOFT);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
       doc.text(filialLabel(f), marginX, by + rowH / 2 + 1);
       const trackX = marginX + 30;
       const trackW = contentW - 30 - 45;
-      doc.setDrawColor(...LINE);
-      doc.setLineWidth(0.3);
-      doc.rect(trackX, by + 2, trackW, rowH - 4);
+      doc.setFillColor(...BORDER);
+      doc.roundedRect(trackX, by + 2, trackW, rowH - 4, 1.5, 1.5, 'F');
       const barW = Math.max((v / maxFil) * trackW, 2);
-      const tone = i % 4 < 2 ? ACCENT : INK;
-      if (i % 2 === 0) {
-        doc.setFillColor(...tone);
-        doc.rect(trackX, by + 2, barW, rowH - 4, 'F');
-      } else {
-        halftoneRect(trackX, by + 2, barW, rowH - 4, tone, 1.3);
-      }
+      doc.setFillColor(...filCores[i % filCores.length]);
+      doc.roundedRect(trackX, by + 2, barW, rowH - 4, 1.5, 1.5, 'F');
       doc.setFontSize(8.5);
-      doc.setFont('courier', 'bold');
-      doc.setTextColor(...INK);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
       doc.text(`${fmtMi(v)} (${(v / total * 100).toFixed(0)}%)`, marginX + contentW, by + rowH / 2 + 1, { align: 'right' });
     });
     y += filiaisOrdenadas.length * (rowH + 3) + 8;
@@ -8775,16 +8675,16 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         fmtMi(v / mesesOrdenados.length),
       ]),
       theme: 'striped',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
-      columnStyles: { 1: { halign: 'right', font: 'courier' }, 2: { halign: 'right', font: 'courier' }, 3: { halign: 'right', font: 'courier' } },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
     });
     y = doc.lastAutoTable.finalY + 10;
 
-    y = ensureSpacePdf(doc, pageHeight, y, 40, () => { doc.setFillColor(...PAPER); doc.rect(0, 0, pageWidth, pageHeight, 'F'); });
-    y = sectionTitle('Mapa mensal por filial', y, INK);
+    y = ensureSpacePdf(doc, pageHeight, y, 40);
+    y = sectionTitle('Mapa mensal por filial', y, VIOLET);
     autoTable(doc, {
       startY: y,
       head: [['Filial', ...mesesOrdenados.map((m) => MONTHS_PT[m.split('-')[1]])]],
@@ -8793,67 +8693,62 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         ...mesesOrdenados.map((m) => (byMonthFilial.get(`${m}|${f}`) || 0) / 1e6).map((v) => v.toFixed(1)),
       ]),
       theme: 'striped',
-      styles: { fontSize: 7.5, cellPadding: 2, font: 'courier' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 7.5, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
     });
     y = doc.lastAutoTable.finalY + 4;
     doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...INK_FAINT);
+    doc.setTextColor(...SLATE_LIGHT);
     doc.text('Valores em R$ milhões.', marginX, y);
 
     // ===== Produtos =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Portfólio de produtos', y);
     y = sectionDesc(`A base ativa em ${ano} conta com ${fmtInt(produtosOrdenados.length)} produtos distintos vendidos.`, y);
 
-    y = sectionTitle('Faturamento por grupo de produto', y, ACCENT);
+    y = sectionTitle('Faturamento por grupo de produto', y, ORANGE);
     const topGrupos = gruposOrdenados.slice(0, 10);
     const maxGrupo = topGrupos[0]?.[1] || 1;
     const rowHG = 9;
     topGrupos.forEach(([g, v], i) => {
       const by = y + i * (rowHG + 2.5);
       doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...INK_SOFT);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...SLATE);
       const label = doc.splitTextToSize(g, 34)[0];
       doc.text(label, marginX, by + rowHG / 2 + 1);
       const trackX = marginX + 36;
       const trackW = contentW - 36 - 30;
-      doc.setDrawColor(...LINE);
-      doc.setLineWidth(0.3);
-      doc.rect(trackX, by + 1.5, trackW, rowHG - 3);
+      doc.setFillColor(...BORDER);
+      doc.rect(trackX, by + 1.5, trackW, rowHG - 3, 'F');
       const barW = Math.max((v / maxGrupo) * trackW, 2);
-      doc.setFillColor(...ACCENT);
+      doc.setFillColor(...BLUE);
       doc.rect(trackX, by + 1.5, barW, rowHG - 3, 'F');
       doc.setFontSize(7.5);
-      doc.setFont('courier', 'bold');
-      doc.setTextColor(...INK);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...NAVY);
       doc.text(fmtMi(v), marginX + contentW, by + rowHG / 2 + 1, { align: 'right' });
     });
     y += topGrupos.length * (rowHG + 2.5) + 10;
 
-    y = ensureSpacePdf(doc, pageHeight, y, 90, () => { doc.setFillColor(...PAPER); doc.rect(0, 0, pageWidth, pageHeight, 'F'); });
-    y = sectionTitle('Concentração de receita (curva ABC)', y, INK);
+    y = ensureSpacePdf(doc, pageHeight, y, 90);
+    y = sectionTitle('Concentração de receita (curva ABC)', y, RED);
     y = sectionDesc('Percentual acumulado do faturamento por produto, ordenado do maior para o menor.', y);
     const chartH3 = 48;
     const chartY3 = y;
     const maxRank = abcCurve[abcCurve.length - 1]?.rank || 1;
-    doc.setDrawColor(...LINE);
-    doc.setLineDashPattern([0.2, 1], 0);
+    doc.setDrawColor(...BORDER);
     [0.25, 0.5, 0.75, 1].forEach((p) => {
       const gy = chartY3 + chartH3 * (1 - p);
       doc.line(marginX, gy, marginX + contentW, gy);
       doc.setFontSize(6.5);
-      doc.setFont('courier', 'normal');
-      doc.setTextColor(...INK_FAINT);
+      doc.setTextColor(...SLATE_LIGHT);
       doc.text(`${Math.round(p * 100)}%`, marginX + contentW, gy - 0.8, { align: 'right' });
     });
-    doc.setLineDashPattern([], 0);
-    doc.setDrawColor(...INK);
+    doc.setDrawColor(...BLUE);
     doc.setLineWidth(0.7);
     for (let i = 0; i < abcCurve.length - 1; i += 1) {
       const p1 = abcCurve[i];
@@ -8866,16 +8761,16 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     }
     const marcaX = marginX + (countTo80Products / maxRank) * contentW;
     const marcaY = chartY3 + chartH3 * 0.2;
-    doc.setDrawColor(...ACCENT);
+    doc.setDrawColor(...ORANGE);
     doc.setLineDashPattern([1, 1], 0);
     doc.line(marcaX, chartY3, marcaX, chartY3 + chartH3);
     doc.setLineDashPattern([], 0);
-    doc.setFillColor(...ACCENT);
+    doc.setFillColor(...ORANGE);
     doc.circle(marcaX, chartY3 + chartH3 * 0.2, 1.2, 'F');
     doc.setFontSize(7.5);
-    doc.setFont('courier', 'bold');
-    doc.setTextColor(...INK);
-    doc.text(`${countTo80Products} PRODUTOS = 80%`, marcaX + 3, marcaY - 2);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...NAVY);
+    doc.text(`${countTo80Products} produtos = 80%`, marcaX + 3, marcaY - 2);
     y = chartY3 + chartH3 + 12;
     y = paragraph(
       `Apenas ${countTo80Products} produtos (${(countTo80Products / produtosOrdenados.length * 100).toFixed(0)}% do portfólio) respondem por 80% de toda a receita.`,
@@ -8883,7 +8778,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     );
 
     // ===== Top produtos =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Top 20 produtos por faturamento', y);
     y = sectionDesc('Ranking do período com quantidade vendida, número de notas e ticket médio por nota.', y);
@@ -8900,23 +8795,23 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         formatarMoeda(p.valor / p.notas),
       ]),
       theme: 'striped',
-      styles: { fontSize: 7.6, cellPadding: 2, font: 'helvetica' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 7.6, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
-      columnStyles: { 3: { halign: 'right', font: 'courier' }, 4: { halign: 'right', font: 'courier' }, 5: { halign: 'right', font: 'courier' }, 6: { halign: 'right', font: 'courier' } },
+      columnStyles: { 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } },
     });
     y = doc.lastAutoTable.finalY + 10;
 
     // ===== Clientes e vendedores =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Clientes e canais de venda', y);
     y = sectionDesc(
       `A base ativa soma ${fmtInt(clientesOrdenados.length)} clientes distintos em ${ano}, atendidos por ${fmtInt(vendedoresOrdenados.length)} vendedores/canais.`,
       y
     );
-    y = sectionTitle('Top 15 clientes por faturamento', y, ACCENT);
+    y = sectionTitle('Top 15 clientes por faturamento', y, AQUA);
     autoTable(doc, {
       startY: y,
       head: [['#', 'Cliente', 'Faturamento', '% total', 'Notas', 'Meses', 'Ticket médio']],
@@ -8930,16 +8825,16 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         formatarMoeda(c.valor / c.notas),
       ]),
       theme: 'striped',
-      styles: { fontSize: 7.6, cellPadding: 2, font: 'helvetica' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 7.6, cellPadding: 2 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
-      columnStyles: { 2: { halign: 'right', font: 'courier' }, 3: { halign: 'right', font: 'courier' }, 4: { halign: 'right', font: 'courier' }, 5: { halign: 'right', font: 'courier' }, 6: { halign: 'right', font: 'courier' } },
+      columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } },
     });
     y = doc.lastAutoTable.finalY + 10;
 
-    y = ensureSpacePdf(doc, pageHeight, y, 60, () => { doc.setFillColor(...PAPER); doc.rect(0, 0, pageWidth, pageHeight, 'F'); });
-    y = sectionTitle('Top 10 vendedores/canais por faturamento', y, INK);
+    y = ensureSpacePdf(doc, pageHeight, y, 60);
+    y = sectionTitle('Top 10 vendedores/canais por faturamento', y, VIOLET);
     autoTable(doc, {
       startY: y,
       head: [['#', 'Código', 'Faturamento', '% do total']],
@@ -8950,16 +8845,16 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         `${(val / total * 100).toFixed(1)}%`,
       ]),
       theme: 'striped',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
-      columnStyles: { 2: { halign: 'right', font: 'courier' }, 3: { halign: 'right', font: 'courier' } },
+      columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' } },
     });
     y = doc.lastAutoTable.finalY + 10;
 
     // ===== Perfil fiscal =====
-    newPage();
+    doc.addPage();
     y = 24;
     y = sectionTitle('Perfil fiscal das operações', y);
     y = sectionDesc('Distribuição do faturamento por Código Fiscal de Operação (CFOP) agrupado.', y);
@@ -8972,11 +8867,11 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
         ['Outras operações', fmtMi(cfopOutros), `${(cfopOutros / total * 100).toFixed(1)}%`],
       ],
       theme: 'striped',
-      styles: { fontSize: 9, cellPadding: 3, font: 'helvetica' },
-      headStyles: { fillColor: INK, textColor: 255, fontStyle: 'bold', font: 'courier' },
-      alternateRowStyles: { fillColor: PAPER_DEEP },
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: marginX, right: marginX },
-      columnStyles: { 1: { halign: 'right', font: 'courier' }, 2: { halign: 'right', font: 'courier' } },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
     });
     y = doc.lastAutoTable.finalY + 12;
     y = paragraph(
@@ -8985,7 +8880,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     );
 
     y += 8;
-    y = sectionTitle('Notas metodológicas', y, INK);
+    y = sectionTitle('Notas metodológicas', y, SLATE);
     paragraph(
       `Fonte: base de notas fiscais de saída (ERP), consolidada por mês de emissão, filial, código de produto, cliente e vendedor/canal. A projeção anual usa a média mensal observada extrapolada para 12 meses, sem ajuste de sazonalidade.`,
       y
@@ -13823,34 +13718,18 @@ const custoDetalheTitulo = custoDetalheItem
                                 null
                               );
 
-                              // Paleta e helpers visuais — mesmo sistema do relatório executivo
-                              // anual: newsprint + tinta preta + um único acento-sinal, meio-tom
-                              // como segunda cor no lugar de mais matizes.
-                              const INK = [17, 17, 15];
-                              const INK_SOFT = [82, 78, 68];
-                              const INK_FAINT = [108, 103, 90];
-                              const LINE = [214, 208, 190];
-                              const PAPER_DEEP = [238, 234, 220];
-                              const ACCENT = [199, 66, 33];
-                              const NAVY = INK;
-                              const SLATE = INK_SOFT;
-                              const SLATE_LIGHT = INK_FAINT;
-                              const BORDER = LINE;
-                              const halftoneRect = (x, y, w, h, color, density = 1.4) => {
-                                doc.setFillColor(...color);
-                                for (let dy = density / 2; dy < h; dy += density) {
-                                  for (let dx = density / 2; dx < w; dx += density) {
-                                    doc.circle(x + dx, y + dy, density * 0.16, 'F');
-                                  }
-                                }
-                              };
+                              // Paleta e helpers visuais
+                              const NAVY = [15, 23, 42];
+                              const SLATE = [100, 116, 139];
+                              const SLATE_LIGHT = [148, 163, 184];
+                              const BORDER = [226, 232, 240];
                               const CARDS = [
-                                { titulo: 'Faturamento do período', valor: formatarMoeda(total), sub: 'Líquido no período', tone: ACCENT },
-                                { titulo: 'Devoluções (CFOP)', valor: formatarMoeda(totalDev), sub: 'Valores de devolução', tone: INK },
-                                { titulo: 'Fat. médio / dia', valor: formatarMoeda(mediaDia), sub: 'Média nos dias com venda', tone: INK },
-                                { titulo: 'Ticket médio', valor: formatarMoeda(ticket), sub: 'Por movimento', tone: INK },
-                                { titulo: 'Clientes ativos', valor: String(clientes), sub: 'Com vendas no mês', tone: INK },
-                                { titulo: 'Dias ativos', valor: String(dias), sub: 'Dias com faturamento', tone: INK },
+                                { titulo: 'Faturamento do período', valor: formatarMoeda(total), sub: 'Líquido no período', accent: [37, 99, 235], tint: [239, 246, 255] },
+                                { titulo: 'Devoluções (CFOP)', valor: formatarMoeda(totalDev), sub: 'Valores de devolução', accent: [225, 29, 72], tint: [255, 241, 242] },
+                                { titulo: 'Fat. médio / dia', valor: formatarMoeda(mediaDia), sub: 'Média nos dias com venda', accent: [79, 70, 229], tint: [238, 242, 255] },
+                                { titulo: 'Ticket médio', valor: formatarMoeda(ticket), sub: 'Por movimento', accent: [124, 58, 237], tint: [245, 243, 255] },
+                                { titulo: 'Clientes ativos', valor: String(clientes), sub: 'Com vendas no mês', accent: [5, 150, 105], tint: [236, 253, 245] },
+                                { titulo: 'Dias ativos', valor: String(dias), sub: 'Dias com faturamento', accent: [217, 119, 6], tint: [255, 251, 235] },
                               ];
 
                               const loadImageAsDataUrl = (url) =>
@@ -13899,23 +13778,18 @@ const custoDetalheTitulo = custoDetalheItem
                               };
 
                               const sectionTitle = (texto, y) => {
-                                doc.setFillColor(...ACCENT);
-                                doc.rect(marginX, y - 3.6, 1.6, 1.6, 'F');
-                                doc.rect(marginX, y - 1.6, 1.6, 1.6, 'F');
-                                doc.setFillColor(...INK);
-                                doc.rect(marginX + 2.2, y - 3.6, 1.6, 1.6, 'F');
-                                doc.rect(marginX + 2.2, y - 1.6, 1.6, 1.6, 'F');
+                                doc.setFillColor(...NAVY);
+                                doc.rect(marginX, y - 4, 3, 5, 'F');
                                 doc.setFontSize(11.5);
-                                doc.setFont('helvetica', 'bold');
+                                doc.setFont(undefined, 'bold');
                                 doc.setTextColor(...NAVY);
-                                doc.text(texto, marginX + 7.5, y);
+                                doc.text(texto, marginX + 6, y);
                                 return y + 7;
                               };
 
                               // ===== Cabeçalho =====
-                              doc.setFillColor(...INK);
+                              doc.setFillColor(...NAVY);
                               doc.rect(0, 0, pageWidth, 34, 'F');
-                              halftoneRect(pageWidth - 30, 0, 30, 34, ACCENT, 1.6);
                               if (logoDataUrl) {
                                 try {
                                   doc.addImage(logoDataUrl, 'PNG', marginX, 8, 22, 14.9);
@@ -13924,21 +13798,20 @@ const custoDetalheTitulo = custoDetalheItem
                                 }
                               }
                               const textX = logoDataUrl ? marginX + 28 : marginX;
-                              doc.setTextColor(250, 248, 241);
+                              doc.setTextColor(255, 255, 255);
                               doc.setFontSize(17);
-                              doc.setFont('courier', 'bold');
-                              doc.text('FECHAMENTO DE FATURAMENTO', textX, 15);
+                              doc.setFont(undefined, 'bold');
+                              doc.text('Fechamento de Faturamento', textX, 15);
                               doc.setFontSize(11);
-                              doc.setFont('helvetica', 'normal');
+                              doc.setFont(undefined, 'normal');
                               doc.text(
                                 `${mesLabel} de ${faturamentoAno}${termoBusca ? ` — filtro: "${filtroGraficoProduto}"` : ''}`,
                                 textX,
                                 22
                               );
                               doc.setFontSize(8.5);
-                              doc.setFont('courier', 'normal');
-                              doc.setTextColor(200, 192, 176);
-                              doc.text(`GERADO EM ${new Date().toLocaleString('pt-BR')}`, textX, 28);
+                              doc.setTextColor(190, 200, 215);
+                              doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, textX, 28);
                               doc.setTextColor(0, 0, 0);
 
                               // ===== Cards de indicadores =====
@@ -13951,26 +13824,22 @@ const custoDetalheTitulo = custoDetalheItem
                                 const row = Math.floor(i / 3);
                                 const x = marginX + col * (cardW + gap);
                                 const cy = y + row * (cardH + gap);
-                                doc.setDrawColor(...LINE);
-                                doc.setLineWidth(0.3);
-                                doc.rect(x, cy, cardW, cardH);
-                                halftoneRect(x + cardW - 8, cy + 3, 5, 5, card.tone, 1.0);
-                                doc.setFontSize(6.6);
-                                doc.setFont('courier', 'normal');
+                                doc.setFillColor(...card.tint);
+                                doc.roundedRect(x, cy, cardW, cardH, 2, 2, 'F');
+                                doc.setFillColor(...card.accent);
+                                doc.roundedRect(x, cy, 2.2, cardH, 1, 1, 'F');
+                                doc.setFontSize(7.5);
+                                doc.setFont(undefined, 'bold');
                                 doc.setTextColor(...SLATE);
-                                doc.text(card.titulo.toUpperCase(), x + 4, cy + 7);
-                                doc.setDrawColor(...LINE);
-                                doc.setLineDashPattern([0.4, 0.6], 0);
-                                doc.line(x + 4, cy + 10, x + cardW - 4, cy + 10);
-                                doc.setLineDashPattern([], 0);
-                                doc.setFontSize(12.5);
-                                doc.setFont('courier', 'bold');
+                                doc.text(card.titulo.toUpperCase(), x + 6, cy + 7);
+                                doc.setFontSize(13);
+                                doc.setFont(undefined, 'bold');
                                 doc.setTextColor(...NAVY);
-                                doc.text(card.valor, x + 4, cy + 17.5);
-                                doc.setFontSize(6.6);
-                                doc.setFont('helvetica', 'normal');
+                                doc.text(card.valor, x + 6, cy + 15);
+                                doc.setFontSize(7);
+                                doc.setFont(undefined, 'normal');
                                 doc.setTextColor(...SLATE_LIGHT);
-                                doc.text(card.sub, x + 4, cy + 21.5);
+                                doc.text(card.sub, x + 6, cy + 20.5);
                               });
                               y += 2 * (cardH + gap) + 6;
 
@@ -13999,15 +13868,11 @@ const custoDetalheTitulo = custoDetalheItem
                                 const bx = chartX + i * barSlot + barGap / 2;
                                 const barH = (Math.abs(item.valor) / maxValor) * chartH;
                                 const by = chartY + chartH - barH;
-                                if (item.valor >= 0) {
-                                  doc.setFillColor(...ACCENT);
-                                  doc.rect(bx, by, barW, Math.max(barH, 0.4), 'F');
-                                } else {
-                                  halftoneRect(bx, by, barW, Math.max(barH, 0.4), INK, 0.9);
-                                }
+                                const cor = item.valor >= 0 ? [37, 99, 235] : [225, 29, 72];
+                                doc.setFillColor(...cor);
+                                doc.rect(bx, by, barW, Math.max(barH, 0.4), 'F');
                                 if (barSlot >= 5) {
                                   doc.setFontSize(5.5);
-                                  doc.setFont('courier', 'normal');
                                   doc.setTextColor(...SLATE);
                                   doc.text(item.dia.slice(8), bx + barW / 2, chartY + chartH + 4, { align: 'center' });
                                 }
@@ -14040,11 +13905,11 @@ const custoDetalheTitulo = custoDetalheItem
                                   formatarMoeda(item.valor),
                                 ]),
                                 theme: 'striped',
-                                styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold', font: 'courier' },
-                                alternateRowStyles: { fillColor: PAPER_DEEP },
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
                                 margin: { left: marginX, right: marginX },
-                                columnStyles: { 1: { halign: 'right', fontStyle: 'bold', font: 'courier' } },
+                                columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
                               });
                               y = doc.lastAutoTable.finalY + 14;
 
@@ -14062,11 +13927,11 @@ const custoDetalheTitulo = custoDetalheItem
                                     ])
                                   : [['Sem dados para o período', '', '']],
                                 theme: 'striped',
-                                styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold', font: 'courier' },
-                                alternateRowStyles: { fillColor: PAPER_DEEP },
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
                                 margin: { left: marginX, right: marginX },
-                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold', font: 'courier' } },
+                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
                               });
                               y = doc.lastAutoTable.finalY + 12;
 
@@ -14085,11 +13950,11 @@ const custoDetalheTitulo = custoDetalheItem
                                     ])
                                   : [['-', 'Sem dados para o período', '', '']],
                                 theme: 'striped',
-                                styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold', font: 'courier' },
-                                alternateRowStyles: { fillColor: PAPER_DEEP },
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
                                 margin: { left: marginX, right: marginX },
-                                columnStyles: { 3: { halign: 'right', fontStyle: 'bold', font: 'courier' } },
+                                columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } },
                               });
                               y = doc.lastAutoTable.finalY + 12;
 
@@ -14107,11 +13972,11 @@ const custoDetalheTitulo = custoDetalheItem
                                     ])
                                   : [['Sem dados para o período', '', '']],
                                 theme: 'striped',
-                                styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold', font: 'courier' },
-                                alternateRowStyles: { fillColor: PAPER_DEEP },
+                                styles: { fontSize: 8, cellPadding: 2 },
+                                headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                alternateRowStyles: { fillColor: [248, 250, 252] },
                                 margin: { left: marginX, right: marginX },
-                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold', font: 'courier' } },
+                                columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
                               });
                               y = doc.lastAutoTable.finalY + 12;
 
@@ -14128,11 +13993,11 @@ const custoDetalheTitulo = custoDetalheItem
                                     formatarMoeda(valor),
                                   ]),
                                   theme: 'striped',
-                                  styles: { fontSize: 8, cellPadding: 2, font: 'helvetica' },
-                                  headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold', font: 'courier' },
-                                  alternateRowStyles: { fillColor: PAPER_DEEP },
+                                  styles: { fontSize: 8, cellPadding: 2 },
+                                  headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                                  alternateRowStyles: { fillColor: [248, 250, 252] },
                                   margin: { left: marginX, right: marginX },
-                                  columnStyles: { 2: { halign: 'right', fontStyle: 'bold', font: 'courier' } },
+                                  columnStyles: { 2: { halign: 'right', fontStyle: 'bold' } },
                                 });
                               }
 
