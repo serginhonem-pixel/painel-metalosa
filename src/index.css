@@ -197,3 +197,203 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ============================================================
+   Console scope — instrument-panel visual system for Faturamento.
+   Reuses this file's existing override pattern (.app-dark above)
+   to restyle stock Tailwind utility classes already in the markup,
+   so the whole tab reads as one system without touching every line.
+   ============================================================ */
+
+.console-scope {
+  font-family: 'Barlow', ui-sans-serif, system-ui, sans-serif;
+}
+
+.console-scope h1,
+.console-scope h2,
+.console-scope h3 {
+  font-family: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Panel / bezel surfaces (previously bg-white, bg-slate-50/100, bg-slate-900 variants) */
+.console-scope .bg-white,
+.console-scope .bg-slate-50,
+.console-scope .bg-slate-100,
+.console-scope .bg-slate-900,
+.console-scope .bg-slate-900\/70,
+.console-scope .bg-slate-900\/95,
+.console-scope .bg-slate-800\/70,
+.console-scope .bg-slate-950\/30,
+.console-scope .bg-slate-950\/40 {
+  background-color: #12171d;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 40%);
+}
+
+.console-scope .bg-white\/5 {
+  background-color: #171d25;
+}
+
+/* Hairline borders (bezel edges) */
+.console-scope .border-slate-200,
+.console-scope .border-slate-100,
+.console-scope .border-slate-50,
+.console-scope .border-slate-700,
+.console-scope .border-slate-800,
+.console-scope .border-slate-800\/70,
+.console-scope .border-slate-700\/80,
+.console-scope .border-white\/10 {
+  border-color: #232b34;
+}
+
+/* Ink */
+.console-scope .text-slate-900,
+.console-scope .text-slate-800,
+.console-scope .text-white {
+  color: #e7ecf1;
+}
+
+.console-scope .text-slate-700,
+.console-scope .text-slate-600 {
+  color: #a9b3bf;
+}
+
+.console-scope .text-slate-500,
+.console-scope .text-slate-400,
+.console-scope .text-slate-300,
+.console-scope .text-slate-200,
+.console-scope .text-slate-100 {
+  color: #66727e;
+}
+
+/* Primary accent (was blue-600 buttons / active states) */
+.console-scope .bg-blue-600 {
+  background-color: #f2b544;
+  color: #1a1206;
+}
+
+/* Info accent (was blue-2xx/blue-7xx text, blue-50 fills) */
+.console-scope .text-blue-300,
+.console-scope .text-blue-200,
+.console-scope .text-blue-700,
+.console-scope .text-blue-600,
+.console-scope .text-blue-500,
+.console-scope .text-blue-400 {
+  color: #4fb3e8;
+}
+
+.console-scope .bg-blue-50 {
+  background-color: rgba(79, 179, 232, 0.1);
+}
+
+.console-scope .border-blue-200 {
+  border-color: rgba(79, 179, 232, 0.35);
+}
+
+.console-scope .ring-blue-200 {
+  --tw-ring-color: rgba(79, 179, 232, 0.4);
+}
+
+/* Positive (emerald family) */
+.console-scope .bg-emerald-500,
+.console-scope .bg-emerald-500\/20 {
+  background-color: #33c17a;
+}
+.console-scope .bg-emerald-500\/20 {
+  background-color: rgba(51, 193, 122, 0.16);
+}
+
+.console-scope .text-emerald-300,
+.console-scope .text-emerald-200,
+.console-scope .text-emerald-600,
+.console-scope .text-emerald-700,
+.console-scope .text-emerald-400,
+.console-scope .text-emerald-500 {
+  color: #33c17a;
+}
+
+.console-scope .border-emerald-700\/50,
+.console-scope .border-emerald-400\/40,
+.console-scope .border-emerald-400,
+.console-scope .border-emerald-300 {
+  border-color: rgba(51, 193, 122, 0.4);
+}
+
+/* Critical (rose/red family) */
+.console-scope .text-rose-300,
+.console-scope .text-rose-500,
+.console-scope .text-rose-600,
+.console-scope .text-rose-700,
+.console-scope .text-rose-400,
+.console-scope .text-rose-200,
+.console-scope .text-red-300 {
+  color: #e5484d;
+}
+
+.console-scope .bg-rose-50,
+.console-scope .bg-rose-100 {
+  background-color: rgba(229, 72, 77, 0.12);
+}
+
+.console-scope .border-rose-300,
+.console-scope .border-rose-400,
+.console-scope .border-red-700\/50 {
+  border-color: rgba(229, 72, 77, 0.4);
+}
+
+.console-scope .bg-red-900\/50 {
+  background-color: rgba(229, 72, 77, 0.14);
+}
+
+/* Amber stays the accent family */
+.console-scope .text-amber-300,
+.console-scope .text-amber-600 {
+  color: #f2b544;
+}
+
+/* Corner language: rectangular bezels, not soft consumer rounding */
+.console-scope .rounded-3xl {
+  border-radius: 10px;
+}
+.console-scope .rounded-2xl {
+  border-radius: 8px;
+}
+.console-scope .rounded-xl {
+  border-radius: 6px;
+}
+.console-scope .rounded-lg {
+  border-radius: 4px;
+}
+
+/* Depth: replace soft ambient shadows with a tight instrument-bezel edge */
+.console-scope .shadow-sm,
+.console-scope .shadow,
+.console-scope .shadow-lg,
+.console-scope .shadow-xl,
+.console-scope .shadow-2xl,
+.console-scope .shadow-inner {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Ban: colored border-left/right accents above 1px */
+.console-scope .border-l-4 {
+  border-left-width: 1px;
+}
+
+/* Decorative blur blobs are not part of this system */
+.console-scope [class*='blur-3xl'] {
+  display: none;
+}
+
+.console-scope input,
+.console-scope select,
+.console-scope textarea {
+  font-family: inherit;
+}
+
+.console-scope .font-console-mono,
+.console-scope [class*='font-console-mono'] {
+  font-variant-numeric: tabular-nums;
+}

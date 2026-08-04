@@ -12480,97 +12480,108 @@ const custoDetalheTitulo = custoDetalheItem
 
           {/* ABA DE FATURAMENTO */}
           {abaAtiva === 'faturamento' && (
-            <div className="space-y-8 animate-in slide-in-from-right duration-700">
-              <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-2xl">
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" />
-                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-emerald-600/5 blur-3xl" />
-                <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-                  <div className="flex items-center gap-6">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-inner">
-                      <DollarSign size={28} className="text-blue-300" />
+            <div className="console-scope space-y-6 animate-in slide-in-from-right duration-700">
+              {/*
+                THESIS: Faturamento reads as an instrument console, not a marketing dashboard — the business's
+                vitals as gauges, not a hero-metric card.
+                OWN-WORLD: near-black bezel panels (#12171d) on #0b0f14, 1px hairline borders, rectangular
+                corners, amber (#f2b544) as the single brand/primary accent, green/red reserved for state
+                (positive/critical), Barlow Condensed for panel titles, Roboto Mono tabular figures for data.
+                STORY: a gestor scans revenue, movement, and returns in one instrument sweep and trusts the
+                read because it looks like the plant's own control room, not a template.
+                FIRST VIEWPORT: header module (id badge, live status, sound toggle, 4 readout cells) atop a
+                segmented sub-view switch atop a 6-cell KPI instrument row, master cell weighted larger.
+                FORM: Control Room Console, direction 4 of 7 (grounded), seed key 7634edd0.
+                FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review,
+                the verdict, and DESIGN.md.
+              */}
+              <div className="relative rounded border border-console-border-strong bg-console-panel px-6 py-5">
+                <div className="absolute inset-x-0 top-0 h-px bg-console-accent/60" />
+                <div className="flex flex-wrap items-start justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded border border-console-border-strong bg-console-raised">
+                      <DollarSign size={20} className="text-console-accent" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Operacao em tempo real</p>
+                      <div className="flex items-center gap-3">
+                        <h2 className="font-console-display text-xl font-bold uppercase tracking-wide text-console-ink">
+                          Faturamento
+                        </h2>
+                        <span className="inline-flex items-center gap-1.5 rounded-sm border border-console-positive/40 bg-console-positive/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-console-positive">
+                          <span className="h-1.5 w-1.5 rounded-full bg-console-positive animate-pulse" />
+                          Ao vivo
+                        </span>
                       </div>
-                      <h2 className="text-3xl font-black text-white tracking-tight">Faturamento</h2>
-                      <p className="text-sm text-slate-400 mt-1 font-medium">
-                        Consolidado industrial - {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      <p className="mt-1 text-xs text-console-dim">
+                        Consolidado industrial · {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3 min-w-[320px]">
-                    <button
-                      type="button"
-                      onClick={alternarSom}
-                      className={`self-end px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-                        somAtivo
-                          ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40'
-                          : 'border border-white/10 text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {somAtivo ? 'Som ativo' : 'Ativar som'}
-                    </button>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Ultima atualizacao</p>
-                        <div className="flex items-end gap-1">
-                          <span className="text-sm font-semibold text-emerald-200">
-                            {faturamentoArquivoEm
-                              ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })
-                              : faturamentoAtualizadoEm
-                              ? new Date(faturamentoAtualizadoEm).toLocaleString('pt-BR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })
-                              : 'Carregando...'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Movimentos</p>
-                        <div className="flex items-end gap-1">
-                          <span className="text-2xl font-black text-blue-200">{faturamentoAtual.movimentos || 0}</span>
-                          <span className="text-[10px] text-slate-500 mb-1">no mes</span>
-                        </div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Dias ativos</p>
-                        <div className="flex items-end gap-1">
-                          <span className="text-2xl font-black text-amber-300">{faturamentoAtual.diasAtivos || 0}</span>
-                          <span className="text-[10px] text-slate-500 mb-1">dias uteis</span>
-                        </div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">Faturamento mes</p>
-                        <div className="flex items-end gap-1">
-                          <span className="text-xl font-black text-blue-300">{formatarMoeda(faturamentoAtual.total)}</span>
-                        </div>
-                      </div>
-                    </div>
+                  <button
+                    type="button"
+                    onClick={alternarSom}
+                    className={`rounded-sm border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors ${
+                      somAtivo
+                        ? 'border-console-positive/40 bg-console-positive/10 text-console-positive'
+                        : 'border-console-border-strong text-console-dim hover:text-console-ink'
+                    }`}
+                  >
+                    {somAtivo ? 'Som ativo' : 'Ativar som'}
+                  </button>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded border border-console-border bg-console-border md:grid-cols-4">
+                  <div className="bg-console-bg px-4 py-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Ultima atualizacao</p>
+                    <p className="mt-1 font-console-mono text-sm font-medium tabular-nums text-console-ink">
+                      {faturamentoArquivoEm
+                        ? new Date(faturamentoArquivoEm).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : faturamentoAtualizadoEm
+                        ? new Date(faturamentoAtualizadoEm).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : 'Carregando...'}
+                    </p>
+                  </div>
+                  <div className="bg-console-bg px-4 py-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Movimentos</p>
+                    <p className="mt-1 flex items-baseline gap-1.5">
+                      <span className="font-console-mono text-xl font-semibold tabular-nums text-console-ink">{faturamentoAtual.movimentos || 0}</span>
+                      <span className="text-[10px] text-console-faint">no mes</span>
+                    </p>
+                  </div>
+                  <div className="bg-console-bg px-4 py-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Dias ativos</p>
+                    <p className="mt-1 flex items-baseline gap-1.5">
+                      <span className="font-console-mono text-xl font-semibold tabular-nums text-console-accent">{faturamentoAtual.diasAtivos || 0}</span>
+                      <span className="text-[10px] text-console-faint">dias uteis</span>
+                    </p>
+                  </div>
+                  <div className="bg-console-bg px-4 py-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Faturamento mes</p>
+                    <p className="mt-1 font-console-mono text-lg font-semibold tabular-nums text-console-ink">{formatarMoeda(faturamentoAtual.total)}</p>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="inline-flex gap-px rounded border border-console-border bg-console-border p-px">
                 <button
                   onClick={() => setSubAbaFaturamento('atual')}
-                  className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${subAbaFaturamento === 'atual' ? 'bg-blue-600 text-white shadow' : 'bg-slate-100 text-slate-500 hover:text-slate-700'}`}
+                  className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${subAbaFaturamento === 'atual' ? 'bg-console-accent text-console-accent-ink' : 'bg-console-panel text-console-dim hover:text-console-ink'}`}
                 >
                   Faturamento Atual
                 </button>
                 <button
                   onClick={() => setSubAbaFaturamento('2025')}
-                  className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${subAbaFaturamento === '2025' ? 'bg-blue-600 text-white shadow' : 'bg-slate-100 text-slate-500 hover:text-slate-700'}`}
+                  className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${subAbaFaturamento === '2025' ? 'bg-console-accent text-console-accent-ink' : 'bg-console-panel text-console-dim hover:text-console-ink'}`}
                 >
                   Faturamento 2025
                 </button>
@@ -13463,18 +13474,19 @@ const custoDetalheTitulo = custoDetalheItem
                         const clientes    = Number(ativo ? k.clientesAtivos   : faturamentoAtual.clientesAtivos)   || 0;
                         const ticket      = Number(ativo ? k.ticketMedio      : faturamentoAtual.ticketMedio)      || 0;
                         const mediaDia    = dias > 0 ? total / dias : 0;
-                        const bg          = ativo ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-200';
                         const fmt = (v) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                        const cellBase = 'bg-console-panel px-5 py-4';
+                        const cellActive = ativo ? 'ring-1 ring-inset ring-console-accent/50' : '';
                         return (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Faturamento do periodo</p>
-                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(total)}</p>
-                              <p className="text-xs text-slate-400 mt-1">Liquido no periodo.</p>
+                          <div className="grid grid-cols-1 gap-px overflow-hidden rounded border border-console-border bg-console-border sm:grid-cols-2 xl:grid-cols-6">
+                            <div className={`${cellBase} ${cellActive} xl:col-span-2`}>
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Faturamento do periodo</p>
+                              <p className="mt-2 font-console-mono text-3xl font-semibold tabular-nums text-console-ink">{fmt(total)}</p>
+                              <p className="mt-1 text-xs text-console-dim">Liquido no periodo</p>
                             </div>
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <div className="flex items-center gap-2">
-                                <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Devolucoes (CFOP)</p>
+                            <div className={`${cellBase} ${cellActive}`}>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Devolucoes (CFOP)</p>
                                 {!ativo && (
                                   <span
                                     title={[
@@ -13484,34 +13496,29 @@ const custoDetalheTitulo = custoDetalheItem
                                         return `${label} (${cfop}): ${formatarMoeda(valor)}`;
                                       }),
                                     ].join('\n')}
-                                    className="text-slate-400"
+                                    className="text-console-faint"
                                   >
-                                    <Info size={14} />
+                                    <Info size={13} />
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(totalDev)}</p>
-                              <p className="text-xs text-slate-400 mt-1">Valores de devolucao no periodo.</p>
+                              <p className="mt-2 font-console-mono text-xl font-semibold tabular-nums text-console-critical">{fmt(totalDev)}</p>
+                              <p className="mt-1 text-xs text-console-dim">No periodo</p>
                             </div>
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Fat. medio/dia</p>
-                              <p className="text-xl font-bold text-slate-900 mt-2 leading-tight">{fmt(mediaDia)}</p>
-                              <p className="text-xs text-slate-400 mt-1">Media nos dias com faturamento.</p>
+                            <div className={`${cellBase} ${cellActive}`}>
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Fat. medio/dia</p>
+                              <p className="mt-2 font-console-mono text-xl font-semibold tabular-nums text-console-ink">{fmt(mediaDia)}</p>
+                              <p className="mt-1 text-xs text-console-dim">Media nos dias ativos</p>
                             </div>
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Ticket medio</p>
-                              <p className="text-xl font-bold text-slate-900 mt-2">{fmt(ticket)}</p>
-                              <p className="text-xs text-slate-400 mt-1">Por movimento.</p>
+                            <div className={`${cellBase} ${cellActive}`}>
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Ticket medio</p>
+                              <p className="mt-2 font-console-mono text-xl font-semibold tabular-nums text-console-ink">{fmt(ticket)}</p>
+                              <p className="mt-1 text-xs text-console-dim">Por movimento</p>
                             </div>
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Clientes ativos</p>
-                              <p className="text-2xl font-bold text-slate-900 mt-2">{clientes}</p>
-                              <p className="text-xs text-slate-400 mt-1">Com vendas no mes.</p>
-                            </div>
-                            <div className={`border rounded-2xl p-5 shadow-sm ${bg}`}>
-                              <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">Dias ativos</p>
-                              <p className="text-2xl font-bold text-slate-900 mt-2">{dias}</p>
-                              <p className="text-xs text-slate-400 mt-1">Dias com faturamento.</p>
+                            <div className={`${cellBase} ${cellActive}`}>
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-console-faint">Clientes ativos</p>
+                              <p className="mt-2 font-console-mono text-xl font-semibold tabular-nums text-console-ink">{clientes}</p>
+                              <p className="mt-1 text-xs text-console-dim">Com vendas no mes</p>
                             </div>
                           </div>
                         );
