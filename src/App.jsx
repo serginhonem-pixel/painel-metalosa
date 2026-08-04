@@ -70,7 +70,10 @@ import {
   ScanLine,
   Search,
   ChevronUp,
-  MoreHorizontal
+  MoreHorizontal,
+  ClipboardList,
+  Unlock,
+  Timer
 } from 'lucide-react';
 
 // --- Constantes e Dados Iniciais ---
@@ -8498,7 +8501,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
     const clienteLider = clientesOrdenados[0];
     const KPIS = [
       { titulo: 'FATURAMENTO', valor: fmtMi(total), sub: `${ano} · ${fmtInt(linhasAno.length)} notas`, accent: BLUE, tint: [239, 246, 255] },
-      { titulo: 'MÉDIA MENSAL', valor: fmtMi(total / mesesOrdenados.length), sub: `projeção anual ≈ ${fmtMi((total / mesesOrdenados.length) * 12)}`, accent: ORANGE, tint: [255, 247, 237] },
+      { titulo: 'MÉDIA MENSAL', valor: fmtMi(total / mesesOrdenados.length), sub: `projeção anual ~ ${fmtMi((total / mesesOrdenados.length) * 12)}`, accent: ORANGE, tint: [255, 247, 237] },
       { titulo: 'FILIAL LÍDER', valor: filialLider ? filialLabel(filialLider[0]) : '-', sub: filialLider ? `${(filialLider[1] / total * 100).toFixed(0)}% do faturamento` : '', accent: AQUA, tint: [236, 253, 245] },
       { titulo: 'CONCENTRAÇÃO', valor: `${top10ClientPct.toFixed(0)}%`, sub: 'da receita em 10 clientes', accent: RED, tint: [255, 241, 242] },
     ];
@@ -8510,7 +8513,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       doc.setFillColor(...card.tint);
       doc.roundedRect(x, y, cardW, cardH, 2, 2, 'F');
       doc.setFillColor(...card.accent);
-      doc.roundedRect(x, y, 2.2, cardH, 1, 1, 'F');
+      doc.circle(x + cardW - 5, y + 5, 1.4, 'F');
       doc.setFontSize(7);
       doc.setFont(undefined, 'bold');
       doc.setTextColor(...SLATE);
@@ -8521,7 +8524,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       doc.text(card.valor, x + 6, y + 15.5);
       doc.setFontSize(6.8);
       doc.setFont(undefined, 'normal');
-      doc.setTextColor(...SLATE_LIGHT);
+      doc.setTextColor(...SLATE);
       const subLinhas = doc.splitTextToSize(card.sub, cardW - 10);
       doc.text(subLinhas, x + 6, y + 21.5);
     });
@@ -13827,7 +13830,7 @@ const custoDetalheTitulo = custoDetalheItem
                                 doc.setFillColor(...card.tint);
                                 doc.roundedRect(x, cy, cardW, cardH, 2, 2, 'F');
                                 doc.setFillColor(...card.accent);
-                                doc.roundedRect(x, cy, 2.2, cardH, 1, 1, 'F');
+                                doc.circle(x + cardW - 5, cy + 5, 1.4, 'F');
                                 doc.setFontSize(7.5);
                                 doc.setFont(undefined, 'bold');
                                 doc.setTextColor(...SLATE);
@@ -13838,7 +13841,7 @@ const custoDetalheTitulo = custoDetalheItem
                                 doc.text(card.valor, x + 6, cy + 15);
                                 doc.setFontSize(7);
                                 doc.setFont(undefined, 'normal');
-                                doc.setTextColor(...SLATE_LIGHT);
+                                doc.setTextColor(...SLATE);
                                 doc.text(card.sub, x + 6, cy + 20.5);
                               });
                               y += 2 * (cardH + gap) + 6;
@@ -15091,15 +15094,18 @@ const custoDetalheTitulo = custoDetalheItem
                     {/* Linha 2: KPI strip */}
                     <div className="mt-5 grid grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
                       {[
-                        { ...manutencaoKpis[0], border: 'border-l-amber-400', bg: 'bg-amber-400/5' },
-                        { ...manutencaoKpis[1], border: 'border-l-blue-400', bg: 'bg-blue-400/5' },
-                        { ...manutencaoKpis[2], border: 'border-l-emerald-400', bg: 'bg-emerald-400/5' },
-                        { ...manutencaoKpis[3], border: 'border-l-rose-400', bg: 'bg-rose-400/5' },
-                        { ...manutencaoKpis[4], border: 'border-l-cyan-400', bg: 'bg-cyan-400/5' },
-                        { ...manutencaoKpis[5], border: 'border-l-purple-400', bg: 'bg-purple-400/5' },
+                        { ...manutencaoKpis[0], dot: 'bg-amber-400', bg: 'bg-amber-400/5' },
+                        { ...manutencaoKpis[1], dot: 'bg-blue-400', bg: 'bg-blue-400/5' },
+                        { ...manutencaoKpis[2], dot: 'bg-emerald-400', bg: 'bg-emerald-400/5' },
+                        { ...manutencaoKpis[3], dot: 'bg-rose-400', bg: 'bg-rose-400/5' },
+                        { ...manutencaoKpis[4], dot: 'bg-cyan-400', bg: 'bg-cyan-400/5' },
+                        { ...manutencaoKpis[5], dot: 'bg-purple-400', bg: 'bg-purple-400/5' },
                       ].map((kpi) => (
-                        <div key={kpi.id} className={`rounded-xl border border-slate-800/60 border-l-2 ${kpi.border} ${kpi.bg} px-2.5 sm:px-4 py-2.5 sm:py-3 min-w-0`}>
-                          <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-slate-500 truncate">{kpi.label}</p>
+                        <div key={kpi.id} className={`rounded-xl border border-slate-800/60 ${kpi.bg} px-2.5 sm:px-4 py-2.5 sm:py-3 min-w-0`}>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${kpi.dot}`} />
+                            <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-slate-500 truncate">{kpi.label}</p>
+                          </div>
                           <p className={`mt-1 sm:mt-1.5 text-lg sm:text-2xl font-black ${kpi.tone} truncate`}>{kpi.value}</p>
                         </div>
                       ))}
@@ -16154,17 +16160,17 @@ const custoDetalheTitulo = custoDetalheItem
                     {/* KPIs */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                       {[
-                        { label: 'Total OS', value: relatorioResumoGeral.total, icon: '📋', accent: 'from-slate-500/20 to-slate-600/10', border: 'border-slate-700/40', tone: 'text-white' },
-                        { label: 'Abertas', value: relatorioResumoGeral.abertas, icon: '🔓', accent: 'from-amber-500/15 to-amber-600/5', border: 'border-amber-500/25', tone: 'text-amber-300' },
-                        { label: 'Em andamento', value: relatorioResumoGeral.emAndamento, icon: '⚙️', accent: 'from-blue-500/15 to-blue-600/5', border: 'border-blue-500/25', tone: 'text-blue-300' },
-                        { label: 'Finalizadas', value: relatorioResumoGeral.finalizadas, icon: '✅', accent: 'from-emerald-500/15 to-emerald-600/5', border: 'border-emerald-500/25', tone: 'text-emerald-300' },
-                        { label: '% Resolvidas', value: `${relatorioResumoGeral.pctResolvidas}%`, icon: '📊', accent: 'from-cyan-500/15 to-cyan-600/5', border: 'border-cyan-500/25', tone: 'text-cyan-300' },
-                        { label: 'Tempo médio', value: relatorioResumoGeral.tempoMedioStr, icon: '⏱️', accent: 'from-purple-500/15 to-purple-600/5', border: 'border-purple-500/25', tone: 'text-purple-300' },
+                        { label: 'Total OS', value: relatorioResumoGeral.total, icon: ClipboardList, accent: 'from-slate-500/20 to-slate-600/10', border: 'border-slate-700/40', tone: 'text-white' },
+                        { label: 'Abertas', value: relatorioResumoGeral.abertas, icon: Unlock, accent: 'from-amber-500/15 to-amber-600/5', border: 'border-amber-500/25', tone: 'text-amber-300' },
+                        { label: 'Em andamento', value: relatorioResumoGeral.emAndamento, icon: Settings, accent: 'from-blue-500/15 to-blue-600/5', border: 'border-blue-500/25', tone: 'text-blue-300' },
+                        { label: 'Finalizadas', value: relatorioResumoGeral.finalizadas, icon: CheckCircle2, accent: 'from-emerald-500/15 to-emerald-600/5', border: 'border-emerald-500/25', tone: 'text-emerald-300' },
+                        { label: '% Resolvidas', value: `${relatorioResumoGeral.pctResolvidas}%`, icon: BarChart3, accent: 'from-cyan-500/15 to-cyan-600/5', border: 'border-cyan-500/25', tone: 'text-cyan-300' },
+                        { label: 'Tempo médio', value: relatorioResumoGeral.tempoMedioStr, icon: Timer, accent: 'from-purple-500/15 to-purple-600/5', border: 'border-purple-500/25', tone: 'text-purple-300' },
                       ].map((kpi) => (
                         <div key={kpi.label} className={`rounded-xl border ${kpi.border} bg-gradient-to-br ${kpi.accent} p-4 hover:scale-[1.02] transition-transform`}>
                           <div className="flex items-center justify-between">
                             <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-500">{kpi.label}</p>
-                            <span className="text-sm">{kpi.icon}</span>
+                            <kpi.icon size={14} className={kpi.tone} strokeWidth={2.25} />
                           </div>
                           <p className={`mt-2 text-2xl font-black ${kpi.tone}`}>{kpi.value}</p>
                         </div>
