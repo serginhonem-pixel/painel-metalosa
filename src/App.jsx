@@ -15062,8 +15062,8 @@ const custoDetalheTitulo = custoDetalheItem
                     {/* Linha 1: título + ações */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl border border-amber-400/25 bg-amber-400/10 flex items-center justify-center shrink-0">
-                          <Wrench size={18} className="text-amber-300" />
+                        <div className="h-10 w-10 rounded-full border-2 border-[#2f5aa8]/40 ring-2 ring-[#2f5aa8]/15 ring-offset-2 ring-offset-slate-950 bg-[#2f5aa8]/15 flex items-center justify-center shrink-0">
+                          <Wrench size={18} className="text-[#8fb2e8]" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
@@ -15073,7 +15073,7 @@ const custoDetalheTitulo = custoDetalheItem
                               Online
                             </span>
                             {isManutencaoOnly && (
-                              <span className="rounded-full border border-amber-400/20 bg-amber-400/[0.08] px-2.5 py-0.5 text-[10px] font-bold text-amber-200/80">
+                              <span className="rounded-full border border-[#2f5aa8]/25 bg-[#2f5aa8]/[0.10] px-2.5 py-0.5 text-[10px] font-bold text-[#c3d6f5]/85">
                                 Perfil operador
                               </span>
                             )}
@@ -15084,7 +15084,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <button
                         onClick={abrirNovaOs}
                         data-tour="nova-os"
-                        className="w-full sm:w-auto shrink-0 rounded-xl bg-amber-400 text-slate-950 text-xs font-black px-5 py-2.5 shadow-lg shadow-amber-500/20 hover:bg-amber-300 transition-all duration-200 flex items-center justify-center gap-2"
+                        className="w-full sm:w-auto shrink-0 rounded-xl bg-[#2f5aa8] text-white text-xs font-black px-5 py-2.5 shadow-lg shadow-[#1f3f7a]/25 hover:bg-[#25488c] transition-all duration-200 flex items-center justify-center gap-2"
                       >
                         <Plus size={14} />
                         Nova OS
@@ -15132,7 +15132,7 @@ const custoDetalheTitulo = custoDetalheItem
                             onClick={() => setSubAbaManutencao(id)}
                             className={`relative flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
                               isActive
-                                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                                ? 'bg-[#2f5aa8] text-white shadow-sm'
                                 : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
                             }`}
                           >
@@ -15281,14 +15281,14 @@ const custoDetalheTitulo = custoDetalheItem
                       {/* Ações rápidas */}
                       <div className="rounded-xl border border-slate-800/50 bg-slate-900/40 overflow-hidden">
                         <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/50">
-                          <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                          <div className="w-2 h-2 rounded-full bg-[#2f5aa8]"></div>
                           <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Ações rápidas</h3>
                         </div>
                         <div className="p-3 space-y-2">
-                          <button type="button" onClick={abrirNovaOs} className="w-full flex items-center gap-3 rounded-lg border border-amber-400/25 bg-amber-400/[0.06] hover:bg-amber-400/10 px-3 py-3 text-left transition-colors">
-                            <Plus size={14} className="text-amber-300 shrink-0" />
+                          <button type="button" onClick={abrirNovaOs} className="w-full flex items-center gap-3 rounded-lg border border-[#2f5aa8]/30 bg-[#2f5aa8]/[0.08] hover:bg-[#2f5aa8]/15 px-3 py-3 text-left transition-colors">
+                            <Plus size={14} className="text-[#8fb2e8] shrink-0" />
                             <div>
-                              <p className="text-xs font-bold text-amber-100">Abrir nova OS</p>
+                              <p className="text-xs font-bold text-[#c3d6f5]">Abrir nova OS</p>
                               <p className="text-[10px] text-slate-500">Registrar ocorrência</p>
                             </div>
                           </button>
@@ -15509,7 +15509,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{aberturaStr}</td>
                                   <td className="px-2 sm:px-4 py-3">
                                     <div className="flex items-center justify-end gap-0.5 sm:gap-1">
-                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-[#8fb2e8] hover:bg-[#1f3f7a]/15 transition-all">
                                         <Eye size={13} /><span className="hidden sm:inline">Ver</span>
                                       </button>
                                       <button type="button" onClick={() => handleEditarOs(ordem)} title="Editar" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">
@@ -15542,7 +15542,7 @@ const custoDetalheTitulo = custoDetalheItem
                                     {manutencaoBusca ? `Nenhum resultado para "${manutencaoBusca}"` : manutencaoFiltroStatus !== 'Todas' ? `Nenhuma OS com status "${manutencaoFiltroStatus}"` : 'Sem ordens registradas'}
                                   </p>
                                   {(manutencaoBusca || manutencaoFiltroStatus !== 'Todas') && (
-                                    <button type="button" onClick={() => { setManutencaoBusca(''); setManutencaoFiltroStatus('Todas'); }} className="text-xs text-amber-400 hover:text-amber-300">Limpar filtros</button>
+                                    <button type="button" onClick={() => { setManutencaoBusca(''); setManutencaoFiltroStatus('Todas'); }} className="text-xs text-[#8fb2e8] hover:text-white">Limpar filtros</button>
                                   )}
                                 </div>
                               </td>
@@ -15564,7 +15564,7 @@ const custoDetalheTitulo = custoDetalheItem
                       <button
                         type="button"
                         onClick={abrirNovaOs}
-                        className="shrink-0 flex items-center gap-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold px-3.5 py-2 hover:bg-amber-300 transition-colors"
+                        className="shrink-0 flex items-center gap-1.5 rounded-lg bg-[#2f5aa8] text-white text-xs font-bold px-3.5 py-2 hover:bg-[#25488c] transition-colors"
                       >
                         <Plus size={12} />
                         Nova OS
@@ -15632,7 +15632,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{aberturaStr}</td>
                                   <td className="px-2 sm:px-4 py-3">
                                     <div className="flex items-center justify-end gap-0.5 sm:gap-1">
-                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all">
+                                      <button type="button" onClick={() => handleVisualizarOs(ordem)} title="Ver" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-[#8fb2e8] hover:bg-[#1f3f7a]/15 transition-all">
                                         <Eye size={13} /><span className="hidden sm:inline">Ver</span>
                                       </button>
                                       <button type="button" onClick={() => handleEditarOs(ordem)} title="Editar" className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all">
@@ -15657,7 +15657,7 @@ const custoDetalheTitulo = custoDetalheItem
                                 <div className="flex flex-col items-center gap-3">
                                   <Users size={28} className="text-slate-700" />
                                   <p className="text-sm text-slate-500">Você ainda não abriu nenhuma OS</p>
-                                  <button type="button" onClick={abrirNovaOs} className="flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                                  <button type="button" onClick={abrirNovaOs} className="flex items-center gap-1.5 text-xs font-bold text-[#8fb2e8] hover:text-white transition-colors">
                                     <Plus size={12} />
                                     Abrir primeira OS
                                   </button>
@@ -15688,7 +15688,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                       <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/70">Cadastro de ativos</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8fb2e8]/70">Cadastro de ativos</p>
                           <h3 className="mt-1 text-lg font-black text-white">Registrar máquina para abertura de OS</h3>
                           <p className="mt-1 text-xs text-slate-400">
                             Os ativos salvos aqui entram imediatamente na seleção da OS de manutenção.
@@ -15703,8 +15703,8 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="grid grid-cols-1 gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
                       <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
-                            <Plus size={16} className="text-amber-300" />
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#2f5aa8]/25 bg-[#2f5aa8]/15">
+                            <Plus size={16} className="text-[#8fb2e8]" />
                           </div>
                           <div>
                             <h4 className="text-sm font-black uppercase tracking-wider text-slate-200">Novo ativo</h4>
@@ -15729,7 +15729,7 @@ const custoDetalheTitulo = custoDetalheItem
                             <input
                               name="nomeMaq"
                               type="text"
-                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-[#2f5aa8]"
                               placeholder="Ex: Prensa hidráulica 03"
                               required
                             />
@@ -15742,7 +15742,7 @@ const custoDetalheTitulo = custoDetalheItem
                               list="novo-ativo-cc-opcoes"
                               autoComplete="off"
                               placeholder="Ex: Industria, Transporte, Corte..."
-                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                              className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-[#2f5aa8]"
                               required
                             />
                             <datalist id="novo-ativo-cc-opcoes">
@@ -15765,7 +15765,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <select
                                 value={novoAtivoProcesso}
                                 onChange={(e) => setNovoAtivoProcesso(e.target.value)}
-                                className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-400"
+                                className="mt-2 w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-[#2f5aa8]"
                               >
                                 <option value="">Selecione o processo</option>
                                 {listaSetores
@@ -15784,7 +15784,7 @@ const custoDetalheTitulo = custoDetalheItem
                           <div className="flex gap-3">
                             <button
                               type="submit"
-                              className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-4 py-3 text-xs font-black text-slate-950 shadow-lg shadow-amber-500/20 transition-all duration-200 hover:brightness-110"
+                              className="flex-1 rounded-xl bg-gradient-to-r from-[#2f5aa8] to-[#1f3f7a] px-4 py-3 text-xs font-black text-white shadow-lg shadow-[#1f3f7a]/25 transition-all duration-200 hover:brightness-110"
                             >
                               Salvar ativo
                             </button>
@@ -15826,7 +15826,7 @@ const custoDetalheTitulo = custoDetalheItem
                               <div key={m.id} className="flex items-start justify-between gap-4 rounded-xl border border-slate-800/40 bg-slate-950/20 p-4">
                                 <div className="min-w-0">
                                   <p className="truncate text-sm font-bold text-white">{m.nome}</p>
-                                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-amber-300">
+                                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-[#8fb2e8]">
                                     {m.setor || 'Sem setor'}
                                   </p>
                                   {normalizarTexto(m.setor) === 'industria' && (
@@ -15897,7 +15897,7 @@ const custoDetalheTitulo = custoDetalheItem
                             setTourOperadorOpen(true);
                           }}
                           title="Guia interativo"
-                          className="rounded-lg border border-amber-400/30 bg-amber-400/[0.06] px-4 py-2 text-xs font-bold text-amber-200 hover:bg-amber-400/[0.12] hover:border-amber-400/40 transition-all duration-200"
+                          className="rounded-lg border border-[#2f5aa8]/35 bg-[#2f5aa8]/[0.08] px-4 py-2 text-xs font-bold text-[#c3d6f5] hover:bg-[#2f5aa8]/[0.16] hover:border-[#2f5aa8]/45 transition-all duration-200"
                         >
                           Guia interativo
                         </button>
@@ -16058,7 +16058,7 @@ const custoDetalheTitulo = custoDetalheItem
                                   <button
                                     type="button"
                                     onClick={() => handleVisualizarOs(os)}
-                                    className="rounded-lg border border-amber-400/20 bg-amber-500/[0.05] px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/10 transition-all"
+                                    className="rounded-lg border border-[#2f5aa8]/25 bg-[#1f3f7a]/[0.06] px-2.5 py-1 font-bold text-[#8fb2e8] hover:bg-[#1f3f7a]/15 transition-all"
                                   >
                                     Ver
                                   </button>
@@ -16138,8 +16138,8 @@ const custoDetalheTitulo = custoDetalheItem
                     {/* Header + filtro período */}
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/20 flex items-center justify-center">
-                          <BarChart3 size={18} className="text-amber-400" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1f3f7a]/25 to-[#1f3f7a]/10 border border-[#1f3f7a]/25 flex items-center justify-center">
+                          <BarChart3 size={18} className="text-[#8fb2e8]" />
                         </div>
                         <div>
                           <h3 className="text-sm font-black text-slate-100 uppercase tracking-wider">Relatórios de Manutenção</h3>
@@ -16152,7 +16152,7 @@ const custoDetalheTitulo = custoDetalheItem
                         <span className="text-slate-600 text-xs">até</span>
                         <input type="date" value={relatorioFim} onChange={(e) => setRelatorioFim(e.target.value)} className="bg-slate-800/60 border border-slate-700/40 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:border-amber-500/50 focus:outline-none" />
                         {(relatorioInicio || relatorioFim) && (
-                          <button onClick={() => { setRelatorioInicio(''); setRelatorioFim(''); }} className="text-[10px] text-amber-400 hover:text-amber-300 font-bold ml-1">Limpar</button>
+                          <button onClick={() => { setRelatorioInicio(''); setRelatorioFim(''); }} className="text-[10px] text-[#8fb2e8] hover:text-white font-bold ml-1">Limpar</button>
                         )}
                       </div>
                     </div>
@@ -16440,7 +16440,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="rounded-2xl border border-slate-800/50 bg-gradient-to-b from-slate-900/60 to-slate-900/30 p-6 shadow-md">
                       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/70">Painel de logs</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8fb2e8]/70">Painel de logs</p>
                           <h3 className="mt-1 text-lg font-black text-white">Rastreamento das ações da manutenção</h3>
                           <p className="mt-1 text-xs text-slate-400">
                             Mostra abertura, visualização, alteração de status, reabertura com contestação e ajustes de nome.
@@ -16535,7 +16535,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <div className="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
                       <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Detalhes da OS</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#8fb2e8]">Detalhes da OS</p>
                           <h3 className="mt-1 text-lg font-black text-white">
                             {manutencaoDetalheModal.ativo || manutencaoDetalheModal.id}
                           </h3>
@@ -16668,7 +16668,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 px-4 py-6">
                     <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
                       <div className="border-b border-slate-800 px-6 py-5">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Nova OS</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#8fb2e8]">Nova OS</p>
                         <h3 className="mt-2 text-lg font-black text-white">Qual o status da maquina?</h3>
                         <p className="mt-1 text-xs text-slate-400">
                           Selecione antes de abrir a ordem para preencher esse campo automaticamente.
@@ -17221,7 +17221,7 @@ const custoDetalheTitulo = custoDetalheItem
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/85 px-4 py-6">
               <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
                 <div className="border-b border-slate-800 px-6 py-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-300">Identificação</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#8fb2e8]">Identificação</p>
                   <h3 className="mt-2 text-lg font-black text-white">Como você quer aparecer na manutenção?</h3>
                   <p className="mt-1 text-xs text-slate-400">
                     Esse nome será salvo no banco da manutenção para logs, contestação e histórico de OS.
@@ -17233,7 +17233,7 @@ const custoDetalheTitulo = custoDetalheItem
                     <input
                       value={perfilNomeInput}
                       onChange={(e) => setPerfilNomeInput(e.target.value)}
-                      className="w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-amber-400 focus:outline-none"
+                      className="w-full rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-[#2f5aa8] focus:outline-none"
                       placeholder="Ex: João Silva"
                     />
                     <p className="mt-2 text-[11px] text-slate-500">Login atual: {authUser.email}</p>
@@ -17248,7 +17248,7 @@ const custoDetalheTitulo = custoDetalheItem
                   <button
                     type="button"
                     onClick={handleSalvarPerfilNome}
-                    className="rounded-full border border-amber-400/50 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-100 hover:bg-amber-500/20"
+                    className="rounded-full border border-[#2f5aa8]/55 bg-[#1f3f7a]/15 px-4 py-2 text-xs font-bold text-[#c3d6f5] hover:bg-[#1f3f7a]/25"
                   >
                     Salvar nome
                   </button>

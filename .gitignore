@@ -37,3 +37,6 @@ cors.json
 *.xlsx
 
 .vercel
+
+# impeccable skill scratch state
+.impeccable/

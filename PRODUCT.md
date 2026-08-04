@@ -38,7 +38,9 @@ Ferramenta interna proprietária da Metalosa — não é um produto vendido a te
 
 ## Brand Commitments
 
-Nenhuma identidade visual formal (logo, cores institucionais, manual de marca) precisa ser preservada — liberdade total para propor uma nova direção visual mais profissional. Nome da empresa (Metalosa) deve continuar aparecendo onde já aparece hoje (relatórios, títulos de documentos gerados).
+Nome da empresa (Metalosa) deve continuar aparecendo onde já aparece hoje (relatórios, títulos de documentos gerados).
+
+O azul-marinho da logo real da Metalosa (`#00296B`, extraído de `src/data/logo.png`) é a cor de identidade confirmada pelo usuário para a aba Manutenção (2026-08-04) — usada como acento principal (variante de UI `#2f5aa8`/`#1f3f7a` sobre fundo escuro) no lugar de âmbar decorativo, mantendo o fundo escuro (slate) já usado no resto do painel. Cores de status (âmbar = aberta/pausada, azul = em andamento, esmeralda = finalizada, rosa = crítica) continuam reservadas para o significado real de cada estado, não para identidade visual. Ainda não estendido às outras abas.
 
 ## Evidence on Hand
 
