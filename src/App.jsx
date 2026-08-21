@@ -2359,8 +2359,7 @@ export default function App() {
     setTimeout(handlePrint, 700);
   };
 
-  const handleImprimirOs = (ordem) => {
-    const now = new Date();
+  const construirBlocoOsHtml = (ordem, now) => {
     const prioridade = String(ordem?.prioridade || '').toLowerCase();
     const status = String(ordem?.status || '').toLowerCase();
     const statusMaquina = String(ordem?.statusMaquina || '').toLowerCase();
@@ -2444,45 +2443,8 @@ export default function App() {
       return rows || '<tr><td colspan="4">Sem dados.</td></tr>';
     })();
 
-    const html = `
-      <!doctype html>
-      <html lang="pt-BR">
-      <head>
-        <meta charset="utf-8" />
-        <title>Impressao OS</title>
-        <style>
-          @page { size: A4 portrait; margin: 10mm 12mm; }
-          * { box-sizing: border-box; }
-          body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #fff; font-size: 14px; }
-          h1 { font-size: 20px; margin: 0; font-weight: 700; color: #0f172a; }
-          h2 { font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
-          .header { background: #fff; color: #0f172a; padding: 10px 4px 10px 0; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-          .brand { display: flex; align-items: center; gap: 10px; }
-          .brand img { height: 34px; width: auto; }
-          .brand small { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #64748b; margin-top: 2px; }
-          .meta { font-size: 11px; color: #64748b; text-align: right; }
-          .badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; margin-top: 5px; }
-          .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
-          .badge-danger { background: #fecaca; color: #991b1b; }
-          .badge-warn { background: #fde68a; color: #92400e; }
-          .badge-info { background: #bae6fd; color: #075985; }
-          .badge-success { background: #bbf7d0; color: #166534; }
-          .badge-muted { background: #e2e8f0; color: #475569; }
-          .section { margin-top: 12px; }
-          table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
-          th, td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; font-size: 13px; }
-          th { background: #f1f5f9; color: #334155; font-weight: 600; width: 16%; white-space: nowrap; }
-          td { color: #0f172a; width: 34%; }
-          tr:last-child td, tr:last-child th { border-bottom: none; }
-          .box { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; background: #f8fafc; margin-top: 4px; }
-          .photo img { max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #e2e8f0; display: block; margin-top: 4px; }
-          .footer { margin-top: 10px; font-size: 10px; color: #94a3b8; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 6px; }
-          @media print {
-            body { background: #fff; }
-          }
-        </style>
-      </head>
-      <body>
+    return `
+      <div class="os-page">
         <div class="header">
           <div class="brand">
             <img src="${escapeHtmlRelatorio(logoMetalosa)}" alt="Metalosa" />
@@ -2514,6 +2476,81 @@ export default function App() {
         ${descricaoHtml}
         ${fotoHtml ? `<div class="section"><h2>Foto</h2><div class="photo"><img src="${escapeHtmlRelatorio(ordem?.fotoUrl)}" alt="Foto da OS" /></div></div>` : ''}
         <div class="footer">Metalosa &middot; Manutencao &middot; ${escapeHtmlRelatorio(ordem?.id || '')}</div>
+      </div>
+    `;
+  };
+
+  const OS_PRINT_STYLE = `
+    @page { size: A4 portrait; margin: 10mm 12mm; }
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #fff; font-size: 14px; }
+    h1 { font-size: 20px; margin: 0; font-weight: 700; color: #0f172a; }
+    h2 { font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; }
+    .header { background: #fff; color: #0f172a; padding: 10px 4px 10px 0; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand img { height: 34px; width: auto; }
+    .brand small { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #64748b; margin-top: 2px; }
+    .meta { font-size: 11px; color: #64748b; text-align: right; }
+    .badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; margin-top: 5px; }
+    .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
+    .badge-danger { background: #fecaca; color: #991b1b; }
+    .badge-warn { background: #fde68a; color: #92400e; }
+    .badge-info { background: #bae6fd; color: #075985; }
+    .badge-success { background: #bbf7d0; color: #166534; }
+    .badge-muted { background: #e2e8f0; color: #475569; }
+    .section { margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; font-size: 13px; }
+    th { background: #f1f5f9; color: #334155; font-weight: 600; width: 16%; white-space: nowrap; }
+    td { color: #0f172a; width: 34%; }
+    tr:last-child td, tr:last-child th { border-bottom: none; }
+    .box { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; background: #f8fafc; margin-top: 4px; }
+    .photo img { max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #e2e8f0; display: block; margin-top: 4px; }
+    .footer { margin-top: 10px; font-size: 10px; color: #94a3b8; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 6px; }
+    .os-page + .os-page { margin-top: 18px; padding-top: 18px; border-top: 2px dashed #cbd5e1; page-break-before: always; }
+    @media print {
+      body { background: #fff; }
+    }
+  `;
+
+  const handleImprimirOs = (ordem) => {
+    const now = new Date();
+    const bloco = construirBlocoOsHtml(ordem, now);
+    const html = `
+      <!doctype html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Impressao OS</title>
+        <style>${OS_PRINT_STYLE}</style>
+      </head>
+      <body>
+        ${bloco}
+      </body>
+      </html>
+    `;
+
+    printHtmlRelatorio(html);
+  };
+
+  const handleImprimirOrdensPeriodo = () => {
+    const lista = relatorioOrdensFiltradas;
+    if (!lista || lista.length === 0) {
+      alert('Nenhuma OS encontrada no periodo selecionado.');
+      return;
+    }
+    const now = new Date();
+    const blocos = lista.map((ordem) => construirBlocoOsHtml(ordem, now)).join('');
+    const html = `
+      <!doctype html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Impressao OS - Periodo</title>
+        <style>${OS_PRINT_STYLE}</style>
+      </head>
+      <body>
+        ${blocos}
       </body>
       </html>
     `;
@@ -15161,6 +15198,13 @@ const custoDetalheTitulo = custoDetalheItem
                             className="px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-white transition-all duration-200"
                           >
                             PPT
+                          </button>
+                          <button
+                            onClick={handleImprimirOrdensPeriodo}
+                            title="Imprime uma folha detalhada para cada OS do periodo selecionado"
+                            className="px-3 py-1.5 rounded-lg border border-slate-700/60 bg-slate-900/30 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-white transition-all duration-200"
+                          >
+                            Imprimir OS do período
                           </button>
                         </>
                       )}
