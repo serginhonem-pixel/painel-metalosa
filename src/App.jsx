@@ -11,6 +11,7 @@ import municipiosLatLong from './data/municipios_brasil_latlong.json';
 import logoMetalosa from './data/logo.png';
 import absenteismoLeandro from './data/absenteismo_leandro_dez2025_jan2026.json';
 import vendedoresData from './data/vendedores.json';
+import gruposData from './data/grupos.json';
 import { maquinasBaseData, setoresBaseData } from './data/maquinasBase';
 import DashboardManutencaoTV from './components/DashboardManutencaoTV';
 import DashboardGlobalTV from './components/DashboardGlobalTV';
@@ -564,6 +565,12 @@ const normalizarDescricaoProduto = (valor) => {
   if (!texto || texto === '0') return '';
   if (/^\*+$/.test(texto)) return '';
   return texto;
+};
+
+const GRUPO_NOMES = (gruposData && gruposData.nomes) || {};
+const obterNomeGrupo = (codigo) => {
+  const cod = String(codigo ?? '').trim();
+  return GRUPO_NOMES[cod] || cod || 'Sem grupo';
 };
 
 const ensureSpacePdf = (doc, pageHeight, currentY, needed) => {
@@ -8278,7 +8285,22 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
 
   const handleExportarRelatorioExecutivoAnual = async () => {
     const ano = faturamentoAno;
-    const linhasAno = (faturamentoLinhas || []).filter((row) => obterMesKey(row)?.key?.startsWith(`${ano}-`));
+    const linhasAno = (faturamentoLinhas || [])
+      .filter((row) => obterMesKey(row)?.key?.startsWith(`${ano}-`))
+      // Respeita os filtros ativos do painel (Filial / Grupo / CFOP), igual ao dashboard.
+      .filter((row) => {
+        const ehDevolucao = normalizarTipoMovimento(row?.TipoMovimento ?? row?.tipoMovimento) === 'devolucao';
+        if (filtroFilial !== 'Todas' && obterFilialFaturamento(row) !== filtroFilial) return false;
+        if (filtroGrupo !== 'Todos') {
+          const grupoRow = row?.Grupo ?? row?.grupo ?? 'Sem grupo';
+          if (grupoRow !== filtroGrupo) return false;
+        }
+        if (filtroCfops.length > 0 && !ehDevolucao) {
+          const cfop = String(row?.CodFiscal ?? row?.codFiscal ?? row?.CFOP ?? row?.cfop ?? '').trim();
+          if (!cfop || !filtroCfops.includes(cfop)) return false;
+        }
+        return true;
+      });
     if (!linhasAno.length) return;
 
     const WEEKDAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
@@ -8310,8 +8332,7 @@ body{font-family:"Segoe UI",Helvetica,Arial,sans-serif;color:#0f172a;background:
       byFilial.set(filial, (byFilial.get(filial) || 0) + valor);
       byMonthFilial.set(`${mesInfo.key}|${filial}`, (byMonthFilial.get(`${mesInfo.key}|${filial}`) || 0) + valor);
 
-      const grupoRaw = row.Grupo;
-      const grupo = grupoRaw && String(grupoRaw).trim() ? String(grupoRaw).trim() : 'Sem grupo';
+      const grupo = obterNomeGrupo(row.Grupo);
       byGroup.set(grupo, (byGroup.get(grupo) || 0) + valor);
 
       const codigo = String(row.Codigo || '').trim();
