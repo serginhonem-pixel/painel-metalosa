@@ -1573,6 +1573,7 @@ export default function App() {
   const manutencaoRestritaEmails = [
     'manutencao@metalosa.com.br',
     'engsegtrab@metalosa.com.br',
+    'alcentral@metalosa.com.br',
     'wilson@metalosa.com.br',
     'breno.feitosa@metalosa.com.br',
     'alexandre.mendonca@metalosa.com.br',
